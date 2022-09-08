@@ -553,6 +553,10 @@ function maturity_date_of_the_month(frm) {
 		} 
 	}
 
+	if (previous_maturity_date < frm.doc.maturity_date) {
+		previous_maturity_date = frm.doc.maturity_date
+	}
+	
 	return {
 		'previous_maturity_date': previous_maturity_date,
 		'current_maturity_date': current_maturity_date
