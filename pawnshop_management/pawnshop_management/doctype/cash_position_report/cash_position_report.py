@@ -15,6 +15,9 @@ class CashPositionReport(Document):
 		a_pulled_out_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'change_status_date': self.date, 'item_series': 'A', 'workflow_state': 'Pulled Out', 'branch': self.branch})
 		a_returned_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'change_status_date': self.date, 'item_series': 'A', 'workflow_state': 'Returned', 'branch': self.branch})
 		a_total_active = frappe.db.count('Pawn Ticket Jewelry', {'date_loan_granted': ['<=', self.date], 'item_series': 'A', 'workflow_state': ['in', ['Active', 'Expired', 'Returned']], 'branch': self.branch})
+		a_in_principal_active = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', "date_loan_granted": self.date, 'workflow_state': 'Active'}, fields=['desired_principal'], pluck='desired_principal')
+		a_in_principal_renewed = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', "date_loan_granted": self.date, 'workflow_state': 'Renewed'}, fields=['desired_principal'], pluck='desired_principal')
+		a_in_principal = a_in_principal_active - a_in_principal_renewed
 
 		b_in_count_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'date_loan_granted': self.date ,'item_series': 'B', 'workflow_state': 'Active', 'branch': self.branch})
 		b_renewed_count_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'change_status_date': self.date, 'workflow_state': 'Renewed', 'item_series': 'B', 'branch': self.branch})
@@ -36,6 +39,7 @@ class CashPositionReport(Document):
 		invetory_count_doc.date = self.date
 		invetory_count_doc.branch = self.branch
 		invetory_count_doc.in_count_a = a_in_count
+		invetory_count_doc.principal_in_a = a_in_principal
 		invetory_count_doc.out_count_a = a_out_count
 		invetory_count_doc.returned_a = a_returned_of_the_day
 		invetory_count_doc.pulled_out_a = a_pulled_out_of_the_day

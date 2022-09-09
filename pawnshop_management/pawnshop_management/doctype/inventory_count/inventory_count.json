@@ -12,21 +12,33 @@
   "branch",
   "section_break_4",
   "in_count_a",
+  "principal_in_a",
   "out_count_a",
+  "principal_out_a",
   "returned_a",
+  "principal_ret_a",
   "pulled_out_a",
+  "principal_po_a",
   "total_a",
   "column_break_5",
   "in_count_b",
+  "principal_in_b",
   "out_count_b",
+  "principal_out_b",
   "returned_b",
+  "principal_ret_b",
   "pulled_out_b",
+  "principal_po_b",
   "total_b",
   "column_break_13",
   "in_count_nj",
+  "principal_in_nj",
   "out_count_nj",
+  "principal_out_nj",
   "returned_nj",
+  "principal_ret_nj",
   "pulled_out_nj",
+  "principal_po_nj",
   "total_nj"
  ],
  "fields": [
@@ -52,11 +64,11 @@
    "read_only": 1
   },
   {
+   "default": "0",
    "fieldname": "in_count_a",
    "fieldtype": "Int",
    "in_list_view": 1,
-   "label": "IN(A)",
-   "read_only": 1
+   "label": "IN(A)"
   },
   {
    "default": "0",
@@ -123,11 +135,11 @@
    "label": "Total(NJ)"
   },
   {
+   "default": "0",
    "fieldname": "out_count_a",
    "fieldtype": "Int",
    "in_list_view": 1,
-   "label": "OUT(A)",
-   "read_only": 1
+   "label": "OUT(A)"
   },
   {
    "default": "0",
@@ -160,11 +172,82 @@
   {
    "fieldname": "section_break_4",
    "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "principal_in_a",
+   "fieldtype": "Currency",
+   "label": "Principal In(A)"
+  },
+  {
+   "default": "0",
+   "fieldname": "principal_out_a",
+   "fieldtype": "Currency",
+   "label": "Principal Out(A)"
+  },
+  {
+   "default": "0",
+   "fieldname": "principal_ret_a",
+   "fieldtype": "Currency",
+   "label": "Principal R(A)"
+  },
+  {
+   "default": "0",
+   "fieldname": "principal_po_a",
+   "fieldtype": "Currency",
+   "label": "Principal PO(A)"
+  },
+  {
+   "default": "0",
+   "fieldname": "principal_in_b",
+   "fieldtype": "Currency",
+   "label": "Principal In(B)"
+  },
+  {
+   "default": "0",
+   "fieldname": "principal_out_b",
+   "fieldtype": "Currency",
+   "label": "Principal Out(B)"
+  },
+  {
+   "default": "0",
+   "fieldname": "principal_ret_b",
+   "fieldtype": "Currency",
+   "label": "Principal R(B)"
+  },
+  {
+   "default": "0",
+   "fieldname": "principal_po_b",
+   "fieldtype": "Currency",
+   "label": "Principal PO(B)"
+  },
+  {
+   "default": "0",
+   "fieldname": "principal_in_nj",
+   "fieldtype": "Currency",
+   "label": "Principal In(NJ)"
+  },
+  {
+   "fieldname": "principal_out_nj",
+   "fieldtype": "Currency",
+   "label": "Principal Out(NJ)"
+  },
+  {
+   "default": "0",
+   "fieldname": "principal_ret_nj",
+   "fieldtype": "Currency",
+   "label": "Principal R(NJ)"
+  },
+  {
+   "default": "0",
+   "fieldname": "principal_po_nj",
+   "fieldtype": "Currency",
+   "label": "Principal PO(NJ)"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-08-03 15:57:15.626720",
+ "modified": "2022-09-09 14:16:10.566733",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Inventory Count",
