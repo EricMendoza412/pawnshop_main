@@ -19,7 +19,7 @@ class CashPositionReport(Document):
 		a_in_principal_renewed = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', "date_loan_granted": self.date, 'workflow_state': 'Renewed'}, fields=['desired_principal'], pluck='desired_principal')
 			
 		sum_active_in = 0
-		for record in a_in_principal:
+		for record in a_in_principal_active:
 			sum_active_in += record
 		sum_renewed_in = 0
 		for record in a_in_principal_renewed:
