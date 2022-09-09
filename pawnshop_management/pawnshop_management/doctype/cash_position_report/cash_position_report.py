@@ -16,7 +16,7 @@ class CashPositionReport(Document):
 		a_returned_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'change_status_date': self.date, 'item_series': 'A', 'workflow_state': 'Returned', 'branch': self.branch})
 		a_total_active = frappe.db.count('Pawn Ticket Jewelry', {'date_loan_granted': ['<=', self.date], 'item_series': 'A', 'workflow_state': ['in', ['Active', 'Expired', 'Returned']], 'branch': self.branch})
 		a_in_principal_active = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', "date_loan_granted": self.date, 'workflow_state': 'Active'}, fields=['desired_principal'], pluck='desired_principal')
-		a_in_principal_renewed = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', "date_loan_granted": self.date, 'workflow_state': 'Renewed'}, fields=['desired_principal'], pluck='desired_principal')
+		a_in_principal_renewed = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', "change_status_date": self.date, 'workflow_state': 'Renewed'}, fields=['desired_principal'], pluck='desired_principal')
 			
 		sum_active_in = 0
 		for record in a_in_principal_active:
