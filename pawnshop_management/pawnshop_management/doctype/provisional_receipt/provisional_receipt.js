@@ -406,7 +406,11 @@ function calculate_maturity_date_interest(frm) {
 			console.log("SC1");
 			if (temp_maturity_date.previous_maturity_date <= date_today && tawad_until_date >= date_today) {
 				console.log("SC1-1");
-				temp_interest = temp_interest * (multiplier - 1);
+				if (multiplier == 1 && frm.doc.date_issued > frm.doc.maturity_date) {
+					temp_interest = temp_interest * (multiplier);
+				} else {
+					temp_interest = temp_interest * (multiplier - 1);
+				}
 			} else {
 				console.log("SC1-2");
 				console.log(multiplier);
@@ -417,7 +421,7 @@ function calculate_maturity_date_interest(frm) {
 			temp_interest = 0.00;
 		}
 		console.log("Multiplier after: " + String(multiplier));
-		console.log(temp_interest);
+		console.log("Interest: " + temp_interest);
 		frm.set_value('interest_payment', temp_interest);
 		frm.refresh_field('interest_payment');
 	});
@@ -481,9 +485,11 @@ function calculate_date_difference(current_date, due_date) {
 		month_difference -= 1;
 	}
 
+	console.log("Month difference: " + month_difference);
+
 	return {
 		"days": day_difference,
-		"months": month_difference,
+		"months": month_difference
 	}
 }
 
@@ -551,6 +557,10 @@ function maturity_date_of_the_month(frm) {
 				previous_maturity_date = frappe.datetime.add_months(current_maturity_date, -1);
 			} 
 		} 
+	}
+
+	if (previous_maturity_date < frm.doc.maturity_date) {
+		previous_maturity_date = frm.doc.maturity_date
 	}
 
 	return {
