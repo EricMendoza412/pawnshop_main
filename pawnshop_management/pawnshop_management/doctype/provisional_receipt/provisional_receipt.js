@@ -406,9 +406,11 @@ function calculate_maturity_date_interest(frm) {
 			console.log("SC1");
 			if (temp_maturity_date.previous_maturity_date <= date_today && tawad_until_date >= date_today) {
 				console.log("SC1-1");
-				if (multiplier == 1 && frm.doc.date_issued > frm.doc.maturity_date) {
+				if (multiplier == 1 && frm.doc.date_issued > frm.doc.maturity_date && date_today > tawad_until_date) {
+					console.log("SC1-1A");
 					temp_interest = temp_interest * (multiplier);
 				} else {
+					console.log("SC1-1B");
 					temp_interest = temp_interest * (multiplier - 1);
 				}
 			} else {
@@ -436,6 +438,7 @@ function calculate_maturity_date_interest(frm) {
 // 		'current_maturity_date': next_maturity_date
 // 	}
 // }
+
 
 
 function calculate_date_difference(current_date, due_date) {
