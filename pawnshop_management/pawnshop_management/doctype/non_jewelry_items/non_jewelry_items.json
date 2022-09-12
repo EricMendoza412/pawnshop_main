@@ -297,14 +297,15 @@
   },
   {
    "fieldname": "branch",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "Branch",
+   "options": "Branch",
    "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-11 09:35:20.596701",
+ "modified": "2022-09-12 09:47:22.752658",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",

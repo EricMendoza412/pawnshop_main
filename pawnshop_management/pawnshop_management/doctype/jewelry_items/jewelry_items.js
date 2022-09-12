@@ -57,6 +57,12 @@ frappe.ui.form.on('Jewelry Items', {
 	// },
 
 	refresh: function(frm){
+		let is_allowed = frappe.user_roles.includes('Administrator');
+		frm.toggle_enable(
+			[
+				"branch"
+			],
+			 is_allowed);
 		frm.toggle_display(['sizelength', 'selling_price', 'selling_price_per_gram'], frm.doc.workflow_state === "Pulled Out" || frm.doc.workflow_state === "Scrap" || frm.doc.workflow_state === "On Display" || frm.doc.workflow_state === "Sold")
 		frappe.call({
 			method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip',

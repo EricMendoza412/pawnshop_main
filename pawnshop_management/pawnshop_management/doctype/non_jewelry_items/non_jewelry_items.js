@@ -3,6 +3,12 @@
 
 frappe.ui.form.on('Non Jewelry Items', {
 	refresh: function(frm){
+		let is_allowed = frappe.user_roles.includes('Administrator');
+		frm.toggle_enable(
+			[
+				"branch"
+			],
+			 is_allowed);
 		if (frm.is_new()) {
 			frappe.call({
 				method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip',

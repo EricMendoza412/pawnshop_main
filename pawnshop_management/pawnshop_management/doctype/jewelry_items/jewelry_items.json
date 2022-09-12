@@ -157,8 +157,9 @@
   },
   {
    "fieldname": "branch",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "Branch",
+   "options": "Branch",
    "read_only": 1
   },
   {
@@ -217,7 +218,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-08-30 17:54:24.752102",
+ "modified": "2022-09-12 09:46:55.108598",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Jewelry Items",
