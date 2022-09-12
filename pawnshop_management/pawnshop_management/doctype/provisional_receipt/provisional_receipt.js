@@ -411,7 +411,7 @@ function calculate_maturity_date_interest(frm) {
 					temp_interest = temp_interest * (multiplier);
 				} else {
 					console.log("SC1-1B");
-					temp_interest = temp_interest * (multiplier - 1);
+					temp_interest = temp_interest * (multiplier - 1); //sifiuadfiodsf
 				}
 			} else {
 				console.log("SC1-2");
