@@ -130,7 +130,8 @@ frappe.ui.form.on('Provisional Receipt', {
 							'Returned',
 							'Expired'
 						]
-					]
+					],
+					"branch": frm.doc.branch
 				}
 			}
 		})
@@ -944,13 +945,13 @@ function get_new_pawn_ticket_no(frm) {
 					frappe.db.get_value("Pawnshop Naming Series", "Garcia's Pawnshop - POB", "a_series")
 					.then(r => {
 						let current_count = r.message.a_series;
-						new_pawn_ticket_no(frm, "6-", current_count, 'A');
+						new_pawn_ticket_no(frm, "3-", current_count, 'A');
 					})
 				} else if (data.message.item_series == "B") {
 					frappe.db.get_value("Pawnshop Naming Series", "Garcia's Pawnshop - POB", "b_series")
 					.then(r => {
 						let current_count = r.message.b_series;
-						new_pawn_ticket_no(frm, "6-", current_count, 'B');
+						new_pawn_ticket_no(frm, "3-", current_count, 'B');
 					})
 				}
 			})
@@ -958,7 +959,7 @@ function get_new_pawn_ticket_no(frm) {
 			frappe.db.get_value("Pawnshop Naming Series", "Garcia's Pawnshop - POB", "b_series")
 			.then(r => {
 				let current_count = r.message.b_series;
-				new_pawn_ticket_no(frm, "6-", current_count, 'B');
+				new_pawn_ticket_no(frm, "3-", current_count, 'B');
 			})
 		}
 	} else if (frm.doc.branch == "Garcia's Pawnshop - TNZ") {
@@ -969,13 +970,13 @@ function get_new_pawn_ticket_no(frm) {
 					frappe.db.get_value("Pawnshop Naming Series", "Garcia's Pawnshop - TNZ", "a_series")
 					.then(r => {
 						let current_count = r.message.a_series;
-						new_pawn_ticket_no(frm, "6-", current_count, 'A');
+						new_pawn_ticket_no(frm, "5-", current_count, 'A');
 					})
 				} else if (data.message.item_series == "B") {
 					frappe.db.get_value("Pawnshop Naming Series", "Garcia's Pawnshop - TNZ", "b_series")
 					.then(r => {
 						let current_count = r.message.b_series;
-						new_pawn_ticket_no(frm, "6-", current_count, 'B');
+						new_pawn_ticket_no(frm, "5-", current_count, 'B');
 					})
 				}
 			})
@@ -983,7 +984,7 @@ function get_new_pawn_ticket_no(frm) {
 			frappe.db.get_value("Pawnshop Naming Series", "Garcia's Pawnshop - TNZ", "b_series")
 			.then(r => {
 				let current_count = r.message.b_series;
-				new_pawn_ticket_no(frm, "6-", current_count, 'B');
+				new_pawn_ticket_no(frm, "5-", current_count, 'B');
 			})
 		}
 	}
