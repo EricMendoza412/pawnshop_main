@@ -102,7 +102,8 @@ frappe.ui.form.on('Jewelry Items', {
 						"in", 
 						[
 							"Appraiser",
-							"Supervisor"
+							"Supervisor",
+							"Appraiser/Cashier"
 						]
 					]
 				}
@@ -181,6 +182,10 @@ frappe.ui.form.on('Jewelry Karat List', {
 
 	weight: function(frm, cdt, cdn){
 		set_total_weight(frm, cdt, cdn)
+	},
+
+	karat_remove: function(frm, cdt, cdn){
+
 	}
 });
 
