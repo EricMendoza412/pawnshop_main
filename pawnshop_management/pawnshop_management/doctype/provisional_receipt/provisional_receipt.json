@@ -27,6 +27,11 @@
   "previous_interest_payment",
   "redeemables_section",
   "items",
+  "for_dummy_accounts_section",
+  "customer_tracking_no",
+  "customer_name",
+  "actual_items_j",
+  "actual_items_nj",
   "payments_section",
   "interest_payment",
   "discount",
@@ -263,12 +268,45 @@
   {
    "fieldname": "column_break_28",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "for_dummy_accounts_section",
+   "fieldtype": "Section Break",
+   "label": "For Dummy Accounts"
+  },
+  {
+   "fieldname": "customer_tracking_no",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Customer Tracking No",
+   "options": "Customer"
+  },
+  {
+   "fetch_from": "customer_tracking_no.customer_name",
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Customer Name"
+  },
+  {
+   "fieldname": "actual_items_j",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Actual Items J",
+   "options": "Jewelry List"
+  },
+  {
+   "fieldname": "actual_items_nj",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Actual Items NJ",
+   "options": "Non Jewelry List"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-22 12:03:22.978633",
+ "modified": "2022-09-14 10:13:37.312666",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Provisional Receipt",

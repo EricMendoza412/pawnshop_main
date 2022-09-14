@@ -137,9 +137,9 @@ frappe.ui.form.on('Provisional Receipt', {
 		})
 
 		frm.add_custom_button('Test Button', () => {
-			var date_difference = calculate_date_difference(frm.doc.date_issued, frm.doc.maturity_date)
-			console.log("Difference in Days: " + date_difference.days);
-			console.log("Difference in Months: " + date_difference.months);
+			var word = String(frm.doc.complete_name).lastIndexOf("Dummy");
+			console.log(word);
+			frm.toggle_display(['customer_tracking_no', 'customer_name', 'actual_items_j', 'actual_items_nj'], word != -1)
 		})
 
 	},
@@ -166,6 +166,10 @@ frappe.ui.form.on('Provisional Receipt', {
 		calculate_interest(frm);
 	},
 
+	pawn_ticket_type: function(frm){
+		show_fields_for_dummy(frm)
+	},
+
 	pawn_ticket_no: function(frm){
 		frm.clear_table('items');
 		show_items(frm.doc.pawn_ticket_type, frm.doc.pawn_ticket_no);
@@ -187,6 +191,14 @@ frappe.ui.form.on('Provisional Receipt', {
 		show_previous_interest_payment(frm);
 		select_transaction_type(frm)
 		calculate_interest(frm);
+		var word = String(frm.doc.complete_name).lastIndexOf("Dummy");
+		console.log(word);
+		frm.toggle_display(['customer_tracking_no', 'customer_name'], word != -1)
+		show_fields_for_dummy(frm)
+	},
+
+	complete_name: function(frm){
+		show_fields_for_dummy(frm)		
 	},
 
 	transaction_type: function(frm){
@@ -338,6 +350,18 @@ frappe.ui.form.on('Provisional Receipt', {
 	}
 });
 
+function show_fields_for_dummy(frm) {
+	var word = String(frm.doc.complete_name).lastIndexOf("Dummy");
+	frm.toggle_display(['actual_items_j'], word != -1 && frm.doc.pawn_ticket_type == 'Pawn Ticket Jewelry')
+	frm.toggle_display(['actual_items_nj'], word != -1 && frm.doc.pawn_ticket_type == 'Pawn Ticket Non Jewelry')
+	if (frm.doc.pawn_ticket_type == 'Pawn Ticket Jewelry') {
+		cur_frm.clear_table('actual_items_nj')
+		frm.refresh_field('actual_items_nj')
+	} else if (frm.doc.pawn_ticket_type == 'Pawn Ticket Non Jewelry') {
+		cur_frm.clear_table('actual_items_j')
+		frm.refresh_field('actual_items_j')
+	}
+}
 
 function show_payment_fields(frm) {
 	frm.set_df_property('amortization', 'hidden', 0);
