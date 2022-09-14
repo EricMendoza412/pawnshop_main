@@ -116,7 +116,6 @@
   {
    "fieldname": "batch_number",
    "fieldtype": "Int",
-   "hidden": 1,
    "label": "Batch Number"
   },
   {
@@ -218,7 +217,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-09-12 09:46:55.108598",
+ "modified": "2022-09-12 10:46:19.133052",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Jewelry Items",
