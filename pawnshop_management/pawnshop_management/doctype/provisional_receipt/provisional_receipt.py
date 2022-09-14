@@ -91,6 +91,22 @@ class ProvisionalReceipt(Document):
 			new_pawn_ticket.net_proceeds = previous_pawn_ticket.net_proceeds
 			new_pawn_ticket.save(ignore_permissions=True)
 			new_pawn_ticket.submit()
+			# if "Dummy" in self.complete_name:
+			# 	if self.pawn_ticket_type == "Pawn Ticket Jewelry":
+			# 		previous_pawn_ticket = frappe.get_doc(self.pawn_ticket_type, self.pawn_ticket_no)
+			# 		new_pawn_ticket = frappe.new_doc(self.pawn_ticket_type)
+			# 		new_pawn_ticket.branch = self.branch
+			# 		new_pawn_ticket.item_series = previous_pawn_ticket.item_series
+			# 		new_pawn_ticket.pawn_ticket = self.new_pawn_ticket_no
+			# 		new_pawn_ticket.date_loan_granted = self.date_issued
+			# 		new_pawn_ticket.old_pawn_ticket = self.pawn_ticket_no
+			# 		new_pawn_ticket.maturity_date = add_to_date(self.date_issued, days=30)
+			# 		new_pawn_ticket.customers_tracking_no = self.customer_tracking_no
+			# 		new_pawn_ticket.customers_full_name = self.customer_name
+			# 		new_pawn_ticket.inventory_tracking_no = previous_pawn_ticket.inventory_tracking_no
+			# 		new_pawn_ticket.created_by_pr = self.name
+
+			
 
 		elif self.transaction_type == "Amortization":
 			interest_rate = frappe.get_doc('Pawnshop Management Settings')
