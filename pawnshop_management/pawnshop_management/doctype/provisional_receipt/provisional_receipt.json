@@ -282,11 +282,13 @@
    "options": "Customer"
   },
   {
+   "default": "     ",
    "fetch_from": "customer_tracking_no.customer_name",
    "fieldname": "customer_name",
    "fieldtype": "Data",
    "hidden": 1,
-   "label": "Customer Name"
+   "label": "Customer Name",
+   "read_only": 1
   },
   {
    "fieldname": "actual_items_j",
@@ -306,7 +308,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-09-14 10:13:37.312666",
+ "modified": "2022-09-14 14:30:04.728570",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Provisional Receipt",

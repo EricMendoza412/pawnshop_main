@@ -116,7 +116,9 @@
   {
    "fieldname": "batch_number",
    "fieldtype": "Int",
-   "label": "Batch Number"
+   "hidden": 1,
+   "label": "Batch Number",
+   "read_only": 1
   },
   {
    "fieldname": "appraisers_section",
@@ -217,7 +219,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-09-12 10:46:19.133052",
+ "modified": "2022-09-14 16:06:25.971481",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Jewelry Items",

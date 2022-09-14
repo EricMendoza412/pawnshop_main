@@ -142,6 +142,102 @@ frappe.ui.form.on('Provisional Receipt', {
 			frm.toggle_display(['customer_tracking_no', 'customer_name', 'actual_items_j', 'actual_items_nj'], word != -1)
 		})
 
+		frappe.call({
+			method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip_from_settings'
+		}).then(result => {
+			let branch_ip_settings = result.message;
+
+		frappe.call({
+			method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip'
+		}).then(ip => {
+			if (ip.message == branch_ip_settings["rabies_house"] || ip.message == branch_ip_settings["rabies_house"]) {
+				
+					frappe.db.get_value('Pawnshop Naming Series', "Rabie's House", 'jewelry_inventory_count')
+					.then(r =>{
+						let jewelry_inventory_count = r.message.jewelry_inventory_count
+						frm.set_query('item_no', 'actual_items_j', function(){
+						return {
+							filters: {
+								batch_number: String(jewelry_inventory_count),
+								branch: "Rabie's House"
+							}
+						}
+							})
+						})
+				
+						frappe.db.get_value('Pawnshop Naming Series', "Rabie's House", 'inventory_count')
+						.then(r =>{
+							let inventory_count = r.message.inventory_count
+							frm.set_query('item_no', 'actual_items_nj', function(){
+								return {
+									filters: {
+										batch_number: String(inventory_count),
+										branch: "Rabie's House"
+									}
+								}
+							})
+						})
+					
+				} else if (ip.message == branch_ip_settings["gtc"]) {
+					if (frm.doc.item_series == "A") {
+						frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - GTC", 'jewelry_inventory_count')
+						.then(r =>{
+							let jewelry_inventory_count = r.message.jewelry_inventory_count
+							frm.set_query('item_no', 'jewelry_items', function(){
+								return {
+									filters: {
+										batch_number: String(jewelry_inventory_count),
+										branch: "Garcia's Pawnshop - GTC"
+									}
+								}
+							})
+						})
+					} else if (frm.doc.item_series == "B") {
+						frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - GTC", 'jewelry_inventory_count')
+						.then(r =>{
+							let jewelry_inventory_count = r.message.jewelry_inventory_count
+							frm.set_query('item_no', 'jewelry_items', function(){
+								return {
+									filters: {
+										batch_number: String(jewelry_inventory_count),
+										branch: "Garcia's Pawnshop - GTC"
+									}
+								}
+							})
+						})
+					}
+				} else if (ip.message == branch_ip_settings["tanza"]) {
+					if (frm.doc.item_series == "A") {
+						frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - TNZ", 'jewelry_inventory_count')
+						.then(r =>{
+							let jewelry_inventory_count = r.message.jewelry_inventory_count
+							frm.set_query('item_no', 'jewelry_items', function(){
+								return {
+									filters: {
+										batch_number: String(jewelry_inventory_count),
+										branch: "Garcia's Pawnshop - TNZ"
+									}
+								}
+							})
+						})
+					} else if (frm.doc.item_series == "B") {
+						frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - TNZ", 'jewelry_inventory_count')
+						.then(r =>{
+							let jewelry_inventory_count = r.message.jewelry_inventory_count
+							frm.set_query('item_no', 'jewelry_items', function(){
+								return {
+									filters: {
+										batch_number: String(jewelry_inventory_count),
+										branch: "Garcia's Pawnshop - TNZ"
+									}
+								}
+							})
+						})
+					}
+				}
+			})
+		})
+
 	},
 
 	branch: function(frm){
@@ -167,7 +263,15 @@ frappe.ui.form.on('Provisional Receipt', {
 	},
 
 	pawn_ticket_type: function(frm){
-		show_fields_for_dummy(frm)
+		// try {
+		// frm.set_value('pawn_ticket_no',"");
+		// frm.refresh_field('pawn_ticket_no');
+		//   }
+		//   catch(err) {
+		// 	frappe.msgprint(__('Error handled'));
+		//   }
+		frm.set_df_property('pawn_ticket_type', 'read_only', 1);
+		show_fields_for_dummy(frm);
 	},
 
 	pawn_ticket_no: function(frm){
@@ -193,7 +297,6 @@ frappe.ui.form.on('Provisional Receipt', {
 		calculate_interest(frm);
 		var word = String(frm.doc.complete_name).lastIndexOf("Dummy");
 		console.log(word);
-		frm.toggle_display(['customer_tracking_no', 'customer_name'], word != -1)
 		show_fields_for_dummy(frm)
 	},
 
@@ -202,6 +305,7 @@ frappe.ui.form.on('Provisional Receipt', {
 	},
 
 	transaction_type: function(frm){
+		show_fields_for_dummy(frm);
 		frm.set_value('bank_payment', 0.00);
 		frm.set_value('gcash_amount_payment', 0.00);
 		frm.set_value('cash', 0.00);
@@ -350,10 +454,88 @@ frappe.ui.form.on('Provisional Receipt', {
 	}
 });
 
+frappe.ui.form.on('Jewelry List', {
+
+	item_no: function(frm, cdt, cdn){
+		let table_length = parseInt(frm.doc.actual_items_j.length)
+		if (frm.doc.actual_items_j.length > 1) {
+			for (let index = 0; index < table_length - 1; index++) {
+				if (frm.doc.actual_items_j[table_length-1].item_no == frm.doc.actual_items_j[index].item_no) {
+					frm.doc.actual_items_j.pop(table_length-1);
+					frm.refresh_field('actual_items_j');
+					frappe.msgprint({
+						title:__('Notification'),
+						indicator:'red',
+						message: __('Added item is already in the list. Item removed.')
+					});
+					//set_total_appraised_amount(frm, cdt, cdn);
+				}
+			}
+		}	
+
+		
+	},
+	actual_items_j_add: function(frm, cdt, cdn){
+		let table_length = parseInt(frm.doc.actual_items_j.length)
+		if (table_length > 4) {
+			frm.fields_dict["actual_items_j"].grid.grid_buttons.find(".grid-add-row")[0].style.visibility = "hidden";
+		}
+	},
+
+	suggested_appraisal_value: function(frm, cdt, cdn){
+		//set_total_appraised_amount(frm,cdt, cdn);
+	},
+
+	actual_items_j_remove: function(frm, cdt, cdn){ //calculate appraisal value when removing items
+		let table_length = parseInt(frm.doc.actual_items_j.length)
+		//set_total_appraised_amount(frm, cdt, cdn);
+		if (table_length <= 4) {
+			frm.fields_dict["actual_items_j"].grid.grid_buttons.find(".grid-add-row")[0].style.visibility = "visible";
+		}
+	}
+});
+
+frappe.ui.form.on('Non Jewelry List', {
+	item_no: function(frm, cdt, cdn){
+		let table_length = parseInt(frm.doc.actual_items_nj.length)
+		if (frm.doc.actual_items_nj.length > 1) {
+			// for (let index = 0; index < table_length - 1; index++) {
+			// 	if (frm.doc.non_jewelry_items[table_length-1].item_no == frm.doc.non_jewelry_items[index].item_no) {
+			// 		frm.doc.non_jewelry_items.pop(table_length-1);
+			// 		frm.refresh_field('actual_items_nj');
+			// 		frappe.msgprint({
+			// 			title:__('Notification'),
+			// 			indicator:'red',
+			// 			message: __('Added item is already in the list. Item removed.')
+			// 		});
+			// 		set_total_appraised_amount(frm, cdt, cdn);
+			// 	}
+			// }
+		}	
+	},
+
+	// suggested_appraisal_value: function(frm, cdt, cdn){
+	// 	set_total_appraised_amount(frm,cdt, cdn);
+	// },
+
+	actual_items_nj_remove: function(frm, cdt, cdn){
+		//set_total_appraised_amount(frm, cdt, cdn);
+		frm.fields_dict["actual_items_nj"].grid.grid_buttons.find(".grid-add-row")[0].style.visibility = "visible";
+	},
+
+	actual_items_nj_add: function(frm, cdt, cdn){
+		frm.fields_dict["actual_items_nj"].grid.grid_buttons.find(".grid-add-row")[0].style.visibility = "hidden";
+	}
+});
+
 function show_fields_for_dummy(frm) {
+	console.log("pumasok dito");
+	frm.set_value('customer_name', "  ");
+	frm.refresh_field('customer_name');
 	var word = String(frm.doc.complete_name).lastIndexOf("Dummy");
-	frm.toggle_display(['actual_items_j'], word != -1 && frm.doc.pawn_ticket_type == 'Pawn Ticket Jewelry')
-	frm.toggle_display(['actual_items_nj'], word != -1 && frm.doc.pawn_ticket_type == 'Pawn Ticket Non Jewelry')
+	frm.toggle_display(['customer_tracking_no', 'customer_name'], word != -1 && (frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization'))
+	frm.toggle_display(['actual_items_j'], word != -1 && frm.doc.pawn_ticket_type == 'Pawn Ticket Jewelry' && (frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization'))
+	frm.toggle_display(['actual_items_nj'], word != -1 && frm.doc.pawn_ticket_type == 'Pawn Ticket Non Jewelry' && (frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization'))
 	if (frm.doc.pawn_ticket_type == 'Pawn Ticket Jewelry') {
 		cur_frm.clear_table('actual_items_nj')
 		frm.refresh_field('actual_items_nj')

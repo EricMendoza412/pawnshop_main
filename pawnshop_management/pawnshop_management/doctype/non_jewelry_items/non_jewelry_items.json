@@ -271,6 +271,7 @@
    "fieldtype": "Int",
    "hidden": 1,
    "label": "Batch Number",
+   "read_only": 1,
    "set_only_once": 1
   },
   {
@@ -305,7 +306,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-09-12 09:47:22.752658",
+ "modified": "2022-09-14 16:06:50.944050",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",

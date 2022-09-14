@@ -277,16 +277,16 @@ frappe.ui.form.on('Non Jewelry List', {
 		let table_length = parseInt(frm.doc.non_jewelry_items.length)
 		if (frm.doc.non_jewelry_items.length > 1) {
 			for (let index = 0; index < table_length - 1; index++) {
-				if (frm.doc.non_jewelry_items[table_length-1].item_no == frm.doc.non_jewelry_items[index].item_no) {
-					frm.doc.non_jewelry_items.pop(table_length-1);
-					frm.refresh_field('jewelry_items');
-					frappe.msgprint({
-						title:__('Notification'),
-						indicator:'red',
-						message: __('Added item is already in the list. Item removed.')
-					});
-					set_total_appraised_amount(frm, cdt, cdn);
-				}
+				// if (frm.doc.non_jewelry_items[table_length-1].item_no == frm.doc.non_jewelry_items[index].item_no) {
+				// 	frm.doc.non_jewelry_items.pop(table_length-1);
+				// 	//frm.refresh_field('non_jewelry_items');
+				// 	// frappe.msgprint({
+				// 	// 	title:__('Notification'),
+				// 	// 	indicator:'red',
+				// 	// 	message: __('Added item is already in the list. Item removed.')
+				// 	// });
+				// 	set_total_appraised_amount(frm, cdt, cdn);
+				// }
 			}
 		}	
 	},
