@@ -170,7 +170,6 @@ frappe.ui.form.on('Jewelry Items', {
 
 frappe.ui.form.on('Jewelry Karat List', {
 	karat: function(frm, cdt, cdn){
-		console.log(frm.doc.karats.length);
 		if (frm.doc.karats.length> 1) {
 			frm.set_value('karat', 'Multiple Karat');
 			frm.refresh_field('karat')
@@ -184,8 +183,9 @@ frappe.ui.form.on('Jewelry Karat List', {
 		set_total_weight(frm, cdt, cdn)
 	},
 
-	karat_remove: function(frm, cdt, cdn){
-
+	karats_remove: function(frm, cdt, cdn){
+		console.log("Hello");
+		set_total_weight(frm, cdt, cdn)
 	}
 });
 

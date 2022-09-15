@@ -40,6 +40,10 @@ frappe.ui.form.on('Provisional Receipt', {
 	// },
 
 	refresh: function(frm) {
+		frm.toggle_display(['bank'], frm.doc.mode_of_payment === 'Bank Transfer' || frm.doc.mode_of_payment === 'Cash & Bank Transfer' || frm.doc.mode_of_payment === 'GCash & Bank Transfer');
+		frm.toggle_display(['bank_payment'], frm.doc.mode_of_payment === 'Cash & Bank Transfer' || frm.doc.mode_of_payment === 'GCash & Bank Transfer');
+		frm.toggle_display(['cash'], frm.doc.mode_of_payment === 'Cash & Bank Transfer' || frm.doc.mode_of_payment === 'Cash & GCash');
+		frm.toggle_display(['gcash_amount_payment'], frm.doc.mode_of_payment === 'GCash & Bank Transfer' || frm.doc.mode_of_payment === 'Cash & GCash');
 		let is_allowed = frappe.user_roles.includes('Administrator');
 		frm.toggle_enable(['date_loan_granted' ,'expiry_date', 'maturity_date', 'branch'], is_allowed);
 		if ((frm.doc.discount != 0 || frm.doc.discount != null) && frm.doc.docstatus == 1) {
@@ -136,11 +140,9 @@ frappe.ui.form.on('Provisional Receipt', {
 			}
 		})
 
-		frm.add_custom_button('Test Button', () => {
-			var word = String(frm.doc.complete_name).lastIndexOf("Dummy");
-			console.log(word);
-			frm.toggle_display(['customer_tracking_no', 'customer_name', 'actual_items_j', 'actual_items_nj'], word != -1)
-		})
+		// frm.add_custom_button('Test Button', () => {
+		// 	frappe.call('')
+		// })
 
 		frappe.call({
 			method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip_from_settings'
@@ -555,7 +557,6 @@ function show_payment_fields(frm) {
 }
 
 function calculate_interest(frm) {
-	
 	frm.set_value('interest_payment', 0.00);
 	frm.refresh_field('interest_payment');
 	var date_today = frm.doc.date_issued;											//frappe.datetime.get_today()
