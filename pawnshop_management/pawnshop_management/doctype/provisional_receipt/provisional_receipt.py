@@ -102,12 +102,12 @@ class ProvisionalReceipt(Document):
 					new_pawn_ticket.expiry_date = add_to_date(self.date_issued, days=90)
 					for i in range(len(actual_items)):
 						new_pawn_ticket.append("non_jewelry_items", {
-							"item_no": actual_items_nj[i].item_no,
-							"type": actual_items_nj[i].type,
-							"brand": actual_items_nj[i].brand,
-							"model": actual_items_nj[i].model,
-							"model_number": actual_items_nj[i].model_number,
-							"suggested_appraisal_value": actual_items_nj[i].suggested_appraisal_value
+							"item_no": actual_items[i].item_no,
+							"type": actual_items[i].type,
+							"brand": actual_items[i].brand,
+							"model": actual_items[i].model,
+							"model_number": actual_items[i].model_number,
+							"suggested_appraisal_value": actual_items[i].suggested_appraisal_value
 						})
 			elif "Dummy" not in self.complete_name: 
 				previous_pawn_ticket = frappe.get_doc(self.pawn_ticket_type, self.pawn_ticket_no)
