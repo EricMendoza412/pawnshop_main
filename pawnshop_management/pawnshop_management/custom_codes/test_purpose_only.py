@@ -4,6 +4,7 @@ from frappe.utils import add_to_date
 import frappe
 
 @frappe.whitelist()
-def add_months(date):
-    months = add_to_date(date, months=-6)
-    return months
+def get_child():
+    doc = frappe.get_doc('Pawn Ticket Non Jewelry', '20-86B')
+    for child_doc in doc.get_children():
+        print(child_doc.name)

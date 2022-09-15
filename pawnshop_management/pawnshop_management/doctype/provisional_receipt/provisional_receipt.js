@@ -40,6 +40,7 @@ frappe.ui.form.on('Provisional Receipt', {
 	// },
 
 	refresh: function(frm) {
+		frm.toggle_display(['new_pawn_ticket_no'], (frm.doc.new_pawn_ticket_no != ""))
 		frm.toggle_display(['bank'], frm.doc.mode_of_payment === 'Bank Transfer' || frm.doc.mode_of_payment === 'Cash & Bank Transfer' || frm.doc.mode_of_payment === 'GCash & Bank Transfer');
 		frm.toggle_display(['bank_payment'], frm.doc.mode_of_payment === 'Cash & Bank Transfer' || frm.doc.mode_of_payment === 'GCash & Bank Transfer');
 		frm.toggle_display(['cash'], frm.doc.mode_of_payment === 'Cash & Bank Transfer' || frm.doc.mode_of_payment === 'Cash & GCash');
@@ -531,11 +532,11 @@ frappe.ui.form.on('Non Jewelry List', {
 });
 
 function show_fields_for_dummy(frm) {
-	console.log("pumasok dito");
 	frm.set_value('customer_name', "  ");
 	frm.refresh_field('customer_name');
 	var word = String(frm.doc.complete_name).lastIndexOf("Dummy");
 	frm.toggle_display(['customer_tracking_no', 'customer_name'], word != -1 && (frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization'))
+	frm.toggle_reqd('customer_tracking_no', word != -1)
 	frm.toggle_display(['actual_items_j'], word != -1 && frm.doc.pawn_ticket_type == 'Pawn Ticket Jewelry' && (frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization'))
 	frm.toggle_display(['actual_items_nj'], word != -1 && frm.doc.pawn_ticket_type == 'Pawn Ticket Non Jewelry' && (frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization'))
 	if (frm.doc.pawn_ticket_type == 'Pawn Ticket Jewelry') {
