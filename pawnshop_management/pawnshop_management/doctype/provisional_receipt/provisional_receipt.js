@@ -38,6 +38,9 @@ frappe.ui.form.on('Provisional Receipt', {
 	// 		check_creditted_interest_payments(frm);
 	// 	}
 	// },
+	afte_save: function(frm){
+		frm.toggle_display(['new_pawn_ticket_no'], (frm.doc.docstatus == 0 && frm.doc.new_pawn_ticket_no != ""))
+	},
 
 	refresh: function(frm) {
 		frm.toggle_display(['bank'], frm.doc.mode_of_payment === 'Bank Transfer' || frm.doc.mode_of_payment === 'Cash & Bank Transfer' || frm.doc.mode_of_payment === 'GCash & Bank Transfer');
@@ -484,9 +487,6 @@ frappe.ui.form.on('Jewelry List', {
 		}
 	},
 
-	suggested_appraisal_value: function(frm, cdt, cdn){
-		//set_total_appraised_amount(frm,cdt, cdn);
-	},
 
 	actual_items_j_remove: function(frm, cdt, cdn){ //calculate appraisal value when removing items
 		let table_length = parseInt(frm.doc.actual_items_j.length)
@@ -531,11 +531,11 @@ frappe.ui.form.on('Non Jewelry List', {
 });
 
 function show_fields_for_dummy(frm) {
-	console.log("pumasok dito");
 	frm.set_value('customer_name', "  ");
 	frm.refresh_field('customer_name');
 	var word = String(frm.doc.complete_name).lastIndexOf("Dummy");
 	frm.toggle_display(['customer_tracking_no', 'customer_name'], word != -1 && (frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization'))
+	frm.toggle_reqd('customer_tracking_no', word != -1)
 	frm.toggle_display(['actual_items_j'], word != -1 && frm.doc.pawn_ticket_type == 'Pawn Ticket Jewelry' && (frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization'))
 	frm.toggle_display(['actual_items_nj'], word != -1 && frm.doc.pawn_ticket_type == 'Pawn Ticket Non Jewelry' && (frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization'))
 	if (frm.doc.pawn_ticket_type == 'Pawn Ticket Jewelry') {
