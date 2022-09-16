@@ -38,8 +38,11 @@ frappe.ui.form.on('Provisional Receipt', {
 	// 		check_creditted_interest_payments(frm);
 	// 	}
 	// },
-	afte_save: function(frm){
-		frm.toggle_display(['new_pawn_ticket_no'], (frm.doc.docstatus == 0 && frm.doc.new_pawn_ticket_no != ""))
+	after_save: function(frm){
+		console.log("Test");
+		if (frm.doc.docstatus == 0) {
+			frm.set_df_property('new_pawn_ticket_no', 'hidden', 0)
+		}
 	},
 
 	refresh: function(frm) {
@@ -341,19 +344,19 @@ frappe.ui.form.on('Provisional Receipt', {
 			clear_all_payment_fields();
 			show_payment_fields(frm);
 			frm.set_df_property('additional_amortization', 'hidden', 1);
-			frm.toggle_display(['new_pawn_ticket_no'], frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization');
 			// frm.set_df_property('advance_interest', 'hidden', 1);
 			frm.set_df_property('number_of_months_to_pay_in_advance', 'hidden', 1);
 			get_new_pawn_ticket_no(frm);
 			select_transaction_type(frm);
+			frm.toggle_display(['new_pawn_ticket_no'], frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization');
 		} else if (frm.doc.transaction_type == "Renewal w/ Amortization") {
 			// frm.toggle_enable(['additional_amortization'], frm.doc.mode_of_payment == "Cash & GCash" || frm.doc.mode_of_payment == "Cash & Bank Transfer" || frm.doc.mode_of_payment == "GCash & Bank Transfer")
-			frm.toggle_display(['new_pawn_ticket_no'], frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization');
 			clear_all_payment_fields();
 			show_payment_fields(frm);
 			get_new_pawn_ticket_no(frm);
 			frm.set_df_property('number_of_months_to_pay_in_advance', 'hidden', 1);
 			select_transaction_type(frm);
+			frm.toggle_display(['new_pawn_ticket_no'], frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization');
 		}
 
 	},
