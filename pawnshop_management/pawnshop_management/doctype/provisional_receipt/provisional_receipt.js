@@ -38,9 +38,11 @@ frappe.ui.form.on('Provisional Receipt', {
 	// 		check_creditted_interest_payments(frm);
 	// 	}
 	// },
+	afte_save: function(frm){
+		frm.toggle_display(['new_pawn_ticket_no'], (frm.doc.docstatus == 0 && frm.doc.new_pawn_ticket_no != ""))
+	},
 
 	refresh: function(frm) {
-		frm.toggle_display(['new_pawn_ticket_no'], (frm.doc.new_pawn_ticket_no != ""))
 		frm.toggle_display(['bank'], frm.doc.mode_of_payment === 'Bank Transfer' || frm.doc.mode_of_payment === 'Cash & Bank Transfer' || frm.doc.mode_of_payment === 'GCash & Bank Transfer');
 		frm.toggle_display(['bank_payment'], frm.doc.mode_of_payment === 'Cash & Bank Transfer' || frm.doc.mode_of_payment === 'GCash & Bank Transfer');
 		frm.toggle_display(['cash'], frm.doc.mode_of_payment === 'Cash & Bank Transfer' || frm.doc.mode_of_payment === 'Cash & GCash');
@@ -485,9 +487,6 @@ frappe.ui.form.on('Jewelry List', {
 		}
 	},
 
-	suggested_appraisal_value: function(frm, cdt, cdn){
-		//set_total_appraised_amount(frm,cdt, cdn);
-	},
 
 	actual_items_j_remove: function(frm, cdt, cdn){ //calculate appraisal value when removing items
 		let table_length = parseInt(frm.doc.actual_items_j.length)

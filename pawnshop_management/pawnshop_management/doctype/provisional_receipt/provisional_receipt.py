@@ -53,7 +53,6 @@ class ProvisionalReceipt(Document):
 
 		if self.transaction_type == "Renewal": # Create New Pawn Ticket
 			if "Dummy" in self.complete_name:
-				print("CONFIRMED")
 				if self.pawn_ticket_type == "Pawn Ticket Jewelry":
 					previous_pawn_ticket = frappe.get_doc(self.pawn_ticket_type, self.pawn_ticket_no)
 					new_pawn_ticket = frappe.new_doc(self.pawn_ticket_type)
@@ -84,6 +83,36 @@ class ProvisionalReceipt(Document):
 							"desired_principal": actual_items[i].desired_principal,
 							"comments": actual_items[i].comments
 						})
+					new_jewelry_batch = frappe.new_doc('Jewelry Batch')
+					current_inventory_batch = frappe.get_doc('Pawnshop Naming Series', self.branch)
+					if self.branch == "Rabie's House":
+						new_jewelry_batch.inventory_tracking_no = "20-" + str(current_inventory_batch.jewelry_inventory_count) + 'J'
+					elif self.branch == "Garcia's Pawnshop - TNZ":
+						new_jewelry_batch.inventory_tracking_no = "5-" + str(current_inventory_batch.jewelry_inventory_count) + 'J'
+					elif self.branch == "Garcia's Pawnshop - GTC":
+						new_jewelry_batch.inventory_tracking_no = "4-" + str(current_inventory_batch.jewelry_inventory_count) + 'J'
+					elif self.branch == "Garcia's Pawnshop - MOL":
+						new_jewelry_batch.inventory_tracking_no = "6-" + str(current_inventory_batch.jewelry_inventory_count) + 'J'
+					elif self.branch == "Garcia's Pawnshop - POB":
+						new_jewelry_batch.inventory_tracking_no = "3-" + str(current_inventory_batch.jewelry_inventory_count) + 'J'
+					elif self.branch == "Garcia's Pawnshop - CC":
+						new_jewelry_batch.inventory_tracking_no = "1-" + str(current_inventory_batch.jewelry_inventory_count) + 'J'
+					new_jewelry_batch.branch = self.branch
+					for i in range(len(actual_items)):
+						new_jewelry_batch.append('items', {
+							"item_no": actual_items[i].item_no,
+							"type": actual_items[i].type,
+							"karat_category": actual_items[i].karat_category,
+							"karat": actual_items[i].karat,
+							"weight": actual_items[i].weight,
+							"color": actual_items[i].color,
+							"colors_if_multi": actual_items[i].colors_if_multi,
+							"additional_for_stone": actual_items[i].additional_for_stone,
+							"suggested_appraisal_value": actual_items[i].suggested_appraisal_value,
+							"desired_principal": actual_items[i].desired_principal,
+							"comments": actual_items[i].comments
+						})
+					new_jewelry_batch.save(ignore_permissions=True)
 				elif self.pawn_ticket_type == "Pawn Ticket Non Jewelry":
 					previous_pawn_ticket = frappe.get_doc(self.pawn_ticket_type, self.pawn_ticket_no)
 					new_pawn_ticket = frappe.new_doc(self.pawn_ticket_type)
@@ -109,6 +138,31 @@ class ProvisionalReceipt(Document):
 							"model_number": actual_items[i].model_number,
 							"suggested_appraisal_value": actual_items[i].suggested_appraisal_value
 						})
+					new_non_jewelry_batch = frappe.new_doc('Non Jewelry Batch')
+					current_inventory_batch = frappe.get_doc('Pawnshop Naming Series', self.branch)
+					if self.branch == "Rabie's House":
+						new_non_jewelry_batch.inventory_tracking_no = "20-" + str(current_inventory_batch.inventory_count) + 'NJ'
+					elif self.branch == "Garcia's Pawnshop - TNZ":
+						new_non_jewelry_batch.inventory_tracking_no = "5-" + str(current_inventory_batch.inventory_count) + 'NJ'
+					elif self.branch == "Garcia's Pawnshop - GTC":
+						new_non_jewelry_batch.inventory_tracking_no = "4-" + str(current_inventory_batch.inventory_count) + 'NJ'
+					elif self.branch == "Garcia's Pawnshop - MOL":
+						new_non_jewelry_batch.inventory_tracking_no = "6-" + str(current_inventory_batch.inventory_count) + 'NJ'
+					elif self.branch == "Garcia's Pawnshop - POB":
+						new_non_jewelry_batch.inventory_tracking_no = "3-" + str(current_inventory_batch.inventory_count) + 'NJ'
+					elif self.branch == "Garcia's Pawnshop - CC":
+						new_non_jewelry_batch.inventory_tracking_no = "1-" + str(current_inventory_batch.inventory_count) + 'NJ'
+					new_non_jewelry_batch.branch = self.branch
+					for i in range(len(actual_items)):
+						new_non_jewelry_batch.append('items', {
+							"item_no": actual_items[i].item_no,
+							"type": actual_items[i].type,
+							"brand": actual_items[i].brand,
+							"model": actual_items[i].model,
+							"model_number": actual_items[i].model_number,
+							"suggested_appraisal_value": actual_items[i].suggested_appraisal_value
+						})
+					new_non_jewelry_batch.save(ignore_permissions=True)
 			elif "Dummy" not in self.complete_name: 
 				previous_pawn_ticket = frappe.get_doc(self.pawn_ticket_type, self.pawn_ticket_no)
 				new_pawn_ticket = frappe.new_doc(self.pawn_ticket_type)
@@ -200,7 +254,7 @@ class ProvisionalReceipt(Document):
 
 					actual_items = self.actual_items_j
 					new_pawn_ticket.expiry_date = add_to_date(self.date_issued, days=120)
-					for i in range(len(previous_items)):
+					for i in range(len(actual_items)):
 						new_pawn_ticket.append("jewelry_items", {
 							"item_no": actual_items[i].item_no,
 							"type": actual_items[i].type,
@@ -214,6 +268,36 @@ class ProvisionalReceipt(Document):
 							"desired_principal": actual_items[i].desired_principal,
 							"comments": actual_items[i].comments
 						})
+					new_jewelry_batch = frappe.new_doc('Jewelry Batch')
+					current_inventory_batch = frappe.get_doc('Pawnshop Naming Series', self.branch)
+					if self.branch == "Rabie's House":
+						new_jewelry_batch.inventory_tracking_no = "20-" + str(current_inventory_batch.jewelry_inventory_count) + 'J'
+					elif self.branch == "Garcia's Pawnshop - TNZ":
+						new_jewelry_batch.inventory_tracking_no = "5-" + str(current_inventory_batch.jewelry_inventory_count) + 'J'
+					elif self.branch == "Garcia's Pawnshop - GTC":
+						new_jewelry_batch.inventory_tracking_no = "4-" + str(current_inventory_batch.jewelry_inventory_count) + 'J'
+					elif self.branch == "Garcia's Pawnshop - MOL":
+						new_jewelry_batch.inventory_tracking_no = "6-" + str(current_inventory_batch.jewelry_inventory_count) + 'J'
+					elif self.branch == "Garcia's Pawnshop - POB":
+						new_jewelry_batch.inventory_tracking_no = "3-" + str(current_inventory_batch.jewelry_inventory_count) + 'J'
+					elif self.branch == "Garcia's Pawnshop - CC":
+						new_jewelry_batch.inventory_tracking_no = "1-" + str(current_inventory_batch.jewelry_inventory_count) + 'J'
+					new_jewelry_batch.branch = self.branch
+					for i in range(len(actual_items)):
+						new_jewelry_batch.append('items', {
+							"item_no": actual_items[i].item_no,
+							"type": actual_items[i].type,
+							"karat_category": actual_items[i].karat_category,
+							"karat": actual_items[i].karat,
+							"weight": actual_items[i].weight,
+							"color": actual_items[i].color,
+							"colors_if_multi": actual_items[i].colors_if_multi,
+							"additional_for_stone": actual_items[i].additional_for_stone,
+							"suggested_appraisal_value": actual_items[i].suggested_appraisal_value,
+							"desired_principal": actual_items[i].desired_principal,
+							"comments": actual_items[i].comments
+						})
+					new_jewelry_batch.save(ignore_permissions=True)
 				elif self.pawn_ticket_type == "Pawn Ticket Non Jewelry":
 					previous_pawn_ticket = frappe.get_doc(self.pawn_ticket_type, self.pawn_ticket_no)
 					new_pawn_ticket = frappe.new_doc(self.pawn_ticket_type)
@@ -228,10 +312,60 @@ class ProvisionalReceipt(Document):
 					new_pawn_ticket.inventory_tracking_no = previous_pawn_ticket.inventory_tracking_no
 					new_pawn_ticket.created_by_pr = self.name
 
-					actual_items = self.actual_items_j
+					actual_items = self.actual_items_nj
+					new_pawn_ticket.expiry_date = add_to_date(self.date_issued, days=90)
+					for i in range(len(actual_items)):
+						new_pawn_ticket.append("non_jewelry_items", {
+							"item_no": actual_items[i].item_no,
+							"type": actual_items[i].type,
+							"brand": actual_items[i].brand,
+							"model": actual_items[i].model,
+							"model_number": actual_items[i].model_number,
+							"suggested_appraisal_value": actual_items[i].suggested_appraisal_value
+						})
+					new_non_jewelry_batch = frappe.new_doc('Non Jewelry Batch')
+					current_inventory_batch = frappe.get_doc('Pawnshop Naming Series', self.branch)
+					if self.branch == "Rabie's House":
+						new_non_jewelry_batch.inventory_tracking_no = "20-" + str(current_inventory_batch.inventory_count) + 'NJ'
+					elif self.branch == "Garcia's Pawnshop - TNZ":
+						new_non_jewelry_batch.inventory_tracking_no = "5-" + str(current_inventory_batch.inventory_count) + 'NJ'
+					elif self.branch == "Garcia's Pawnshop - GTC":
+						new_non_jewelry_batch.inventory_tracking_no = "4-" + str(current_inventory_batch.inventory_count) + 'NJ'
+					elif self.branch == "Garcia's Pawnshop - MOL":
+						new_non_jewelry_batch.inventory_tracking_no = "6-" + str(current_inventory_batch.inventory_count) + 'NJ'
+					elif self.branch == "Garcia's Pawnshop - POB":
+						new_non_jewelry_batch.inventory_tracking_no = "3-" + str(current_inventory_batch.inventory_count) + 'NJ'
+					elif self.branch == "Garcia's Pawnshop - CC":
+						new_non_jewelry_batch.inventory_tracking_no = "1-" + str(current_inventory_batch.inventory_count) + 'NJ'
+					new_non_jewelry_batch.branch = self.branch
+					for i in range(len(actual_items)):
+						new_non_jewelry_batch.append('items', {
+							"item_no": actual_items[i].item_no,
+							"type": actual_items[i].type,
+							"brand": actual_items[i].brand,
+							"model": actual_items[i].model,
+							"model_number": actual_items[i].model_number,
+							"suggested_appraisal_value": actual_items[i].suggested_appraisal_value
+						})
+					new_non_jewelry_batch.save(ignore_permissions=True)
+				elif self.pawn_ticket_type == "Pawn Ticket Non Jewelry":
+					previous_pawn_ticket = frappe.get_doc(self.pawn_ticket_type, self.pawn_ticket_no)
+					new_pawn_ticket = frappe.new_doc(self.pawn_ticket_type)
+					new_pawn_ticket.branch = self.branch
+					new_pawn_ticket.item_series = previous_pawn_ticket.item_series
+					new_pawn_ticket.pawn_ticket = self.new_pawn_ticket_no
+					new_pawn_ticket.date_loan_granted = self.date_issued
+					new_pawn_ticket.old_pawn_ticket = self.pawn_ticket_no
+					new_pawn_ticket.maturity_date = add_to_date(self.date_issued, days=30)
+					new_pawn_ticket.customers_tracking_no = self.customer_tracking_no
+					new_pawn_ticket.customers_full_name = self.customer_name
+					new_pawn_ticket.inventory_tracking_no = previous_pawn_ticket.inventory_tracking_no
+					new_pawn_ticket.created_by_pr = self.name
+
+					actual_items = self.actual_items_nj
 					new_pawn_ticket.expiry_date = add_to_date(self.date_issued, days=90)
 					for i in range(len(previous_items)):
-						new_pawn_ticket.append("jewelry_items", {
+						new_pawn_ticket.append("non_jewelry_items", {
 							"item_no": actual_items[i].item_no,
 							"type": actual_items[i].type,
 							"karat_category": actual_items[i].karat_category,
@@ -246,51 +380,51 @@ class ProvisionalReceipt(Document):
 						})
 			else: 
 				previous_pawn_ticket = frappe.get_doc(self.pawn_ticket_type, self.pawn_ticket_no)
-			new_pawn_ticket = frappe.new_doc(self.pawn_ticket_type)
-			new_pawn_ticket.branch = self.branch
-			new_pawn_ticket.item_series = previous_pawn_ticket.item_series
-			new_pawn_ticket.pawn_ticket = self.new_pawn_ticket_no
-			new_pawn_ticket.date_loan_granted = self.date_issued
-			new_pawn_ticket.old_pawn_ticket = self.pawn_ticket_no
-			new_pawn_ticket.maturity_date = add_to_date(self.date_issued, days=30)
-			new_pawn_ticket.customers_tracking_no = previous_pawn_ticket.customers_tracking_no
-			new_pawn_ticket.customers_full_name = previous_pawn_ticket.customers_full_name
-			new_pawn_ticket.inventory_tracking_no = previous_pawn_ticket.inventory_tracking_no
-			new_pawn_ticket.created_by_pr = self.name
-			if self.pawn_ticket_type == "Pawn Ticket Non Jewelry":
-				previous_items = previous_pawn_ticket.non_jewelry_items
-				new_pawn_ticket.expiry_date = add_to_date(self.date_issued, days=90)
-				for i in range(len(previous_items)):
-					new_pawn_ticket.append("non_jewelry_items", {
-						"item_no": previous_items[i].item_no,
-						"type": previous_items[i].type,
-						"brand": previous_items[i].brand,
-						"model": previous_items[i].model,
-						"model_number": previous_items[i].model_number,
-						"suggested_appraisal_value": previous_items[i].suggested_appraisal_value
-					})
-			elif self.pawn_ticket_type == "Pawn Ticket Jewelry":
-				previous_items = previous_pawn_ticket.jewelry_items
-				new_pawn_ticket.expiry_date = add_to_date(self.date_issued, days=120)
-				for i in range(len(previous_items)):
-					new_pawn_ticket.append("jewelry_items", {
-						"item_no": previous_items[i].item_no,
-						"type": previous_items[i].type,
-						"karat_category": previous_items[i].karat_category,
-						"karat": previous_items[i].karat,
-						"weight": previous_items[i].weight,
-						"color": previous_items[i].color,
-						"colors_if_multi": previous_items[i].colors_if_multi,
-						"additional_for_stone": previous_items[i].additional_for_stone,
-						"suggested_appraisal_value": previous_items[i].suggested_appraisal_value,
-						"desired_principal": previous_items[i].desired_principal,
-						"comments": previous_items[i].comments
-					})
-			new_pawn_ticket.desired_principal = previous_pawn_ticket.desired_principal
-			new_pawn_ticket.interest = previous_pawn_ticket.interest
-			new_pawn_ticket.net_proceeds = previous_pawn_ticket.net_proceeds
-			new_pawn_ticket.save(ignore_permissions=True)
-			new_pawn_ticket.submit()
+				new_pawn_ticket = frappe.new_doc(self.pawn_ticket_type)
+				new_pawn_ticket.branch = self.branch
+				new_pawn_ticket.item_series = previous_pawn_ticket.item_series
+				new_pawn_ticket.pawn_ticket = self.new_pawn_ticket_no
+				new_pawn_ticket.date_loan_granted = self.date_issued
+				new_pawn_ticket.old_pawn_ticket = self.pawn_ticket_no
+				new_pawn_ticket.maturity_date = add_to_date(self.date_issued, days=30)
+				new_pawn_ticket.customers_tracking_no = previous_pawn_ticket.customers_tracking_no
+				new_pawn_ticket.customers_full_name = previous_pawn_ticket.customers_full_name
+				new_pawn_ticket.inventory_tracking_no = previous_pawn_ticket.inventory_tracking_no
+				new_pawn_ticket.created_by_pr = self.name
+				if self.pawn_ticket_type == "Pawn Ticket Non Jewelry":
+					previous_items = previous_pawn_ticket.non_jewelry_items
+					new_pawn_ticket.expiry_date = add_to_date(self.date_issued, days=90)
+					for i in range(len(previous_items)):
+						new_pawn_ticket.append("non_jewelry_items", {
+							"item_no": previous_items[i].item_no,
+							"type": previous_items[i].type,
+							"brand": previous_items[i].brand,
+							"model": previous_items[i].model,
+							"model_number": previous_items[i].model_number,
+							"suggested_appraisal_value": previous_items[i].suggested_appraisal_value
+						})
+				elif self.pawn_ticket_type == "Pawn Ticket Jewelry":
+					previous_items = previous_pawn_ticket.jewelry_items
+					new_pawn_ticket.expiry_date = add_to_date(self.date_issued, days=120)
+					for i in range(len(previous_items)):
+						new_pawn_ticket.append("jewelry_items", {
+							"item_no": previous_items[i].item_no,
+							"type": previous_items[i].type,
+							"karat_category": previous_items[i].karat_category,
+							"karat": previous_items[i].karat,
+							"weight": previous_items[i].weight,
+							"color": previous_items[i].color,
+							"colors_if_multi": previous_items[i].colors_if_multi,
+							"additional_for_stone": previous_items[i].additional_for_stone,
+							"suggested_appraisal_value": previous_items[i].suggested_appraisal_value,
+							"desired_principal": previous_items[i].desired_principal,
+							"comments": previous_items[i].comments
+						})
+				new_pawn_ticket.desired_principal = previous_pawn_ticket.desired_principal
+				new_pawn_ticket.interest = previous_pawn_ticket.interest
+				new_pawn_ticket.net_proceeds = previous_pawn_ticket.net_proceeds
+				new_pawn_ticket.save(ignore_permissions=True)
+				new_pawn_ticket.submit()
 			
 
 
