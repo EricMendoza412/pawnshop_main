@@ -1140,7 +1140,7 @@ function get_new_pawn_ticket_no(frm) {
 					})
 				}
 			})
-		} else if (frm.doc.pawn_ticket_type == "Pawn Ticket Jewelry") {
+		} else if (frm.doc.pawn_ticket_type == "Pawn Ticket Non Jewelry") {
 			frappe.db.get_value("Pawnshop Naming Series", "Garcia's Pawnshop - MOL", "b_series")
 			.then(r => {
 				let current_count = r.message.b_series;
@@ -1165,7 +1165,7 @@ function get_new_pawn_ticket_no(frm) {
 					})
 				}
 			})
-		} else if (frm.doc.pawn_ticket_type == "Pawn Ticket Jewelry") {
+		} else if (frm.doc.pawn_ticket_type == "Pawn Ticket Non Jewelry") {
 			frappe.db.get_value("Pawnshop Naming Series", "Garcia's Pawnshop - POB", "b_series")
 			.then(r => {
 				let current_count = r.message.b_series;
@@ -1190,7 +1190,7 @@ function get_new_pawn_ticket_no(frm) {
 					})
 				}
 			})
-		} else if (frm.doc.pawn_ticket_type == "Pawn Ticket Jewelry") {
+		} else if (frm.doc.pawn_ticket_type == "Pawn Ticket Non Jewelry") {
 			frappe.db.get_value("Pawnshop Naming Series", "Garcia's Pawnshop - TNZ", "b_series")
 			.then(r => {
 				let current_count = r.message.b_series;
