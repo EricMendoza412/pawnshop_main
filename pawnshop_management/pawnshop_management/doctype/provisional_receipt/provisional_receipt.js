@@ -241,7 +241,7 @@ frappe.ui.form.on('Provisional Receipt', {
 				}
 			})
 		})
-
+		///
 	},
 
 	branch: function(frm){
