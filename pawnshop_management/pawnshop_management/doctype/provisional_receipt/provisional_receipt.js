@@ -591,14 +591,14 @@ function show_fields_for_dummy(frm) {
 	if (frm.doc.pawn_ticket_type == 'Pawn Ticket Jewelry') {
 		cur_frm.clear_table('actual_items_nj')
 		frm.refresh_field('actual_items_nj')
-		if(word != -1 && frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization') {
+		if(word != -1 && (frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization')) {
 			frm.toggle_reqd('actual_items_j', true)
 			frm.toggle_reqd('customer_tracking_no', true)
 		}
 	} else if (frm.doc.pawn_ticket_type == 'Pawn Ticket Non Jewelry') {
 		cur_frm.clear_table('actual_items_j')
 		frm.refresh_field('actual_items_j')
-		if(word != -1 && frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization') {
+		if(word != -1 && (frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization')) {
 		frm.toggle_reqd('actual_items_nj', true)
 		frm.toggle_reqd('customer_tracking_no', true)
 		}
