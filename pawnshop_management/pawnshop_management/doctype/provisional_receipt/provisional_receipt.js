@@ -586,7 +586,6 @@ function show_fields_for_dummy(frm) {
 	frm.refresh_field('customer_name');
 	var word = String(frm.doc.complete_name).lastIndexOf("Dummy");
 	frm.toggle_display(['customer_tracking_no', 'customer_name'], word != -1 && (frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization'))
-	frm.toggle_reqd('customer_tracking_no', word != -1)
 	frm.toggle_display(['actual_items_j'], word != -1 && frm.doc.pawn_ticket_type == 'Pawn Ticket Jewelry' && (frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization'))
 	frm.toggle_display(['actual_items_nj'], word != -1 && frm.doc.pawn_ticket_type == 'Pawn Ticket Non Jewelry' && (frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization'))
 	if (frm.doc.pawn_ticket_type == 'Pawn Ticket Jewelry') {
@@ -594,12 +593,14 @@ function show_fields_for_dummy(frm) {
 		frm.refresh_field('actual_items_nj')
 		if(word != -1 && frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization') {
 			frm.toggle_reqd('actual_items_j', true)
+			frm.toggle_reqd('customer_tracking_no', true)
 		}
 	} else if (frm.doc.pawn_ticket_type == 'Pawn Ticket Non Jewelry') {
 		cur_frm.clear_table('actual_items_j')
 		frm.refresh_field('actual_items_j')
 		if(word != -1 && frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization') {
 		frm.toggle_reqd('actual_items_nj', true)
+		frm.toggle_reqd('customer_tracking_no', true)
 		}
 	}
 }
