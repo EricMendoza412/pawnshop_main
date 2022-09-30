@@ -37,7 +37,7 @@ frappe.ui.form.on('Cash Position Report', {
 								frm.refresh_field('branch');
 							} else if (current_ip == ip["gtc"]) {
 								frm.set_value('branch', "Garcia's Pawnshop - GTC");
-								frm.refresh_field('branch');
+								frm.refresh_field('branch');f
 							} else if (current_ip == ip["tanza"]) {
 								frm.set_value('branch', "Garcia's Pawnshop - TNZ");
 								frm.refresh_field('branch');
@@ -322,22 +322,6 @@ function get_provisional_receipts_of_the_day(frm, date_today = null) {
 			frm.set_value('provisional_receipts', r.message);
 			frm.refresh_field('provisional_receipts');
 		})
-		// frappe.db.get_list('Provisional Receipt', {
-		// 	fields: ['total'],
-		// 	filters: {
-		// 		date_issued: date_today,
-		// 		docstatus: 1,
-		// 		branch: "Garcia's Pawnshop - GTC"
-		// 	}
-		// }).then(records => {
-		// 	let temp_total = 0.00;
-		// 	frm.set_value('provisional_receipts', 0.00);
-		// 	for (let index = 0; index < records.length; index++) {
-		// 		temp_total += parseFloat(records[index].total)
-		// 	}
-		// 	frm.set_value('provisional_receipts', temp_total);
-		// 	frm.refresh_field('provisional_receipts');
-		// })
 	} else if (frm.doc.branch == "Garcia's Pawnshop - MOL") {
 		frappe.db.get_list('Provisional Receipt', {
 			fields: ['total'],
@@ -430,49 +414,16 @@ function get_jewelry_b_of_the_day(frm, date_today=null) {
 			temp_total += parseFloat(records[index].net_proceeds)
 		}
 		frm.set_value('jewelry_b', temp_total);
+		frm.refresh_field('jewelry_b');
 	})
 }
 
 function get_non_jewelry_of_the_day(frm, date_today=null) {
-	if (frm.doc.branch == "Rabie's House") {
 		frappe.db.get_list('Pawn Ticket Non Jewelry', {
 			fields: ['net_proceeds'],
 			filters: {
 				date_loan_granted: date_today,
-				branch: "Rabie's House",
-				old_pawn_ticket: ''
-			}
-		}).then(records => {
-			let temp_total = 0.00;
-			frm.set_value('non_jewelry', 0.00);
-			for (let index = 0; index < records.length; index++) {
-				temp_total += parseFloat(records[index].net_proceeds)
-			}
-			frm.set_value('non_jewelry', temp_total);
-			frm.refresh_field('non_jewelry');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - CC") {
-		frappe.db.get_list('Pawn Ticket Non Jewelry', {
-			fields: ['net_proceeds'],
-			filters: {
-				date_loan_granted: date_today,
-				branch: "Garcia's Pawnshop - CC"
-			}
-		}).then(records => {
-			let temp_total = 0.00;
-			frm.set_value('non_jewelry', 0.00);
-			for (let index = 0; index < records.length; index++) {
-				temp_total += parseFloat(records[index].net_proceeds)
-			}
-			frm.set_value('non_jewelry', temp_total);
-			frm.refresh_field('non_jewelry');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - GTC") {
-		frappe.db.get_list('Pawn Ticket Non Jewelry', {
-			fields: ['net_proceeds'],
-			filters: {
-				date_loan_granted: date_today,
-				branch: "Garcia's Pawnshop - GTC",
+				branch: frm.doc.branch,
 				old_pawn_ticket: '',
 				docstatus: 1
 			}
@@ -485,55 +436,7 @@ function get_non_jewelry_of_the_day(frm, date_today=null) {
 			frm.set_value('non_jewelry', temp_total);
 			frm.refresh_field('non_jewelry');
 		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - MOL") {
-		frappe.db.get_list('Pawn Ticket Non Jewelry', {
-			fields: ['net_proceeds'],
-			filters: {
-				date_loan_granted: date_today,
-				branch: "Garcia's Pawnshop - MOL"
-			}
-		}).then(records => {
-			let temp_total = 0.00;
-			frm.set_value('non_jewelry', 0.00);
-			for (let index = 0; index < records.length; index++) {
-				temp_total += parseFloat(records[index].net_proceeds)
-			}
-			frm.set_value('non_jewelry', temp_total);
-			frm.refresh_field('non_jewelry');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - POB") {
-		frappe.db.get_list('Pawn Ticket Non Jewelry', {
-			fields: ['net_proceeds'],
-			filters: {
-				date_loan_granted: date_today,
-				branch: "Garcia's Pawnshop - POB"
-			}
-		}).then(records => {
-			let temp_total = 0.00;
-			frm.set_value('non_jewelry', 0.00);
-			for (let index = 0; index < records.length; index++) {
-				temp_total += parseFloat(records[index].net_proceeds)
-			}
-			frm.set_value('non_jewelry', temp_total);
-			frm.refresh_field('non_jewelry');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - TNZ") {
-		frappe.db.get_list('Pawn Ticket Non Jewelry', {
-			fields: ['net_proceeds'],
-			filters: {
-				date_loan_granted: date_today,
-				branch: "Garcia's Pawnshop - TNZ"
-			}
-		}).then(records => {
-			let temp_total = 0.00;
-			frm.set_value('non_jewelry', 0.00);
-			for (let index = 0; index < records.length; index++) {
-				temp_total += parseFloat(records[index].net_proceeds)
-			}
-			frm.set_value('non_jewelry', temp_total);
-			frm.refresh_field('non_jewelry');
-		})
-	}
+	
 }
 
 function total_cash_breakdown(frm) {
