@@ -278,42 +278,7 @@ function calculate_ending_balance() {
 	var ending_balance = parseFloat(cur_frm.doc.beginning_balance) + calculate_net_cash();
 	return ending_balance;
 }
-function get_provisional_receipts_of_the_day(frm, date_today = null) {
-	if (frm.doc.branch == "Rabie's House") {
-		frappe.db.get_list('Provisional Receipt', {
-			fields: ['total'],
-			filters: {
-				date_issued: date_today,
-				docstatus: 1,
-				branch: "Rabie's House"
-			}
-		}).then(records => {
-			let temp_total = 0.00;
-			frm.set_value('provisional_receipts', 0.00);
-			for (let index = 0; index < records.length; index++) {
-				temp_total += parseFloat(records[index].total)
-			}
-			frm.set_value('provisional_receipts', temp_total);
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - CC") {
-		frappe.db.get_list('Provisional Receipt', {
-			fields: ['total'],
-			filters: {
-				date_issued: date_today,
-				docstatus: 1,
-				branch: "Garcia's Pawnshop - CC"
-			}
-		}).then(records => {
-			let temp_total = 0.00;
-			frm.set_value('provisional_receipts', 0.00);
-			for (let index = 0; index < records.length; index++) {
-				temp_total += parseFloat(records[index].total)
-			}
-			frm.set_value('provisional_receipts', temp_total);
-			frm.refresh_field('provisional_receipts');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - GTC") {
-
+function get_provisional_receipts_of_the_day(frm, date_today = null) {	
 		frappe.call('pawnshop_management.pawnshop_management.custom_codes.daily_balance.get_all_PR_total', {
 			date: frm.doc.date,
 			branch: frm.doc.branch
@@ -322,7 +287,7 @@ function get_provisional_receipts_of_the_day(frm, date_today = null) {
 			frm.set_value('provisional_receipts', r.message);
 			frm.refresh_field('provisional_receipts');
 		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - MOL") {
+	 if (frm.doc.branch == "Garcia's Pawnshop - MOL") {
 		frappe.db.get_list('Provisional Receipt', {
 			fields: ['total'],
 			filters: {
@@ -339,41 +304,7 @@ function get_provisional_receipts_of_the_day(frm, date_today = null) {
 			frm.set_value('provisional_receipts', temp_total);
 			frm.refresh_field('provisional_receipts');
 		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - POB") {
-		frappe.db.get_list('Provisional Receipt', {
-			fields: ['total'],
-			filters: {
-				date_issued: date_today,
-				docstatus: 1,
-				branch: "Garcia's Pawnshop - POB"
-			}
-		}).then(records => {
-			let temp_total = 0.00;
-			frm.set_value('provisional_receipts', 0.00);
-			for (let index = 0; index < records.length; index++) {
-				temp_total += parseFloat(records[index].total)
-			}
-			frm.set_value('provisional_receipts', temp_total);
-			frm.refresh_field('provisional_receipts');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - TNZ") {
-		frappe.db.get_list('Provisional Receipt', {
-			fields: ['total'],
-			filters: {
-				date_issued: date_today,
-				docstatus: 1,
-				branch: "Garcia's Pawnshop - TNZ"
-			}
-		}).then(records => {
-			let temp_total = 0.00;
-			frm.set_value('provisional_receipts', 0.00);
-			for (let index = 0; index < records.length; index++) {
-				temp_total += parseFloat(records[index].total)
-			}
-			frm.set_value('provisional_receipts', temp_total);
-			frm.refresh_field('provisional_receipts');
-		})
-	}
+	} 
 }
 
 function get_jewelry_a_of_the_day(frm, date_today=null) {
