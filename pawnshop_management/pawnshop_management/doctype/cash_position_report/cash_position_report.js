@@ -295,24 +295,6 @@ function get_provisional_receipts_of_the_day(frm, date_today = null) {
 			frm.set_value('provisional_receipts', r.message);
 			frm.refresh_field('provisional_receipts');
 		})
-	 if (frm.doc.branch == "Garcia's Pawnshop - MOL") {
-		frappe.db.get_list('Provisional Receipt', {
-			fields: ['total'],
-			filters: {
-				date_issued: date_today,
-				docstatus: 1,
-				branch: "Garcia's Pawnshop - MOL"
-			}
-		}).then(records => {
-			let temp_total = 0.00;
-			frm.set_value('provisional_receipts', 0.00);
-			for (let index = 0; index < records.length; index++) {
-				temp_total += parseFloat(records[index].total)
-			}
-			frm.set_value('provisional_receipts', temp_total);
-			frm.refresh_field('provisional_receipts');
-		})
-	} 
 }
 
 function get_jewelry_a_of_the_day(frm, date_today=null) {
