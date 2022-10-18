@@ -99,9 +99,17 @@ frappe.ui.form.on('Cash Position Report', {
 	},
 
 	date: function(frm){
+		get_beginning_balance(frm)
+		get_provisional_receipts_of_the_day(frm, frm.doc.date);
+		get_non_jewelry_of_the_day(frm, frm.doc.date);
+		get_gcash_provisional_receipt(frm, frm.doc.date);
+		select_naming_series(frm);
+		get_jewelry_b_of_the_day(frm, frm.doc.date);
+		get_jewelry_a_of_the_day(frm, frm.doc.date);
 		get_additional_pawn_records(frm);
 		get_additional_redeem(frm);
 		get_additional_partial_payment(frm);
+		get_total_discount(frm);
 	},
 
 	validate: function(frm){
