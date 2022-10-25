@@ -334,18 +334,16 @@ frappe.ui.form.on('Provisional Receipt', {
 		frm.clear_table('items');
 		show_items(frm.doc.pawn_ticket_type, frm.doc.pawn_ticket_no);
 		frm.refresh_field('items');
+		frm.set_df_property('pawn_ticket_no', 'read_only', 1);
 		if (frm.doc.date_issued > frm.doc.maturity_date && frm.doc.interest_payment > 0) {
 			frm.set_df_property('transaction_type', 'options', ['Renewal', 'Redemption', 'Interest Payment', 'Renewal w/ Amortization']);
 			frm.refresh_field('transaction_type');
-			console.log("Hi");
 		} else if (frm.doc.date_issued > frm.doc.maturity_date) {
 			frm.set_df_property('transaction_type', 'options', ['Renewal', 'Redemption', 'Renewal w/ Amortization']);
 			frm.refresh_field('transaction_type');
-			console.log("Hello");
 		} else {
 			frm.set_df_property('transaction_type', 'options', ['Renewal', 'Redemption', 'Amortization', 'Renewal w/ Amortization']);
 			frm.refresh_field('transaction_type');
-			console.log("Welcome");
 		}
 		calculate_total_amortization(frm, frm.doc.pawn_ticket_type, frm.doc.pawn_ticket_no);
 		show_previous_interest_payment(frm);
