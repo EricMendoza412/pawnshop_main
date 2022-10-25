@@ -2,11 +2,26 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe import _ # _ for to set the string into literal string
+from pawnshop_management.pawnshop_management.custom_codes.get_ip import get_ip_from_settings
 
 def execute(filters=None):
+	current_ip = frappe.local.request_ip
+	branch_ip = get_ip_from_settings()
+	if str(current_ip) == str(branch_ip['cavite_city']):
+		branch = "Garcia's Pawnshop - CC"
+	elif str(current_ip) == str(branch_ip['poblacion']):
+		branch = "Garcia's Pawnshop - POB"
+	elif str(current_ip) == str(branch_ip['molino']):
+		branch = "Garcia's Pawnshop - MOL"
+	elif str(current_ip) == str(branch_ip['gtc']):
+		branch = "Garcia's Pawnshop - GTC"
+	elif str(current_ip) == str(branch_ip['tanza']):
+		branch = "Garcia's Pawnshop - TNZ"
+
 	columns, data = [], []
 	columns = get_columns()
-	data = frappe.get_all('Inventory Count', fields=['date', 'in_count_a','principal_in_a', 'out_count_a','principal_out_a', 'returned_a','principal_ret_a', 'pulled_out_a','principal_po_a', 'total_a'], order_by='date desc')
+	data = frappe.get_all('Inventory Count', filters={'branch':branch}, fields=['date', 'in_count_a','principal_in_a', 'out_count_a','principal_out_a', 'returned_a','principal_ret_a', 'pulled_out_a','principal_po_a', 'total_a'], order_by='date desc')
 	return columns, data
 
 
