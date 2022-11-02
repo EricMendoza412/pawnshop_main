@@ -116,9 +116,11 @@ frappe.ui.form.on('Cash Position Report', {
 		// if (frm.doc.total_cash != frm.doc.ending_balance) {
 		// 	frappe.throw("Cash on hand is not equal to the Ending Balance")
 		// }
-
-		frappe.msgprint(__('CPR saved'));
-		
+		if (frm.doc.total_cash == 0){
+			frappe.throw("Cash on hand should not be zero")
+		}else{
+			frappe.msgprint(__('CPR saved'));
+		}
 	},
 
 	beginning_balance: function(frm){
