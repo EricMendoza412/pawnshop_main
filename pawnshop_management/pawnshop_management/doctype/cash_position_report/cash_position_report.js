@@ -147,6 +147,18 @@ frappe.ui.form.on('Cash Position Report', {
 		frm.refresh_field('total_in');
 	},
 
+	gcash_positive: function(frm){
+		frm.set_value('total_in', 0.00);
+		frm.set_value('total_in', + calculate_total_in());
+		frm.refresh_field('total_in');
+	},
+
+	bank_transfer_return: function(frm){
+		frm.set_value('total_in', 0.00);
+		frm.set_value('total_in', + calculate_total_in());
+		frm.refresh_field('total_in');
+	},
+
 	jewelry_a: function(frm){
 		frm.set_value('total_out', 0.00);
 		frm.set_value('total_out', calculate_total_out());
