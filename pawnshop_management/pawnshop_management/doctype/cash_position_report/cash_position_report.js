@@ -270,7 +270,7 @@ function get_beginning_balance(frm) {
 }
 
 function calculate_total_in() {
-	var total_in = parseFloat(cur_frm.doc.provisional_receipts) + parseFloat(cur_frm.doc.selling) + parseFloat(cur_frm.doc.cash_from_vault);
+	var total_in = parseFloat(cur_frm.doc.provisional_receipts) + parseFloat(cur_frm.doc.selling) + parseFloat(cur_frm.doc.cash_from_vault) + parseFloat(cur_frm.doc.gcash_positive) + parseFloat(cur_frm.doc.bank_transfer_return);
 	return total_in;
 }
 
