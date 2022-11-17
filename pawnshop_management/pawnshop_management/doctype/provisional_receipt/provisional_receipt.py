@@ -1167,7 +1167,7 @@ class ProvisionalReceipt(Document):
 					row_values9.debit_in_account_currency = flt(self.previous_interest_payment)
 					row_values9.credit_in_account_currency = flt(0)
 
-				doc1.save(ignore_permissions=True)
+				#doc1.save(ignore_permissions=True)
 				# doc1.submit()
 
 			# For GCash Accounts
