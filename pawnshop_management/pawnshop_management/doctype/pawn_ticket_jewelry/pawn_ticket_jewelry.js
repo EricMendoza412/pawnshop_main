@@ -85,7 +85,7 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 	refresh: function(frm){
 		let is_allowed = frappe.user_roles.includes('Administrator');
 		frm.toggle_enable(['date_loan_granted', 'branch'], is_allowed)
-		frm.toggle_display(['old_pawn_ticket'], frm.doc.old_pawn_ticket != '')
+		//frm.toggle_display(['old_pawn_ticket'], frm.doc.old_pawn_ticket != '')
 		if (frm.is_new()) {
 			show_tracking_no(frm);
 			frm.set_value('date_loan_granted', frappe.datetime.nowdate())
