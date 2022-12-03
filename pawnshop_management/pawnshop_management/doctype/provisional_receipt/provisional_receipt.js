@@ -1154,7 +1154,7 @@ function get_new_pawn_ticket_no(frm) {
 			frappe.db.get_value("Pawnshop Naming Series", "Garcia's Pawnshop - CC", "b_series")
 			.then(r => {
 				let current_count = r.message.b_series;
-				new_pawn_ticket_no(frm, "20-", current_count, 'B');
+				new_pawn_ticket_no(frm, "1-", current_count, 'B');
 			})
 		}
 		
