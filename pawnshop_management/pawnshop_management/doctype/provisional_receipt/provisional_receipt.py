@@ -4070,7 +4070,7 @@ class ProvisionalReceipt(Document):
 					row_values9.debit_in_account_currency = flt(self.previous_interest_payment)
 					row_values9.credit_in_account_currency = flt(0)
 
-				doc2.save(ignore_permissions=True)
+				# doc2.save(ignore_permissions=True)
 				# doc2.submit()
 				
 			elif self.transaction_type == "Interest Payment" and self.mode_of_payment == "Cash":
