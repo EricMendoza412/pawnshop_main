@@ -21,7 +21,7 @@ def execute(filters=None):
 	
 	columns, data = [], []
 	columns = get_columns()
-	data = frappe.get_all("Pawn Ticket Non Jewelry", filters={'Branch':branch}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'expiry_date', 'workflow_state', 'change_status_date', '_comments'])
+	data = frappe.get_all("Pawn Ticket Non Jewelry", filters={'Branch':"Garcia's Pawnshop - CC"}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'expiry_date', 'workflow_state', 'change_status_date', '_comments'])
 	comments = string_extractor
 	for i in range(len(data)):
 		description = ""
