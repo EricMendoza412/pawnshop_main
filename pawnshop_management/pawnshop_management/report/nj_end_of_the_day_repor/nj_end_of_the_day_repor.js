@@ -12,9 +12,15 @@ frappe.call({
             callback: (result) => {
                 let ip = result.message;
                 if (current_ip == ip["cavite_city"]) {
-
+                    default_branch.push("Garcia's Pawnshop - CC"); 
                 } else if (current_ip == ip["poblacion"]) {
-                   default_branch.push("Garcia's Pawnshop - POB");
+                    default_branch.push("Garcia's Pawnshop - POB");
+                } else if (current_ip == ip["molino"]) {
+                    default_branch.push("Garcia's Pawnshop - MOL");
+                } else if (current_ip == ip["gtc"]) {
+                    default_branch.push("Garcia's Pawnshop - GTC");
+                } else if (current_ip == ip["tanza"]) {
+                    default_branch.push("Garcia's Pawnshop - TNZ");
                 }
             }
         })
