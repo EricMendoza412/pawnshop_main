@@ -5,23 +5,33 @@ import frappe
 from frappe import _ # _ for to set the string into literal string
 from pawnshop_management.pawnshop_management.custom_codes.get_ip import get_ip_from_settings
 
+import frappe
+from frappe.model.base_document import BaseDocument
+import json
+
+# @frappe.whitelist()
+# def get_full_user_name(user=None):
+# 	p = frappe.db.get_value("User", user, "full_name")
+# 	return p
+
+
 def execute(filters=None):
-	current_ip = frappe.local.request_ip
-	branch_ip = get_ip_from_settings()
-	if str(current_ip) == str(branch_ip['cavite_city']):
-		branch = "Garcia's Pawnshop - CC"
-	elif str(current_ip) == str(branch_ip['poblacion']):
-		branch = "Garcia's Pawnshop - POB"
-	elif str(current_ip) == str(branch_ip['molino']):
-		branch = "Garcia's Pawnshop - MOL"
-	elif str(current_ip) == str(branch_ip['gtc']):
-		branch = "Garcia's Pawnshop - GTC"
-	elif str(current_ip) == str(branch_ip['tanza']):
-		branch = "Garcia's Pawnshop - TNZ"
+	# current_ip = frappe.local.request_ip
+	# branch_ip = get_ip_from_settings()
+	# # if str(current_ip) == str(branch_ip['cavite_city']):
+	# # 	branch = "Garcia's Pawnshop - CC"
+	# # elif str(current_ip) == str(branch_ip['poblacion']):
+	# # 	branch = "Garcia's Pawnshop - POB"
+	# # elif str(current_ip) == str(branch_ip['molino']):
+	# # 	branch = "Garcia's Pawnshop - MOL"
+	# # elif str(current_ip) == str(branch_ip['gtc']):
+	# # 	branch = "Garcia's Pawnshop - GTC"
+	# # elif str(current_ip) == str(branch_ip['tanza']):
+	# # 	branch = "Garcia's Pawnshop - TNZ"
 	
 	columns, data = [], []
 	columns = get_columns()
-	data = frappe.get_all("Pawn Ticket Non Jewelry", filters={'Branch':branch}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'expiry_date', 'workflow_state', 'change_status_date', '_comments'])
+	data = frappe.get_all("Pawn Ticket Non Jewelry", filters=filters, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'expiry_date', 'workflow_state', 'change_status_date', '_comments'])
 	comments = string_extractor
 	for i in range(len(data)):
 		description = ""
