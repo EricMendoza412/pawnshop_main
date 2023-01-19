@@ -27,7 +27,7 @@ frappe.call({
     }
 });
 
-let is_allowed = frappe.user_roles.includes('Administrator','Auditor');
+let is_allowed = frappe.user_roles.includes('Auditor') || frappe.user_roles.includes('Administrator');
 if(is_allowed){
     frappe.query_reports["NJ End of the Day Repor"] = {
         "filters": [
@@ -43,7 +43,6 @@ if(is_allowed){
                     "Garcia's Pawnshop - TNZ",
                 ],
                 default: default_branch
-                
             }
 
             // ,{
