@@ -48,14 +48,15 @@ frappe.query_reports["J End of Day Report"] = {
 		 	fieldname: "item_series",
 		 	label: __("Series"),
 		 	fieldtype: "Select",
-			 options: ["A", "B"],
+			options: ["A", "B"],
 			default: "A"
 		},
 		{
-			fieldname: "change_status_Date",
-			label: __("Date status changed"),
-			fieldtype: "Date",
-			default: ""
+			fieldname: "workflow_state",
+			label: __("work flow"),
+			fieldtype: "Select",
+			options: ["Active", "Renewed", "Redeemed", "Expired", "Returned", "Pulled Out", "Rejected"],
+			default: "Active"
 	   	}
 	]
 }
