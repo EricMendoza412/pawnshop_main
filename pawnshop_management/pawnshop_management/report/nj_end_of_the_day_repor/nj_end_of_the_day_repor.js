@@ -43,6 +43,13 @@ if(is_allowed){
                     "Garcia's Pawnshop - TNZ",
                 ],
                 default: default_branch
+            },
+            {
+                fieldname: "workflow_state",
+                label: __("work flow"),
+                fieldtype: "Select",
+                options: ["Active", "Renewed", "Redeemed", "Expired", "Returned", "Pulled Out", "Rejected"],
+                default: "Active"
             }
 
             // ,{
