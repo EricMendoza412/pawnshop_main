@@ -54,8 +54,8 @@ frappe.query_reports["J End of Day Report"] = {
 		{
 			fieldname: "change_status_Date",
 			label: __("Date status changed"),
-			fieldtype: "Data",
-			default: " "
+			fieldtype: "Date",
+			default: ""
 	   	}
 	]
 }
