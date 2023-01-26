@@ -43,15 +43,20 @@ frappe.query_reports["J End of Day Report"] = {
 				"Garcia's Pawnshop - TNZ",
 			],
 			default: default_branch
-		}
-
-		 ,{
+		},
+		{
 		 	fieldname: "item_series",
-		 	label: __("Status"),
+		 	label: __("Series"),
 		 	fieldtype: "Select",
 			 options: ["A", "B"],
 			default: "A"
-		 }
+		},
+		{
+			fieldname: "change_status_Date",
+			label: __("Date status changed"),
+			fieldtype: "Data",
+			default: " "
+	   	}
 	]
 }
 }else{
