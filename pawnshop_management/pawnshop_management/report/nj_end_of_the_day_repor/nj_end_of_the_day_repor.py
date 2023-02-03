@@ -36,11 +36,11 @@ def execute(filters=None):
 	for i in range(len(data)):
 		description = ""
 		comments = string_extractor(data[i]["_comments"])
-		details = frappe.db.get_list("Non Jewelry List", filters={'parent': data[i]['pawn_ticket']}, fields=['item_no', 'type', 'brand', 'model', 'model_number', 'comments'])
+		details = frappe.db.get_list("Non Jewelry List", filters={'parent': data[i]['pawn_ticket']}, fields=['item_no', 'type', 'brand', 'model', 'model_number', '_comments'])
 		customer = frappe.get_doc('Customer', data[i]['customers_tracking_no'])
 		data[i]['contact_no'] = customer.mobile_no
 		for j in range(len(details)):
-			description += details[j]["item_no"] + ", " + details[j]["type"] + ", " + details[j]["brand"] + ", " + details[j]["model"] + ", " + details[j]["model_number"] + ", " + details[j]["comments"]+ "; "
+			description += details[j]["item_no"] + ", " + details[j]["type"] + ", " + details[j]["brand"] + ", " + details[j]["model"] + ", " + details[j]["model_number"] + ", " + details[j]["_comments"]+ "; "
 		data[i]['description'] = description
 		data[i]['comments'] = comments
 	return columns, data
