@@ -40,8 +40,8 @@ def execute(filters=None):
 		customer = frappe.get_doc('Customer', data[i]['customers_tracking_no'])
 		data[i]['contact_no'] = customer.mobile_no
 		for j in range(len(details)):
-			commentsNJ = string_extractor(details[j]["_comments"])
-			description += details[j]["item_no"] + ", " + details[j]["type"] + ", " + details[j]["brand"] + ", " + details[j]["model"] + ", " + details[j]["model_number"] + ", " + commentsNJ + "; "
+			#commentsNJ = string_extractor(details[j]["_comments"])
+			description += details[j]["item_no"] + ", " + details[j]["type"] + ", " + details[j]["brand"] + ", " + details[j]["model"] + ", " + details[j]["model_number"] + "; "
 		data[i]['description'] = description
 		data[i]['comments'] = comments
 	return columns, data
