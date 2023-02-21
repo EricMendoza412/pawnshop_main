@@ -785,7 +785,7 @@ function maturity_date_of_the_month(frm) {
 	var previous_maturity_date = frm.doc.maturity_date;
 	
 	if (parseInt(current_date[0]) > parseInt(maturity_date[0])) { //Calculate month difference if maturity date is for next year
-		month_difference = Math.abs(parseInt(current_date[1]) - (12 - parseInt(maturity_date[1])));
+		month_difference = Math.abs(parseInt(current_date[1]) + (12 - parseInt(maturity_date[1])));
 	} else if(parseInt(current_date[0]) == parseInt(maturity_date[0])){ // Calculate month difference if maturity date is the same year
 		month_difference = parseInt(current_date[1]) - parseInt(maturity_date[1]);
 		if (month_difference < 0) {
