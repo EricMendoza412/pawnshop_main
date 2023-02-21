@@ -920,21 +920,25 @@ function expiry_date(frm) {			// To determin if the current date is really to be
 	
 
 	if (actual_current_date > actual_previous_expiry_date) {
-		if (parseInt(current_date[0]) > parseInt(previous_expiry_date[0])) {
-			month_difference = parseInt(current_date[1]) + (12 - parseInt(previous_expiry_date[1]))
-		} else if (parseInt(current_date[0]) == parseInt(previous_expiry_date[0])) {
-			month_difference = parseInt(current_date[1]) - parseInt(previous_expiry_date[1]);
+		if (parseInt(current_date[2]) > parseInt(previous_expiry_date[2])) {
+			month_difference = parseInt(current_date[0]) + (12 - parseInt(previous_expiry_date[0]))
+		} else if (parseInt(current_date[2]) == parseInt(previous_expiry_date[2])) {
+			month_difference = parseInt(current_date[0]) - parseInt(previous_expiry_date[0]);
 			if (month_difference < 0) {
 				month_difference = 0;
 			}
 		}
 	}
 
-	if (current_date[0] > previous_expiry_date[0]){
-		if (current_date[2] > previous_expiry_date[2]) {
+	if (current_date[2] > previous_expiry_date[2]){
+		if (current_date[1] < previous_expiry_date[1]) {
 			actual_current_expiry_date = frappe.datetime.add_months(actual_current_expiry_date, month_difference);
 			actual_previous_expiry_date = frappe.datetime.add_months(actual_current_expiry_date, -1);
+		} else {
+			actual_current_expiry_date = frappe.datetime.add_months(actual_current_expiry_date, month_difference + 1);
+			actual_previous_expiry_date = frappe.datetime.add_months(actual_current_expiry_date, -1);
 		}
+
 	} else if (current_date[0] == previous_expiry_date[0]) {
 		if (current_date[1] > previous_expiry_date[1]) {
 			if (current_date[2] > previous_expiry_date[2]) {
@@ -951,6 +955,7 @@ function expiry_date(frm) {			// To determin if the current date is really to be
 			}
 		}
 	}
+	console.log (actual_previous_expiry_date + " " + actual_current_expiry_date);
 	return {
 		'previous_expiry_date': actual_previous_expiry_date,
 		'current_expiry_date': actual_current_expiry_date
