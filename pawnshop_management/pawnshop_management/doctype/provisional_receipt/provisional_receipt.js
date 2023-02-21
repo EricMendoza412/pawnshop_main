@@ -881,7 +881,7 @@ function expiry_interest_multiplier(frm) {
 
 	if (parseInt(temp_expiry_date[0]) > parseInt(split_original_expiry_date[0])) {
 		console.log("A1");
-		multiplier = parseInt(temp_expiry_date[1]) + (12 - parseInt(split_original_expiry_date[1]))
+		multiplier = parseInt(temp_expiry_date[1]) + (12 - parseInt(split_original_expiry_date[1])) + 1;
 	} else if (parseInt(temp_expiry_date[0]) == parseInt(split_original_expiry_date[0])) {
 		console.log("B1");
 		if (parseInt(temp_expiry_date[1]) == parseInt(split_original_expiry_date[1])) {
@@ -1064,7 +1064,7 @@ function calculate_expiry_date_interest(frm) {
 		} else {
 			temp_interest = initial_interest;
 		}
-		console.log("Ineterest for Renewal: " + temp_interest);
+		console.log("Interest: " + temp_interest);
 		frm.set_value('interest_payment', temp_interest)
 		frm.refresh_field('interest_payment')
 	});
