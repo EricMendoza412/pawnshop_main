@@ -781,7 +781,6 @@ function maturity_date_of_the_month(frm) {
 	var current_date = frm.doc.date_issued.split("-");//frappe.datetime.get_today().split("-");
 	var maturity_date = frm.doc.maturity_date.split("-");
 	var month_difference = 0;
-	var previous_maturity_date = null;
 	var current_maturity_date = frm.doc.maturity_date;
 	var previous_maturity_date = frm.doc.maturity_date;
 	
@@ -800,8 +799,11 @@ function maturity_date_of_the_month(frm) {
 	if (current_date[0] > maturity_date[0]){
 		console.log("MD1");
 		if (current_date[2] > maturity_date[2]) {
-			current_maturity_date = frappe.datetime.add_months(frm.doc.maturity_date, month_difference);
-			previous_maturity_date = frappe.datetime.add_months(current_maturity_date, -1);
+			previous_maturity_date = current_maturity_date;
+			current_maturity_date = frappe.datetime.add_months(frm.doc.maturity_date, 1);
+		} else {
+			previous_maturity_date = current_maturity_date;
+			current_maturity_date = frappe.datetime.add_months(frm.doc.maturity_date, 1);
 		}
 	} else if (current_date[0] == maturity_date[0]) {
 		console.log("MD2");
