@@ -407,7 +407,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 
 
 function compute_nj_av(frm) {
-	frappe.db.get_value('Models', frm.doc.model, ['defective', 'minimum', 'maximum']).then(function(r){
+	frappe.db.get_value('Models', frm.doc.model, ['defective', 'minimum', 'maximum', 'no_charger_less']).then(function(r){
 		let price_suggestion = r.message;
 		var initial_price;
 		if (frm.doc.category == "Maximum") {
@@ -418,7 +418,7 @@ function compute_nj_av(frm) {
 			initial_price = parseFloat(price_suggestion.defective);
 		}
 
-		if(frm.doc.no_charger_less == 0){
+		if(price_suggestion.no_charger_less == 0){
 			if (frm.doc.charger == 0){
 				initial_price = initial_price - 300;
 				console.log("hello");
