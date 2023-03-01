@@ -726,8 +726,8 @@ function calculate_date_difference(current_date, due_date) {
 		days_in_month["Feb"] = 29
 	}
 
-	if (date_today_year >= maturity_date_year) {
-		year_difference = date_today_year - maturity_date_year
+	if (date_today_year > maturity_date_year) {
+		year_difference = date_today_year - maturity_date_year -1
 	} else {
 		year_difference = 0
 	}
