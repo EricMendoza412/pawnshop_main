@@ -419,7 +419,7 @@ function compute_nj_av(frm) {
 		}
 
 		console.log("Hello there "+price_suggestion.no_charger_less);
-		if(price_suggestion.no_charger_less == 0){
+		if(price_suggestion.no_charger_less != 1){
 			if (frm.doc.charger == 0){
 				initial_price = initial_price - 300;
 				console.log("hello");
