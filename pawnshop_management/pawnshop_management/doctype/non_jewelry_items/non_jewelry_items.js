@@ -418,7 +418,7 @@ function compute_nj_av(frm) {
 			initial_price = parseFloat(price_suggestion.defective);
 		}
 
-		console.log(price_suggestion.no_charger_less);
+		console.log("Hello there "+price_suggestion.no_charger_less);
 		if(price_suggestion.no_charger_less == 0){
 			if (frm.doc.charger == 0){
 				initial_price = initial_price - 300;
