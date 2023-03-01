@@ -421,6 +421,7 @@ function compute_nj_av(frm) {
 		if(frm.doc.no_charger_less == 0){
 			if (frm.doc.charger == 0){
 				initial_price = initial_price - 300;
+				console.log("hello");
 			}
 		}
 		frm.set_value('appraisal_value', initial_price)
