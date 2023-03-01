@@ -235,14 +235,19 @@ frappe.ui.form.on('Non Jewelry Items', {
 	model:function(frm){
 		frappe.db.get_value('Models', frm.doc.model, ['defective', 'minimum', 'maximum']).then(function(r){
 			let price_suggestion = r.message;
+			var initial_price;
 			if (frm.doc.category == "Maximum") {
-				if (frm.doc.charger == 0) {
-					frm.set_value('appraisal_value', parseFloat(price_suggestion.maximum) - 300)
-					frm.refresh_field('appraisal_value')
-				} else {
-					frm.set_value('appraisal_value', parseFloat(price_suggestion.maximum))
-					frm.refresh_field('appraisal_value')
-				}
+				initial_price = parseFloat(price_suggestion.maximum);
+
+				
+				// if (frm.doc.charger == 0) {
+				// 	frm.set_value('appraisal_value', parseFloat(price_suggestion.maximum) - 300)
+				// 	frm.refresh_field('appraisal_value')
+				// }
+				//  else {
+				// 	frm.set_value('appraisal_value', parseFloat(price_suggestion.maximum))
+				// 	frm.refresh_field('appraisal_value')
+				// }
 			} else if (frm.doc.category == "Minimum") {
 				if (frm.doc.charger == 0) {
 					frm.set_value('appraisal_value', parseFloat(price_suggestion.minimum) - 300)
@@ -260,6 +265,15 @@ frappe.ui.form.on('Non Jewelry Items', {
 					frm.refresh_field('appraisal_value')
 				}
 			}
+
+			if(frm.doc.no_charger_less == 0){
+				if (frm.doc.charger == 0){
+					initial_price = initial_price - 300;
+				}
+			}
+			frm.set_value('appraisal_value', initial_price)
+			frm.refresh_field('appraisal_value')
+
 		});
 	},
 
