@@ -304,7 +304,11 @@ frappe.ui.form.on('Non Jewelry Items', {
 
 	charger: function(frm){
 		compute_nj_av(frm)
-	    }
+	},
+
+	not_openline: function(frm){
+		compute_nj_av(frm)
+	}
 });
 
 
@@ -323,6 +327,13 @@ function compute_nj_av(frm) {
 		if(price_suggestion.no_charger_less != 1){
 			if (frm.doc.charger == 0){
 				initial_price = initial_price - 300;
+			}
+		}
+
+		if(frm.doc.not_openline == 1){
+			initial_price = initial_price - 1500;
+			if(initial_price < 0){
+				initial_price = 0;
 			}
 		}
 		frm.set_value('appraisal_value', initial_price)
