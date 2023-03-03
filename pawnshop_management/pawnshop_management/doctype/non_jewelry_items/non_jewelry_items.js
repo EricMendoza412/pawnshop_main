@@ -52,7 +52,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 			frm.refresh_field('charger')
 		}
 
-		frm.disable_save();
+		//frm.disable_save();
 		frm.set_df_property('disk_type', 'hidden', 1);
 		frm.set_df_property('internet_connection_capability', 'hidden', 1);
 		frm.set_df_property('bag', 'hidden', 1);
