@@ -395,7 +395,7 @@ frappe.ui.form.on('Provisional Receipt', {
 			show_payment_fields(frm);
 			frm.set_df_property('additional_amortization', 'hidden', 1);
 			frm.set_df_property('number_of_months_to_pay_in_advance', 'hidden', 1);
-			//get_new_pawn_ticket_no(frm);
+			get_new_pawn_ticket_no(frm);
 			select_transaction_type(frm);
 			frm.toggle_display(['new_pawn_ticket_no'], frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization');
 		} else if (frm.doc.transaction_type == "Renewal w/ Amortization") {
