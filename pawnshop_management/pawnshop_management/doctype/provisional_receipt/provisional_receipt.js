@@ -1302,6 +1302,7 @@ function select_transaction_type(frm) {					// Sets all field values calculation
 		calculate_total_amortization(frm, frm.doc.pawn_ticket_type, frm.doc.pawn_ticket_no);
 		show_previous_interest_payment(frm);
 		frm.set_value('total', parseFloat(frm.doc.interest_payment) + parseFloat(frm.doc.principal_amount) - parseFloat(frm.doc.previous_interest_payment) - parseFloat(frm.doc.discount));
+		console.log(parseFloat(frm.doc.interest_payment) + parseFloat(frm.doc.principal_amount) - parseFloat(frm.doc.previous_interest_payment) - parseFloat(frm.doc.discount));
 		frm.refresh_field('total');
 	} else if (frm.doc.transaction_type == "Amortization") {
 		calculate_total_amortization(frm, frm.doc.pawn_ticket_type, frm.doc.pawn_ticket_no);
