@@ -1317,11 +1317,11 @@ function select_transaction_type(frm) {					// Sets all field values calculation
 		calculate_total_amortization(frm, frm.doc.pawn_ticket_type, frm.doc.pawn_ticket_no);
 		show_previous_interest_payment(frm);
 	} else if(frm.doc.transaction_type == "Renewal"){
-		//calculate_interest(frm);
-		calculate_total_amortization(frm, frm.doc.pawn_ticket_type, frm.doc.pawn_ticket_no);
+		calculate_interest(frm);
+		//calculate_total_amortization(frm, frm.doc.pawn_ticket_type, frm.doc.pawn_ticket_no);
 		frm.set_value('interest_payment', parseFloat(frm.doc.interest_payment));
 		frm.refresh_field('interest_payment');
-		show_previous_interest_payment(frm);
+		//show_previous_interest_payment(frm);
 		frm.set_value('advance_interest', parseFloat(frm.doc.interest));
 		frm.refresh_field('advance_interest');
 		frm.set_value('total', parseFloat(frm.doc.interest_payment) + parseFloat(frm.doc.advance_interest) - parseFloat(frm.doc.previous_interest_payment));
