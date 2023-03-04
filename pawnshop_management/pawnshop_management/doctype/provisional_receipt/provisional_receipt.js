@@ -359,7 +359,7 @@ frappe.ui.form.on('Provisional Receipt', {
 	},
 
 	transaction_type: function(frm){
-		show_fields_for_dummy(frm);
+		//show_fields_for_dummy(frm);
 		frm.set_value('bank_payment', 0.00);
 		frm.set_value('gcash_amount_payment', 0.00);
 		frm.set_value('cash', 0.00);
