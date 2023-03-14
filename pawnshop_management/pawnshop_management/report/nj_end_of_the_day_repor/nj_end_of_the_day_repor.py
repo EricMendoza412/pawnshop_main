@@ -31,14 +31,14 @@ def execute(filters=None):
 	
 	columns, data = [], []
 	columns = get_columns()
-	data = frappe.get_all("Pawn Ticket Non Jewelry", filters=filters, fields=['pawn_ticket', 'customers_tracking_no', 'customers_name', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'expiry_date', 'workflow_state', 'change_status_date', '_comments'])
+	data = frappe.get_all("Pawn Ticket Non Jewelry", filters=filters, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'expiry_date', 'workflow_state', 'change_status_date', '_comments'])
 	comments = string_extractor
 	for i in range(len(data)):
 		description = ""
 		comments = string_extractor(data[i]["_comments"])
 		details = frappe.db.get_list("Non Jewelry List", filters={'parent': data[i]['pawn_ticket']}, fields=['item_no', 'type', 'brand', 'model', 'model_number', '_comments'])
-		#customer = frappe.get_doc('Customer', data[i]['customers_tracking_no'])
-		contact = frappe.get_doc('Contact', data[i]['customers_name'])
+		customer = frappe.get_doc('Customer', data[i]['customers_tracking_no'])
+		contact = frappe.get_doc('Contact', customer.customer_primary_contact)
 		data[i]['contact_no'] = contact.mobile_no
 		for j in range(len(details)):
 			#commentsNJ = string_extractor(details[j]["_comments"])
