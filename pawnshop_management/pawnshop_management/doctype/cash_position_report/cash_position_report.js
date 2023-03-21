@@ -270,6 +270,7 @@ frappe.ui.form.on('Cash Position Report', {
 	}
 });
 
+
 function get_beginning_balance(frm) {
 	frappe.call('pawnshop_management.pawnshop_management.custom_codes.get_latest_cpr.get_latest_cpr', {
 		branch: frm.doc.branch
