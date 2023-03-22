@@ -8,11 +8,21 @@
  "engine": "InnoDB",
  "field_order": [
   "naming_series",
+  "branch",
+  "date",
+  "column_break_4",
   "beginning_balance",
+  "net_cash",
+  "ending_balance",
+  "in_section",
   "provisional_receipts",
   "selling",
   "cash_from_vault",
+  "gcash_positive",
+  "bank_transfer_return",
+  "column_break_14",
   "total_in",
+  "out_section",
   "jewelry_a",
   "jewelry_b",
   "non_jewelry",
@@ -21,12 +31,11 @@
   "acknowledgement_receipts",
   "gcash",
   "bank_transfer",
-  "total_out",
   "column_break_9",
-  "branch",
-  "date",
-  "net_cash",
-  "ending_balance",
+  "total_out",
+  "j_new_sangla_a",
+  "j_new_sangla_b",
+  "nj_new_sanga_b",
   "cash_breakdown_section",
   "one_thousand_php_bills",
   "five_hundred_php_bills",
@@ -39,9 +48,8 @@
   "five_php_coin",
   "peso_php_coin",
   "twenty_five_cent_php_coin",
-  "section_break_27",
-  "total_cash",
   "column_break_29",
+  "total_cash",
   "shortage_overage",
   "daily_balance_section",
   "additional_pawn",
@@ -148,10 +156,6 @@
    "fieldname": "cash_to_vault",
    "fieldtype": "Currency",
    "label": "Cash To Vault"
-  },
-  {
-   "fieldname": "section_break_27",
-   "fieldtype": "Section Break"
   },
   {
    "default": "0.00",
@@ -322,29 +326,62 @@
    "fieldtype": "Currency",
    "label": "Total Discount",
    "read_only": 1
+  },
+  {
+   "default": "0.0",
+   "fieldname": "gcash_positive",
+   "fieldtype": "Data",
+   "label": "Gcash (From Return)"
+  },
+  {
+   "default": "0.0",
+   "fieldname": "bank_transfer_return",
+   "fieldtype": "Data",
+   "label": "Bank transfer (From Return)"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "in_section",
+   "fieldtype": "Section Break",
+   "label": "IN"
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "out_section",
+   "fieldtype": "Section Break",
+   "label": "OUT"
+  },
+  {
+   "fieldname": "j_new_sangla_a",
+   "fieldtype": "Small Text",
+   "label": "J New Sangla (A)"
+  },
+  {
+   "fieldname": "j_new_sangla_b",
+   "fieldtype": "Small Text",
+   "label": "J New Sangla (B)"
+  },
+  {
+   "fieldname": "nj_new_sanga_b",
+   "fieldtype": "Small Text",
+   "label": "NJ New Sanga (B)"
   }
  ],
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2022-08-19 14:37:14.904534",
+ "modified": "2023-03-22 13:05:21.657733",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Cash Position Report",
  "owner": "Administrator",
- "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  }
- ],
+ "permissions": [],
  "sort_field": "modified",
  "sort_order": "DESC",
  "track_changes": 1

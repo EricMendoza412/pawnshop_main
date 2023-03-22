@@ -122,7 +122,7 @@
    "fieldname": "ram",
    "fieldtype": "Select",
    "label": "RAM",
-   "options": "Not Shown\n2 GB\n3 GB\n4 GB\n6 GB\n8 GB\n12 GB",
+   "options": "Not Shown\n1 GB\n2 GB\n3 GB\n4 GB\n6 GB\n8 GB\n12 GB\n16 GB",
    "reqd": 1,
    "set_only_once": 1
   },
@@ -130,7 +130,7 @@
    "fieldname": "internal_memory",
    "fieldtype": "Select",
    "label": "Internal Memory",
-   "options": "32 GB\n64 GB\n128 GB\n237 GB\n256 GB\n512 GB\n930 GB\n1 TB",
+   "options": "32 GB\n64 GB\n128 GB\n237 GB\n256 GB\n512 GB\n930 GB\n1 TB\n2 TB",
    "reqd": 1,
    "set_only_once": 1
   },
@@ -306,7 +306,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-09-16 10:10:36.514344",
+ "modified": "2023-03-22 15:23:43.922723",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",

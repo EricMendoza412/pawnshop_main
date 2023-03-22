@@ -1,0 +1,33 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2023-03-21 14:37:19.686226",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "json": "{\"filters\":[],\"fields\":[[\"workflow_state\",\"Pawn Ticket Jewelry\"],[\"name\",\"Pawn Ticket Jewelry\"],[\"docstatus\",\"Pawn Ticket Jewelry\"],[\"pawn_ticket\",\"Pawn Ticket Jewelry\"],[\"desired_principal\",\"Pawn Ticket Jewelry\"],[\"item_series\",\"Pawn Ticket Jewelry\"],[\"old_pawn_ticket\",\"Pawn Ticket Jewelry\"]],\"order_by\":\"`tabPawn Ticket Jewelry`.`modified` desc\",\"page_length\":20,\"column_widths\":{\"workflow_state\":120,\"name\":120,\"docstatus\":120,\"pawn_ticket\":120,\"desired_principal\":120,\"item_series\":120,\"old_pawn_ticket\":120},\"group_by\":null}",
+ "letter_head": "BOA Letterhead",
+ "modified": "2023-03-21 14:37:19.686226",
+ "modified_by": "Administrator",
+ "module": "Pawnshop Management",
+ "name": "New Sangla today (J)",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "SELECT old_pawn_ticket as \"Old pawn ticket\"\nFROM `tabPawn Ticket Jewelry`\nWHERE `tabPawn Ticket Jewelry`.docstatus=1\nAND `tabPawn Ticket Jewelry`.old_pawn_ticket IS NOT NULL\nAND `tabPawn Ticket Jewelry`.date_loan_granted = CURDATE()",
+ "ref_doctype": "Pawn Ticket Jewelry",
+ "report_name": "New Sangla today (J)",
+ "report_script": "",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Vault Custodian"
+  }
+ ]
+}

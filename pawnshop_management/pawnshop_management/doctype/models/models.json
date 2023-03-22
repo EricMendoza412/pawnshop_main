@@ -15,7 +15,10 @@
   "maximum",
   "column_break_7",
   "item_image",
-  "preview"
+  "preview",
+  "model_number",
+  "ram",
+  "internal_memory"
  ],
  "fields": [
   {
@@ -73,11 +76,26 @@
   {
    "fieldname": "column_break_7",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "model_number",
+   "fieldtype": "Data",
+   "label": "Model number"
+  },
+  {
+   "fieldname": "ram",
+   "fieldtype": "Data",
+   "label": "Ram"
+  },
+  {
+   "fieldname": "internal_memory",
+   "fieldtype": "Data",
+   "label": "Internal Memory"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-21 12:35:48.067466",
+ "modified": "2023-03-22 15:11:40.123385",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Models",
