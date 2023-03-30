@@ -24,7 +24,7 @@ def execute(filters=None):
 
 	branch = ""
 	data = frappe.db.sql("""
-		SELECT old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted`, desired_principal
+		SELECT old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, desired_principal
 		FROM `tabPawn Ticket Jewelry`
 		WHERE `tabPawn Ticket Jewelry`.docstatus=1
 		AND `tabPawn Ticket Jewelry`.old_pawn_ticket IS NOT NULL
