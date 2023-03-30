@@ -10,15 +10,16 @@
   "model",
   "type",
   "brand",
+  "model_number",
+  "ram",
+  "internal_memory",
   "defective",
   "minimum",
   "maximum",
+  "no_charger_less",
   "column_break_7",
   "item_image",
-  "preview",
-  "model_number",
-  "ram",
-  "internal_memory"
+  "preview"
  ],
  "fields": [
   {
@@ -84,18 +85,26 @@
   },
   {
    "fieldname": "ram",
-   "fieldtype": "Data",
-   "label": "Ram"
+   "fieldtype": "Select",
+   "label": "Ram",
+   "options": "Multiple\n1 GB\n2 GB\n3 GB\n4 GB\n6 GB\n8 GB\n12 GB\n16 GB\nNot Shown"
   },
   {
    "fieldname": "internal_memory",
-   "fieldtype": "Data",
-   "label": "Internal Memory"
+   "fieldtype": "Select",
+   "label": "Internal Memory",
+   "options": "Multiple\n16 GB\n32 GB\n64 GB\n128 GB\n237 GB\n256 GB\n512 GB\n930 GB\n1 TB\n2 TB"
+  },
+  {
+   "default": "0",
+   "fieldname": "no_charger_less",
+   "fieldtype": "Check",
+   "label": "No Charger No Less 300"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-22 15:11:40.123385",
+ "modified": "2023-03-30 15:58:49.683893",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Models",
