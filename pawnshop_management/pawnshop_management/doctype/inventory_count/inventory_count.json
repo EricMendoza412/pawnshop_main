@@ -91,8 +91,7 @@
    "fieldname": "total_a",
    "fieldtype": "Int",
    "in_list_view": 1,
-   "label": "Total(A)",
-   "read_only": 1
+   "label": "Total(A)"
   },
   {
    "fieldname": "column_break_13",
@@ -247,7 +246,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-09-09 14:16:10.566733",
+ "modified": "2023-03-23 10:55:38.953194",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Inventory Count",

@@ -62,37 +62,11 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Audit Forms",
-   "link_to": "Audit Form",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Items",
+   "label": "Envelope Items",
+   "link_to": "Models",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Jewelry Batch",
-   "link_to": "Jewelry Batch",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "NJ Batch",
-   "link_to": "Non Jewelry Batch",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
   },
   {
    "hidden": 0,
@@ -115,7 +89,8 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Role Management",
+   "label": "Gadget Price List",
+   "link_to": "Models",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
@@ -123,138 +98,14 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Role Assignment",
-   "link_to": "Role Assignment",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Reports",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "NJ End of the Day",
-   "link_to": "NJ End of the Day Repor",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "LER A Series",
-   "link_to": "LER",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "LPR A Series",
-   "link_to": "LPR",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "VC Jewelry Report A",
-   "link_to": "Vault Custodian Jewelry Report A",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "VC Jewelry Report B",
-   "link_to": "Vault Custodian Jewelry Report B",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "VC Non Jewelry Report",
-   "link_to": "Vault Custodian Non Jewelry Report",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "icon": "",
-   "is_query_report": 0,
-   "label": "Settings",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Pawnshop Interest Rates",
-   "link_to": "Pawnshop Management Settings",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Ip Settings",
-   "link_to": "Branch IP Addressing",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "PT Naming Series ",
-   "link_to": "Pawnshop Naming Series",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Loyalty Program",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Loyalty Card",
-   "link_to": "Loyalty Card",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Loyalty Program",
-   "link_to": "Loyalty Program",
+   "label": "Models",
+   "link_to": "Models",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
   }
  ],
- "modified": "2022-08-19 13:35:47.919280",
+ "modified": "2023-03-24 12:54:29.360605",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Pawnshop Management",
@@ -262,66 +113,6 @@
  "pin_to_bottom": 0,
  "pin_to_top": 0,
  "shortcuts": [
-  {
-   "doc_view": "Report Builder",
-   "label": "LER A",
-   "link_to": "LER",
-   "type": "Report"
-  },
-  {
-   "doc_view": "",
-   "label": "LER B",
-   "link_to": "LER B",
-   "type": "Report"
-  },
-  {
-   "doc_view": "Report Builder",
-   "label": "LPR A",
-   "link_to": "LPR",
-   "type": "Report"
-  },
-  {
-   "doc_view": "Report Builder",
-   "label": "LPR B",
-   "link_to": "LPR B",
-   "type": "Report"
-  },
-  {
-   "doc_view": "Report Builder",
-   "label": "NJ End of Day Report",
-   "link_to": "NJ End of the Day Repor",
-   "type": "Report"
-  },
-  {
-   "doc_view": "Report Builder",
-   "label": "J End of The Day Report",
-   "link_to": "J End of Day Report",
-   "type": "Report"
-  },
-  {
-   "doc_view": "Report Builder",
-   "label": "VC Jewelry Report A",
-   "link_to": "Vault Custodian Jewelry Report A",
-   "type": "Report"
-  },
-  {
-   "doc_view": "Report Builder",
-   "label": "VC Jewelry Report B",
-   "link_to": "Vault Custodian Jewelry Report B",
-   "type": "Report"
-  },
-  {
-   "doc_view": "Report Builder",
-   "label": "VC Non Jewelry Report",
-   "link_to": "Vault Custodian Non Jewelry Report",
-   "type": "Report"
-  },
-  {
-   "doc_view": "Report Builder",
-   "label": "J End of Day Report",
-   "link_to": "J End of Day Report",
-   "type": "Report"
-  },
   {
    "doc_view": "New",
    "label": "New Pawn Ticket Jewelry",
@@ -347,10 +138,34 @@
    "type": "DocType"
   },
   {
-   "doc_view": "New",
-   "label": "New Audit Form",
-   "link_to": "Audit Form",
-   "type": "DocType"
+   "doc_view": "Report Builder",
+   "label": "VC Tracker (Gadget)",
+   "link_to": "NJ End of the Day Repor",
+   "type": "Report"
+  },
+  {
+   "doc_view": "Report Builder",
+   "label": "VC Tracker (Jewelry)",
+   "link_to": "J End of Day Report",
+   "type": "Report"
+  },
+  {
+   "doc_view": "Report Builder",
+   "label": "VC list - A ",
+   "link_to": "Vault Custodian Jewelry Report A",
+   "type": "Report"
+  },
+  {
+   "doc_view": "Report Builder",
+   "label": "VC list -B (J)",
+   "link_to": "Vault Custodian Jewelry Report B",
+   "type": "Report"
+  },
+  {
+   "doc_view": "Report Builder",
+   "label": "VC list - B (NJ)",
+   "link_to": "Vault Custodian Non Jewelry Report",
+   "type": "Report"
   }
  ],
  "shortcuts_label": "Shortcuts"

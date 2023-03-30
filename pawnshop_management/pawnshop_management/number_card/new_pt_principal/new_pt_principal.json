@@ -1,0 +1,22 @@
+{
+ "creation": "2023-03-22 17:21:31.527004",
+ "docstatus": 0,
+ "doctype": "Number Card",
+ "filters_json": "{}",
+ "function": "Count",
+ "idx": 0,
+ "is_public": 0,
+ "is_standard": 1,
+ "label": "New PT Principal",
+ "modified": "2023-03-22 17:21:31.605107",
+ "modified_by": "Administrator",
+ "module": "Pawnshop Management",
+ "name": "New PT Principal",
+ "owner": "Administrator",
+ "report_field": "new_pt_principal",
+ "report_function": "Sum",
+ "report_name": "Renewed PT today (J)",
+ "show_percentage_stats": 1,
+ "stats_time_interval": "Daily",
+ "type": "Report"
+}

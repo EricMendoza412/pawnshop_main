@@ -22,6 +22,7 @@
   "internet_connection_capability",
   "videocard",
   "category",
+  "not_openline",
   "accessories_section",
   "charger",
   "case",
@@ -92,7 +93,7 @@
    "fieldname": "appraisal_value",
    "fieldtype": "Currency",
    "label": "Appraisal Value",
-   "set_only_once": 1
+   "read_only": 1
   },
   {
    "fieldname": "comments",
@@ -302,11 +303,17 @@
    "label": "Branch",
    "options": "Branch",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "not_openline",
+   "fieldtype": "Check",
+   "label": "Not Openline"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-22 15:23:43.922723",
+ "modified": "2023-03-25 11:17:20.497785",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",
