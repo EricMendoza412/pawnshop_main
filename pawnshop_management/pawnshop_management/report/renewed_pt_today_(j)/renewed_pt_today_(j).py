@@ -8,7 +8,7 @@ from pawnshop_management.pawnshop_management.custom_codes.get_ip import get_ip_f
 
 def execute(filters=None):
 	columns, data = [], []
-
+	branch = ""
 	current_ip = frappe.local.request_ip
 	branch_ip = get_ip_from_settings()
 	if str(current_ip) == str(branch_ip['cavite_city']):
@@ -22,7 +22,7 @@ def execute(filters=None):
 	elif str(current_ip) == str(branch_ip['tanza']):
 		branch = "Garcia's Pawnshop - TNZ"
 
-	branch = ""
+	
 	data = frappe.db.sql("""
 		SELECT old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, desired_principal
 		FROM `tabPawn Ticket Jewelry`
