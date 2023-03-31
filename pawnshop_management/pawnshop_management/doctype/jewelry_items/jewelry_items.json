@@ -70,7 +70,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Karat Category",
-   "options": "Defective\nRegular\nSagad\n3.4g and Below",
+   "options": "Defective\nRegular\nSagad",
    "reqd": 1
   },
   {
@@ -219,7 +219,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-24 14:12:17.805409",
+ "modified": "2023-03-31 13:53:17.946941",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Jewelry Items",
