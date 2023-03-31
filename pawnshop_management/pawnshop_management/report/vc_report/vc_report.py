@@ -40,7 +40,16 @@ def execute(filters=None):
 		AND `tabPawn Ticket Jewelry`.branch = %s
 	""", (branch), as_dict=True)
 
-	data = data_redeemed + data_renewed
+	data_new_sangla = frappe.db.sql("""
+		SELECT '' as old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, desired_principal
+		FROM `tabPawn Ticket Jewelry`
+		WHERE `tabPawn Ticket Jewelry`.docstatus=1
+		AND `tabPawn Ticket Jewelry`.old_pawn_ticket IS NULL
+		AND `tabPawn Ticket Jewelry`.date_loan_granted = CURDATE()
+		AND `tabPawn Ticket Jewelry`.branch = %s
+	""", (branch), as_dict=True)
+
+	data = data_redeemed + data_renewed + data_new_sangla
 
 	columns = get_columns()
 	return columns, data
