@@ -1,0 +1,111 @@
+<script type="text/html" id="item_tmpl"></script>
+  <h1>Redeemed Pawn Tickets</h1>
+  <table class="table table-bordered">
+	<thead>
+		<tr>
+			<th style="width: 15%">{%= __("Staus") %}</th>
+			<th style="width: 10%">{%= __("Type") %}</th>
+			<th style="width: 25%">{%= __("Pawn Ticket") %}</th>
+			<th style="width: 25%">{%= __("Inventory#") %}</th>
+			<th style="width: 25%">{%= __("Principal") %}</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% let sum = 0 %}
+		{% for(var i=0, l=data.length; i<l; i++) { %}
+			<tr>
+				{% if(data[i].workflow_state == "Redeemed") { %}
+				<td>{%= data[i].workflow_state %}</td>
+				<td>{% if(data[i].inventory_tracking_no.substr(-2) == "NJ"){ %}
+					{%= __("Gadget") %}
+					{%}%}	
+				</td>
+				<td>{%= data[i].pawn_ticket %}</td>
+				<td>{%= data[i].inventory_tracking_no %}</td>
+				<td>{%= data[i].desired_principal %}</td>
+				{% sum += data[i].desired_principal %}
+				{% } %}
+			</tr>
+		{% } %}
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td style="text-align: right"><b>Total:</b></td>
+				<td>{{ sum }}</td>
+			</tr>
+	</tbody>
+  </table>
+
+  <h1>Renewed Pawn Tickets</h1>
+  <table class="table table-bordered">
+	<thead>
+		<tr>
+			<th style="width: 15%">{%= __("Old Pawn Ticket") %}</th>
+			<th style="width: 10%">{%= __("Type") %}</th>
+			<th style="width: 25%">{%= __("New Pawn Ticket") %}</th>
+			<th style="width: 25%">{%= __("Inventory#") %}</th>
+			<th style="width: 25%">{%= __("Principal") %}</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% let sumRN = 0 %}
+		{% for(var i=0, l=data.length; i<l; i++) { %}
+			<tr>
+				{% if(!data[i].old_pawn_ticket == "") { %}
+				<td>{%= data[i].old_pawn_ticket %}</td>
+				<td>{% if(data[i].inventory_tracking_no.substr(-2) == "NJ"){ %}
+					{%= __("Gadget") %}
+					{%}%}	
+				</td>
+				<td>{%= data[i].pawn_ticket %}</td>
+				<td>{%= data[i].inventory_tracking_no %}</td>
+				<td>{%= data[i].desired_principal %}</td>
+				{% sumRN += data[i].desired_principal %}
+				{% } %}
+			</tr>
+		{% } %}
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td style="text-align: right"><b>Total:</b></td>
+				<td>{{ sumRN }}</td>
+			</tr>
+	</tbody>
+  </table>
+
+  <h1>New Sangla</h1>
+  <table class="table table-bordered">
+	<thead>
+		<tr>
+			<th style="width: 25%">{%= __("Type") %}</th>
+			<th style="width: 25%">{%= __("Pawn Ticket") %}</th>
+			<th style="width: 25%">{%= __("Inventory#") %}</th>
+			<th style="width: 25%">{%= __("Principal") %}</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% let sumNS = 0 %}
+		{% for(var i=0, l=data.length; i<l; i++) { %}
+			<tr>
+				{% if((data[i].old_pawn_ticket == "") && !(data[i].workflow_state == "Redeemed")) { %}
+				<td>{% if(data[i].inventory_tracking_no.substr(-2) == "NJ"){ %}
+					{%= __("Gadget") %}
+					{%}%}	
+				</td>
+				<td>{%= data[i].pawn_ticket %}</td>
+				<td>{%= data[i].inventory_tracking_no %}</td>
+				<td>{%= data[i].desired_principal %}</td>
+				{% sumNS += data[i].desired_principal %}
+				{% } %}
+			</tr>
+		{% } %}
+			<tr>
+				<td></td>
+				<td></td>
+				<td style="text-align: right"><b>Total:</b></td>
+				<td>{{ sumNS }}</td>
+			</tr>
+	</tbody>
+  </table>
