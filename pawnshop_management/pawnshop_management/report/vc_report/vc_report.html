@@ -3,11 +3,12 @@
   <table class="table table-bordered">
 	<thead>
 		<tr>
-			<th style="width: 15%">{%= __("Staus") %}</th>
+			<th style="width: 15%">{%= __("Date Redeemed") %}</th>
+			<th style="width: 15%">{%= __("Status") %}</th>
 			<th style="width: 10%">{%= __("Type") %}</th>
-			<th style="width: 25%">{%= __("Pawn Ticket") %}</th>
-			<th style="width: 25%">{%= __("Inventory#") %}</th>
-			<th style="width: 25%">{%= __("Principal") %}</th>
+			<th style="width: 20%">{%= __("Pawn Ticket") %}</th>
+			<th style="width: 20%">{%= __("Inventory#") %}</th>
+			<th style="width: 20%">{%= __("Principal") %}</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -15,6 +16,7 @@
 		{% for(var i=0, l=data.length; i<l; i++) { %}
 			<tr>
 				{% if(data[i].workflow_state == "Redeemed") { %}
+				<td>{%= data[i].change_status_date %}</td>
 				<td>{%= data[i].workflow_state %}</td>
 				<td>{% if(data[i].inventory_tracking_no.substr(-2) == "NJ"){ %}
 					{%= __("Gadget") %}
@@ -31,6 +33,7 @@
 				<td></td>
 				<td></td>
 				<td></td>
+				<td></td>
 				<td style="text-align: right"><b>Total:</b></td>
 				<td>{{ sum }}</td>
 			</tr>
@@ -43,9 +46,10 @@
 		<tr>
 			<th style="width: 15%">{%= __("Old Pawn Ticket") %}</th>
 			<th style="width: 10%">{%= __("Type") %}</th>
-			<th style="width: 25%">{%= __("New Pawn Ticket") %}</th>
-			<th style="width: 25%">{%= __("Inventory#") %}</th>
-			<th style="width: 25%">{%= __("Principal") %}</th>
+			<th style="width: 15%">{%= __("Date Loan Granted") %}</th>
+			<th style="width: 20%">{%= __("New Pawn Ticket") %}</th>
+			<th style="width: 20%">{%= __("Inventory#") %}</th>
+			<th style="width: 20%">{%= __("Principal") %}</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -58,6 +62,7 @@
 					{%= __("Gadget") %}
 					{%}%}	
 				</td>
+				<td>{%= data[i].date_loan_granted %}</td>
 				<td>{%= data[i].pawn_ticket %}</td>
 				<td>{%= data[i].inventory_tracking_no %}</td>
 				<td>{%= data[i].desired_principal %}</td>
@@ -66,6 +71,7 @@
 			</tr>
 		{% } %}
 			<tr>
+				<td></td>
 				<td></td>
 				<td></td>
 				<td></td>
@@ -79,10 +85,11 @@
   <table class="table table-bordered">
 	<thead>
 		<tr>
-			<th style="width: 25%">{%= __("Type") %}</th>
-			<th style="width: 25%">{%= __("Pawn Ticket") %}</th>
-			<th style="width: 25%">{%= __("Inventory#") %}</th>
-			<th style="width: 25%">{%= __("Principal") %}</th>
+			<th style="width: 20%">{%= __("Type") %}</th>
+			<th style="width: 20%">{%= __("Date Loan Granted") %}</th>
+			<th style="width: 20%">{%= __("Pawn Ticket") %}</th>
+			<th style="width: 20%">{%= __("Inventory#") %}</th>
+			<th style="width: 20%">{%= __("Principal") %}</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -94,6 +101,7 @@
 					{%= __("Gadget") %}
 					{%}%}	
 				</td>
+				<td>{%= data[i].date_loan_granted %}</td>
 				<td>{%= data[i].pawn_ticket %}</td>
 				<td>{%= data[i].inventory_tracking_no %}</td>
 				<td>{%= data[i].desired_principal %}</td>
@@ -102,6 +110,7 @@
 			</tr>
 		{% } %}
 			<tr>
+				<td></td>
 				<td></td>
 				<td></td>
 				<td style="text-align: right"><b>Total:</b></td>
