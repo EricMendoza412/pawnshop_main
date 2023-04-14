@@ -44,5 +44,6 @@ frappe.query_reports["VC Report"] = {
 			fieldtype: "Date",
 			default: currentDate
 		}
+        
 	]
 };
