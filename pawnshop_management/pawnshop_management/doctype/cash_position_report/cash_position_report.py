@@ -8,60 +8,165 @@ from frappe.utils import today
 
 class CashPositionReport(Document):
 	def create_inventory_count_document(self):
-		a_in_count_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'date_loan_granted': self.date ,'item_series': 'A', 'workflow_state': 'Active', 'branch': self.branch})
+#A IN count
+		a_in_count_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'date_loan_granted': self.date ,'item_series': 'A', 'branch': self.branch, 'workflow_state': 'Active'})
+		a_in_rd_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'date_loan_granted': self.date ,'item_series': 'A', 'branch': self.branch, 'workflow_state': 'Redeemed'})
 		a_renewed_count_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'change_status_date': self.date, 'workflow_state': 'Renewed', 'item_series': 'A', 'branch': self.branch})
-		a_in_count = a_in_count_of_the_day - a_renewed_count_of_the_day
-		a_out_count = frappe.db.count('Pawn Ticket Jewelry', {'change_status_date': self.date, 'workflow_state': 'Redeemed', 'item_series': 'A', 'branch': self.branch})
-		a_pulled_out_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'change_status_date': self.date, 'item_series': 'A', 'workflow_state': 'Pulled Out', 'branch': self.branch})
-		a_returned_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'change_status_date': self.date, 'item_series': 'A', 'workflow_state': 'Returned', 'branch': self.branch})
-		a_total_active = frappe.db.count('Pawn Ticket Jewelry', {'date_loan_granted': ['<=', self.date], 'item_series': 'A', 'workflow_state': ['in', ['Active', 'Expired', 'Returned']], 'branch': self.branch})
+		a_in_count = a_in_count_of_the_day - a_renewed_count_of_the_day + a_in_rd_of_the_day
+#A IN principal
 		a_in_principal_active = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', "date_loan_granted": self.date, 'workflow_state': 'Active'}, fields=['desired_principal'], pluck='desired_principal')
-		a_in_principal_renewed = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', "change_status_date": self.date, 'workflow_state': 'Renewed'}, fields=['desired_principal'], pluck='desired_principal')
-			
+		a_in_principal_renewed = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', "change_status_date": self.date, 'workflow_state': 'Renewed'}, fields=['desired_principal'], pluck='desired_principal')	
+		a_in_rd = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', "date_loan_granted": self.date, 'workflow_state': 'Redeemed'}, fields=['desired_principal'], pluck='desired_principal')
 		sum_active_in = 0
 		for record in a_in_principal_active:
 			sum_active_in += record
 		sum_renewed_in = 0
 		for record in a_in_principal_renewed:
 			sum_renewed_in += record
-		a_in_principal = sum_active_in - sum_renewed_in
-
-		b_in_count_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'date_loan_granted': self.date ,'item_series': 'B', 'workflow_state': 'Active', 'branch': self.branch})
+		sum_rd_in_a = 0
+		for record in a_in_rd:
+			sum_rd_in_a += record	
+		a_in_principal = sum_active_in - sum_renewed_in + sum_rd_in_a
+#A OUT count
+		a_out_count = frappe.db.count('Pawn Ticket Jewelry', {'change_status_date': self.date, 'workflow_state': 'Redeemed', 'item_series': 'A', 'branch': self.branch})
+#A OUT principal
+		a_principal_redeemed = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', "change_status_date": self.date, 'workflow_state': 'Redeemed'}, fields=['desired_principal'], pluck='desired_principal')
+		a_out_principal = 0
+		for record in a_principal_redeemed:
+			a_out_principal += record
+#A PO count
+		a_pulled_out_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'change_status_date': self.date, 'item_series': 'A', 'workflow_state': 'Pulled Out', 'branch': self.branch})
+#A PO principal
+		a_principal_pulled_out = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', "change_status_date": self.date, 'workflow_state': 'Pulled Out'}, fields=['desired_principal'], pluck='desired_principal')
+		a_po_principal = 0
+		for record in a_principal_pulled_out:
+			a_po_principal += record
+#A RET count
+		a_returned_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'change_status_date': self.date, 'item_series': 'A', 'workflow_state': 'Returned', 'branch': self.branch})
+#A RET principal
+		a_principal_returned = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', "change_status_date": self.date, 'workflow_state': 'Returned'}, fields=['desired_principal'], pluck='desired_principal')
+		a_ret_principal = 0
+		for record in a_principal_returned:
+			a_ret_principal += record
+#A Total
+		a_total_active = frappe.db.count('Pawn Ticket Jewelry', {'date_loan_granted': ['<=', self.date], 'item_series': 'A', 'workflow_state': ['in', ['Active', 'Expired', 'Returned']], 'branch': self.branch})
+#B IN count
+		b_in_count_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'date_loan_granted': self.date ,'item_series': 'B', 'branch': self.branch, 'workflow_state': 'Active'})
 		b_renewed_count_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'change_status_date': self.date, 'workflow_state': 'Renewed', 'item_series': 'B', 'branch': self.branch})
-		b_in_count = b_in_count_of_the_day - b_renewed_count_of_the_day
+		b_in_rd_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'date_loan_granted': self.date ,'item_series': 'B', 'branch': self.branch, 'workflow_state': 'Redeemed'})
+		b_in_count = b_in_count_of_the_day - b_renewed_count_of_the_day + b_in_rd_of_the_day
+#B IN principal
+		b_in_principal_active = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'B', "date_loan_granted": self.date, 'workflow_state': 'Active'}, fields=['desired_principal'], pluck='desired_principal')
+		b_in_principal_renewed = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'B', "change_status_date": self.date, 'workflow_state': 'Renewed'}, fields=['desired_principal'], pluck='desired_principal')	
+		b_in_rd = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'B', "date_loan_granted": self.date, 'workflow_state': 'Redeemed'}, fields=['desired_principal'], pluck='desired_principal')
+		sum_active_in_b = 0
+		for record in b_in_principal_active:
+			sum_active_in_b += record
+		sum_renewed_in_b = 0
+		for record in b_in_principal_renewed:
+			sum_renewed_in_b += record
+		sum_rd_in_b = 0
+		for record in b_in_rd:
+			sum_rd_in_b += record	
+		b_in_principal = sum_active_in_b - sum_renewed_in_b + sum_rd_in_b
+#B OUT count
 		b_out_count = frappe.db.count('Pawn Ticket Jewelry', {'change_status_date': self.date, 'workflow_state': 'Redeemed', 'item_series': 'B', 'branch': self.branch})
+#B OUT principal
+		b_principal_redeemed = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'B', "change_status_date": self.date, 'workflow_state': 'Redeemed'}, fields=['desired_principal'], pluck='desired_principal')
+		b_out_principal = 0
+		for record in b_principal_redeemed:
+			b_out_principal += record
+#B PO count
 		b_pulled_out_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'change_status_date': self.date, 'item_series': 'B', 'workflow_state': 'Pulled Out', 'branch': self.branch})
+#B PO principal
+		b_principal_pulled_out = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'B', "change_status_date": self.date, 'workflow_state': 'Pulled Out'}, fields=['desired_principal'], pluck='desired_principal')
+		b_po_principal = 0
+		for record in b_principal_pulled_out:
+			b_po_principal += record
+#B RET count
 		b_returned_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'change_status_date': self.date, 'item_series': 'B', 'workflow_state': 'Returned', 'branch': self.branch})
+#B RET principal
+		b_principal_returned = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'B', "change_status_date": self.date, 'workflow_state': 'Returned'}, fields=['desired_principal'], pluck='desired_principal')
+		b_ret_principal = 0
+		for record in b_principal_returned:
+			b_ret_principal += record
+#B Total
 		b_total_active = frappe.db.count('Pawn Ticket Jewelry', {'date_loan_granted': ['<=', self.date], 'item_series': 'B', 'workflow_state': ['in', ['Active', 'Expired', 'Returned']], 'branch': self.branch})
-
+#BNJ IN count
 		nj_in_count_of_the_day = frappe.db.count('Pawn Ticket Non Jewelry', {'date_loan_granted': self.date , 'workflow_state': 'Active', 'branch': self.branch})
 		nj_renewed_count_of_the_day = frappe.db.count('Pawn Ticket Non Jewelry', {'change_status_date': self.date, 'workflow_state': 'Renewed', 'branch': self.branch})
-		nj_in_count = nj_in_count_of_the_day - nj_renewed_count_of_the_day
+		bnj_in_rd_of_the_day = frappe.db.count('Pawn Ticket Non Jewelry', {'date_loan_granted': self.date , 'branch': self.branch, 'workflow_state': 'Redeemed'})
+		nj_in_count = nj_in_count_of_the_day - nj_renewed_count_of_the_day + bnj_in_rd_of_the_day
+#BNJ IN principal
+		bnj_in_principal_active = frappe.db.get_all('Pawn Ticket Non Jewelry', filters={"branch": self.branch, "date_loan_granted": self.date, 'workflow_state': 'Active'}, fields=['desired_principal'], pluck='desired_principal')
+		bnj_in_principal_renewed = frappe.db.get_all('Pawn Ticket Non Jewelry', filters={"branch": self.branch, "change_status_date": self.date, 'workflow_state': 'Renewed'}, fields=['desired_principal'], pluck='desired_principal')	
+		bnj_in_rd = frappe.db.get_all('Pawn Ticket Non Jewelry', filters={"branch": self.branch, "date_loan_granted": self.date, 'workflow_state': 'Redeemed'}, fields=['desired_principal'], pluck='desired_principal')
+		sum_active_in_bnj = 0
+		for record in bnj_in_principal_active:
+			sum_active_in_bnj += record
+		sum_renewed_in_bnj = 0
+		for record in bnj_in_principal_renewed:
+			sum_renewed_in_bnj += record
+		sum_rd_in_bnj = 0
+		for record in bnj_in_rd:
+			sum_rd_in_bnj += record	
+		bnj_in_principal = sum_active_in_bnj - sum_renewed_in_bnj + sum_rd_in_bnj
+#BNJ OUT count
 		nj_out_count = frappe.db.count('Pawn Ticket Non Jewelry', {'change_status_date': self.date, 'workflow_state': 'Redeemed', 'branch': self.branch})
+#BNJ OUT principal
+		bnj_principal_redeemed = frappe.db.get_all('Pawn Ticket Non Jewelry', filters={"branch": self.branch, "change_status_date": self.date, 'workflow_state': 'Redeemed'}, fields=['desired_principal'], pluck='desired_principal')
+		bnj_out_principal = 0
+		for record in bnj_principal_redeemed:
+			bnj_out_principal += record
+#BNJ PO count
 		nj_pulled_out_of_the_day = frappe.db.count('Pawn Ticket Non Jewelry', {'change_status_date': self.date, 'workflow_state': 'Pulled Out', 'branch': self.branch})
+#BNJ PO principal
+		bnj_principal_pulled_out = frappe.db.get_all('Pawn Ticket Non Jewelry', filters={"branch": self.branch, "change_status_date": self.date, 'workflow_state': 'Pulled Out'}, fields=['desired_principal'], pluck='desired_principal')
+		bnj_po_principal = 0
+		for record in bnj_principal_pulled_out:
+			bnj_po_principal += record
+#BNJ RET count
 		nj_returned_of_the_day = frappe.db.count('Pawn Ticket Non Jewelry', {'change_status_date': self.date, 'workflow_state': 'Returned', 'branch': self.branch})
+#BNJ RET principal
+		bnj_principal_returned = frappe.db.get_all('Pawn Ticket Non Jewelry', filters={"branch": self.branch, "change_status_date": self.date, 'workflow_state': 'Returned'}, fields=['desired_principal'], pluck='desired_principal')
+		bnj_ret_principal = 0
+		for record in bnj_principal_returned:
+			bnj_ret_principal += record
+#BNJ Total
 		nj_total_active = frappe.db.count('Pawn Ticket Non Jewelry', {'date_loan_granted': ['<=', self.date], 'workflow_state': ['in', ['Active', 'Expired', 'Returned']], 'branch': self.branch})
 
+#assign to document fields
 		invetory_count_doc = frappe.new_doc('Inventory Count')
 		invetory_count_doc.date = self.date
 		invetory_count_doc.branch = self.branch
 		invetory_count_doc.in_count_a = a_in_count
 		invetory_count_doc.principal_in_a = a_in_principal
 		invetory_count_doc.out_count_a = a_out_count
+		invetory_count_doc.principal_out_a = a_out_principal
 		invetory_count_doc.returned_a = a_returned_of_the_day
+		invetory_count_doc.principal_ret_a = a_ret_principal
 		invetory_count_doc.pulled_out_a = a_pulled_out_of_the_day
+		invetory_count_doc.principal_po_a = a_po_principal
 		invetory_count_doc.total_a = a_total_active
 
 		invetory_count_doc.in_count_b = b_in_count
+		invetory_count_doc.principal_in_b = b_in_principal
 		invetory_count_doc.out_count_b = b_out_count
+		invetory_count_doc.principal_out_b = b_out_principal
 		invetory_count_doc.returned_b = b_returned_of_the_day
+		invetory_count_doc.principal_ret_b = b_ret_principal
 		invetory_count_doc.pulled_out_b = b_pulled_out_of_the_day
+		invetory_count_doc.principal_po_b = b_po_principal
 		invetory_count_doc.total_b = b_total_active
-
+		
 		invetory_count_doc.in_count_nj = nj_in_count
+		invetory_count_doc.principal_in_nj = bnj_in_principal
 		invetory_count_doc.out_count_nj = nj_out_count
-		invetory_count_doc.returned_nj = nj_returned_of_the_day
+		invetory_count_doc.principal_out_nj = bnj_out_principal
 		invetory_count_doc.pulled_out_nj = nj_pulled_out_of_the_day
+		invetory_count_doc.principal_po_nj = bnj_po_principal
+		invetory_count_doc.returned_nj = nj_returned_of_the_day
+		invetory_count_doc.principal_ret_nj = bnj_ret_principal
 		invetory_count_doc.total_nj = nj_total_active
 		invetory_count_doc.save(ignore_permissions=True)
 # Added Comment
