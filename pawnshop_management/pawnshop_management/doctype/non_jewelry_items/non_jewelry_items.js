@@ -42,14 +42,13 @@ frappe.ui.form.on('Non Jewelry Items', {
 				}
 			})
 
-		}
-
-		if (frm.doc.type == "Cellphone" || frm.doc.type == "Tablet") {
-			frm.set_value('charger', 1)
-			frm.refresh_field('charger')
-		} else {
-			frm.set_value('charger', 0)
-			frm.refresh_field('charger')
+			if (frm.doc.type == "Cellphone" || frm.doc.type == "Tablet") {
+				frm.set_value('charger', 1)
+				frm.refresh_field('charger')
+			} else {
+				frm.set_value('charger', 0)
+				frm.refresh_field('charger')
+			}
 		}
 
 		//frm.disable_save();

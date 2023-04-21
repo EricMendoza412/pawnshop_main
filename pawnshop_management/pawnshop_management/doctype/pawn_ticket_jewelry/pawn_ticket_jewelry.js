@@ -6,80 +6,8 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 		frm.set_df_property('customers_tracking_no', 'read_only', 1);
 	},
 
-	before_workflow_action: function(frm){
-		if (frm.selected_workflow_action === "Collect") { // Change status
-			frappe.call({
-				method: 'pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.update_fields_after_status_change_collect_pawn_ticket',
-				args: {
-					pawn_ticket_type: "Pawn Ticket Jewelry",
-					pawn_ticket_no: String(frm.doc.pawn_ticket),
-					inventory_tracking_no: String(frm.doc.inventory_tracking_no)
-				},
-				callback: function(){
-					frm.refresh_field('change_status_date');
-				}
-			})
-		} else if (frm.selected_workflow_action === "Redeem") {
-			frappe.call({
-				method: 'pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.update_fields_after_status_change_redeem_pawn_ticket',
-				args: {
-					pawn_ticket_type: "Pawn Ticket Jewelry",
-					pawn_ticket_no: String(frm.doc.pawn_ticket),
-					inventory_tracking_no: String(frm.doc.inventory_tracking_no)
-				},
-				callback: function(){
-					frm.refresh_field('change_status_date');
-				}
-			})
-		} else if (frm.selected_workflow_action === "Review") {
-			frappe.call({
-				method: 'pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.update_fields_after_status_change_review_pawn_ticket',
-				args: {
-					pawn_ticket_type: "Pawn Ticket Jewelry",
-					pawn_ticket_no: String(frm.doc.pawn_ticket),
-					inventory_tracking_no: String(frm.doc.inventory_tracking_no)
-				},
-				callback: function(){
-					frm.refresh_field('change_status_date')
-				}
-			})
-		} else if (frm.selected_workflow_action === "Collect") {
-			frappe.call({
-				method: 'pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.update_fields_after_status_change_collect_pawn_ticket',
-				args: {
-					pawn_ticket_type: "Pawn Ticket Jewelry",
-					pawn_ticket_no: String(frm.doc.pawn_ticket),
-					inventory_tracking_no: String(frm.doc.inventory_tracking_no)
-				},
-				callback: function(){
-					frm.refresh_field('change_status_date')
-				}
-			})
-		} else if (frm.selected_workflow_action === "Pull Out") {
-			frappe.call({
-				method: 'pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.update_fields_after_status_change_pull_out_pawn_ticket',
-				args: {
-					pawn_ticket_type: "Pawn Ticket Jewelry",
-					pawn_ticket_no: String(frm.doc.pawn_ticket),
-					inventory_tracking_no: String(frm.doc.inventory_tracking_no)
-				},
-				callback: function(){
-					frm.refresh_field('change_status_date')
-				}
-			})
-		} else if (frm.selected_workflow_action === "Renew") {
-			frappe.call({
-				method: 'pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.update_fields_after_status_change_renew_pawn_ticket',
-				args: {
-					pawn_ticket_type: "Pawn Ticket Jewelry",
-					pawn_ticket_no: String(frm.doc.pawn_ticket),
-					inventory_tracking_no: String(frm.doc.inventory_tracking_no)
-				},
-				callback: function(){
-					frm.refresh_field('change_status_date')
-				}
-			})
-		}
+	after_workflow_action: function(frm){
+		frm.reload_doc()
 	},
 
 	refresh: function(frm){
@@ -89,7 +17,7 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 		if (frm.is_new()) {
 			show_tracking_no(frm);
 			frm.set_value('date_loan_granted', frappe.datetime.nowdate())
-			frm.set_value('change_status_date', frappe.datetime.nowdate())
+			//frm.set_value('change_status_date', frappe.datetime.nowdate())
 			frappe.call({
 				method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip',
 				callback: function(data){
@@ -303,6 +231,24 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 				}
 			})
 		})
+
+		if(frm.customers_tracking_no != null)
+		{
+			let html = ``;
+			frappe.call({
+				method: "pawnshop_management.pawnshop_management.utils.get_contact_image_by_customer",
+				args: {
+					customer: frm.doc.customers_tracking_no,
+				},
+				callback: function(r) {
+					if (r.message) {
+						$(frm.fields_dict['default_image'].wrapper).html(r.message);
+					}
+				}
+
+			});
+		}
+
 	},
 
 	branch: function(frm){
@@ -335,6 +281,21 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 
 	customers_tracking_no: function(frm){
 		// show_tracking_no(frm)
+        let html = ``;
+        frappe.call({
+            method: "pawnshop_management.pawnshop_management.utils.get_contact_image_by_customer",
+            args: {
+                customer: frm.doc.customers_tracking_no,
+            },
+            callback: function(r) {
+                if (r.message) {
+                    $(frm.fields_dict['default_image'].wrapper).html(r.message);
+                }
+            }
+
+        });
+
+
 	},
 
 	item_series: function(frm){

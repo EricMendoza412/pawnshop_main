@@ -16,6 +16,7 @@
   "bank",
   "amortization",
   "previous_interest_payment",
+  "series",
   "column_break_10",
   "date_issued",
   "branch",
@@ -172,7 +173,6 @@
    "fieldtype": "Date",
    "in_list_view": 1,
    "label": "Date Issued",
-   "read_only": 1,
    "reqd": 1
   },
   {
@@ -305,12 +305,19 @@
    "hidden": 1,
    "label": "Actual Items NJ",
    "options": "Non Jewelry List"
+  },
+  {
+   "fetch_from": "pawn_ticket_no.item_series",
+   "fieldname": "series",
+   "fieldtype": "Data",
+   "label": "Series",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-03-28 09:04:56.571889",
+ "modified": "2023-04-21 10:17:14.268115",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Provisional Receipt",

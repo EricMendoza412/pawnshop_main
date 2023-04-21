@@ -5,8 +5,36 @@ from pydoc import doc
 import frappe
 from frappe.model.document import Document
 from frappe.utils import flt
+from pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket import (
+    update_fields_after_status_change_collect_pawn_ticket,
+    update_fields_after_status_change_pull_out_pawn_ticket,
+	update_fields_after_status_change_return_pawn_ticket,
+	update_fields_after_status_change_renew_pawn_ticket,
+	update_fields_after_status_change_redeem_pawn_ticket
+)
 
 class PawnTicketNonJewelry(Document):
+	def update_pawn_ticket_jewelry_statuses(self):
+		if self.workflow_state == "Expired":
+			update_fields_after_status_change_collect_pawn_ticket("Pawn Ticket Non Jewelry", self.inventory_tracking_no, self.pawn_ticket)
+		elif self.workflow_state == "Pulled Out":
+			update_fields_after_status_change_pull_out_pawn_ticket("Pawn Ticket Non Jewelry", self.inventory_tracking_no, self.pawn_ticket)
+		elif self.workflow_state == "Returned":
+			update_fields_after_status_change_return_pawn_ticket("Pawn Ticket Non Jewelry", self.inventory_tracking_no, self.pawn_ticket)
+		elif self.workflow_state == "Renewed":
+			update_fields_after_status_change_renew_pawn_ticket("Pawn Ticket Non Jewelry", self.inventory_tracking_no, self.pawn_ticket)	
+		elif self.workflow_state == "Redeemed":
+			update_fields_after_status_change_redeem_pawn_ticket("Pawn Ticket Non Jewelry", self.inventory_tracking_no, self.pawn_ticket)	
+
+	def on_update(self):
+		self.update_pawn_ticket_jewelry_statuses()
+	def on_update_after_submit(self):
+		self.update_pawn_ticket_jewelry_statuses()
+	# def on_trash(self):
+	# 	self.update_pawn_ticket_jewelry_statuses()
+	def on_cancel(self):
+		self.update_pawn_ticket_jewelry_statuses()
+
 	def before_save(self):
 		if frappe.db.exists('Pawn Ticket Non Jewelry', self.name) == None:
 			if self.amended_from == None:

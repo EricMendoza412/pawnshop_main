@@ -20,6 +20,7 @@
   "customers_name",
   "customers_full_name",
   "customer_birthday",
+  "default_image",
   "created_by_pr",
   "section_break_9",
   "inventory_tracking_no",
@@ -187,6 +188,11 @@
    "fieldtype": "Data",
    "label": "Customer Birthday",
    "read_only": 1
+  },
+  {
+   "fieldname": "default_image",
+   "fieldtype": "HTML",
+   "label": "Default Image"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -197,7 +203,7 @@
    "link_fieldname": "inventory_tracking_no"
   }
  ],
- "modified": "2023-03-22 12:21:39.424733",
+ "modified": "2023-04-21 09:48:16.920402",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Pawn Ticket Jewelry",

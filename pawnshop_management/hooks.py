@@ -36,6 +36,7 @@ app_license = "MIT"
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
+doctype_js = {"Contact" : "public/js/contact.js"}
 
 # Home Pages
 # ----------
@@ -104,6 +105,12 @@ permission_query_conditions = {
 # 		"on_trash": "method"
 #	}
 # }
+
+doc_events = {
+	"Contact": {
+		"validate": "pawnshop_management.pawnshop_management.doc_events.validate_contact",
+	}
+}
 
 
 # Scheduled Tasks

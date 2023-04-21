@@ -2,82 +2,10 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Pawn Ticket Non Jewelry', {
-	before_workflow_action: function(frm){
-		if (frm.selected_workflow_action === "Collect") { // Change status
-			frappe.call({
-				method: 'pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.update_fields_after_status_change_collect_pawn_ticket',
-				args: {
-					pawn_ticket_type: "Pawn Ticket Non Jewelry",
-					pawn_ticket_no: String(frm.doc.pawn_ticket),
-					inventory_tracking_no: String(frm.doc.inventory_tracking_no)
-				},
-				callback: function(){
-					frm.refresh_field('change_status_date');
-				}
-			})
-		} else if (frm.selected_workflow_action === "Redeem") {
-			frappe.call({
-				method: 'pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.update_fields_after_status_change_redeem_pawn_ticket',
-				args: {
-					pawn_ticket_type: "Pawn Ticket Non Jewelry",
-					pawn_ticket_no: String(frm.doc.pawn_ticket),
-					inventory_tracking_no: String(frm.doc.inventory_tracking_no)
-				},
-				callback: function(){
-					frm.refresh_field('change_status_date');
-				}
-			})
-		} else if (frm.selected_workflow_action === "Review") {
-			frappe.call({
-				method: 'pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.update_fields_after_status_change_review_pawn_ticket',
-				args: {
-					pawn_ticket_type: "Pawn Ticket Non Jewelry",
-					pawn_ticket_no: String(frm.doc.pawn_ticket),
-					inventory_tracking_no: String(frm.doc.inventory_tracking_no)
-				},
-				callback: function(){
-					frm.refresh_field('change_status_date')
-				}
-			})
-		} else if (frm.selected_workflow_action === "Collect") {
-			frappe.call({
-				method: 'pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.update_fields_after_status_change_collect_pawn_ticket',
-				args: {
-					pawn_ticket_type: "Pawn Ticket Non Jewelry",
-					pawn_ticket_no: String(frm.doc.pawn_ticket),
-					inventory_tracking_no: String(frm.doc.inventory_tracking_no)
-				},
-				callback: function(){
-					frm.refresh_field('change_status_date')
-				}
-			})
-		} else if (frm.selected_workflow_action === "Pull Out") {
-			frappe.call({
-				method: 'pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.update_fields_after_status_change_pull_out_pawn_ticket',
-				args: {
-					pawn_ticket_type: "Pawn Ticket Non Jewelry",
-					pawn_ticket_no: String(frm.doc.pawn_ticket),
-					inventory_tracking_no: String(frm.doc.inventory_tracking_no)
-				},
-				callback: function(){
-					frm.refresh_field('change_status_date')
-				}
-			})
-		} else if (frm.selected_workflow_action === "Renew") {
-			frappe.call({
-				method: 'pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.update_fields_after_status_change_renew_pawn_ticket',
-				args: {
-					pawn_ticket_type: "Pawn Ticket Non Jewelry",
-					pawn_ticket_no: String(frm.doc.pawn_ticket),
-					inventory_tracking_no: String(frm.doc.inventory_tracking_no)
-				},
-				callback: function(){
-					frm.refresh_field('change_status_date')
-				}
-			})
-		}
-	},
 
+	after_workflow_action: function(frm){
+		frm.reload_doc()
+	},
 	validate: function(frm, cdt, cdn){
 		var temp_principal = 0.0;
 		$.each(frm.doc.non_jewelry_items, function(index, item){

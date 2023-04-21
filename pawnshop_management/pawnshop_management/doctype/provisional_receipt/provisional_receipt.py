@@ -6148,6 +6148,7 @@ class ProvisionalReceipt(Document):
 					row_values2.account = "4112-005 - Interest on Past Due Loans - J - TNZ - MPConso"
 					row_values2.branch = "Garcia's Pawnshop - TNZ"
 					row_values2.cost_center = "5 - Tanza - MPConso"
+					# row_values2.cost_center = frappe.get_value("Branch Defaults", "Garcia's Pawnshop - TNZ", "cost_center")
 				elif self.branch == "Rabie's House":
 					row_values2.account = "4112-001 - Interest on Past Due Loans - J - CC - MPConso"
 					row_values2.branch = "Garcia's Pawnshop - CC"

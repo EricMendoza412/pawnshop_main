@@ -3,7 +3,7 @@
 
 frappe.ui.form.on('Jewelry Batch', {
 	refresh: function(frm) {
-		if (frm.is_new) {
+		if (frm.is_new()) {
 			frappe.call({
 				method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip',
 				callback: function(data){
