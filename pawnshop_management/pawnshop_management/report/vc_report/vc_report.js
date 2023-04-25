@@ -36,14 +36,45 @@ let year = date.getFullYear();
 // This arrangement can be altered based on how we want the date's format to appear.
 let currentDate = `${year}-${month}-${day}`;
 
-frappe.query_reports["VC Report"] = {
-	"filters": [
-		{
-			fieldname: "change_status_date",
-			label: __("Date"),
-			fieldtype: "Date",
-			default: currentDate
-		}
-        
-	]
-};
+let is_allowed = frappe.user_roles.includes('Auditor') || frappe.user_roles.includes('Administrator');
+if(is_allowed){
+    frappe.query_reports["VC Report"] = {
+        "filters": [
+            {
+                fieldname: "change_status_date",
+                label: __("Date"),
+                fieldtype: "Date",
+                default: currentDate
+            },
+            {
+                fieldname: "branch",
+                label: __("Branch"),
+                fieldtype: "Select",
+                options: [
+                    "Garcia\\'s Pawnshop - CC", 
+                    "Garcia\\'s Pawnshop - GTC", 
+                    "Garcia\\'s Pawnshop - MOL",
+                    "Garcia\\'s Pawnshop - POB",
+                    "Garcia\\'s Pawnshop - TNZ",
+                ],
+                default: default_branch
+            }
+            
+        ]
+    };
+}else{
+    frappe.query_reports["VC Report"] = {
+        "filters": [
+            {
+                fieldname: "change_status_date",
+                label: __("Date"),
+                fieldtype: "Date",
+                default: currentDate
+            }
+            
+        ]
+    };
+
+}
+
+

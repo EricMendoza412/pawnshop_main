@@ -7,21 +7,28 @@ from pawnshop_management.pawnshop_management.custom_codes.get_ip import get_ip_f
 
 
 def execute(filters=None):
+	status_value = getattr(filters, 'branch')
 	columns, data = [], []
 	branch = ""
+	branch_fr_ip = ""
 	current_ip = frappe.local.request_ip
 	branch_ip = get_ip_from_settings()
 	if str(current_ip) == str(branch_ip['cavite_city']):
-		branch = "Garcia\\'s Pawnshop - CC"
+		branch_fr_ip = "Garcia\\'s Pawnshop - CC"
 	elif str(current_ip) == str(branch_ip['poblacion']):
-		branch = "Garcia\\'s Pawnshop - POB"
+		branch_fr_ip = "Garcia\\'s Pawnshop - POB"
 	elif str(current_ip) == str(branch_ip['molino']):
-		branch = "Garcia\\'s Pawnshop - MOL"
+		branch_fr_ip = "Garcia\\'s Pawnshop - MOL"
 	elif str(current_ip) == str(branch_ip['gtc']):
-		branch = "Garcia\\'s Pawnshop - GTC"
+		branch_fr_ip = "Garcia\\'s Pawnshop - GTC"
 	elif str(current_ip) == str(branch_ip['tanza']):
-		branch = "Garcia\\'s Pawnshop - TNZ"
+		branch_fr_ip = "Garcia\\'s Pawnshop - TNZ"
 
+	if status_value == None:
+		branch = branch_fr_ip
+	else:
+		branch = status_value
+		
 	conditions = ""
 	if filters:
 		conditions += f" AND `tabPawn Ticket Jewelry`.change_status_date = '{filters.get('change_status_date')}' "
