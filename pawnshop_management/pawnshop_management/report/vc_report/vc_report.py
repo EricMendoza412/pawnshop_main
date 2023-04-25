@@ -42,9 +42,14 @@ def execute(filters=None):
 		conditions4 += f" AND `tabPawn Ticket Non Jewelry`.date_loan_granted = '{filters.get('change_status_date')}' "
 		conditions4 += f" AND `tabPawn Ticket Non Jewelry`.branch = '{branch}' "
 
+	conditions5 = ""
+	if filters:
+		conditions5 += f" AND `tabProvisional Receipt`.date_issued = '{filters.get('change_status_date')}' "
+		conditions5 += f" AND `tabProvisional Receipt`.branch = '{branch}' "
+
 
 	data_redeemed_J = frappe.db.sql(f"""
-        SELECT branch, change_status_date, '' as old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal
+        SELECT branch, change_status_date, '' as old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, '' as net_proceeds, item_series
         FROM `tabPawn Ticket Jewelry`
         WHERE `tabPawn Ticket Jewelry`.docstatus=1
         AND `tabPawn Ticket Jewelry`.workflow_state = 'Redeemed'
@@ -52,7 +57,7 @@ def execute(filters=None):
     """, as_dict=True)
 	
 	data_renewed_J = frappe.db.sql(f"""
-		SELECT branch, change_status_date, old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal
+		SELECT branch, change_status_date, old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, '' as net_proceeds, item_series
 		FROM `tabPawn Ticket Jewelry`
 		WHERE `tabPawn Ticket Jewelry`.docstatus=1
 		AND `tabPawn Ticket Jewelry`.old_pawn_ticket IS NOT NULL
@@ -60,7 +65,7 @@ def execute(filters=None):
 	""", as_dict=True)
 
 	data_new_sangla_J = frappe.db.sql(f"""
-		SELECT branch, change_status_date, '' as old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal
+		SELECT branch, change_status_date, '' as old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, net_proceeds, item_series
 		FROM `tabPawn Ticket Jewelry`
 		WHERE `tabPawn Ticket Jewelry`.docstatus=1
 		AND `tabPawn Ticket Jewelry`.old_pawn_ticket IS NULL
@@ -68,7 +73,7 @@ def execute(filters=None):
 	""", as_dict=True)
 
 	data_redeemed_NJ = frappe.db.sql(f"""
-        SELECT branch, change_status_date, '' as old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal
+        SELECT branch, change_status_date, '' as old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, '' as net_proceeds, item_series
         FROM `tabPawn Ticket Non Jewelry`
         WHERE `tabPawn Ticket Non Jewelry`.docstatus=1
         AND `tabPawn Ticket Non Jewelry`.workflow_state = 'Redeemed'
@@ -76,7 +81,7 @@ def execute(filters=None):
     """, as_dict=True)
 	
 	data_renewed_NJ = frappe.db.sql(f"""
-		SELECT branch, change_status_date, old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal
+		SELECT branch, change_status_date, old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, '' as net_proceeds, item_series
 		FROM `tabPawn Ticket Non Jewelry`
 		WHERE `tabPawn Ticket Non Jewelry`.docstatus=1
 		AND `tabPawn Ticket Non Jewelry`.old_pawn_ticket IS NOT NULL
@@ -84,33 +89,26 @@ def execute(filters=None):
 	""", as_dict=True)
 
 	data_new_sangla_NJ = frappe.db.sql(f"""
-		SELECT branch, change_status_date, '' as old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal
+		SELECT branch, change_status_date, '' as old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, net_proceeds, item_series
 		FROM `tabPawn Ticket Non Jewelry`
 		WHERE `tabPawn Ticket Non Jewelry`.docstatus=1
 		AND `tabPawn Ticket Non Jewelry`.old_pawn_ticket IS NULL
 		{conditions4}
 	""", as_dict=True)
 
-	data = data_redeemed_J + data_renewed_J + data_new_sangla_J + data_redeemed_NJ + data_renewed_NJ + data_new_sangla_NJ
+	data_pr_amort = frappe.db.sql(f"""
+		SELECT branch, principal_amount as change_status_date, '' as old_pawn_ticket, transaction_type as workflow_state, pawn_ticket_no as pawn_ticket, date_issued as date_loan_granted, pawn_ticket_type as inventory_tracking_no, additional_amortization as desired_principal, total as net_proceeds, series as item_series
+		FROM `tabProvisional Receipt`
+		WHERE `tabProvisional Receipt`.docstatus=1
+		{conditions5}
+	""", as_dict=True)
+
+	data = data_redeemed_J + data_renewed_J + data_new_sangla_J + data_redeemed_NJ + data_renewed_NJ + data_new_sangla_NJ + data_pr_amort
 	columns = get_columns()
 	return columns, data
 
 def get_columns():
 	columns = [
-		{
-			'fieldname': 'old_pawn_ticket',
-			'label': _('Old Pawn Ticket'),
-			'fieldtype': 'Data',
-			'width': 100
-		},
-
-		{
-			'fieldname': 'workflow_state',
-			'label': _('Status'),
-			'fieldtype': 'Data',
-			'width': 200
-		},
-
 		{
 			'fieldname': 'pawn_ticket',
 			'label': _('Pawn Ticket'),
@@ -120,15 +118,8 @@ def get_columns():
 
 		{
 			'fieldname': 'date_loan_granted',
-			'label': _('Date Loan Granted'),
+			'label': _('DLG or Change Status Date'),
 			'fieldtype': 'Date',
-			'width': 200
-		},
-
-		{
-			'fieldname': 'desired_principal',
-			'label': _('New PT Principal'),
-			'fieldtype': 'Data',
 			'width': 200
 		}
 		
