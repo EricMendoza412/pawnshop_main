@@ -18,7 +18,7 @@
 	  {% let count = 0 %}
 	  {% for(var i=0, l=data.length; i<l; i++) { %}
 		  <tr>
-			  {% if((data[i].item_series == "A") && (data[i].old_pawn_ticket == "") && !(data[i].change_status_date == data[i].date_loan_granted)) { %}
+			  {% if((data[i].item_series == "A") && (data[i].old_pawn_ticket == "") && ((data[i].workflow_state == "Active") || ((data[i].workflow_state == "Redeemed") && (data[i].change_status_date == data[i].date_loan_granted)))) { %}
 			  <td>{% if(data[i].inventory_tracking_no.substr(-2) == "NJ"){ %}
 				  {%= __("Gadget") %}
 				  {%}%}	
@@ -62,7 +62,7 @@
 		{% let countB = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
 			<tr>
-				{% if((data[i].item_series == "B") && (data[i].old_pawn_ticket == "") && !(data[i].change_status_date == data[i].date_loan_granted)) { %}
+				{% if((data[i].item_series == "B") && (data[i].old_pawn_ticket == "") && ((data[i].workflow_state == "Active") || ((data[i].workflow_state == "Redeemed") && (data[i].change_status_date == data[i].date_loan_granted))) { %}
 				<td>{% if(data[i].inventory_tracking_no.substr(-2) == "NJ"){ %}
 					{%= __("Gadget") %}
 					{%}%}	
