@@ -16,7 +16,7 @@ class CashPositionReport(Document):
 #A IN principal
 		a_in_principal_active = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', "date_loan_granted": self.date, 'workflow_state': 'Active'}, fields=['desired_principal'], pluck='desired_principal')
 		a_in_principal_renewed = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', "change_status_date": self.date, 'workflow_state': 'Renewed'}, fields=['desired_principal'], pluck='desired_principal')	
-		a_in_principal_rnwam = frappe.db.get_all('Provisional Receipt', filters={"docstatus": 1, "branch": self.branch, "series": 'A', "pawn_ticket_type": 'Pawn Ticket Jewelry', "transaction_type": 'Renewal w/ Amortization'}, fields=['additional_amortization'], pluck='additional_amortization')
+		a_in_principal_rnwam = frappe.db.get_all('Provisional Receipt', filters={"docstatus": 1, "branch": self.branch, "date_issued": self.date, "series": 'A', "pawn_ticket_type": 'Pawn Ticket Jewelry', "transaction_type": 'Renewal w/ Amortization'}, fields=['additional_amortization'], pluck='additional_amortization')
 		a_in_rd = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', "date_loan_granted": self.date, 'workflow_state': 'Redeemed'}, fields=['desired_principal'], pluck='desired_principal')
 		sum_active_in = 0
 		for record in a_in_principal_active:
@@ -29,7 +29,8 @@ class CashPositionReport(Document):
 			sum_rd_in_a += record
 		sum_rn_amort_a = 0
 		for record in a_in_principal_rnwam:
-			sum_rn_amort_a += record	
+			sum_rn_amort_a += record
+		print(f'{sum_active_in},{sum_renewed_in},{sum_rd_in_a},{sum_rn_amort_a}')	
 		a_in_principal = sum_active_in - sum_renewed_in + sum_rd_in_a + sum_rn_amort_a
 #A OUT count
 		a_out_count = frappe.db.count('Pawn Ticket Jewelry', {'change_status_date': self.date, 'workflow_state': 'Redeemed', 'item_series': 'A', 'branch': self.branch})
@@ -62,7 +63,7 @@ class CashPositionReport(Document):
 #B IN principal
 		b_in_principal_active = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'B', "date_loan_granted": self.date, 'workflow_state': 'Active'}, fields=['desired_principal'], pluck='desired_principal')
 		b_in_principal_renewed = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'B', "change_status_date": self.date, 'workflow_state': 'Renewed'}, fields=['desired_principal'], pluck='desired_principal')	
-		b_in_principal_rnwam = frappe.db.get_all('Provisional Receipt', filters={"docstatus": 1, "branch": self.branch, "series": 'B', "pawn_ticket_type": 'Pawn Ticket Jewelry', "transaction_type": 'Renewal w/ Amortization'}, fields=['additional_amortization'], pluck='additional_amortization')
+		b_in_principal_rnwam = frappe.db.get_all('Provisional Receipt', filters={"docstatus": 1, "branch": self.branch, "series": 'B', "date_issued": self.date, "pawn_ticket_type": 'Pawn Ticket Jewelry', "transaction_type": 'Renewal w/ Amortization'}, fields=['additional_amortization'], pluck='additional_amortization')
 		b_in_rd = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'B', "date_loan_granted": self.date, 'workflow_state': 'Redeemed'}, fields=['desired_principal'], pluck='desired_principal')
 		sum_active_in_b = 0
 		for record in b_in_principal_active:
@@ -108,7 +109,7 @@ class CashPositionReport(Document):
 #BNJ IN principal
 		bnj_in_principal_active = frappe.db.get_all('Pawn Ticket Non Jewelry', filters={"branch": self.branch, "date_loan_granted": self.date, 'workflow_state': 'Active'}, fields=['desired_principal'], pluck='desired_principal')
 		bnj_in_principal_renewed = frappe.db.get_all('Pawn Ticket Non Jewelry', filters={"branch": self.branch, "change_status_date": self.date, 'workflow_state': 'Renewed'}, fields=['desired_principal'], pluck='desired_principal')	
-		bnj_in_principal_rnwam = frappe.db.get_all('Provisional Receipt', filters={"docstatus": 1, "branch": self.branch, "series": 'B', "pawn_ticket_type": 'Pawn Ticket Non Jewelry', "transaction_type": 'Renewal w/ Amortization'}, fields=['additional_amortization'], pluck='additional_amortization')
+		bnj_in_principal_rnwam = frappe.db.get_all('Provisional Receipt', filters={"docstatus": 1, "branch": self.branch, "date_issued": self.date, "series": 'B', "pawn_ticket_type": 'Pawn Ticket Non Jewelry', "transaction_type": 'Renewal w/ Amortization'}, fields=['additional_amortization'], pluck='additional_amortization')
 		bnj_in_rd = frappe.db.get_all('Pawn Ticket Non Jewelry', filters={"branch": self.branch, "date_loan_granted": self.date, 'workflow_state': 'Redeemed'}, fields=['desired_principal'], pluck='desired_principal')
 		sum_active_in_bnj = 0
 		for record in bnj_in_principal_active:
