@@ -18,7 +18,7 @@
 	  {% let count = 0 %}
 	  {% for(var i=0, l=data.length; i<l; i++) { %}
 		  <tr>
-			  {% if((data[i].item_series == "A") && (data[i].old_pawn_ticket == "") && ((data[i].workflow_state == "Active") || ((data[i].workflow_state == "Redeemed") && (data[i].change_status_date == data[i].date_loan_granted)))) { %}
+			  {% if((data[i].item_series == "A") && (data[i].old_pawn_ticket == "") && ((data[i].workflow_state == "Active") || ((data[i].workflow_state == "Redeemed") && (data[i].date_loan_granted == data[i].change_status_date)))) { %}
 			  <td>{% if(data[i].inventory_tracking_no.substr(-2) == "NJ"){ %}
 				  {%= __("Gadget") %}
 				  {%}%}	
@@ -62,7 +62,7 @@
 		{% let countB = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
 			<tr>
-				{% if((data[i].item_series == "B") && (data[i].old_pawn_ticket == "") && ((data[i].workflow_state == "Active") || ((data[i].workflow_state == "Redeemed") && (data[i].change_status_date == data[i].date_loan_granted))) { %}
+				{% if((data[i].item_series == "B") && (data[i].old_pawn_ticket == "") && ((data[i].workflow_state == "Active") || ((data[i].workflow_state == "Redeemed") && (data[i].date_loan_granted == data[i].change_status_date)))) { %}
 				<td>{% if(data[i].inventory_tracking_no.substr(-2) == "NJ"){ %}
 					{%= __("Gadget") %}
 					{%}%}	
@@ -106,7 +106,7 @@
 		{% let countRD = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
 			<tr>
-				{% if((data[i].workflow_state == "Redeemed") && (data[i].item_series == "A") && !(data[i].change_status_date == "")) { %}
+				{% if((data[i].workflow_state == "Redeemed") && (data[i].item_series == "A")) { %}
 				<td>{% if(data[i].inventory_tracking_no.substr(-2) == "NJ"){ %}
 					{%= __("Gadget") %}
 					{%}%}	
@@ -148,7 +148,7 @@
 		{% let countRDB = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
 			<tr>
-				{% if((data[i].workflow_state == "Redeemed") && (data[i].item_series == "B")  && !(data[i].change_status_date == "")) { %}
+				{% if((data[i].workflow_state == "Redeemed") && (data[i].item_series == "B")) { %}
 				<td>{% if(data[i].inventory_tracking_no.substr(-2) == "NJ"){ %}
 					{%= __("Gadget") %}
 					{%}%}	

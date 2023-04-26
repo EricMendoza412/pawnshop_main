@@ -76,6 +76,7 @@ def execute(filters=None):
 		FROM `tabPawn Ticket Jewelry`
 		WHERE `tabPawn Ticket Jewelry`.docstatus=1
 		AND `tabPawn Ticket Jewelry`.old_pawn_ticket IS NULL
+        AND `tabPawn Ticket Jewelry`.workflow_state = 'Active'		
 		{conditions2}
 	""", as_dict=True)
 
@@ -100,6 +101,7 @@ def execute(filters=None):
 		FROM `tabPawn Ticket Non Jewelry`
 		WHERE `tabPawn Ticket Non Jewelry`.docstatus=1
 		AND `tabPawn Ticket Non Jewelry`.old_pawn_ticket IS NULL
+		AND `tabPawn Ticket Non Jewelry`.workflow_state = 'Active'	
 		{conditions4}
 	""", as_dict=True)
 
