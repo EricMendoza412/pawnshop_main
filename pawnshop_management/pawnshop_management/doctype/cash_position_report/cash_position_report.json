@@ -33,9 +33,6 @@
   "bank_transfer",
   "column_break_9",
   "total_out",
-  "j_new_sangla_a",
-  "j_new_sangla_b",
-  "nj_new_sanga_b",
   "cash_breakdown_section",
   "one_thousand_php_bills",
   "five_hundred_php_bills",
@@ -356,27 +353,12 @@
    "fieldname": "out_section",
    "fieldtype": "Section Break",
    "label": "OUT"
-  },
-  {
-   "fieldname": "j_new_sangla_a",
-   "fieldtype": "Small Text",
-   "label": "J New Sangla (A)"
-  },
-  {
-   "fieldname": "j_new_sangla_b",
-   "fieldtype": "Small Text",
-   "label": "J New Sangla (B)"
-  },
-  {
-   "fieldname": "nj_new_sanga_b",
-   "fieldtype": "Small Text",
-   "label": "NJ New Sangla (B)"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-03-23 08:55:53.642911",
+ "modified": "2023-04-29 00:55:24.802885",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Cash Position Report",
