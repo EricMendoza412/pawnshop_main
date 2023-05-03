@@ -11,6 +11,7 @@
   "karat_category",
   "karat",
   "weight",
+  "densi",
   "color",
   "colors_if_multi",
   "additional_for_stone",
@@ -94,6 +95,7 @@
    "width": "100px"
   },
   {
+   "fetch_from": "item_no.comments",
    "fieldname": "comments",
    "fieldtype": "Small Text",
    "label": "Comments",
@@ -115,12 +117,18 @@
    "fieldtype": "Currency",
    "label": "Desired Principal",
    "read_only": 1
+  },
+  {
+   "fetch_from": "item_no.densi",
+   "fieldname": "densi",
+   "fieldtype": "Data",
+   "label": "Densi"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-06-09 11:41:49.023810",
+ "modified": "2023-05-02 15:06:03.832245",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Jewelry List",

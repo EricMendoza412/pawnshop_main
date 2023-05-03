@@ -105,7 +105,7 @@
    "type": "Link"
   }
  ],
- "modified": "2023-03-31 16:42:14.287674",
+ "modified": "2023-05-03 12:24:39.373824",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Pawnshop Management",
@@ -151,19 +151,19 @@
   },
   {
    "doc_view": "Report Builder",
-   "label": "VC list - A ",
+   "label": "VC Count - A ",
    "link_to": "Vault Custodian Jewelry Report A",
    "type": "Report"
   },
   {
    "doc_view": "Report Builder",
-   "label": "VC list -B (J)",
+   "label": "VC Count -B (J)",
    "link_to": "Vault Custodian Jewelry Report B",
    "type": "Report"
   },
   {
    "doc_view": "Report Builder",
-   "label": "VC list - B (NJ)",
+   "label": "VC Count - B (NJ)",
    "link_to": "Vault Custodian Non Jewelry Report",
    "type": "Report"
   },
@@ -171,6 +171,12 @@
    "doc_view": "Report Builder",
    "label": "Transaction Log",
    "link_to": "VC Report",
+   "type": "Report"
+  },
+  {
+   "doc_view": "Report Builder",
+   "label": "VC Turnover List",
+   "link_to": "VC Turnover List",
    "type": "Report"
   }
  ],

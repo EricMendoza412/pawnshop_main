@@ -1,0 +1,23 @@
+{
+ "add_total_row": 1,
+ "columns": [],
+ "creation": "2023-05-01 17:33:37.306853",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "BOA Letterhead",
+ "modified": "2023-05-03 12:27:30.446519",
+ "modified_by": "Administrator",
+ "module": "Pawnshop Management",
+ "name": "VC Turnover List",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Pawn Ticket Jewelry",
+ "report_name": "VC Turnover List",
+ "report_type": "Script Report",
+ "roles": []
+}
