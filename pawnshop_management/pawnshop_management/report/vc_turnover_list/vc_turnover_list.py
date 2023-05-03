@@ -32,29 +32,37 @@ def execute(filters=None):
 
 	for i in range(len(data_active)):
 		description = ""
-		details = frappe.db.get_list("Jewelry List", filters={'parent': data_active[i]['pawn_ticket']}, fields=['type', 'karat_category', 'karat', 'weight', 'color', 'colors_if_multi', 'additional_for_stone', 'densi','comments'])
-		for j in range(len(details)):
-			if details[j]['colors_if_multi'] == None:
-				details[j]['colors_if_multi'] = ''
-			else:
-				details[j]['colors_if_multi'] = "," + details[j]['colors_if_multi']
+		detailsJL = frappe.db.get_list("Jewelry List", filters={'parent': data_active[i]['pawn_ticket']}, fields=['item_no','type', 'karat_category', 'karat', 'weight', 'color', 'colors_if_multi', 'additional_for_stone', 'densi','comments'])
+		
+		for j in range(len(detailsJL)):
+			details = frappe.db.get_list("Jewelry Items", filters={'item_no': detailsJL[j]['item_no']}, fields=['item_no','type', 'karat_category', 'karat', 'total_weight', 'color', 'colors_if_multi', 'additional_for_stone', 'densi','comments'])
+			
+			for doc in details:
+				densi, comments, colorMulti, addForStone  = "", "", "", ""
+				if doc.densi != None:
+					densi = ", " + doc.densi
+				if doc.comments != None:
+					comments = ", " + doc.comments
+				if doc.colors_if_multi != None:
+					colorMulti = ", " + doc.colors_if_multi
+				if doc.additional_for_stone != None:
+					addForStone = ", Stone:" + str(doc.additional_for_Stone)
 
-			if details[j]['additional_for_stone'] == None:
-				details[j]['additional_for_stone'] = ''
-			else:
-				details[j]['additional_for_stone'] = "," + details[j]['additional_for_stone']
+				description += "One " + doc.type + ", " + doc.karat_category + ", " + doc.karat + ", " + str(doc.total_weight) + ", " + doc.color + colorMulti + densi + comments + colorMulti + addForStone + "; "
+
+# 
 			
-			if details[j]['densi'] == None:
-				details[j]['densi'] = ''
-			else:
-				details[j]['densi'] = "," + details[j]['densi']	
+			# if details[j]['densi'] == None:
+			# 	details[j]['densi'] = ''
+			# else:
+			# 	details[j]['densi'] = "," + details[j]['densi']	
 			
-			if details[j]['comments'] == None:
-				details[j]['comments'] = ''
-			else:
-				details[j]['comments'] = "," + details[j]['comments']	
+			# if details[j]['comments'] == None:
+			# 	details[j]['comments'] = ''
+			# else:
+			# 	details[j]['comments'] = "," + details[j]['comments']	
 				
-			description += "One " + details[j]["type"] + ", " + str(details[j]["karat_category"]) + ", " + str(details[j]["karat"]) + ", " + str(details[j]["weight"]) + ", " + str(details[j]["color"]) + str(details[j]["colors_if_multi"]) + str(details[j]["additional_for_stone"]) + str(details[j]["densi"]) + str(details[j]["comments"]) + "; "
+			# description += "One " + details[j]["type"] + ", " + str(details[j]["karat_category"]) + ", " + str(details[j]["karat"]) + ", " + str(details[j]["weight"]) + ", " + str(details[j]["color"]) + str(details[j]["colors_if_multi"]) + str(details[j]["additional_for_stone"]) + str(details[j]["densi"]) + str(details[j]["comments"]) + "; "
 		data_active[i]['description'] = description
 
 	data = data_active
