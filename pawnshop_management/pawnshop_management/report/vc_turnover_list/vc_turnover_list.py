@@ -26,8 +26,8 @@ def execute(filters=None):
 	elif str(current_ip) == str(branch_ip['tanza']):
 		branch_fr_ip = "Garcia's Pawnshop - TNZ"
 
-	data_act = frappe.get_all("Pawn Ticket Jewelry", filters={'branch': branch_fr_ip, 'workflow_state': "Active"}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'workflow_state'])
-	data_exp = frappe.get_all("Pawn Ticket Jewelry", filters={'branch': branch_fr_ip, 'workflow_state': "Expired"}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'workflow_state'])
+	data_act = frappe.get_all("Pawn Ticket Jewelry", filters={'branch': branch_fr_ip, 'workflow_state': "Active"}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'expiry_date'])
+	data_exp = frappe.get_all("Pawn Ticket Jewelry", filters={'branch': branch_fr_ip, 'workflow_state': "Expired"}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'expiry_date'])
 	data_active = data_act + data_exp
 
 	for i in range(len(data_active)):
@@ -108,8 +108,8 @@ def get_columns():
 		},
 
 		{
-			'fieldname': 'workflow_state',
-			'label': _('Status'),
+			'fieldname': 'expiry_date',
+			'label': _('Expiry Date'),
 			'fieldtype': 'Data',
 			'width': 100
 		}
