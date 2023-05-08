@@ -366,7 +366,8 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 					let tracking_no = value.message;
 					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
 					let new_ticket_no = parseInt(tracking_no.a_series);
-					frm.set_value('pawn_ticket', "1-"+ new_ticket_no + frm.doc.item_series);
+					// frm.set_value('pawn_ticket', "1-"+ new_ticket_no + frm.doc.item_series);
+					frm.set_value('pawn_ticket', "1-"+ new_ticket_no);
 					frm.set_value('inventory_tracking_no', "1-"+ non_jewelry_count + 'J');
 					frm.refresh_field('pawn_ticket');
 				})
