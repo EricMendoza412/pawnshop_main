@@ -50,19 +50,6 @@ def execute(filters=None):
 
 				description += "One " + doc.type + ", " + doc.karat_category + ", " + doc.karat + ", " + str(doc.total_weight) + ", " + doc.color + colorMulti + densi + comments + colorMulti + addForStone + "; "
 
-# 
-			
-			# if details[j]['densi'] == None:
-			# 	details[j]['densi'] = ''
-			# else:
-			# 	details[j]['densi'] = "," + details[j]['densi']	
-			
-			# if details[j]['comments'] == None:
-			# 	details[j]['comments'] = ''
-			# else:
-			# 	details[j]['comments'] = "," + details[j]['comments']	
-				
-			# description += "One " + details[j]["type"] + ", " + str(details[j]["karat_category"]) + ", " + str(details[j]["karat"]) + ", " + str(details[j]["weight"]) + ", " + str(details[j]["color"]) + str(details[j]["colors_if_multi"]) + str(details[j]["additional_for_stone"]) + str(details[j]["densi"]) + str(details[j]["comments"]) + "; "
 		data_active[i]['description'] = description
 
 	data = data_active
