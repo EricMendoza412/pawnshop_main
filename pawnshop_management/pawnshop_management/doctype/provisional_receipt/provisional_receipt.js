@@ -1270,7 +1270,12 @@ function get_new_pawn_ticket_no(frm) {
 
 function new_pawn_ticket_no(frm, prefix, series_count, item_series) {
 	// frm.set_df_property('new_pawn_ticket_no', 'hidden', 0);
-	frm.set_value('new_pawn_ticket_no', prefix + series_count + item_series)
+	
+	if (item_series == "B"){
+		frm.set_value('new_pawn_ticket_no', prefix + series_count + item_series)
+	}else{
+		frm.set_value('new_pawn_ticket_no', prefix + series_count)
+	}
 	frm.refresh_field('new_pawn_ticket_no')
 	// if (frm.doc.pawn_ticket_type == "Pawn Ticket Non Jewelry" && frm.doc.transaction_type == "Renewal") {
 	// 	frm.set_value('new_pawn_ticket_no', prefix + series_count + item_series)
