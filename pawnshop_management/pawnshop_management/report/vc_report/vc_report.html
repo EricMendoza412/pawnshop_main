@@ -147,7 +147,15 @@
 		{% let sumB = 0 %}
 		{% let countRDB = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
-			<tr>
+			{% let duplicate = false %}
+			{% for(var j=0; j<i; j++) { %}
+			{% if(data[i].pawn_ticket == data[j].pawn_ticket) { %}
+			  {% duplicate = true %}
+			  {% break %}
+			{% } %}
+		  	{% } %}
+			  	{% if not duplicate %}
+				<tr>
 				{% if((data[i].workflow_state == "Redeemed") && (data[i].item_series == "B")) { %}
 				<td>{% if(data[i].inventory_tracking_no.substr(-2) == "NJ"){ %}
 					{%= __("Gadget") %}
@@ -161,7 +169,8 @@
 				{% sumB += data[i].desired_principal %}
 				{% countRDB += 1 %}
 				{% } %}
-			</tr>
+				</tr>
+				{% endif %}
 		{% } %}
 			<tr>
 				<td></td>
