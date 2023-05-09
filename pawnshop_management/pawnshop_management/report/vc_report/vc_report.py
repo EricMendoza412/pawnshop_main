@@ -56,7 +56,7 @@ def execute(filters=None):
 
 
 	data_redeemed_J = frappe.db.sql(f"""
-        SELECT branch, change_status_date, '' as old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, '' as net_proceeds, item_series
+        SELECT branch, change_status_date, old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, '' as net_proceeds, item_series
         FROM `tabPawn Ticket Jewelry`
         WHERE `tabPawn Ticket Jewelry`.docstatus=1
         AND `tabPawn Ticket Jewelry`.workflow_state = 'Redeemed'
