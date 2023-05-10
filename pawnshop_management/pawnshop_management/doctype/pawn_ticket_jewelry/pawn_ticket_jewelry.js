@@ -403,7 +403,7 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 					let tracking_no = value.message;
 					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
 					let new_ticket_no = parseInt(tracking_no.a_series);
-					frm.set_value('pawn_ticket', "4-"+ new_ticket_no + frm.doc.item_series);
+					frm.set_value('pawn_ticket', "4-"+ new_ticket_no);
 					frm.set_value('inventory_tracking_no', "4-"+ non_jewelry_count + 'J');
 					frm.refresh_field('pawn_ticket');
 				})
@@ -440,7 +440,7 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 					let tracking_no = value.message;
 					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
 					let new_ticket_no = parseInt(tracking_no.a_series);
-					frm.set_value('pawn_ticket', "6-"+ new_ticket_no + frm.doc.item_series);
+					frm.set_value('pawn_ticket', "6-"+ new_ticket_no);
 					frm.set_value('inventory_tracking_no', "6-"+ non_jewelry_count + 'J');
 					frm.refresh_field('pawn_ticket');
 				})
@@ -476,7 +476,7 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 					let tracking_no = value.message;
 					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
 					let new_ticket_no = parseInt(tracking_no.a_series);
-					frm.set_value('pawn_ticket', "3-"+ new_ticket_no + frm.doc.item_series);
+					frm.set_value('pawn_ticket', "3-"+ new_ticket_no);
 					frm.set_value('inventory_tracking_no', "3-"+ non_jewelry_count + 'J');
 					frm.refresh_field('pawn_ticket');
 				})
@@ -511,7 +511,7 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 					let tracking_no = value.message;
 					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
 					let new_ticket_no = parseInt(tracking_no.a_series);
-					frm.set_value('pawn_ticket', "5-"+ new_ticket_no + frm.doc.item_series);
+					frm.set_value('pawn_ticket', "5-"+ new_ticket_no);
 					frm.set_value('inventory_tracking_no', "5-"+ non_jewelry_count + 'J');
 					frm.refresh_field('pawn_ticket');
 				})
