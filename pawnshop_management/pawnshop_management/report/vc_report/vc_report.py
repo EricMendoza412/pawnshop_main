@@ -105,14 +105,14 @@ def execute(filters=None):
 		{conditions4}
 	""", as_dict=True)
 
-	data_pr_amort = frappe.db.sql(f"""
-		SELECT branch, principal_amount as change_status_date, '' as old_pawn_ticket, transaction_type as workflow_state, pawn_ticket_no as pawn_ticket, date_issued as date_loan_granted, pawn_ticket_type as inventory_tracking_no, additional_amortization as desired_principal, total as net_proceeds, series as item_series
+	data_pr = frappe.db.sql(f"""
+		SELECT branch, principal_amount as change_status_date, new_pawn_ticket_no as old_pawn_ticket, transaction_type as workflow_state, pawn_ticket_no as pawn_ticket, date_issued as date_loan_granted, pawn_ticket_type as inventory_tracking_no, additional_amortization as desired_principal, total as net_proceeds, series as item_series
 		FROM `tabProvisional Receipt`
 		WHERE `tabProvisional Receipt`.docstatus=1
 		{conditions5}
 	""", as_dict=True)
 
-	data = data_redeemed_J + data_renewed_J + data_new_sangla_J + data_redeemed_NJ + data_renewed_NJ + data_new_sangla_NJ + data_pr_amort
+	data = data_redeemed_J + data_renewed_J + data_new_sangla_J + data_redeemed_NJ + data_renewed_NJ + data_new_sangla_NJ + data_pr
 	columns = get_columns()
 	return columns, data
 
