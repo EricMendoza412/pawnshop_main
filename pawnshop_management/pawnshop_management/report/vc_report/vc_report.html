@@ -281,7 +281,7 @@
 		{% let sumPrincipal = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
 			<tr>
-				{% if((data[i].item_series == "A") && ((data[i].workflow_state == "Renewal") || (data[i].workflow_state == "Renewal w/ Amortization"))) { %}
+				{% if((data[i].item_series == "A") && ((data[i].workflow_state == "Amortization") || (data[i].workflow_state == "Renewal w/ Amortization"))) { %}
 				<td>{% if(data[i].inventory_tracking_no == "Pawn Ticket Non Jewelry"){ %}
 					{%= __("Gadget") %}
 					{%}%}</td>
@@ -321,7 +321,7 @@
 		{% let sumPrincipalB = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
 			<tr>
-				{% if((data[i].item_series == "B") && ((data[i].workflow_state == "Renewal") || (data[i].workflow_state == "Renewal w/ Amortization"))) { %}
+				{% if((data[i].item_series == "B") && ((data[i].workflow_state == "Amortization") || (data[i].workflow_state == "Renewal w/ Amortization"))) { %}
 				<td>{% if(data[i].inventory_tracking_no == "Pawn Ticket Non Jewelry"){ %}
 					{%= __("Gadget") %}
 					{%}%}</td>
