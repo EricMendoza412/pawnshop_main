@@ -12,7 +12,7 @@ frappe.call({
             callback: (result) => {
                 let ip = result.message;
                 if (current_ip == ip["cavite_city"]) {
-                    default_branch.push("Garcia's Pawnshop - CC"); 
+                    default_branch.push("Garcia\\'s Pawnshop - CC"); 
                 } else if (current_ip == ip["poblacion"]) {
                     default_branch.push("Garcia\\'s Pawnshop - POB");
                 } else if (current_ip == ip["molino"]) {
@@ -68,7 +68,7 @@ if(is_allowed){
             {
                 fieldname: "change_status_date",
                 label: __("Date"),
-                fieldtype: "Date",
+                fieldtype: "Read Only",
                 default: currentDate
             }
             

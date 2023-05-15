@@ -11,8 +11,12 @@ from pawnshop_management.pawnshop_management.custom_codes.get_ip import get_ip_f
 def execute(filters=None):
 	columns, data = [], []
 	columns = get_columns()
-
+	status_value = getattr(filters, 'branch')
+	series = getattr(filters, 'series')
 	branch_fr_ip = ""
+	branch = ""
+	item_series = ""
+	pt_type = ""
 	current_ip = frappe.local.request_ip
 	branch_ip = get_ip_from_settings()
 	if str(current_ip) == str(branch_ip['cavite_city']):
@@ -26,29 +30,62 @@ def execute(filters=None):
 	elif str(current_ip) == str(branch_ip['tanza']):
 		branch_fr_ip = "Garcia's Pawnshop - TNZ"
 
-	data_act = frappe.get_all("Pawn Ticket Jewelry", filters={'branch': branch_fr_ip, 'workflow_state': "Active"}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'expiry_date'])
-	data_exp = frappe.get_all("Pawn Ticket Jewelry", filters={'branch': branch_fr_ip, 'workflow_state': "Expired"}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'expiry_date'])
+	if status_value == None:
+		branch = branch_fr_ip
+	else:
+		branch = status_value
+	
+	if series == "A-Jewelry":
+		item_series = "A"
+		pt_type = "Pawn Ticket Jewelry"
+	elif series == "B-Jewelry":
+		item_series = "B"
+		pt_type = "Pawn Ticket Jewelry"
+	elif series == "B-Non Jewelry":
+		item_series = "B"
+		pt_type = "Pawn Ticket Non Jewelry"
+
+
+	data_act = frappe.get_all(pt_type, filters={'branch': branch, 'workflow_state': "Active", 'item_series': item_series}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'expiry_date'])
+	data_exp = frappe.get_all(pt_type, filters={'branch': branch, 'workflow_state': "Expired", 'item_series': item_series}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'expiry_date'])
 	data_active = data_act + data_exp
 
 	for i in range(len(data_active)):
 		description = ""
-		detailsJL = frappe.db.get_list("Jewelry List", filters={'parent': data_active[i]['pawn_ticket']}, fields=['item_no','type', 'karat_category', 'karat', 'weight', 'color', 'colors_if_multi', 'additional_for_stone', 'densi','comments'])
-		
-		for j in range(len(detailsJL)):
-			details = frappe.db.get_list("Jewelry Items", filters={'item_no': detailsJL[j]['item_no']}, fields=['item_no','type', 'karat_category', 'karat', 'total_weight', 'color', 'colors_if_multi', 'additional_for_stone', 'densi','comments'])
-			
-			for doc in details:
-				densi, comments, colorMulti, addForStone  = "", "", "", ""
-				if doc.densi != None:
-					densi = ", " + doc.densi
-				if doc.comments != None:
-					comments = ", " + doc.comments
-				if doc.colors_if_multi != None:
-					colorMulti = ", " + doc.colors_if_multi
-				if doc.additional_for_stone != None:
-					addForStone = ", Stone:" + str(doc.additional_for_Stone)
 
-				description += "One " + doc.type + ", " + doc.karat_category + ", " + doc.karat + ", " + str(doc.total_weight) + ", " + doc.color + colorMulti + densi + comments + colorMulti + addForStone + "; "
+		if pt_type == "Pawn Ticket Non Jewelry":
+			detailsL = frappe.db.get_list("Non Jewelry List", filters={'parent': data_active[i]['pawn_ticket']}, fields=['item_no'])
+			njItem = frappe.get_doc('Non Jewelry Items', detailsL[0]['item_no'])
+			comments, charger, case, box, earphones = "","","","",""
+			if njItem.comments != None:
+				comments = ", " + njItem.comments
+			if njItem.charger:
+				charger = ", w/ charger"
+			else:
+				charger = ", No charger"
+			if njItem.case:
+				case = ", w/ case"
+			if njItem.box:
+				box = ", w/ box"
+			if njItem.earphones:
+				earphones = ", w/ earphones"
+
+			description += "One " + njItem.type + ", " + njItem.brand + ", " + njItem.model + ", " + njItem.model_number + ", Color:" + njItem.color + ", " + njItem.ram + "/" + njItem.internal_memory + ", " + njItem.category + comments + charger + case + box + earphones + "; "
+		elif pt_type == "Pawn Ticket Jewelry":
+			detailsL = frappe.db.get_list("Jewelry List", filters={'parent': data_active[i]['pawn_ticket']}, fields=['item_no'])
+			for j in range(len(detailsL)):
+				details = frappe.db.get_list("Jewelry Items", filters={'item_no': detailsL[j]['item_no']}, fields=['item_no','type', 'karat_category', 'karat', 'total_weight', 'color', 'colors_if_multi', 'additional_for_stone', 'densi','comments'])
+				for doc in details:
+					densi, comments, colorMulti, addForStone  = "", "", "", ""
+					if doc.densi != None:
+						densi = ", " + doc.densi
+					if doc.comments != None:
+						comments = ", " + doc.comments
+					if doc.colors_if_multi != None:
+						colorMulti = ", " + doc.colors_if_multi
+					if doc.additional_for_stone != None:
+						addForStone = ", Stone:" + str(doc.additional_for_Stone)
+					description += "One " + doc.type + ", " + doc.karat_category + ", " + doc.karat + ", " + str(doc.total_weight) + ", " + doc.color + colorMulti + densi + comments + colorMulti + addForStone + "; "
 
 		data_active[i]['description'] = description
 
