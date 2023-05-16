@@ -56,9 +56,12 @@ def execute(filters=None):
 		if pt_type == "Pawn Ticket Non Jewelry":
 			detailsL = frappe.db.get_list("Non Jewelry List", filters={'parent': data_active[i]['pawn_ticket']}, fields=['item_no'])
 			njItem = frappe.get_doc('Non Jewelry Items', detailsL[0]['item_no'])
-			comments, charger, case, box, earphones = "","","","",""
+			comments, charger, case, box, earphones, not_openline, others, pin, manual, sim_card, sd_card, bag, extra_bat, extra_lens = "","","","","","","","","","","","","",""
 			if njItem.comments != None:
 				comments = ", " + njItem.comments
+			if njItem.others != None:
+				others = ", " + njItem.others
+
 			if njItem.charger:
 				charger = ", w/ charger"
 			else:
@@ -69,8 +72,24 @@ def execute(filters=None):
 				box = ", w/ box"
 			if njItem.earphones:
 				earphones = ", w/ earphones"
+			if njItem.not_openline:
+				not_openline = ", Not Openline"	
+			if njItem.pin:
+				pin = ", w/ pin"
+			if njItem.manual:
+				manual = ", w/ manual"
+			if njItem.sim_card:
+				sim_card = ", w/ Sim Card"
+			if njItem.sd_card:
+				sd_card = ", w/ SD card"
+			if njItem.bag:
+				bag = ", w/ bag"
+			if njItem.extra_battery:
+				extra_bat = ", w/ extra battery"
+			if njItem.extra_lens:
+				extra_lens = ", w/ extra lens"
 
-			description += "One " + njItem.type + ", " + njItem.brand + ", " + njItem.model + ", " + njItem.model_number + ", Color:" + njItem.color + ", " + njItem.ram + "/" + njItem.internal_memory + ", " + njItem.category + comments + charger + case + box + earphones + "; "
+			description += "One " + njItem.type + ", " + njItem.brand + ", " + njItem.model + ", " + njItem.model_number + ", Color:" + njItem.color + ", " + njItem.ram + "/" + njItem.internal_memory + ", " + njItem.category + not_openline + comments + charger + case + box + earphones + others + pin + manual + sim_card + sd_card + bag + extra_bat + extra_lens +"; "
 		elif pt_type == "Pawn Ticket Jewelry":
 			detailsL = frappe.db.get_list("Jewelry List", filters={'parent': data_active[i]['pawn_ticket']}, fields=['item_no'])
 			for j in range(len(detailsL)):
