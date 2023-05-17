@@ -55,6 +55,14 @@ class CashPositionReport(Document):
 			a_ret_principal += record
 #A Total
 		a_total_active = frappe.db.count('Pawn Ticket Jewelry', {'date_loan_granted': ['<=', self.date], 'item_series': 'A', 'workflow_state': ['in', ['Active', 'Expired', 'Returned']], 'branch': self.branch})
+#A Total principal
+		a_principal_total_act = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', 'workflow_state': 'Active'}, fields=['desired_principal'], pluck='desired_principal')
+		a_principal_total_exp = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', 'workflow_state': 'Expired'}, fields=['desired_principal'], pluck='desired_principal')
+		a_principal_total = 0
+		for record in a_principal_total_act:
+			a_principal_total += record
+		for record2 in a_principal_total_exp:
+			a_principal_total += record2
 #B IN count
 		b_in_count_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'date_loan_granted': self.date ,'item_series': 'B', 'branch': self.branch, 'workflow_state': 'Active'})
 		b_renewed_count_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'change_status_date': self.date, 'workflow_state': 'Renewed', 'item_series': 'B', 'branch': self.branch})
@@ -101,6 +109,14 @@ class CashPositionReport(Document):
 			b_ret_principal += record
 #B Total
 		b_total_active = frappe.db.count('Pawn Ticket Jewelry', {'date_loan_granted': ['<=', self.date], 'item_series': 'B', 'workflow_state': ['in', ['Active', 'Expired', 'Returned']], 'branch': self.branch})
+#B Total principal
+		b_principal_total_act = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'B', 'workflow_state': 'Active'}, fields=['desired_principal'], pluck='desired_principal')
+		b_principal_total_exp = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'B', 'workflow_state': 'Expired'}, fields=['desired_principal'], pluck='desired_principal')
+		b_principal_total = 0
+		for record in b_principal_total_act:
+			b_principal_total += record
+		for record2 in b_principal_total_exp:
+			b_principal_total += record2
 #BNJ IN count
 		nj_in_count_of_the_day = frappe.db.count('Pawn Ticket Non Jewelry', {'date_loan_granted': self.date , 'workflow_state': 'Active', 'branch': self.branch})
 		nj_renewed_count_of_the_day = frappe.db.count('Pawn Ticket Non Jewelry', {'change_status_date': self.date, 'workflow_state': 'Renewed', 'branch': self.branch})
@@ -147,6 +163,14 @@ class CashPositionReport(Document):
 			bnj_ret_principal += record
 #BNJ Total
 		nj_total_active = frappe.db.count('Pawn Ticket Non Jewelry', {'date_loan_granted': ['<=', self.date], 'workflow_state': ['in', ['Active', 'Expired', 'Returned']], 'branch': self.branch})
+#BNJ Total principal
+		bnj_principal_total_act = frappe.db.get_all('Pawn Ticket Non Jewelry', filters={"branch": self.branch, 'workflow_state': 'Active'}, fields=['desired_principal'], pluck='desired_principal')
+		bnj_principal_total_exp = frappe.db.get_all('Pawn Ticket Non Jewelry', filters={"branch": self.branch, 'workflow_state': 'Expired'}, fields=['desired_principal'], pluck='desired_principal')
+		bnj_principal_total = 0
+		for record in bnj_principal_total_act:
+			bnj_principal_total += record
+		for record2 in bnj_principal_total_exp:
+			bnj_principal_total += record2
 
 #assign to document fields
 		invetory_count_doc = frappe.new_doc('Inventory Count')
@@ -161,6 +185,7 @@ class CashPositionReport(Document):
 		invetory_count_doc.pulled_out_a = a_pulled_out_of_the_day
 		invetory_count_doc.principal_po_a = a_po_principal
 		invetory_count_doc.total_a = a_total_active
+		invetory_count_doc.principal_totala = a_principal_total
 
 		invetory_count_doc.in_count_b = b_in_count
 		invetory_count_doc.principal_in_b = b_in_principal
@@ -171,6 +196,7 @@ class CashPositionReport(Document):
 		invetory_count_doc.pulled_out_b = b_pulled_out_of_the_day
 		invetory_count_doc.principal_po_b = b_po_principal
 		invetory_count_doc.total_b = b_total_active
+		invetory_count_doc.principal_totalb = b_principal_total
 		
 		invetory_count_doc.in_count_nj = nj_in_count
 		invetory_count_doc.principal_in_nj = bnj_in_principal
@@ -181,7 +207,9 @@ class CashPositionReport(Document):
 		invetory_count_doc.returned_nj = nj_returned_of_the_day
 		invetory_count_doc.principal_ret_nj = bnj_ret_principal
 		invetory_count_doc.total_nj = nj_total_active
+		invetory_count_doc.principal_totalnj = bnj_principal_total
 		invetory_count_doc.save(ignore_permissions=True)
+
 # Added Comment
 	def before_save(self):
 		# if self.shortage_overage > 0:

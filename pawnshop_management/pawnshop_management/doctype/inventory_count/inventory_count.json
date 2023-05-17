@@ -20,6 +20,7 @@
   "pulled_out_a",
   "principal_po_a",
   "total_a",
+  "principal_totala",
   "column_break_5",
   "in_count_b",
   "principal_in_b",
@@ -30,6 +31,7 @@
   "pulled_out_b",
   "principal_po_b",
   "total_b",
+  "principal_totalb",
   "column_break_13",
   "in_count_nj",
   "principal_in_nj",
@@ -39,7 +41,8 @@
   "principal_ret_nj",
   "pulled_out_nj",
   "principal_po_nj",
-  "total_nj"
+  "total_nj",
+  "principal_totalnj"
  ],
  "fields": [
   {
@@ -242,11 +245,26 @@
    "fieldname": "principal_po_nj",
    "fieldtype": "Currency",
    "label": "Principal PO(NJ)"
+  },
+  {
+   "fieldname": "principal_totala",
+   "fieldtype": "Currency",
+   "label": "Principal Total(A)"
+  },
+  {
+   "fieldname": "principal_totalb",
+   "fieldtype": "Currency",
+   "label": "Principal Total(B)"
+  },
+  {
+   "fieldname": "principal_totalnj",
+   "fieldtype": "Currency",
+   "label": "Principal Total(NJ)"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-23 10:55:38.953194",
+ "modified": "2023-05-17 15:35:16.385202",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Inventory Count",

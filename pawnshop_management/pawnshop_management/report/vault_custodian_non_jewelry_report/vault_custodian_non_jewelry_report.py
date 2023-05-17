@@ -22,9 +22,9 @@ def execute(filters=None):
 			branch = "Garcia's Pawnshop - GTC"
 		elif str(current_ip) == str(branch_ip['tanza']):
 			branch = "Garcia's Pawnshop - TNZ"
-		data = frappe.get_all('Inventory Count', filters={'branch':branch}, fields=['date', 'in_count_nj', 'principal_in_nj', 'out_count_nj', 'principal_out_nj', 'returned_nj', 'principal_ret_nj', 'pulled_out_nj', 'principal_po_nj', 'total_nj'], order_by='date desc',)
+		data = frappe.get_all('Inventory Count', filters={'branch':branch}, fields=['date', 'in_count_nj', 'principal_in_nj', 'out_count_nj', 'principal_out_nj', 'returned_nj', 'principal_ret_nj', 'pulled_out_nj', 'principal_po_nj', 'total_nj', 'principal_totalnj'], order_by='date desc',)
 	else:
-		data = frappe.get_all('Inventory Count', filters=filters, fields=['date', 'in_count_nj', 'principal_in_nj', 'out_count_nj', 'principal_out_nj', 'returned_nj', 'principal_ret_nj', 'pulled_out_nj', 'principal_po_nj', 'total_nj'], order_by='date desc',)
+		data = frappe.get_all('Inventory Count', filters=filters, fields=['date', 'in_count_nj', 'principal_in_nj', 'out_count_nj', 'principal_out_nj', 'returned_nj', 'principal_ret_nj', 'pulled_out_nj', 'principal_po_nj', 'total_nj', 'principal_totalnj'], order_by='date desc',)
 
 	columns = get_columns()
 	return columns, data
@@ -35,7 +35,7 @@ def get_columns():
 			'fieldname': 'date',
 			'label': 'Date',
 			'fieldtype': 'Date',
-			'width': 200
+			'width': 150
 		},
 
 		{
@@ -99,6 +99,13 @@ def get_columns():
 			'label': 'Total',
 			'fieldtype': 'Int',
 			'width': 100
+		},
+
+		{
+			'fieldname': 'principal_totalnj',
+			'label': 'Principal',
+			'fieldtype': 'Currency',
+			'width': 150
 		}
 	]
 	return columns
