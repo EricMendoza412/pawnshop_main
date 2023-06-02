@@ -324,7 +324,7 @@
 		{% let sumDB = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
 			<tr>
-				{% if(((data[i].workflow_state == "Renewal") || (data[i].workflow_state == "Renewal w/ Amortization")) && (data[i].item_series == "B") && (data[i].inventory_tracking_no == "Pawn Ticket Non Jewelry")) { %} 	
+				{% if(((data[i].workflow_state == "Renewal") || (data[i].workflow_state == "Renewal w/ Amortization")) && (data[i].item_series == "B") && (data[i].inventory_tracking_no == "Pawn Ticket Jewelry")) { %} 	
 				<td>{%= data[i].date_loan_granted %}</td>
 				<td>{%= data[i].pawn_ticket %}</td>
 				<td>{%= data[i].old_pawn_ticket %}</td>
@@ -371,7 +371,7 @@
 		{% let sumDNJ = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
 			<tr>
-				{% if(((data[i].workflow_state == "Renewal") || (data[i].workflow_state == "Renewal w/ Amortization")) && (data[i].item_series == "B") && (data[i].inventory_tracking_no == "Pawn Ticket Jewelry")) { %} 	
+				{% if(((data[i].workflow_state == "Renewal") || (data[i].workflow_state == "Renewal w/ Amortization")) && (data[i].item_series == "B") && (data[i].inventory_tracking_no == "Pawn Ticket Non Jewelry")) { %} 	
 				<td>{%= data[i].date_loan_granted %}</td>
 				<td>{%= data[i].pawn_ticket %}</td>
 				<td>{%= data[i].old_pawn_ticket %}</td>
