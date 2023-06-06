@@ -265,7 +265,7 @@
 			<th style="width: 14%">{%= __("Old Pawn Ticket (A)") %}</th>
 			<th style="width: 14%">{%= __("New Pawn Ticket") %}</th>
 			<th style="width: 14%">{%= __("Old Principal") %}</th>
-			<th style="width: 14%">{%= __("Old Net Proceeds") %}</th>
+			<th style="width: 14%">{%= __("New Principal") %}</th>
 			<th style="width: 14%">{%= __("Accrued Interest") %}</th>
 			<th style="width: 14%">{%= __("Discount") %}</th>		
 		</tr>
@@ -282,7 +282,7 @@
 				<td>{%= data[i].pawn_ticket %}</td>
 				<td>{%= data[i].old_pawn_ticket %}</td>
 				<td>{%= data[i].change_status_date %}</td>
-				<td>{% let netP = data[i].change_status_date - data[i].interest %}
+				<td>{% let netP = data[i].change_status_date - data[i].desired_principal %}
 					{{ netP }}
 				</td>
 				<td style="background-color: rgb(250, 250, 250);">{%= data[i].interest_payment %}</td>
@@ -312,7 +312,7 @@
 			<th style="width: 14%">{%= __("Old Pawn Ticket (B)") %}</th>
 			<th style="width: 14%">{%= __("New Pawn Ticket") %}</th>
 			<th style="width: 14%">{%= __("Old Principal") %}</th>
-			<th style="width: 14%">{%= __("Old Net Proceeds") %}</th>
+			<th style="width: 14%">{%= __("New Principal") %}</th>
 			<th style="width: 14%">{%= __("Accrued Interest") %}</th>
 			<th style="width: 14%">{%= __("Discount") %}</th>		
 		</tr>
@@ -329,7 +329,7 @@
 				<td>{%= data[i].pawn_ticket %}</td>
 				<td>{%= data[i].old_pawn_ticket %}</td>
 				<td>{%= data[i].change_status_date %}</td>
-				<td>{% let netPB = data[i].change_status_date - data[i].interest %}
+				<td>{% let netPB = data[i].change_status_date - data[i].desired_principal %}
 					{{ netPB }}
 				</td>
 				<td style="background-color: rgb(250, 250, 250);">{%= data[i].interest_payment %}</td>
@@ -359,7 +359,7 @@
 			<th style="width: 14%">{%= __("Old Pawn Ticket (NJ)") %}</th>
 			<th style="width: 14%">{%= __("New Pawn Ticket") %}</th>
 			<th style="width: 14%">{%= __("Old Principal") %}</th>
-			<th style="width: 14%">{%= __("Old Net Proceeds") %}</th>
+			<th style="width: 14%">{%= __("New Principal") %}</th>
 			<th style="width: 14%">{%= __("Accrued Interest") %}</th>
 			<th style="width: 14%">{%= __("Discount") %}</th>		
 		</tr>
@@ -376,7 +376,7 @@
 				<td>{%= data[i].pawn_ticket %}</td>
 				<td>{%= data[i].old_pawn_ticket %}</td>
 				<td>{%= data[i].change_status_date %}</td>
-				<td>{% let netPNJ = data[i].change_status_date - data[i].interest %}
+				<td>{% let netPNJ = data[i].change_status_date - data[i].desired_principal %}
 					{{ netPNJ }}
 				</td>
 				<td style="background-color: rgb(250, 250, 250);">{%= data[i].interest_payment %}</td>
