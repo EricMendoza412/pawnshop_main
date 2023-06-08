@@ -3,6 +3,11 @@
 
 frappe.ui.form.on('Provisional Receipt', {
 
+	onload: function(frm) {
+		frm.set_df_property('discount', 'hidden', 1)
+		frm.set_df_property('additional_amortization', 'hidden', 1)
+	},
+
 	validate: function(frm){
 		// if (frm.doc.total > frm.doc.interest_payment && frm.doc.transaction_type == "Interest Payment") {
 		// 	frm.set_value('number_of_months_to_pay_in_advance', 0);
