@@ -261,18 +261,20 @@
   <table class="table table-bordered">
 	<thead>
 		<tr>
-			<th style="width: 16%">{%= __("Date Renewed") %}</th>
-			<th style="width: 14%">{%= __("Old Pawn Ticket (A)") %}</th>
-			<th style="width: 14%">{%= __("New Pawn Ticket") %}</th>
-			<th style="width: 14%">{%= __("Old Principal") %}</th>
-			<th style="width: 14%">{%= __("New Principal") %}</th>
-			<th style="width: 14%">{%= __("Accrued Interest") %}</th>
-			<th style="width: 14%">{%= __("Discount") %}</th>		
+			<th style="width: 14%">{%= __("Date Renewed") %}</th>
+			<th style="width: 13%">{%= __("Old Pawn Ticket (A)") %}</th>
+			<th style="width: 13%">{%= __("New Pawn Ticket (A)") %}</th>
+			<th style="width: 12%">{%= __("Old Principal") %}</th>
+			<th style="width: 12%">{%= __("Old Net Proceeds") %}</th>
+			<th style="width: 12%">{%= __("New Principal") %}</th>
+			<th style="width: 12%">{%= __("Accrued Interest") %}</th>
+			<th style="width: 12%">{%= __("Discount") %}</th>		
 		</tr>
 	</thead>
 	<tbody>
 		{% let sumRN = 0 %}
 		{% let sumNPA = 0 %}
+		{% let sumNPRA = 0 %}
 		{% let sumAI = 0 %}
 		{% let sumD = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
@@ -282,14 +284,18 @@
 				<td>{%= data[i].pawn_ticket %}</td>
 				<td>{%= data[i].old_pawn_ticket %}</td>
 				<td>{%= data[i].change_status_date %}</td>
-				<td>{% let netP = data[i].change_status_date - data[i].desired_principal %}
-					{{ netP }}
+				<td>{% let netP= data[i].change_status_date - data[i].interest %}
+				    {{ netP }}
+				</td>
+				<td>{% let newP = data[i].change_status_date - data[i].desired_principal %}
+					{{ newP }}
 				</td>
 				<td style="background-color: rgb(250, 250, 250);">{%= data[i].interest_payment %}</td>
 				<td style="background-color: rgb(250, 250, 250);">{%= data[i].discount %}</td>
 				{% sumRN += data[i].change_status_date %}
 				{% sumAI += data[i].interest_payment %}
 				{% sumD += data[i].discount %}
+				{% sumNPRA += newP %}
 				{% sumNPA += netP } %}
 			</tr>
 		{% } %}
@@ -299,6 +305,7 @@
 				<td style="text-align: right"><b>Total:</b></td>
 				<td>{{ sumRN }}</td>
 				<td>{{ sumNPA }}</td>
+				<td>{{ sumNPRA }}</td>
 				<td style="background-color: rgb(250, 250, 250);">{{ sumAI }}</td>
 				<td style="background-color: rgb(250, 250, 250);">{{ sumD }}</td>
 			</tr>
@@ -308,18 +315,20 @@
   <table class="table table-bordered">
 	<thead>
 		<tr>
-			<th style="width: 16%">{%= __("Date Renewed") %}</th>
-			<th style="width: 14%">{%= __("Old Pawn Ticket (B)") %}</th>
-			<th style="width: 14%">{%= __("New Pawn Ticket") %}</th>
-			<th style="width: 14%">{%= __("Old Principal") %}</th>
-			<th style="width: 14%">{%= __("New Principal") %}</th>
-			<th style="width: 14%">{%= __("Accrued Interest") %}</th>
-			<th style="width: 14%">{%= __("Discount") %}</th>		
+			<th style="width: 14%">{%= __("Date Renewed") %}</th>
+			<th style="width: 13%">{%= __("Old Pawn Ticket (B)") %}</th>
+			<th style="width: 13%">{%= __("New Pawn Ticket (B)") %}</th>
+			<th style="width: 12%">{%= __("Old Principal") %}</th>
+			<th style="width: 12%">{%= __("Old Net Proceeds") %}</th>
+			<th style="width: 12%">{%= __("New Principal") %}</th>
+			<th style="width: 12%">{%= __("Accrued Interest") %}</th>
+			<th style="width: 12%">{%= __("Discount") %}</th>		
 		</tr>
 	</thead>
 	<tbody>
 		{% let sumRNB = 0 %}
 		{% let sumNPB = 0 %}
+		{% let sumNPRB = 0 %}
 		{% let sumAIB = 0 %}
 		{% let sumDB = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
@@ -329,15 +338,19 @@
 				<td>{%= data[i].pawn_ticket %}</td>
 				<td>{%= data[i].old_pawn_ticket %}</td>
 				<td>{%= data[i].change_status_date %}</td>
-				<td>{% let netPB = data[i].change_status_date - data[i].desired_principal %}
-					{{ netPB }}
+				<td>{% let netPB = data[i].change_status_date - data[i].interest %}
+				    {{ netPB }}
+				</td>
+				<td>{% let newPB = data[i].change_status_date - data[i].desired_principal %}
+					{{ newPB }}
 				</td>
 				<td style="background-color: rgb(250, 250, 250);">{%= data[i].interest_payment %}</td>
 				<td style="background-color: rgb(250, 250, 250);">{%= data[i].discount %}</td>
 				{% sumRNB += data[i].change_status_date %}
 				{% sumAIB += data[i].interest_payment %}
 				{% sumDB += data[i].discount %}
-				{% sumNPB += netPB } %}
+				{% sumNPB += netPB %}
+				{% sumNPRB += newPB } %}
 			</tr>
 		{% } %}
 			<tr>
@@ -346,6 +359,7 @@
 				<td style="text-align: right"><b>Total:</b></td>
 				<td>{{ sumRNB }}</td>
 				<td>{{ sumNPB }}</td>
+				<td>{{ sumNPRB }}</td>
 				<td style="background-color: rgb(250, 250, 250);">{{ sumAIB }}</td>
 				<td style="background-color: rgb(250, 250, 250);">{{ sumDB }}</td>
 			</tr>
@@ -355,18 +369,20 @@
   <table class="table table-bordered">
 	<thead>
 		<tr>
-			<th style="width: 16%">{%= __("Date Renewed") %}</th>
-			<th style="width: 14%">{%= __("Old Pawn Ticket (NJ)") %}</th>
-			<th style="width: 14%">{%= __("New Pawn Ticket") %}</th>
-			<th style="width: 14%">{%= __("Old Principal") %}</th>
-			<th style="width: 14%">{%= __("New Principal") %}</th>
-			<th style="width: 14%">{%= __("Accrued Interest") %}</th>
-			<th style="width: 14%">{%= __("Discount") %}</th>		
+			<th style="width: 14%">{%= __("Date Renewed") %}</th>
+			<th style="width: 13%">{%= __("Old Pawn Ticket (NJ)") %}</th>
+			<th style="width: 13%">{%= __("New Pawn Ticket (NJ)") %}</th>
+			<th style="width: 12%">{%= __("Old Principal") %}</th>
+			<th style="width: 12%">{%= __("Old Net Proceeds") %}</th>
+			<th style="width: 12%">{%= __("New Principal") %}</th>
+			<th style="width: 12%">{%= __("Accrued Interest") %}</th>
+			<th style="width: 12%">{%= __("Discount") %}</th>		
 		</tr>
 	</thead>
 	<tbody>
 		{% let sumRNNJ = 0 %}
 		{% let sumNPNJ = 0 %}
+		{% let sumNPRNJ = 0 %}
 		{% let sumAINJ = 0 %}
 		{% let sumDNJ = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
@@ -376,14 +392,18 @@
 				<td>{%= data[i].pawn_ticket %}</td>
 				<td>{%= data[i].old_pawn_ticket %}</td>
 				<td>{%= data[i].change_status_date %}</td>
-				<td>{% let netPNJ = data[i].change_status_date - data[i].desired_principal %}
-					{{ netPNJ }}
+				<td>{% let netPNJ = data[i].change_status_date - data[i].interest %}
+				    {{ netPNJ }}
+				</td>
+				<td>{% let newPNJ = data[i].change_status_date - data[i].desired_principal %}
+					{{ newPNJ }}
 				</td>
 				<td style="background-color: rgb(250, 250, 250);">{%= data[i].interest_payment %}</td>
 				<td style="background-color: rgb(250, 250, 250);">{%= data[i].discount %}</td>
 				{% sumRNNJ += data[i].change_status_date %}
 				{% sumAINJ += data[i].interest_payment %}
 				{% sumDNJ += data[i].discount %}
+				{% sumNPRNJ += newPNJ %}
 				{% sumNPNJ += netPNJ } %}
 			</tr>
 		{% } %}
@@ -393,6 +413,7 @@
 				<td style="text-align: right"><b>Total:</b></td>
 				<td>{{ sumRNNJ }}</td>
 				<td>{{ sumNPNJ }}</td>
+				<td>{{ sumNPRNJ }}</td>
 				<td style="background-color: rgb(250, 250, 250);">{{ sumAINJ }}</td>
 				<td style="background-color: rgb(250, 250, 250);">{{ sumDNJ }}</td>
 			</tr>
