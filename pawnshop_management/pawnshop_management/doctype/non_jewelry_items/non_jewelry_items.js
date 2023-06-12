@@ -49,9 +49,11 @@ frappe.ui.form.on('Non Jewelry Items', {
 				frm.set_value('charger', 0)
 				frm.refresh_field('charger')
 			}
+
+			frm.disable_save();
 		}
 
-		//frm.disable_save();
+
 		frm.set_df_property('disk_type', 'hidden', 1);
 		frm.set_df_property('internet_connection_capability', 'hidden', 1);
 		frm.set_df_property('bag', 'hidden', 1);
@@ -285,6 +287,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 							frm.set_df_property('bag', 'read_only', 1);
 							frm.set_df_property('extra_battery', 'read_only', 1);
 							frm.set_df_property('extra_lens', 'read_only', 1);
+							frm.set_df_property('not_openline', 'read_only', 1);
 							frm.enable_save();
 						} else {
 							frm.set_value('assistant_appraiser', null);
