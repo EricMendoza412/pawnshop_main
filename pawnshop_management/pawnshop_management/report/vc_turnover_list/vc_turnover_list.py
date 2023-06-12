@@ -93,19 +93,19 @@ def execute(filters=None):
 		elif pt_type == "Pawn Ticket Jewelry":
 			detailsL = frappe.db.get_list("Jewelry List", filters={'parent': data_active[i]['pawn_ticket']}, fields=['item_no'])
 			for j in range(len(detailsL)):
-				details = frappe.db.get_list("Jewelry Items", filters={'item_no': detailsL[j]['item_no']}, fields=['item_no','type', 'karat_category', 'karat', 'total_weight', 'color', 'colors_if_multi', 'additional_for_stone', 'densi','comments'])
-				for doc in details:
-					densi, comments, colorMulti, addForStone  = "", "", "", ""
-					if doc.densi != None:
-						densi = ", " + doc.densi
-					if doc.comments != None:
-						comments = ", " + doc.comments
-					if doc.colors_if_multi != None:
-						colorMulti = ", " + doc.colors_if_multi
-					if doc.additional_for_stone != None:
-						addForStone = ", Stone:" + str(doc.additional_for_Stone)
-					description += "One " + doc.type + ", " + doc.karat_category + ", " + doc.karat + ", " + str(doc.total_weight) + ", " + doc.color + colorMulti + densi + comments + colorMulti + addForStone + "; "
-
+				if detailsL[j]['item_no'] != "0-0J-0":
+					details = frappe.db.get_list("Jewelry Items", filters={'item_no': detailsL[j]['item_no']}, fields=['item_no','type', 'karat_category', 'karat', 'total_weight', 'color', 'colors_if_multi', 'additional_for_stone', 'densi','comments'])
+					for doc in details:
+						densi, comments, colorMulti, addForStone  = "", "", "", ""
+						if doc.densi != None:
+							densi = ", " + doc.densi
+						if doc.comments != None:
+							comments = ", " + doc.comments
+						if doc.colors_if_multi != None:
+							colorMulti = ", " + doc.colors_if_multi
+						if doc.additional_for_stone != None:
+							addForStone = ", Stone:" + str(doc.additional_for_Stone)
+						description += "One " + doc.type + ", " + doc.karat_category + ", " + doc.karat + ", " + str(doc.total_weight) + ", " + doc.color + colorMulti + densi + comments + colorMulti + addForStone + "; "
 		data_active[i]['description'] = description
 
 	data = data_active
