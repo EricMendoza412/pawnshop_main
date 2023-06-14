@@ -14,6 +14,12 @@ frappe.ui.form.on('Provisional Receipt', {
 		// 	frm.refresh_field('number_of_months_to_pay_in_advance');
 		// 	frappe.throw('Payment should not exceed accrued interest amount');
 		// }
+		if (frm.doc.mode_of_payment == "-Select-"){
+			frappe.throw('Please select mode of payment')
+		}
+		if (frm.doc.transaction_type == null || frm.doc.transaction_type == "-Select-") {
+			frappe.throw('Please select transaction type');
+		}
 
 		if (frm.doc.transaction_type == "Renewal w/ Amortization" || frm.doc.transaction_type == "Amortization") {
 			if (frm.doc.additional_amortization <= 0 || frm.doc.additional_amortization == null) {

@@ -105,12 +105,12 @@
    "read_only": 1
   },
   {
-   "default": "---Select Transaction Type---",
+   "default": "-Select-",
    "fieldname": "transaction_type",
    "fieldtype": "Select",
    "in_standard_filter": 1,
    "label": "Transaction Type",
-   "options": "---Select Transaction Type---\nRenewal\nRedemption\nInterest Payment\nAmortization\nRenewal w/ Amortization",
+   "options": "-Select-\nRenewal\nRedemption\nInterest Payment\nAmortization\nRenewal w/ Amortization",
    "reqd": 1
   },
   {
@@ -224,11 +224,11 @@
    "read_only": 1
   },
   {
-   "default": "Cash",
+   "default": "-Select-",
    "fieldname": "mode_of_payment",
    "fieldtype": "Select",
    "label": "Mode of Payment",
-   "options": "Cash\nBank Transfer\nGCash\nCash & GCash\nCash & Bank Transfer\nGCash & Bank Transfer"
+   "options": "-Select-\nCash\nBank Transfer\nGCash\nCash & GCash\nCash & Bank Transfer\nGCash & Bank Transfer"
   },
   {
    "default": "BPI",
@@ -316,7 +316,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-06-08 17:22:32.680526",
+ "modified": "2023-06-14 23:12:17.933123",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Provisional Receipt",
