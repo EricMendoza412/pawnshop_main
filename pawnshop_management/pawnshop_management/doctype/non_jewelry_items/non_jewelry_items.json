@@ -294,6 +294,7 @@
   {
    "fieldname": "assistant_appraiser",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Assistant Appraiser",
    "options": "User"
   },
@@ -313,7 +314,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-25 11:17:20.497785",
+ "modified": "2023-06-15 00:12:07.953021",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",
