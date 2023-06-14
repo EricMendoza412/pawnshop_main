@@ -295,6 +295,7 @@
    "default": "0",
    "fieldname": "additional_pawn",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Additional Pawn",
    "read_only": 1
   },
@@ -302,6 +303,7 @@
    "default": "0.00",
    "fieldname": "additional_redeem",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Additional Redeem",
    "read_only": 1
   },
@@ -314,6 +316,7 @@
    "default": "0",
    "fieldname": "additional_partial_payment",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Additional Partial Payment",
    "read_only": 1
   },
@@ -321,6 +324,7 @@
    "default": "0",
    "fieldname": "total_discount",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Total Discount",
    "read_only": 1
   },
@@ -358,7 +362,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-04-29 00:55:24.802885",
+ "modified": "2023-06-14 23:46:07.720665",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Cash Position Report",
