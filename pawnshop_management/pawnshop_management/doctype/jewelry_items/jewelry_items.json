@@ -7,22 +7,22 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "item_no",
   "batch_number",
   "type",
-  "total_weight",
-  "karat",
   "karat_category",
+  "color",
+  "colors_if_multi",
+  "densi",
+  "additional_for_stone",
   "sizelength",
   "selling_price",
   "selling_price_per_gram",
-  "densi",
-  "column_break_6",
+  "column_break_11",
+  "item_no",
   "branch",
-  "additional_for_stone",
-  "color",
-  "colors_if_multi",
   "section_break_10",
+  "karat",
+  "total_weight",
   "karats",
   "section_break_17",
   "comments",
@@ -48,16 +48,17 @@
    "unique": 1
   },
   {
+   "default": "-Select-",
    "fieldname": "type",
    "fieldtype": "Select",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Type",
-   "options": "Earrings\nBracelet\nNecklace\nRing\nBangles\nPendant\nSet\nEarcuff\nGold Coin",
+   "options": "-Select-\nEarrings\nBracelet\nNecklace\nRing\nBangles\nPendant\nSet\nEarcuff\nGold Coin",
    "reqd": 1
   },
   {
-   "default": "Pt 800",
+   "default": "-Select-",
    "fieldname": "karat",
    "fieldtype": "Data",
    "label": "Karat",
@@ -65,33 +66,31 @@
    "reqd": 1
   },
   {
+   "default": "-Select-",
    "fieldname": "karat_category",
    "fieldtype": "Select",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Karat Category",
-   "options": "Defective\nRegular\nSagad",
+   "options": "-Select-\nDefective\nRegular\nSagad",
    "reqd": 1
   },
   {
-   "fieldname": "column_break_6",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "additional_for_stone",
-   "fieldtype": "Small Text",
-   "label": "Additional for Stone"
+   "fieldtype": "Data",
+   "label": "Additional price for Stone (input amount only)"
   },
   {
    "fieldname": "color",
    "fieldtype": "Select",
    "label": "Color",
-   "options": "Yellow Gold\nWhite Gold\nRose Gold\nMulti Colored",
+   "options": "YG\nWG\nRG\nYG & WG\nYG & RG\nWG & RG\nTricolor",
    "reqd": 1
   },
   {
    "fieldname": "colors_if_multi",
    "fieldtype": "Small Text",
+   "hidden": 1,
    "label": "Colors if Multi"
   },
   {
@@ -111,7 +110,7 @@
   {
    "fieldname": "comments",
    "fieldtype": "Small Text",
-   "label": "Comments"
+   "label": "Comments (defects, stones, etc.) "
   },
   {
    "fieldname": "batch_number",
@@ -205,6 +204,7 @@
    "fieldtype": "Section Break"
   },
   {
+   "default": "0",
    "fieldname": "total_weight",
    "fieldtype": "Float",
    "label": "Total Weight(g)",
@@ -215,11 +215,15 @@
    "fieldname": "densi",
    "fieldtype": "Data",
    "label": "Densi"
+  },
+  {
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-31 13:53:17.946941",
+ "modified": "2023-06-14 22:47:26.416171",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Jewelry Items",

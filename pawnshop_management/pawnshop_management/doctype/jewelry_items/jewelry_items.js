@@ -29,6 +29,18 @@ frappe.ui.form.on('Jewelry Items', {
 		if (parseFloat(frm.doc.desired_principal) > parseFloat(frm.doc.appraisal_value)) {
 			frappe.throw(__('Desired principal is greater than appraisal value'));
 		}
+		if(frm.doc.type == "-Select-"){
+			frappe.throw(__('Please choose the item type'));
+		}
+		if(frm.doc.karat == "-Select-"){
+			frappe.throw(__('Please input item karat'));
+		}
+		if(frm.doc.karat_category == "-Select-"){
+			frappe.throw(__('Please choose karat category'));
+		}
+		if(parseFloat(frm.doc.total_weight) > 500){
+			frappe.throw(__('Inputted grams exceeds limit'));
+		}
 	},
 	// before_workflow_action: function(frm){
 	// 	if (frm.selected_workflow_action === "Collect") { // Change status
@@ -112,6 +124,22 @@ frappe.ui.form.on('Jewelry Items', {
 					})
 				}
 			})
+		}else{
+			if(!frappe.user_roles.includes('Administrator')){
+				frm.set_df_property('type', 'read_only', 1);
+				frm.set_df_property('total_weight', 'read_only', 1);
+				frm.set_df_property('karat', 'read_only', 1);
+				frm.set_df_property('karat_category', 'read_only', 1);
+				frm.set_df_property('densi', 'read_only', 1);
+				frm.set_df_property('additional_for_stone', 'read_only', 1);
+				frm.set_df_property('color', 'read_only', 1);
+				frm.set_df_property('colors_if_multi', 'read_only', 1);
+				frm.set_df_property('appraisal_value', 'read_only', 1);
+				frm.set_df_property('desired_principal', 'read_only', 1);
+				frm.set_df_property('assistant_appraiser', 'read_only', 1);
+				frm.set_df_property('comments', 'read_only', 1);
+				frm.set_df_property('karats', 'read_only', 1);
+			}
 		}
 		frm.set_query('assistant_appraiser', function() {
 			return {
@@ -149,19 +177,6 @@ frappe.ui.form.on('Jewelry Items', {
 								indicator: 'green',
 								message: __('Appraisal Approved')
 							});
-							frm.set_df_property('type', 'read_only', 1);
-							frm.set_df_property('total_weight', 'read_only', 1);
-							frm.set_df_property('karat', 'read_only', 1);
-							frm.set_df_property('karat_category', 'read_only', 1);
-							frm.set_df_property('densi', 'read_only', 1);
-							frm.set_df_property('additional_for_stone', 'read_only', 1);
-							frm.set_df_property('color', 'read_only', 1);
-							frm.set_df_property('colors_if_multi', 'read_only', 1);
-							frm.set_df_property('appraisal_value', 'read_only', 1);
-							frm.set_df_property('desired_principal', 'read_only', 1);
-							frm.set_df_property('assistant_appraiser', 'read_only', 1);
-							frm.set_df_property('comments', 'read_only', 1);
-							frm.set_df_property('karats', 'read_only', 1);
 							frm.enable_save();
 						} else {
 							frm.set_value('assistant_appraiser', null);
