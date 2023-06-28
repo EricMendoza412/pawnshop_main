@@ -1,0 +1,136 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-06-28 23:06:26.323626",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "branch",
+  "currency",
+  "date_of_transfer",
+  "fund_transfer_series",
+  "vc_to_cm",
+  "cm_to_vc",
+  "vc_to_wu_cashier",
+  "wu_cashier_to_vc",
+  "vc_to_fx_cashier",
+  "fx_cashier_to_vc",
+  "vc_to_ps_cashier",
+  "ps_cashier_to_vc",
+  "civ_balance",
+  "given_by",
+  "received_by",
+  "comments"
+ ],
+ "fields": [
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Branch",
+   "options": "Branch",
+   "reqd": 1
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Select",
+   "label": "Currency",
+   "options": "PHP\nUSD"
+  },
+  {
+   "fieldname": "date_of_transfer",
+   "fieldtype": "Datetime",
+   "label": "Date of Transfer"
+  },
+  {
+   "fieldname": "fund_transfer_series",
+   "fieldtype": "Data",
+   "label": "Fund Transfer Series"
+  },
+  {
+   "fieldname": "vc_to_cm",
+   "fieldtype": "Currency",
+   "label": "VC to CM"
+  },
+  {
+   "fieldname": "cm_to_vc",
+   "fieldtype": "Currency",
+   "label": "CM to VC"
+  },
+  {
+   "fieldname": "vc_to_wu_cashier",
+   "fieldtype": "Currency",
+   "label": "VC to WU cashier"
+  },
+  {
+   "fieldname": "wu_cashier_to_vc",
+   "fieldtype": "Currency",
+   "label": "WU cashier to VC"
+  },
+  {
+   "fieldname": "vc_to_fx_cashier",
+   "fieldtype": "Currency",
+   "label": "VC to FX cashier"
+  },
+  {
+   "fieldname": "fx_cashier_to_vc",
+   "fieldtype": "Currency",
+   "label": "FX cashier to VC"
+  },
+  {
+   "fieldname": "vc_to_ps_cashier",
+   "fieldtype": "Currency",
+   "label": "VC to PS cashier"
+  },
+  {
+   "fieldname": "ps_cashier_to_vc",
+   "fieldtype": "Currency",
+   "label": "PS cashier to VC"
+  },
+  {
+   "fieldname": "civ_balance",
+   "fieldtype": "Currency",
+   "label": "CIV Balance"
+  },
+  {
+   "fieldname": "given_by",
+   "fieldtype": "Data",
+   "label": "Given By"
+  },
+  {
+   "fieldname": "received_by",
+   "fieldtype": "Data",
+   "label": "Received By"
+  },
+  {
+   "fieldname": "comments",
+   "fieldtype": "Data",
+   "label": "Comments"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-06-28 23:15:39.820168",
+ "modified_by": "Administrator",
+ "module": "Pawnshop Management",
+ "name": "Fund Transfer",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
