@@ -63,7 +63,7 @@
   },
   {
    "fieldname": "payment_1",
-   "fieldtype": "Data",
+   "fieldtype": "Currency",
    "label": "Payment 1"
   },
   {
@@ -73,7 +73,7 @@
   },
   {
    "fieldname": "payment_2",
-   "fieldtype": "Data",
+   "fieldtype": "Currency",
    "label": "Payment 2"
   },
   {
@@ -134,7 +134,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-06-29 16:27:37.411647",
+ "modified": "2023-06-29 22:42:09.706127",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Subastado Sales Commissions",
