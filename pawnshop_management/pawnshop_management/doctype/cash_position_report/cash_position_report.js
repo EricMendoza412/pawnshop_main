@@ -89,6 +89,7 @@ frappe.ui.form.on('Cash Position Report', {
 		get_provisional_receipts_of_the_day(frm, frm.doc.date);
 		get_non_jewelry_of_the_day(frm, frm.doc.date);
 		get_gcash_provisional_receipt(frm, frm.doc.date);
+		get_ps_fund_transfers(frm, frm.doc.date);
 		select_naming_series(frm);
 		get_jewelry_b_of_the_day(frm, frm.doc.date);
 		get_jewelry_a_of_the_day(frm, frm.doc.date);
@@ -103,6 +104,7 @@ frappe.ui.form.on('Cash Position Report', {
 		get_provisional_receipts_of_the_day(frm, frm.doc.date);
 		get_non_jewelry_of_the_day(frm, frm.doc.date);
 		get_gcash_provisional_receipt(frm, frm.doc.date);
+		get_ps_fund_transfers(frm, frm.doc.date);
 		select_naming_series(frm);
 		get_jewelry_b_of_the_day(frm, frm.doc.date);
 		get_jewelry_a_of_the_day(frm, frm.doc.date);
@@ -321,7 +323,8 @@ function get_jewelry_a_of_the_day(frm, date_today=null) {
 			branch: frm.doc.branch,
 			old_pawn_ticket: '',
 			docstatus: 1
-		}
+		},
+		limit: 500
 	}).then(records => {
 		let temp_total = 0.00;
 		frm.set_value('jewelry_a', 0.00);
@@ -342,7 +345,8 @@ function get_jewelry_b_of_the_day(frm, date_today=null) {
 			branch: frm.doc.branch,
 			old_pawn_ticket: '',
 			docstatus: 1
-		}
+		},
+		limit: 500
 	}).then(records => {
 		let temp_total = 0.00;
 		frm.set_value('jewelry_b', 0.00);
@@ -362,7 +366,8 @@ function get_non_jewelry_of_the_day(frm, date_today=null) {
 				branch: frm.doc.branch,
 				old_pawn_ticket: '',
 				docstatus: 1
-			}
+			},
+			limit: 500
 		}).then(records => {
 			let temp_total = 0.00;
 			frm.set_value('non_jewelry', 0.00);
@@ -372,7 +377,26 @@ function get_non_jewelry_of_the_day(frm, date_today=null) {
 			frm.set_value('non_jewelry', temp_total);
 			frm.refresh_field('non_jewelry');
 		})
-	
+}
+
+function get_ps_fund_transfers(frm, date_today=null) {
+	frappe.db.get_list('Fund Transfer', {
+		fields: ['ps_cashier_to_vc','vc_to_ps_cashier'],
+		filters: { date_of_transfer: date_today,branch: frm.doc.branch},
+		limit: 500
+	}).then(records => {
+		let psToVc = 0;
+		let vcToPs = 0;
+		for (let index = 0; index < records.length; index++) {
+			psToVc += records[index].ps_cashier_to_vc
+			vcToPs += records[index].vc_to_ps_cashier
+		}
+		frm.set_value('cash_to_vault', psToVc);
+		frm.set_value('cash_from_vault', vcToPs);
+		frm.refresh_field('cash_to_vault');
+		frm.refresh_field('cash_from_vault');
+	})
+
 }
 
 function total_cash_breakdown(frm) {

@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:fund_transfer_series",
  "creation": "2023-06-28 23:06:26.323626",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -40,13 +41,14 @@
   },
   {
    "fieldname": "date_of_transfer",
-   "fieldtype": "Datetime",
+   "fieldtype": "Date",
    "label": "Date of Transfer"
   },
   {
    "fieldname": "fund_transfer_series",
    "fieldtype": "Data",
-   "label": "Fund Transfer Series"
+   "label": "Fund Transfer Series",
+   "unique": 1
   },
   {
    "fieldname": "vc_to_cm",
@@ -111,7 +113,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-06-28 23:15:39.820168",
+ "modified": "2023-06-29 14:20:25.532715",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Fund Transfer",
