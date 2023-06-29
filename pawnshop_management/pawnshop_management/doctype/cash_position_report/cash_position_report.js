@@ -90,6 +90,7 @@ frappe.ui.form.on('Cash Position Report', {
 		get_non_jewelry_of_the_day(frm, frm.doc.date);
 		get_gcash_provisional_receipt(frm, frm.doc.date);
 		get_ps_fund_transfers(frm, frm.doc.date);
+		get_subastado_sales(frm, frm.doc.date);
 		select_naming_series(frm);
 		get_jewelry_b_of_the_day(frm, frm.doc.date);
 		get_jewelry_a_of_the_day(frm, frm.doc.date);
@@ -105,6 +106,7 @@ frappe.ui.form.on('Cash Position Report', {
 		get_non_jewelry_of_the_day(frm, frm.doc.date);
 		get_gcash_provisional_receipt(frm, frm.doc.date);
 		get_ps_fund_transfers(frm, frm.doc.date);
+		get_subastado_sales(frm, frm.doc.date);
 		select_naming_series(frm);
 		get_jewelry_b_of_the_day(frm, frm.doc.date);
 		get_jewelry_a_of_the_day(frm, frm.doc.date);
@@ -396,7 +398,55 @@ function get_ps_fund_transfers(frm, date_today=null) {
 		frm.refresh_field('cash_to_vault');
 		frm.refresh_field('cash_from_vault');
 	})
+}
 
+function get_subastado_sales(frm, date_today=null) {
+	frappe.db.get_list('Subastado Sales Commissions', {
+		fields: ['mop_1','payment_1','mop_2','payment_2'],
+		filters: { date_bought_or_returned: date_today, branch: frm.doc.branch},
+		limit: 500
+	}).then(records => {
+		let cash = 0;
+		let gcashRet = 0;
+		let gcash = 0;
+		let bankTransRet = 0;
+		let bankTrans = 0;
+		for (let index = 0; index < records.length; index++) {
+			if(records[index].mop_1 == "Cash" || records[index].mop_2 == "Cash"){
+			  cash += parseInt(records[index].payment_1);
+			  cash += parseInt(records[index].payment_2);	
+			}
+			if(records[index].mop_1 == "Gcash" || records[index].mop_2 == "Gcash"){
+				if(records[index].payment_1 > 0 || records[index].payment_2 > 0){
+					gcash += parseInt(records[index].payment_1);
+					gcash += parseInt(records[index].payment_2);		
+				}else{
+					gcashRet += parseInt((records[index].payment_1 * -1));
+					gcashRet += parseInt((records[index].payment_2 * -1));
+				}
+			}
+			if(records[index].mop_1 == "BPI" || records[index].mop_1 == "BDO" || records[index].mop_1 == "EASTWEST" || records[index].mop_2 == "BPI" || records[index].mop_2 == "BDO" || records[index].mop_2 == "EASTWEST"){
+				if(records[index].payment_1 > 0 || records[index].payment_2 > 0){
+					bankTrans += parseInt(records[index].payment_1);
+					bankTrans += parseInt(records[index].payment_2);		
+				}else{
+					bankTransRet += parseInt((records[index].payment_1 * -1));
+					bankTransRet += parseInt((records[index].payment_2 * -1));
+				}
+			}
+		}
+		frm.set_value('selling', cash);
+		frm.refresh_field('selling');
+		frm.set_value('gcash', gcash);
+		frm.refresh_field('gcash');
+		frm.set_value('gcash_positive', gcashRet);
+		frm.refresh_field('gcash_positive');
+		frm.set_value('bank_transfer', bankTransRet);
+		frm.refresh_field('bank_transfer');
+		frm.set_value('bank_transfer_return', bankTrans);
+		frm.refresh_field('bank_transfer_return');
+
+	})
 }
 
 function total_cash_breakdown(frm) {

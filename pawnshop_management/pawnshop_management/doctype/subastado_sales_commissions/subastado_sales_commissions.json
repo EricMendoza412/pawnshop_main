@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:receipt_number",
  "creation": "2023-04-14 11:47:27.523087",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -14,23 +15,36 @@
   "mop_1",
   "payment_1",
   "mop_2",
-  "payment_2"
+  "payment_2",
+  "mode_of_delivery",
+  "gcash_reference_no",
+  "items",
+  "total_amount",
+  "commision",
+  "distributed_amount",
+  "credited_to",
+  "paid_or_cop",
+  "seller",
+  "reason_for_return",
+  "comments"
  ],
  "fields": [
   {
    "fieldname": "branch",
-   "fieldtype": "Data",
-   "label": "Branch"
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch"
   },
   {
    "fieldname": "date_bought_or_returned",
-   "fieldtype": "Data",
+   "fieldtype": "Date",
    "label": "Date bought or returned"
   },
   {
    "fieldname": "receipt_number",
    "fieldtype": "Data",
-   "label": "Receipt number"
+   "label": "Receipt number",
+   "unique": 1
   },
   {
    "fieldname": "customer_tracker",
@@ -61,11 +75,66 @@
    "fieldname": "payment_2",
    "fieldtype": "Data",
    "label": "Payment 2"
+  },
+  {
+   "fieldname": "mode_of_delivery",
+   "fieldtype": "Data",
+   "label": "Mode of delivery"
+  },
+  {
+   "fieldname": "seller",
+   "fieldtype": "Data",
+   "label": "Seller"
+  },
+  {
+   "fieldname": "paid_or_cop",
+   "fieldtype": "Data",
+   "label": "Paid or COP"
+  },
+  {
+   "fieldname": "reason_for_return",
+   "fieldtype": "Data",
+   "label": "Reason for return"
+  },
+  {
+   "fieldname": "comments",
+   "fieldtype": "Data",
+   "label": "Comments"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Data",
+   "label": "Items"
+  },
+  {
+   "fieldname": "gcash_reference_no",
+   "fieldtype": "Data",
+   "label": "Gcash reference no"
+  },
+  {
+   "fieldname": "commision",
+   "fieldtype": "Currency",
+   "label": "Commision"
+  },
+  {
+   "fieldname": "distributed_amount",
+   "fieldtype": "Currency",
+   "label": "Distributed amount"
+  },
+  {
+   "fieldname": "credited_to",
+   "fieldtype": "Data",
+   "label": "Credited to"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total amount"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-04-14 11:48:05.287592",
+ "modified": "2023-06-29 16:27:37.411647",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Subastado Sales Commissions",
