@@ -412,40 +412,53 @@ function get_subastado_sales(frm, date_today=null) {
 		let bankTransRet = 0;
 		let bankTrans = 0;
 		for (let index = 0; index < records.length; index++) {
-			if(records[index].mop_1 == "Cash" || records[index].mop_2 == "Cash"){
-			  cash += parseInt(records[index].payment_1);
-			  cash += parseInt(records[index].payment_2);	
+			if(records[index].mop_1 == "Cash"){
+				cash += parseInt(records[index].payment_1);	
 			}
-			if(records[index].mop_1 == "Gcash" || records[index].mop_2 == "Gcash"){
-				if(records[index].payment_1 > 0 || records[index].payment_2 > 0){
-					gcash += parseInt(records[index].payment_1);
-					gcash += parseInt(records[index].payment_2);		
+			if(records[index].mop_2 == "Cash"){
+				cash += parseInt(records[index].payment_2);	
+			}
+			if(records[index].mop_1 == "Gcash"){
+				if(records[index].payment_1 > 0){
+					gcash += parseInt(records[index].payment_1);		
 				}else{
 					gcashRet += parseInt((records[index].payment_1 * -1));
+				}
+			}
+			if(records[index].mop_2 == "Gcash"){
+				if(records[index].payment_2 > 0){
+					gcash += parseInt(records[index].payment_2);		
+				}else{
 					gcashRet += parseInt((records[index].payment_2 * -1));
 				}
 			}
-			if(records[index].mop_1 == "BPI" || records[index].mop_1 == "BDO" || records[index].mop_1 == "EASTWEST" || records[index].mop_2 == "BPI" || records[index].mop_2 == "BDO" || records[index].mop_2 == "EASTWEST"){
-				if(records[index].payment_1 > 0 || records[index].payment_2 > 0){
+			if(records[index].mop_1 == "BPI" || records[index].mop_1 == "BDO" || records[index].mop_1 == "EASTWEST"){
+				if(records[index].payment_1 > 0){
 					bankTrans += parseInt(records[index].payment_1);
-					bankTrans += parseInt(records[index].payment_2);		
 				}else{
 					bankTransRet += parseInt((records[index].payment_1 * -1));
+				}
+			}
+			if(records[index].mop_2 == "BPI" || records[index].mop_2 == "BDO" || records[index].mop_2 == "EASTWEST"){
+				if(records[index].payment_2 > 0){
+					bankTrans += parseInt(records[index].payment_2);		
+				}else{
 					bankTransRet += parseInt((records[index].payment_2 * -1));
 				}
 			}
 		}
 		frm.set_value('selling', cash);
-		frm.refresh_field('selling');
 		frm.set_value('gcash', gcash);
-		frm.refresh_field('gcash');
 		frm.set_value('gcash_positive', gcashRet);
-		frm.refresh_field('gcash_positive');
-		frm.set_value('bank_transfer', bankTransRet);
-		frm.refresh_field('bank_transfer');
-		frm.set_value('bank_transfer_return', bankTrans);
-		frm.refresh_field('bank_transfer_return');
+		frm.set_value('bank_transfer', bankTrans);
+		frm.set_value('bank_transfer_return', bankTransRet);
+		
 
+		frm.refresh_field('selling');
+		frm.refresh_field('gcash');
+		frm.refresh_field('gcash_positive');
+		frm.refresh_field('bank_transfer');
+		frm.refresh_field('bank_transfer_return');
 	})
 }
 
