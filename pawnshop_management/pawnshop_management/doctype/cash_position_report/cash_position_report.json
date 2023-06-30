@@ -75,7 +75,8 @@
    "default": "0.00",
    "fieldname": "selling",
    "fieldtype": "Currency",
-   "label": "Selling"
+   "label": "Selling",
+   "read_only": 1
   },
   {
    "default": "0.00",
@@ -146,13 +147,15 @@
    "default": "0.00",
    "fieldname": "cash_from_vault",
    "fieldtype": "Currency",
-   "label": "Cash From Vault"
+   "label": "Cash From Vault",
+   "read_only": 1
   },
   {
    "default": "0.00",
    "fieldname": "cash_to_vault",
    "fieldtype": "Currency",
-   "label": "Cash To Vault"
+   "label": "Cash To Vault",
+   "read_only": 1
   },
   {
    "default": "0.00",
@@ -362,7 +365,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-06-14 23:46:07.720665",
+ "modified": "2023-07-01 00:30:33.911484",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Cash Position Report",
