@@ -529,11 +529,11 @@ function get_gcash_provisional_receipt(frm, date_today = null) {
 			}
 		}).then(records => {
 			let temp_total = 0.00;
-			frm.set_value('gcash', 0.00);
+			//frm.set_value('gcash', 0.00);
 			for (let index = 0; index < records.length; index++) {
 				temp_total += parseFloat(records[index].total)
 			}
-			frm.set_value('gcash', temp_total);
+			//frm.set_value('gcash', temp_total);
 			frm.refresh_field('gcash');
 		})
 	} else if (frm.doc.branch == "Garcia's Pawnshop - TNZ") {
@@ -547,11 +547,11 @@ function get_gcash_provisional_receipt(frm, date_today = null) {
 			}
 		}).then(records => {
 			let temp_total = 0.00;
-			frm.set_value('gcash', 0.00);
+			// frm.set_value('gcash', 0.00);
 			for (let index = 0; index < records.length; index++) {
 				temp_total += parseFloat(records[index].total)
 			}
-			frm.set_value('gcash', temp_total);
+			//frm.set_value('gcash', temp_total);
 			frm.refresh_field('gcash');
 		})
 	} else if (frm.doc.branch == "Garcia's Pawnshop - POB") {
@@ -565,11 +565,11 @@ function get_gcash_provisional_receipt(frm, date_today = null) {
 			}
 		}).then(records => {
 			let temp_total = 0.00;
-			frm.set_value('gcash', 0.00);
+			//frm.set_value('gcash', 0.00);
 			for (let index = 0; index < records.length; index++) {
 				temp_total += parseFloat(records[index].total)
 			}
-			frm.set_value('gcash', temp_total);
+			//frm.set_value('gcash', temp_total);
 			frm.refresh_field('gcash');
 		})
 	} else if (frm.doc.branch == "Garcia's Pawnshop - MOL") {
@@ -583,11 +583,11 @@ function get_gcash_provisional_receipt(frm, date_today = null) {
 			}
 		}).then(records => {
 			let temp_total = 0.00;
-			frm.set_value('gcash', 0.00);
+			//frm.set_value('gcash', 0.00);
 			for (let index = 0; index < records.length; index++) {
 				temp_total += parseFloat(records[index].total)
 			}
-			frm.set_value('gcash', temp_total);
+			//frm.set_value('gcash', temp_total);
 			frm.refresh_field('gcash');
 		})
 	} else if (frm.doc.branch == "Garcia's Pawnshop - GTC") {
@@ -601,11 +601,11 @@ function get_gcash_provisional_receipt(frm, date_today = null) {
 			}
 		}).then(records => {
 			let temp_total = 0.00;
-			frm.set_value('gcash', 0.00);
+			//frm.set_value('gcash', 0.00);
 			for (let index = 0; index < records.length; index++) {
 				temp_total += parseFloat(records[index].total)
 			}
-			frm.set_value('gcash', temp_total);
+			//frm.set_value('gcash', temp_total);
 			frm.refresh_field('gcash');
 		})
 	} else if (frm.doc.branch == "Garcia's Pawnshop - CC") {
@@ -619,11 +619,11 @@ function get_gcash_provisional_receipt(frm, date_today = null) {
 			}
 		}).then(records => {
 			let temp_total = 0.00;
-			frm.set_value('gcash', 0.00);
+			//frm.set_value('gcash', 0.00);
 			for (let index = 0; index < records.length; index++) {
 				temp_total += parseFloat(records[index].total)
 			}
-			frm.set_value('gcash', temp_total);
+			//frm.set_value('gcash', temp_total);
 			frm.refresh_field('gcash');
 		})
 	}
@@ -645,7 +645,7 @@ function get_bank_transfer_provisional_receipt(frm, date_today = null) {
 			for (let index = 0; index < records.length; index++) {
 				temp_total += parseFloat(records[index].total)
 			}
-			frm.set_value('gcash', temp_total);
+			//frm.set_value('gcash', temp_total);
 			frm.refresh_field('bank_transfer');
 		})
 	} else if (frm.doc.branch == "Garcia's Pawnshop - TNZ") {
