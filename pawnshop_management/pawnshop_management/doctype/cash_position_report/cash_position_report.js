@@ -447,6 +447,7 @@ function get_subastado_sales(frm, date_today=null) {
 				}
 			}
 		}
+		cash = cash + gcash + bankTrans
 		frm.set_value('selling', cash);
 		frm.set_value('gcash', gcash);
 		frm.set_value('gcash_positive', gcashRet);
