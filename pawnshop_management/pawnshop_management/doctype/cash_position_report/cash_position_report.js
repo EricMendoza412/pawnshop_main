@@ -310,7 +310,6 @@ function get_provisional_receipts_of_the_day(frm, date_today = null) {
 			date: frm.doc.date,
 			branch: frm.doc.branch
 		}).then(r => {
-			console.log(r.message)
 			frm.set_value('provisional_receipts', r.message);
 			frm.refresh_field('provisional_receipts');
 		})
@@ -456,11 +455,39 @@ function get_subastado_sales(frm, date_today=null) {
 		
 
 		frm.refresh_field('selling');
-		frm.refresh_field('gcash');
+		//frm.refresh_field('gcash');
 		frm.refresh_field('gcash_positive');
-		frm.refresh_field('bank_transfer');
+		//frm.refresh_field('bank_transfer');
 		frm.refresh_field('bank_transfer_return');
+		get_pr_mops(frm, date_today );
 	})
+}
+
+function get_pr_mops(frm, date_today=null){
+	frappe.db.get_list('Provisional Receipt', {
+		fields: ['gcash_amount_payment','bank_payment'],
+		filters: { date_issued: date_today, branch: frm.doc.branch},
+		limit: 500
+	}).then(records => {
+		let gcash2 = 0;
+		let bankTrans2 = 0;
+		for (let index = 0; index < records.length; index++) {
+				gcash2 += parseInt(records[index].gcash_amount_payment);	
+				bankTrans2 += parseInt(records[index].bank_payment);	
+		}
+		
+		gcash2 += parseInt(frm.doc.gcash);
+		bankTrans2 += parseInt(frm.doc.bank_transfer);
+		console.log(gcash2)
+
+		frm.set_value('gcash', gcash2);
+		frm.set_value('bank_transfer', bankTrans2);
+
+		frm.refresh_field('gcash');
+		frm.refresh_field('bank_transfer');
+	})
+
+
 }
 
 function total_cash_breakdown(frm) {
@@ -811,7 +838,6 @@ function get_additional_pawn_records(frm) {
 		frappe.call('pawnshop_management.pawnshop_management.custom_codes.daily_balance.get_all_additional_pawn', {
 			date: frm.doc.date
 		}).then(r => {
-			console.log(r.message)
 			frm.set_value('additional_pawn', r.message);
 			frm.refresh_field('additional_pawn');
 		})

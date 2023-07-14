@@ -27,21 +27,27 @@ frappe.ui.form.on('Provisional Receipt', {
 			}
 		}
 
-		if (frm.doc.transaction_type == "Interest Payment" || frm.doc.transaction_type == "Redemption" || frm.doc.transaction_type == "Renewal") {
+		if(frm.doc.mode_of_payment === 'Bank Transfer' || frm.doc.mode_of_payment === 'Cash & Bank Transfer' || frm.doc.mode_of_payment === 'GCash & Bank Transfer'){
+			if(frm.doc.bank == "-Select-"){
+				frappe.throw('Please select bank');
+			}
+		}
+
+		//if (frm.doc.transaction_type == "Interest Payment" || frm.doc.transaction_type == "Redemption" || frm.doc.transaction_type == "Renewal") {
 			if (frm.doc.mode_of_payment == "Cash & GCash") {
 				if (frm.doc.total != parseFloat(frm.doc.cash) + parseFloat(frm.doc.gcash_amount_payment)) {
-					frappe.throw('Total amount of payment is not enough')
+					frappe.throw('Payment breakdown does not match total')
 				}
 			} else if (frm.doc.mode_of_payment == "Cash & Bank Transfer") {
 				if (frm.doc.total != parseFloat(frm.doc.cash) + parseFloat(frm.doc.bank_payment)) {
-					frappe.throw('Total amount of payment is not enough')
+					frappe.throw('Payment breakdown does not match total')
 				}
 			} else if (frm.doc.mode_of_payment == "GCash & Bank Transfer") {
 				if (frm.doc.total != parseFloat(frm.doc.gcash_amount_payment) + parseFloat(frm.doc.bank_payment)) {
-					frappe.throw('Total amount of payment is not enough')
+					frappe.throw('Payment breakdown does not match total')
 				}
 			}
-		}
+		//}
 	},
 
 	// before_submit: function(frm){
@@ -342,27 +348,51 @@ frappe.ui.form.on('Provisional Receipt', {
 	},
 
 	pawn_ticket_no: function(frm){
-		frm.clear_table('items');
-		show_items(frm.doc.pawn_ticket_type, frm.doc.pawn_ticket_no);
-		frm.refresh_field('items');
-		frm.set_df_property('pawn_ticket_no', 'read_only', 1);
-		if (frm.doc.date_issued > frm.doc.maturity_date && frm.doc.interest_payment > 0) {
-			frm.set_df_property('transaction_type', 'options', ['Renewal', 'Redemption', 'Interest Payment', 'Renewal w/ Amortization']);
-			frm.refresh_field('transaction_type');
-		} else if (frm.doc.date_issued > frm.doc.maturity_date) {
-			frm.set_df_property('transaction_type', 'options', ['Renewal', 'Redemption', 'Renewal w/ Amortization']);
-			frm.refresh_field('transaction_type');
-		} else {
-			frm.set_df_property('transaction_type', 'options', ['Renewal', 'Redemption', 'Amortization', 'Renewal w/ Amortization']);
-			frm.refresh_field('transaction_type');
-		}
-		calculate_total_amortization(frm, frm.doc.pawn_ticket_type, frm.doc.pawn_ticket_no);
-		show_previous_interest_payment(frm);
-		select_transaction_type(frm)
-		calculate_interest(frm);
-		var word = String(frm.doc.complete_name).lastIndexOf("Dummy");
-		console.log(word);
-		show_fields_for_dummy(frm)
+
+		frappe.call({
+			method: "frappe.client.get_value",
+			args: {
+				doctype: "Pawn Ticket Jewelry", // Replace with the actual doctype of your document
+				filters: {
+					name: frm.doc.pawn_ticket_no // Replace with the actual name of your document
+				},
+				fieldname: ['workflow_state','branch']
+			},
+			callback: function(response) {
+				var workflowState = response.message.workflow_state;
+				var branch = response.message.branch;
+				console.log("Workflow State:", workflowState);
+						if((workflowState == "Active" || workflowState == "Expired" || workflowState == "Returned")&&(branch == frm.doc.branch)){
+							frm.clear_table('items');
+							show_items(frm.doc.pawn_ticket_type, frm.doc.pawn_ticket_no);
+							frm.refresh_field('items');
+							frm.set_df_property('pawn_ticket_no', 'read_only', 1);
+							if (frm.doc.date_issued > frm.doc.maturity_date && frm.doc.interest_payment > 0) {
+								frm.set_df_property('transaction_type', 'options', ['Renewal', 'Redemption', 'Interest Payment', 'Renewal w/ Amortization']);
+								frm.refresh_field('transaction_type');
+							} else if (frm.doc.date_issued > frm.doc.maturity_date) {
+								frm.set_df_property('transaction_type', 'options', ['Renewal', 'Redemption', 'Renewal w/ Amortization']);
+								frm.refresh_field('transaction_type');
+							} else {
+								frm.set_df_property('transaction_type', 'options', ['Renewal', 'Redemption', 'Amortization', 'Renewal w/ Amortization']);
+								frm.refresh_field('transaction_type');
+							}
+							calculate_total_amortization(frm, frm.doc.pawn_ticket_type, frm.doc.pawn_ticket_no);
+							show_previous_interest_payment(frm);
+							select_transaction_type(frm)
+							calculate_interest(frm);
+							var word = String(frm.doc.complete_name).lastIndexOf("Dummy");
+							console.log(word);
+							show_fields_for_dummy(frm)
+						}else{
+
+							if (workflowState != null){
+							location.reload();
+							}
+
+						}
+				}
+			});
 	},
 
 	complete_name: function(frm){
@@ -432,13 +462,23 @@ frappe.ui.form.on('Provisional Receipt', {
 		frm.toggle_display(['bank_payment'], frm.doc.mode_of_payment === 'Cash & Bank Transfer' || frm.doc.mode_of_payment === 'GCash & Bank Transfer');
 		frm.toggle_display(['cash'], frm.doc.mode_of_payment === 'Cash & Bank Transfer' || frm.doc.mode_of_payment === 'Cash & GCash');
 		frm.toggle_display(['gcash_amount_payment'], frm.doc.mode_of_payment === 'GCash & Bank Transfer' || frm.doc.mode_of_payment === 'Cash & GCash');
+		frm.toggle_display(['gcash_ref'], frm.doc.mode_of_payment === 'GCash' || frm.doc.mode_of_payment === 'GCash & Bank Transfer' || frm.doc.mode_of_payment === 'Cash & GCash');
+		if(frm.doc.mode_of_payment === 'GCash' || frm.doc.mode_of_payment === 'GCash & Bank Transfer' || frm.doc.mode_of_payment === 'Cash & GCash'){
+			frm.set_df_property('gcash_ref', 'reqd', 1)
+		}else{
+			frm.set_df_property('gcash_ref', 'reqd', 0)
+		}
+
+
 		let is_allowed = frappe.user_roles.includes('Administrator');
 		frm.toggle_enable(['additional_amortization'], is_allowed)
-		if (frm.doc.mode_of_payment == 'Cash & GCash' || frm.doc.mode_of_payment == 'Cash & Bank Transfer' || frm.doc.mode_of_payment == 'GCash & Bank Transfer') {
-			frm.set_df_property('additional_amortization', 'read_only', 1)
-		} else {
-			frm.set_df_property('additional_amortization', 'read_only', 0)
-		}
+
+
+		// if (frm.doc.mode_of_payment == 'Cash & GCash' || frm.doc.mode_of_payment == 'Cash & Bank Transfer' || frm.doc.mode_of_payment == 'GCash & Bank Transfer') {
+		// 	frm.set_df_property('additional_amortization', 'read_only', 1)
+		// } else {
+		// 	frm.set_df_property('additional_amortization', 'read_only', 0)
+		// }
 	},
 
 	discount: function(frm){

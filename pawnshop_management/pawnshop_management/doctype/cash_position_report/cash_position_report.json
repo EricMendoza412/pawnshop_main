@@ -281,13 +281,15 @@
    "default": "0.00",
    "fieldname": "gcash",
    "fieldtype": "Currency",
-   "label": "Gcash"
+   "label": "Gcash",
+   "read_only": 1
   },
   {
    "default": "0.00",
    "fieldname": "bank_transfer",
    "fieldtype": "Currency",
-   "label": "Bank Transfer"
+   "label": "Bank Transfer",
+   "read_only": 1
   },
   {
    "fieldname": "daily_balance_section",
@@ -335,13 +337,15 @@
    "default": "0.0",
    "fieldname": "gcash_positive",
    "fieldtype": "Data",
-   "label": "Gcash (From Return)"
+   "label": "Gcash (From Return)",
+   "read_only": 1
   },
   {
    "default": "0.0",
    "fieldname": "bank_transfer_return",
    "fieldtype": "Data",
-   "label": "Bank transfer (From Return)"
+   "label": "Bank transfer (From Return)",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_4",
@@ -365,7 +369,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-07-01 00:30:33.911484",
+ "modified": "2023-07-15 02:50:51.721766",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Cash Position Report",

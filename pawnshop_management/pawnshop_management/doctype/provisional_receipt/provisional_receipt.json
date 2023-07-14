@@ -13,7 +13,6 @@
   "new_pawn_ticket_no",
   "transaction_type",
   "mode_of_payment",
-  "bank",
   "amortization",
   "previous_interest_payment",
   "series",
@@ -43,7 +42,9 @@
   "column_break_28",
   "cash",
   "gcash_amount_payment",
+  "gcash_ref",
   "bank_payment",
+  "bank",
   "amended_from"
  ],
  "fields": [
@@ -172,6 +173,7 @@
    "fieldtype": "Date",
    "in_list_view": 1,
    "label": "Date Issued",
+   "read_only": 1,
    "reqd": 1
   },
   {
@@ -231,12 +233,11 @@
    "options": "-Select-\nCash\nBank Transfer\nGCash\nCash & GCash\nCash & Bank Transfer\nGCash & Bank Transfer"
   },
   {
-   "default": "BPI",
    "fieldname": "bank",
    "fieldtype": "Select",
    "hidden": 1,
    "label": "Bank",
-   "options": "BPI\nBDO\nEast West"
+   "options": "-Select-\nBPI\nBDO\nEast West"
   },
   {
    "fieldname": "branch",
@@ -311,12 +312,18 @@
    "fieldtype": "Data",
    "label": "Series",
    "read_only": 1
+  },
+  {
+   "fieldname": "gcash_ref",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Gcash Reference#"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-06-14 23:12:17.933123",
+ "modified": "2023-07-15 02:13:12.915878",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Provisional Receipt",
