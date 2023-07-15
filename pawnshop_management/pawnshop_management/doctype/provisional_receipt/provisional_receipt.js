@@ -469,9 +469,8 @@ frappe.ui.form.on('Provisional Receipt', {
 			frm.set_df_property('gcash_ref', 'reqd', 0)
 		}
 
-
-		let is_allowed = frappe.user_roles.includes('Administrator');
-		frm.toggle_enable(['additional_amortization'], is_allowed)
+		//let is_allowed = frappe.user_roles.includes('Administrator');
+		//frm.toggle_enable(['additional_amortization'], is_allowed)
 
 
 		// if (frm.doc.mode_of_payment == 'Cash & GCash' || frm.doc.mode_of_payment == 'Cash & Bank Transfer' || frm.doc.mode_of_payment == 'GCash & Bank Transfer') {
