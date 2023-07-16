@@ -465,7 +465,7 @@ function get_subastado_sales(frm, date_today=null) {
 
 function get_pr_mops(frm, date_today=null){
 	frappe.db.get_list('Provisional Receipt', {
-		fields: ['gcash_amount_payment','bank_payment'],
+		fields: ['gcash_amount_payment','bank_payment','total','mode_of_payment'],
 		filters: { date_issued: date_today, branch: frm.doc.branch},
 		limit: 500
 	}).then(records => {
@@ -473,7 +473,15 @@ function get_pr_mops(frm, date_today=null){
 		let bankTrans2 = 0;
 		for (let index = 0; index < records.length; index++) {
 				gcash2 += parseInt(records[index].gcash_amount_payment);	
-				bankTrans2 += parseInt(records[index].bank_payment);	
+				bankTrans2 += parseInt(records[index].bank_payment);
+				
+				if(records[index].mode_of_payment == "GCash"){
+					gcash2 += records[index].total
+				}
+				if(records[index].mode_of_payment == "Bank Transfer"){
+					bankTrans2 += records[index].total
+				}
+
 		}
 		
 		gcash2 += parseInt(frm.doc.gcash);
