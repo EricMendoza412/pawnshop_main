@@ -422,6 +422,7 @@ function get_subastado_sales(frm, date_today=null) {
 					gcash += parseInt(records[index].payment_1);		
 				}else{
 					gcashRet += parseInt((records[index].payment_1 * -1));
+					cash += parseInt(records[index].payment_1);
 				}
 			}
 			if(records[index].mop_2 == "Gcash"){
@@ -429,6 +430,7 @@ function get_subastado_sales(frm, date_today=null) {
 					gcash += parseInt(records[index].payment_2);		
 				}else{
 					gcashRet += parseInt((records[index].payment_2 * -1));
+					cash += parseInt(records[index].payment_2);
 				}
 			}
 			if(records[index].mop_1 == "BPI" || records[index].mop_1 == "BDO" || records[index].mop_1 == "EASTWEST"){
@@ -436,13 +438,15 @@ function get_subastado_sales(frm, date_today=null) {
 					bankTrans += parseInt(records[index].payment_1);
 				}else{
 					bankTransRet += parseInt((records[index].payment_1 * -1));
+					cash += parseInt(records[index].payment_1);
 				}
 			}
 			if(records[index].mop_2 == "BPI" || records[index].mop_2 == "BDO" || records[index].mop_2 == "EASTWEST"){
 				if(records[index].payment_2 > 0){
-					bankTrans += parseInt(records[index].payment_2);		
+					bankTrans += parseInt(records[index].payment_2);
 				}else{
 					bankTransRet += parseInt((records[index].payment_2 * -1));
+					cash += parseInt(records[index].payment_2);
 				}
 			}
 		}

@@ -11,6 +11,7 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 	},
 
 	refresh: function(frm){
+
 		let is_allowed = frappe.user_roles.includes('Administrator');
 		frm.toggle_enable(['date_loan_granted', 'branch'], is_allowed)
 		//frm.toggle_display(['old_pawn_ticket'], frm.doc.old_pawn_ticket != '')
@@ -59,176 +60,190 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 			frappe.call({
 				method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip'
 			}).then(ip => {
-				if (ip.message == branch_ip_settings["rabies_house"] || ip.message == branch_ip_settings["rabies_house"]) {
-					if (frm.doc.item_series == "A") {
-						frappe.db.get_value('Pawnshop Naming Series', "Rabie's House", 'jewelry_inventory_count')
-						.then(r =>{
-							let jewelry_inventory_count = r.message.jewelry_inventory_count
-							frm.set_query('item_no', 'jewelry_items', function(){
-								return {
-									filters: {
-										batch_number: String(jewelry_inventory_count),
-										branch: "Rabie's House"
-									}
-								}
-							})
-						})
-					} else if (frm.doc.item_series == "B") {
-						frappe.db.get_value('Pawnshop Naming Series', "Rabie's House", 'jewelry_inventory_count')
-						.then(r =>{
-							let jewelry_inventory_count = r.message.jewelry_inventory_count
-							frm.set_query('item_no', 'jewelry_items', function(){
-								return {
-									filters: {
-										batch_number: String(jewelry_inventory_count),
-										branch: "Rabie's House"
-									}
-								}
-							})
-						})
-					}
+
+				frappe.db.get_value('Pawnshop Naming Series', frm.doc.branch, 'jewelry_inventory_count')
+				.then(r =>{
+					let jewelry_inventory_count = r.message.jewelry_inventory_count
+					frm.set_query('item_no', 'jewelry_items', function(){
+						return {
+							filters: {
+								batch_number: String(jewelry_inventory_count),
+								branch: frm.doc.branch
+							}
+						}
+					})
+				})
+
+				// if (ip.message == branch_ip_settings["rabies_house"] || ip.message == branch_ip_settings["rabies_house"]) {
+				// 	if (frm.doc.item_series == "A") {
+				// 		frappe.db.get_value('Pawnshop Naming Series', "Rabie's House", 'jewelry_inventory_count')
+				// 		.then(r =>{
+				// 			let jewelry_inventory_count = r.message.jewelry_inventory_count
+				// 			frm.set_query('item_no', 'jewelry_items', function(){
+				// 				return {
+				// 					filters: {
+				// 						batch_number: String(jewelry_inventory_count),
+				// 						branch: "Rabie's House"
+				// 					}
+				// 				}
+				// 			})
+				// 		})
+				// 	} else if (frm.doc.item_series == "B") {
+				// 		frappe.db.get_value('Pawnshop Naming Series', "Rabie's House", 'jewelry_inventory_count')
+				// 		.then(r =>{
+				// 			let jewelry_inventory_count = r.message.jewelry_inventory_count
+				// 			frm.set_query('item_no', 'jewelry_items', function(){
+				// 				return {
+				// 					filters: {
+				// 						batch_number: String(jewelry_inventory_count),
+				// 						branch: "Rabie's House"
+				// 					}
+				// 				}
+				// 			})
+				// 		})
+				// 	}
 					
-				} else if (ip.message == branch_ip_settings["cavite_city"]) {
-					if (frm.doc.item_series == "A") {
-						frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - CC", 'jewelry_inventory_count')
-						.then(r =>{
-							let jewelry_inventory_count = r.message.jewelry_inventory_count
-							frm.set_query('item_no', 'jewelry_items', function(){
-								return {
-									filters: {
-										batch_number: String(jewelry_inventory_count),
-										branch: "Garcia's Pawnshop - CC"
-									}
-								}
-							})
-						})
-					} else if (frm.doc.item_series == "B") {
-						frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - CC", 'jewelry_inventory_count')
-						.then(r =>{
-							let jewelry_inventory_count = r.message.jewelry_inventory_count
-							frm.set_query('item_no', 'jewelry_items', function(){
-								return {
-									filters: {
-										batch_number: String(jewelry_inventory_count),
-										branch: "Garcia's Pawnshop - CC"
-									}
-								}
-							})
-						})
-					}
-				} else if (ip.message == branch_ip_settings["gtc"]) {
-					if (frm.doc.item_series == "A") {
-						frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - GTC", 'jewelry_inventory_count')
-						.then(r =>{
-							let jewelry_inventory_count = r.message.jewelry_inventory_count
-							frm.set_query('item_no', 'jewelry_items', function(){
-								return {
-									filters: {
-										batch_number: String(jewelry_inventory_count),
-										branch: "Garcia's Pawnshop - GTC"
-									}
-								}
-							})
-						})
-					} else if (frm.doc.item_series == "B") {
-						frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - GTC", 'jewelry_inventory_count')
-						.then(r =>{
-							let jewelry_inventory_count = r.message.jewelry_inventory_count
-							frm.set_query('item_no', 'jewelry_items', function(){
-								return {
-									filters: {
-										batch_number: String(jewelry_inventory_count),
-										branch: "Garcia's Pawnshop - GTC"
-									}
-								}
-							})
-						})
-					}
-				} else if(ip.message == branch_ip_settings["molino"]) {
-					if (frm.doc.item_series == "A") {
-						frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - MOL", 'jewelry_inventory_count')
-						.then(r =>{
-							let jewelry_inventory_count = r.message.jewelry_inventory_count
-							frm.set_query('item_no', 'jewelry_items', function(){
-								return {
-									filters: {
-										batch_number: String(jewelry_inventory_count),
-										branch: "Garcia's Pawnshop - MOL"
-									}
-								}
-							})
-						})
-					} else if (frm.doc.item_series == "B") {
-						frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - MOL", 'jewelry_inventory_count')
-						.then(r =>{
-							let jewelry_inventory_count = r.message.jewelry_inventory_count
-							frm.set_query('item_no', 'jewelry_items', function(){
-								return {
-									filters: {
-										batch_number: String(jewelry_inventory_count),
-										branch: "Garcia's Pawnshop - MOL"
-									}
-								}
-							})
-						})
-					}
-				} else if (ip.message == branch_ip_settings["poblacion"]) {
-					if (frm.doc.item_series == "A") {
-						frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - POB", 'jewelry_inventory_count')
-						.then(r =>{
-							let jewelry_inventory_count = r.message.jewelry_inventory_count
-							frm.set_query('item_no', 'jewelry_items', function(){
-								return {
-									filters: {
-										batch_number: String(jewelry_inventory_count),
-										branch: "Garcia's Pawnshop - POB"
-									}
-								}
-							})
-						})
-					} else if (frm.doc.item_series == "B") {
-						frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - POB", 'jewelry_inventory_count')
-						.then(r =>{
-							let jewelry_inventory_count = r.message.jewelry_inventory_count
-							frm.set_query('item_no', 'jewelry_items', function(){
-								return {
-									filters: {
-										batch_number: String(jewelry_inventory_count),
-										branch: "Garcia's Pawnshop - POB"
-									}
-								}
-							})
-						})
-					}
-				} else if (ip.message == branch_ip_settings["tanza"]) {
-					if (frm.doc.item_series == "A") {
-						frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - TNZ", 'jewelry_inventory_count')
-						.then(r =>{
-							let jewelry_inventory_count = r.message.jewelry_inventory_count
-							frm.set_query('item_no', 'jewelry_items', function(){
-								return {
-									filters: {
-										batch_number: String(jewelry_inventory_count),
-										branch: "Garcia's Pawnshop - TNZ"
-									}
-								}
-							})
-						})
-					} else if (frm.doc.item_series == "B") {
-						frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - TNZ", 'jewelry_inventory_count')
-						.then(r =>{
-							let jewelry_inventory_count = r.message.jewelry_inventory_count
-							frm.set_query('item_no', 'jewelry_items', function(){
-								return {
-									filters: {
-										batch_number: String(jewelry_inventory_count),
-										branch: "Garcia's Pawnshop - TNZ"
-									}
-								}
-							})
-						})
-					}
-				}
+				// } else if (ip.message == branch_ip_settings["cavite_city"]) {
+				// 	if (frm.doc.item_series == "A") {
+				// 		frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - CC", 'jewelry_inventory_count')
+				// 		.then(r =>{
+				// 			let jewelry_inventory_count = r.message.jewelry_inventory_count
+				// 			frm.set_query('item_no', 'jewelry_items', function(){
+				// 				return {
+				// 					filters: {
+				// 						batch_number: String(jewelry_inventory_count),
+				// 						branch: "Garcia's Pawnshop - CC"
+				// 					}
+				// 				}
+				// 			})
+				// 		})
+				// 	} else if (frm.doc.item_series == "B") {
+				// 		frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - CC", 'jewelry_inventory_count')
+				// 		.then(r =>{
+				// 			let jewelry_inventory_count = r.message.jewelry_inventory_count
+				// 			frm.set_query('item_no', 'jewelry_items', function(){
+				// 				return {
+				// 					filters: {
+				// 						batch_number: String(jewelry_inventory_count),
+				// 						branch: "Garcia's Pawnshop - CC"
+				// 					}
+				// 				}
+				// 			})
+				// 		})
+				// 	}
+				// } else if (ip.message == branch_ip_settings["gtc"]) {
+				// 	if (frm.doc.item_series == "A") {
+				// 		frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - GTC", 'jewelry_inventory_count')
+				// 		.then(r =>{
+				// 			let jewelry_inventory_count = r.message.jewelry_inventory_count
+				// 			frm.set_query('item_no', 'jewelry_items', function(){
+				// 				return {
+				// 					filters: {
+				// 						batch_number: String(jewelry_inventory_count),
+				// 						branch: "Garcia's Pawnshop - GTC"
+				// 					}
+				// 				}
+				// 			})
+				// 		})
+				// 	} else if (frm.doc.item_series == "B") {
+				// 		frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - GTC", 'jewelry_inventory_count')
+				// 		.then(r =>{
+				// 			let jewelry_inventory_count = r.message.jewelry_inventory_count
+				// 			frm.set_query('item_no', 'jewelry_items', function(){
+				// 				return {
+				// 					filters: {
+				// 						batch_number: String(jewelry_inventory_count),
+				// 						branch: "Garcia's Pawnshop - GTC"
+				// 					}
+				// 				}
+				// 			})
+				// 		})
+				// 	}
+				// } else if(ip.message == branch_ip_settings["molino"]) {
+				// 	if (frm.doc.item_series == "A") {
+				// 		frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - MOL", 'jewelry_inventory_count')
+				// 		.then(r =>{
+				// 			let jewelry_inventory_count = r.message.jewelry_inventory_count
+				// 			frm.set_query('item_no', 'jewelry_items', function(){
+				// 				return {
+				// 					filters: {
+				// 						batch_number: String(jewelry_inventory_count),
+				// 						branch: "Garcia's Pawnshop - MOL"
+				// 					}
+				// 				}
+				// 			})
+				// 		})
+				// 	} else if (frm.doc.item_series == "B") {
+				// 		frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - MOL", 'jewelry_inventory_count')
+				// 		.then(r =>{
+				// 			let jewelry_inventory_count = r.message.jewelry_inventory_count
+				// 			frm.set_query('item_no', 'jewelry_items', function(){
+				// 				return {
+				// 					filters: {
+				// 						batch_number: String(jewelry_inventory_count),
+				// 						branch: "Garcia's Pawnshop - MOL"
+				// 					}
+				// 				}
+				// 			})
+				// 		})
+				// 	}
+				// } else if (ip.message == branch_ip_settings["poblacion"]) {
+				// 	if (frm.doc.item_series == "A") {
+				// 		frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - POB", 'jewelry_inventory_count')
+				// 		.then(r =>{
+				// 			let jewelry_inventory_count = r.message.jewelry_inventory_count
+				// 			frm.set_query('item_no', 'jewelry_items', function(){
+				// 				return {
+				// 					filters: {
+				// 						batch_number: String(jewelry_inventory_count),
+				// 						branch: "Garcia's Pawnshop - POB"
+				// 					}
+				// 				}
+				// 			})
+				// 		})
+				// 	} else if (frm.doc.item_series == "B") {
+				// 		frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - POB", 'jewelry_inventory_count')
+				// 		.then(r =>{
+				// 			let jewelry_inventory_count = r.message.jewelry_inventory_count
+				// 			frm.set_query('item_no', 'jewelry_items', function(){
+				// 				return {
+				// 					filters: {
+				// 						batch_number: String(jewelry_inventory_count),
+				// 						branch: "Garcia's Pawnshop - POB"
+				// 					}
+				// 				}
+				// 			})
+				// 		})
+				// 	}
+				// } else if (ip.message == branch_ip_settings["tanza"]) {
+				// 	if (frm.doc.item_series == "A") {
+				// 		frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - TNZ", 'jewelry_inventory_count')
+				// 		.then(r =>{
+				// 			let jewelry_inventory_count = r.message.jewelry_inventory_count
+				// 			frm.set_query('item_no', 'jewelry_items', function(){
+				// 				return {
+				// 					filters: {
+				// 						batch_number: String(jewelry_inventory_count),
+				// 						branch: "Garcia's Pawnshop - TNZ"
+				// 					}
+				// 				}
+				// 			})
+				// 		})
+				// 	} else if (frm.doc.item_series == "B") {
+				// 		frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - TNZ", 'jewelry_inventory_count')
+				// 		.then(r =>{
+				// 			let jewelry_inventory_count = r.message.jewelry_inventory_count
+				// 			frm.set_query('item_no', 'jewelry_items', function(){
+				// 				return {
+				// 					filters: {
+				// 						batch_number: String(jewelry_inventory_count),
+				// 						branch: "Garcia's Pawnshop - TNZ"
+				// 					}
+				// 				}
+				// 			})
+				// 		})
+				// 	}
+				// }
 			})
 		})
 
@@ -353,35 +368,63 @@ frappe.ui.form.on('Jewelry List', {
 
 function set_series(frm) { //Set the pawn ticket series
 	if (frm.is_new()){
-		show_tracking_no(frm);
+
+		if(parseInt(frm.doc.desired_principal) > 8000 || parseInt(frm.doc.desired_principal) < 1500){
+			frm.set_value('item_series', "B")
+		}else{
+			frm.set_value('item_series', "A")
+		}
+		frm.refresh_field('item_series');
+		//redundant
+		//show_tracking_no(frm);
 	}	
 }
 
 function show_tracking_no(frm){ //Sets inventory tracking number
+	let branch_code = 0;
+
 	if (frm.doc.branch == "Garcia's Pawnshop - CC") {
+		branch_code = 1;
+	}else if(frm.doc.branch == "Garcia's Pawnshop - POB") {
+		branch_code = 3;
+	}else if(frm.doc.branch == "Garcia's Pawnshop - GTC") {
+		branch_code = 4;
+	}else if(frm.doc.branch == "Garcia's Pawnshop - TNZ") {
+		branch_code = 5;
+	}else if(frm.doc.branch == "Garcia's Pawnshop - MOL") {
+		branch_code = 6;
+	}
 		if (frm.doc.amended_from == null) {
+			let jewelry_inv_count;
 			if (frm.doc.item_series == "A") {
-				frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - CC",['a_series', 'jewelry_inventory_count'])
+				frappe.db.get_value('Pawnshop Naming Series', frm.doc.branch,['a_series', 'jewelry_inventory_count'])
 				.then(value => {
 					let tracking_no = value.message;
-					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
+					jewelry_inv_count = parseInt(tracking_no.jewelry_inventory_count);
 					let new_ticket_no = parseInt(tracking_no.a_series);
 					// frm.set_value('pawn_ticket', "1-"+ new_ticket_no + frm.doc.item_series);
-					frm.set_value('pawn_ticket', "1-"+ new_ticket_no);
-					frm.set_value('inventory_tracking_no', "1-"+ non_jewelry_count + 'J');
+					frm.set_value('pawn_ticket', branch_code+"-"+ new_ticket_no);
+					frm.set_value('inventory_tracking_no', branch_code+"-"+ jewelry_inv_count + 'J');
 					frm.refresh_field('pawn_ticket');
 				})
 			} else if (frm.doc.item_series == "B") {
-				frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - CC",['b_series', 'jewelry_inventory_count'])
+				frappe.db.get_value('Pawnshop Naming Series', frm.doc.branch,['b_series', 'jewelry_inventory_count'])
 				.then(value => {
 					let tracking_no = value.message;
-					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
+					jewelry_inv_count = parseInt(tracking_no.jewelry_inventory_count);
 					let new_ticket_no = parseInt(tracking_no.b_series);
-					frm.set_value('pawn_ticket', "1-"+ new_ticket_no + frm.doc.item_series);
-					frm.set_value('inventory_tracking_no', "1-"+ non_jewelry_count + 'J');
+					frm.set_value('pawn_ticket', branch_code+"-"+ new_ticket_no + frm.doc.item_series);
+					frm.set_value('inventory_tracking_no', branch_code+"-"+ jewelry_inv_count + 'J');
 					frm.refresh_field('pawn_ticket');
 				})
-			}
+			} else if (frm.doc.item_series == "Automatic") {
+				frappe.db.get_value('Pawnshop Naming Series', frm.doc.branch,['b_series', 'jewelry_inventory_count'])
+				.then(value => {
+					let tracking_no = value.message;
+					jewelry_inv_count = parseInt(tracking_no.jewelry_inventory_count);
+					frm.set_value('inventory_tracking_no', branch_code+"-"+ jewelry_inv_count + 'J');
+				})
+				}
 			
 		} else if (frm.doc.amended_from != ""){
 			var previous_pt = frm.doc.amended_from      //Naming for the next document created of amend
@@ -395,187 +438,187 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 				frm.refresh_field('pawn_ticket');
 			}
 		}
-	} else if (frm.doc.branch == "Garcia's Pawnshop - GTC") {
-		if (frm.doc.amended_from == null){
-			if (frm.doc.item_series == "A") {
-				frappe.db.get_value('Pawnshop Naming Series',"Garcia's Pawnshop - GTC",['a_series', 'jewelry_inventory_count'])
-				.then(value => {
-					let tracking_no = value.message;
-					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
-					let new_ticket_no = parseInt(tracking_no.a_series);
-					frm.set_value('pawn_ticket', "4-"+ new_ticket_no);
-					frm.set_value('inventory_tracking_no', "4-"+ non_jewelry_count + 'J');
-					frm.refresh_field('pawn_ticket');
-				})
-			} else if (frm.doc.item_series == "B") {
-				frappe.db.get_value('Pawnshop Naming Series',"Garcia's Pawnshop - GTC",['b_series', 'jewelry_inventory_count'])
-				.then(value => {
-					let tracking_no = value.message;
-					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
-					let new_ticket_no = parseInt(tracking_no.b_series);
-					frm.set_value('pawn_ticket', "4-"+ new_ticket_no + frm.doc.item_series);
-					frm.set_value('inventory_tracking_no', "4-"+ non_jewelry_count + 'J');
-					frm.refresh_field('pawn_ticket');
-				})
-			}
+// if (frm.doc.branch == "Garcia's Pawnshop - GTC") {
+// 		if (frm.doc.amended_from == null){
+// 			if (frm.doc.item_series == "A") {
+// 				frappe.db.get_value('Pawnshop Naming Series',"Garcia's Pawnshop - GTC",['a_series', 'jewelry_inventory_count'])
+// 				.then(value => {
+// 					let tracking_no = value.message;
+// 					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
+// 					let new_ticket_no = parseInt(tracking_no.a_series);
+// 					frm.set_value('pawn_ticket', "4-"+ new_ticket_no);
+// 					frm.set_value('inventory_tracking_no', "4-"+ non_jewelry_count + 'J');
+// 					frm.refresh_field('pawn_ticket');
+// 				})
+// 			} else if (frm.doc.item_series == "B") {
+// 				frappe.db.get_value('Pawnshop Naming Series',"Garcia's Pawnshop - GTC",['b_series', 'jewelry_inventory_count'])
+// 				.then(value => {
+// 					let tracking_no = value.message;
+// 					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
+// 					let new_ticket_no = parseInt(tracking_no.b_series);
+// 					frm.set_value('pawn_ticket', "4-"+ new_ticket_no + frm.doc.item_series);
+// 					frm.set_value('inventory_tracking_no', "4-"+ non_jewelry_count + 'J');
+// 					frm.refresh_field('pawn_ticket');
+// 				})
+// 			}
 			
-		} else {
-			var previous_pt = frm.doc.amended_from      //Naming for the next document created of amend
-			if (count_dash_characters(previous_pt) < 2) {
-				frm.set_value('pawn_ticket', frm.doc.amended_from + "-1");
-				frm.refresh_field('pawn_ticket');
-			} else {
-				var index_of_last_dash_caharacter = previous_pt.lastIndexOf("-")
-				var current_amend_count = index_of_last_dash_caharacter.slice(index_of_last_dash_caharacter, -1)
-				frm.set_value('pawn_ticket', frm.doc.amended_from + "-" + parseInt(current_amend_count) + 1);
-				frm.refresh_field('pawn_ticket');
-			}
-		}
+// 		} else {
+// 			var previous_pt = frm.doc.amended_from      //Naming for the next document created of amend
+// 			if (count_dash_characters(previous_pt) < 2) {
+// 				frm.set_value('pawn_ticket', frm.doc.amended_from + "-1");
+// 				frm.refresh_field('pawn_ticket');
+// 			} else {
+// 				var index_of_last_dash_caharacter = previous_pt.lastIndexOf("-")
+// 				var current_amend_count = index_of_last_dash_caharacter.slice(index_of_last_dash_caharacter, -1)
+// 				frm.set_value('pawn_ticket', frm.doc.amended_from + "-" + parseInt(current_amend_count) + 1);
+// 				frm.refresh_field('pawn_ticket');
+// 			}
+// 		}
 		
-	} else if (frm.doc.branch == "Garcia's Pawnshop - MOL") {
-		if (frm.doc.amended_from == null) {
-			if (frm.doc.item_series == "A") {
-				frappe.db.get_value('Pawnshop Naming Series',"Garcia's Pawnshop - MOL",['a_series', 'jewelry_inventory_count'])
-				.then(value => {
-					let tracking_no = value.message;
-					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
-					let new_ticket_no = parseInt(tracking_no.a_series);
-					frm.set_value('pawn_ticket', "6-"+ new_ticket_no);
-					frm.set_value('inventory_tracking_no', "6-"+ non_jewelry_count + 'J');
-					frm.refresh_field('pawn_ticket');
-				})
-			} else if (frm.doc.item_series == "B") {
-				frappe.db.get_value('Pawnshop Naming Series',"Garcia's Pawnshop - MOL",['b_series', 'jewelry_inventory_count'])
-				.then(value => {
-					let tracking_no = value.message;
-					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
-					let new_ticket_no = parseInt(tracking_no.b_series);
-					frm.set_value('pawn_ticket', "6-"+ new_ticket_no + frm.doc.item_series);
-					frm.set_value('inventory_tracking_no', "6-"+ non_jewelry_count + 'J');
-					frm.refresh_field('pawn_ticket');
-				})
-			}
-		} else {
-			var previous_pt = frm.doc.amended_from      //Naming for the next document created of amend
-			if (count_dash_characters(previous_pt) < 2) {
-				frm.set_value('pawn_ticket', frm.doc.amended_from + "-1");
-				frm.refresh_field('pawn_ticket');
-			} else {
-				var index_of_last_dash_caharacter = previous_pt.lastIndexOf("-")
-				var current_amend_count = index_of_last_dash_caharacter.slice(index_of_last_dash_caharacter, -1)
-				frm.set_value('pawn_ticket', frm.doc.amended_from + "-" + parseInt(current_amend_count) + 1);
-				frm.refresh_field('pawn_ticket');
-			}
-		}
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - MOL") {
+// 		if (frm.doc.amended_from == null) {
+// 			if (frm.doc.item_series == "A") {
+// 				frappe.db.get_value('Pawnshop Naming Series',"Garcia's Pawnshop - MOL",['a_series', 'jewelry_inventory_count'])
+// 				.then(value => {
+// 					let tracking_no = value.message;
+// 					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
+// 					let new_ticket_no = parseInt(tracking_no.a_series);
+// 					frm.set_value('pawn_ticket', "6-"+ new_ticket_no);
+// 					frm.set_value('inventory_tracking_no', "6-"+ non_jewelry_count + 'J');
+// 					frm.refresh_field('pawn_ticket');
+// 				})
+// 			} else if (frm.doc.item_series == "B") {
+// 				frappe.db.get_value('Pawnshop Naming Series',"Garcia's Pawnshop - MOL",['b_series', 'jewelry_inventory_count'])
+// 				.then(value => {
+// 					let tracking_no = value.message;
+// 					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
+// 					let new_ticket_no = parseInt(tracking_no.b_series);
+// 					frm.set_value('pawn_ticket', "6-"+ new_ticket_no + frm.doc.item_series);
+// 					frm.set_value('inventory_tracking_no', "6-"+ non_jewelry_count + 'J');
+// 					frm.refresh_field('pawn_ticket');
+// 				})
+// 			}
+// 		} else {
+// 			var previous_pt = frm.doc.amended_from      //Naming for the next document created of amend
+// 			if (count_dash_characters(previous_pt) < 2) {
+// 				frm.set_value('pawn_ticket', frm.doc.amended_from + "-1");
+// 				frm.refresh_field('pawn_ticket');
+// 			} else {
+// 				var index_of_last_dash_caharacter = previous_pt.lastIndexOf("-")
+// 				var current_amend_count = index_of_last_dash_caharacter.slice(index_of_last_dash_caharacter, -1)
+// 				frm.set_value('pawn_ticket', frm.doc.amended_from + "-" + parseInt(current_amend_count) + 1);
+// 				frm.refresh_field('pawn_ticket');
+// 			}
+// 		}
 		
-	} else if (frm.doc.branch == "Garcia's Pawnshop - POB") {
-		if (frm.doc.amended_from == null) {
-			if (frm.doc.item_series == "A") {
-				frappe.db.get_value('Pawnshop Naming Series',"Garcia's Pawnshop - POB",['a_series', 'jewelry_inventory_count'])
-				.then(value => {
-					let tracking_no = value.message;
-					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
-					let new_ticket_no = parseInt(tracking_no.a_series);
-					frm.set_value('pawn_ticket', "3-"+ new_ticket_no);
-					frm.set_value('inventory_tracking_no', "3-"+ non_jewelry_count + 'J');
-					frm.refresh_field('pawn_ticket');
-				})
-			} else if (frm.doc.item_series == "B") {
-				frappe.db.get_value('Pawnshop Naming Series',"Garcia's Pawnshop - POB",['b_series', 'jewelry_inventory_count'])
-				.then(value => {
-					let tracking_no = value.message;
-					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
-					let new_ticket_no = parseInt(tracking_no.b_series);
-					frm.set_value('pawn_ticket', "3-"+ new_ticket_no + frm.doc.item_series);
-					frm.set_value('inventory_tracking_no', "3-"+ non_jewelry_count + 'J');
-					frm.refresh_field('pawn_ticket');
-				})
-			}
-		} else {
-			var previous_pt = frm.doc.amended_from      //Naming for the next document created of amend
-			if (count_dash_characters(previous_pt) < 2) {
-				frm.set_value('pawn_ticket', frm.doc.amended_from + "-1");
-				frm.refresh_field('pawn_ticket');
-			} else {
-				var index_of_last_dash_caharacter = previous_pt.lastIndexOf("-")
-				var current_amend_count = index_of_last_dash_caharacter.slice(index_of_last_dash_caharacter, -1)
-				frm.set_value('pawn_ticket', frm.doc.amended_from + "-" + parseInt(current_amend_count) + 1);
-				frm.refresh_field('pawn_ticket');
-			}
-		}
-	} else if (frm.doc.branch == "Garcia's Pawnshop - TNZ") {
-		if (frm.doc.amended_from == null) {
-			if (frm.doc.item_series == "A") {
-				frappe.db.get_value('Pawnshop Naming Series',"Garcia's Pawnshop - TNZ",['a_series', 'jewelry_inventory_count'])
-				.then(value => {
-					let tracking_no = value.message;
-					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
-					let new_ticket_no = parseInt(tracking_no.a_series);
-					frm.set_value('pawn_ticket', "5-"+ new_ticket_no);
-					frm.set_value('inventory_tracking_no', "5-"+ non_jewelry_count + 'J');
-					frm.refresh_field('pawn_ticket');
-				})
-			} else if (frm.doc.item_series == "B") {
-				frappe.db.get_value('Pawnshop Naming Series',"Garcia's Pawnshop - TNZ",['b_series', 'jewelry_inventory_count'])
-				.then(value => {
-					let tracking_no = value.message;
-					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
-					let new_ticket_no = parseInt(tracking_no.b_series);
-					frm.set_value('pawn_ticket', "5-"+ new_ticket_no + frm.doc.item_series);
-					frm.set_value('inventory_tracking_no', "5-"+ non_jewelry_count + 'J');
-					frm.refresh_field('pawn_ticket');
-				})
-			}
-		} else {
-			var previous_pt = frm.doc.amended_from      //Naming for the next document created of amend
-			if (count_dash_characters(previous_pt) < 2) {
-				frm.set_value('pawn_ticket', frm.doc.amended_from + "-1");
-				frm.refresh_field('pawn_ticket');
-			} else {
-				var index_of_last_dash_caharacter = previous_pt.lastIndexOf("-")
-				var current_amend_count = index_of_last_dash_caharacter.slice(index_of_last_dash_caharacter, -1)
-				frm.set_value('pawn_ticket', frm.doc.amended_from + "-" + parseInt(current_amend_count) + 1);
-				frm.refresh_field('pawn_ticket');
-			}
-		}
-	} else if (frm.doc.branch == "Rabie's House") {
-		if (frm.doc.amended_from == null) {
-			if (frm.doc.item_series == "A") {
-				frappe.db.get_value('Pawnshop Naming Series',"Rabie's House",['a_series', 'jewelry_inventory_count'])
-				.then(value => {
-					let tracking_no = value.message;
-					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
-					let new_ticket_no = parseInt(tracking_no.a_series);
-					frm.set_value('pawn_ticket', "20-"+ new_ticket_no + frm.doc.item_series);
-					frm.set_value('inventory_tracking_no', "20-"+ non_jewelry_count + 'J');
-					frm.refresh_field('pawn_ticket');
-				})
-			} else if (frm.doc.item_series == "B") {
-				frappe.db.get_value('Pawnshop Naming Series',"Rabie's House",['b_series', 'jewelry_inventory_count'])
-				.then(value => {
-					let tracking_no = value.message;
-					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
-					let new_ticket_no = parseInt(tracking_no.b_series);
-					frm.set_value('pawn_ticket', "20-"+ new_ticket_no + frm.doc.item_series);
-					frm.set_value('inventory_tracking_no', "20-"+ non_jewelry_count + 'J');
-					frm.refresh_field('pawn_ticket');
-				})
-			}
-		} else {
-			var previous_pt = String(frm.doc.amended_from);      //Naming for the next document created of amend
-			if (count_dash_characters(previous_pt) < 2) {
-				frm.set_value('pawn_ticket', frm.doc.amended_from + "-1");
-				frm.refresh_field('pawn_ticket');
-			} else {
-				var index_of_last_dash_caharacter = parseInt(frm.doc.amended_from.lastIndexOf("-"))
-				var current_amend_count = frm.doc.amended_from.substr((index_of_last_dash_caharacter + 1))
-				var original_pt = frm.doc.amended_from.slice(0, parseInt(index_of_last_dash_caharacter))
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - POB") {
+// 		if (frm.doc.amended_from == null) {
+// 			if (frm.doc.item_series == "A") {
+// 				frappe.db.get_value('Pawnshop Naming Series',"Garcia's Pawnshop - POB",['a_series', 'jewelry_inventory_count'])
+// 				.then(value => {
+// 					let tracking_no = value.message;
+// 					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
+// 					let new_ticket_no = parseInt(tracking_no.a_series);
+// 					frm.set_value('pawn_ticket', "3-"+ new_ticket_no);
+// 					frm.set_value('inventory_tracking_no', "3-"+ non_jewelry_count + 'J');
+// 					frm.refresh_field('pawn_ticket');
+// 				})
+// 			} else if (frm.doc.item_series == "B") {
+// 				frappe.db.get_value('Pawnshop Naming Series',"Garcia's Pawnshop - POB",['b_series', 'jewelry_inventory_count'])
+// 				.then(value => {
+// 					let tracking_no = value.message;
+// 					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
+// 					let new_ticket_no = parseInt(tracking_no.b_series);
+// 					frm.set_value('pawn_ticket', "3-"+ new_ticket_no + frm.doc.item_series);
+// 					frm.set_value('inventory_tracking_no', "3-"+ non_jewelry_count + 'J');
+// 					frm.refresh_field('pawn_ticket');
+// 				})
+// 			}
+// 		} else {
+// 			var previous_pt = frm.doc.amended_from      //Naming for the next document created of amend
+// 			if (count_dash_characters(previous_pt) < 2) {
+// 				frm.set_value('pawn_ticket', frm.doc.amended_from + "-1");
+// 				frm.refresh_field('pawn_ticket');
+// 			} else {
+// 				var index_of_last_dash_caharacter = previous_pt.lastIndexOf("-")
+// 				var current_amend_count = index_of_last_dash_caharacter.slice(index_of_last_dash_caharacter, -1)
+// 				frm.set_value('pawn_ticket', frm.doc.amended_from + "-" + parseInt(current_amend_count) + 1);
+// 				frm.refresh_field('pawn_ticket');
+// 			}
+// 		}
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - TNZ") {
+// 		if (frm.doc.amended_from == null) {
+// 			if (frm.doc.item_series == "A") {
+// 				frappe.db.get_value('Pawnshop Naming Series',"Garcia's Pawnshop - TNZ",['a_series', 'jewelry_inventory_count'])
+// 				.then(value => {
+// 					let tracking_no = value.message;
+// 					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
+// 					let new_ticket_no = parseInt(tracking_no.a_series);
+// 					frm.set_value('pawn_ticket', "5-"+ new_ticket_no);
+// 					frm.set_value('inventory_tracking_no', "5-"+ non_jewelry_count + 'J');
+// 					frm.refresh_field('pawn_ticket');
+// 				})
+// 			} else if (frm.doc.item_series == "B") {
+// 				frappe.db.get_value('Pawnshop Naming Series',"Garcia's Pawnshop - TNZ",['b_series', 'jewelry_inventory_count'])
+// 				.then(value => {
+// 					let tracking_no = value.message;
+// 					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
+// 					let new_ticket_no = parseInt(tracking_no.b_series);
+// 					frm.set_value('pawn_ticket', "5-"+ new_ticket_no + frm.doc.item_series);
+// 					frm.set_value('inventory_tracking_no', "5-"+ non_jewelry_count + 'J');
+// 					frm.refresh_field('pawn_ticket');
+// 				})
+// 			}
+// 		} else {
+// 			var previous_pt = frm.doc.amended_from      //Naming for the next document created of amend
+// 			if (count_dash_characters(previous_pt) < 2) {
+// 				frm.set_value('pawn_ticket', frm.doc.amended_from + "-1");
+// 				frm.refresh_field('pawn_ticket');
+// 			} else {
+// 				var index_of_last_dash_caharacter = previous_pt.lastIndexOf("-")
+// 				var current_amend_count = index_of_last_dash_caharacter.slice(index_of_last_dash_caharacter, -1)
+// 				frm.set_value('pawn_ticket', frm.doc.amended_from + "-" + parseInt(current_amend_count) + 1);
+// 				frm.refresh_field('pawn_ticket');
+// 			}
+// 		}
+// 	} else if (frm.doc.branch == "Rabie's House") {
+// 		if (frm.doc.amended_from == null) {
+// 			if (frm.doc.item_series == "A") {
+// 				frappe.db.get_value('Pawnshop Naming Series',"Rabie's House",['a_series', 'jewelry_inventory_count'])
+// 				.then(value => {
+// 					let tracking_no = value.message;
+// 					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
+// 					let new_ticket_no = parseInt(tracking_no.a_series);
+// 					frm.set_value('pawn_ticket', "20-"+ new_ticket_no + frm.doc.item_series);
+// 					frm.set_value('inventory_tracking_no', "20-"+ non_jewelry_count + 'J');
+// 					frm.refresh_field('pawn_ticket');
+// 				})
+// 			} else if (frm.doc.item_series == "B") {
+// 				frappe.db.get_value('Pawnshop Naming Series',"Rabie's House",['b_series', 'jewelry_inventory_count'])
+// 				.then(value => {
+// 					let tracking_no = value.message;
+// 					let non_jewelry_count = parseInt(tracking_no.jewelry_inventory_count);
+// 					let new_ticket_no = parseInt(tracking_no.b_series);
+// 					frm.set_value('pawn_ticket', "20-"+ new_ticket_no + frm.doc.item_series);
+// 					frm.set_value('inventory_tracking_no', "20-"+ non_jewelry_count + 'J');
+// 					frm.refresh_field('pawn_ticket');
+// 				})
+// 			}
+// 		} else {
+// 			var previous_pt = String(frm.doc.amended_from);      //Naming for the next document created of amend
+// 			if (count_dash_characters(previous_pt) < 2) {
+// 				frm.set_value('pawn_ticket', frm.doc.amended_from + "-1");
+// 				frm.refresh_field('pawn_ticket');
+// 			} else {
+// 				var index_of_last_dash_caharacter = parseInt(frm.doc.amended_from.lastIndexOf("-"))
+// 				var current_amend_count = frm.doc.amended_from.substr((index_of_last_dash_caharacter + 1))
+// 				var original_pt = frm.doc.amended_from.slice(0, parseInt(index_of_last_dash_caharacter))
 
-				frm.set_value('pawn_ticket', original_pt + "-" + (parseInt(current_amend_count) + 1));
-				frm.refresh_field('pawn_ticket');
-			}
-		}
-	} 
+// 				frm.set_value('pawn_ticket', original_pt + "-" + (parseInt(current_amend_count) + 1));
+// 				frm.refresh_field('pawn_ticket');
+// 			}
+// 		}
+// 	} 
 	
 }
 
