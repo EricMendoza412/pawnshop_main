@@ -1,0 +1,126 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:form_number",
+ "creation": "2022-08-19 17:01:57.996189",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "form_number",
+  "date_of_sale",
+  "section_break_5",
+  "branch",
+  "customer_tracker",
+  "customer_name",
+  "section_break_6",
+  "ats_tracking_no",
+  "jewelry_items",
+  "total_value",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "date_of_sale",
+   "fieldtype": "Date",
+   "label": "Date of sale",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fetch_from": "customer_tracker.customer_name",
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "Customer Name",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "customer_tracker",
+   "fieldtype": "Link",
+   "label": "Customer Tracker",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "section_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_6",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "jewelry_items",
+   "fieldtype": "Table",
+   "label": "Jewelry Items",
+   "options": "Jewelry List",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "total_value",
+   "fieldtype": "Currency",
+   "label": "Total Value",
+   "non_negative": 1,
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "ats_tracking_no",
+   "fieldtype": "Data",
+   "label": "ATS Tracking No",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "form_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Form number",
+   "read_only": 1,
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Agreement to Sell",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2023-07-24 17:27:44.463245",
+ "modified_by": "Administrator",
+ "module": "Pawnshop Management",
+ "name": "Agreement to Sell",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

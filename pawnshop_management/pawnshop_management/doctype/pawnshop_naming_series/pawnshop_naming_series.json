@@ -10,6 +10,7 @@
   "branch",
   "series_section",
   "a_series",
+  "ats_jewelry_count",
   "column_break_4",
   "b_series",
   "non_jewelry_series_section",
@@ -53,7 +54,7 @@
   {
    "fieldname": "series_section",
    "fieldtype": "Section Break",
-   "label": "Category Series"
+   "label": "Document Series"
   },
   {
    "default": "1",
@@ -90,11 +91,16 @@
   {
    "fieldname": "column_break_12",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ats_jewelry_count",
+   "fieldtype": "Int",
+   "label": "ATS Series"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-30 15:09:33.251839",
+ "modified": "2023-07-24 17:11:53.141820",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Pawnshop Naming Series",
