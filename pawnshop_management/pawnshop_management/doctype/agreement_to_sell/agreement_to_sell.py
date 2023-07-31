@@ -3,6 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
+from frappe.utils import today
 
 class AgreementtoSell(Document):
 	def before_save(self):
@@ -34,3 +35,13 @@ class AgreementtoSell(Document):
 					"comments": items[i].comments
 				})
 			new_jewelry_batch.save(ignore_permissions=True)
+
+	def update_ats_status(self):
+		if self.workflow_state == "Pulled Out":
+			frappe.db.set_value("Agreement to Sell", self.form_number, 'change_status_date', today())
+
+	def on_update(self):
+		self.update_ats_status()
+	def on_update_after_submit(self):
+		self.update_ats_status()
+			

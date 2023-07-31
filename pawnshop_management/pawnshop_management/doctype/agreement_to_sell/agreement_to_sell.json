@@ -9,6 +9,7 @@
  "field_order": [
   "form_number",
   "date_of_sale",
+  "change_status_date",
   "section_break_5",
   "branch",
   "customer_tracker",
@@ -17,6 +18,10 @@
   "ats_tracking_no",
   "jewelry_items",
   "total_value",
+  "people_involved_section",
+  "seller_name_and_signature",
+  "column_break_13",
+  "cashier_name_and_signature",
   "amended_from"
  ],
  "fields": [
@@ -97,12 +102,43 @@
    "options": "Agreement to Sell",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "default": "_______________________________",
+   "fieldname": "seller_name_and_signature",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Seller Name and Signature",
+   "read_only": 1
+  },
+  {
+   "default": "____________________________",
+   "fieldname": "cashier_name_and_signature",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Cashier Name and Signature",
+   "read_only": 1
+  },
+  {
+   "fieldname": "people_involved_section",
+   "fieldtype": "Section Break",
+   "label": "people involved"
+  },
+  {
+   "fieldname": "column_break_13",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "change_status_date",
+   "fieldtype": "Data",
+   "label": "Change Status Date",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-07-24 17:27:44.463245",
+ "modified": "2023-07-31 15:50:16.838293",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Agreement to Sell",

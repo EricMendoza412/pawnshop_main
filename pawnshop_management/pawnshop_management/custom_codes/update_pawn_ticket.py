@@ -2,6 +2,9 @@ import frappe
 from frappe.utils import today
 
 
+
+
+
 @frappe.whitelist()
 def update_pawn_tickets():
     non_jewelry = frappe.db.get_all('Pawn Ticket Non Jewelry', 

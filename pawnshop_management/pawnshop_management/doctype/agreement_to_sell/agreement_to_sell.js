@@ -108,7 +108,7 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 	.then(value => {
 		let tracking_no = value.message;
 		jewelry_inv_count = parseInt(tracking_no.jewelry_inventory_count);
-		frm.set_value('ats_tracking_no', branch_code+"-"+ jewelry_inv_count + 'ATSJ');
+		frm.set_value('ats_tracking_no', 'ATS-'+branch_code+"-"+ jewelry_inv_count + 'J');
 	})
 }
 
