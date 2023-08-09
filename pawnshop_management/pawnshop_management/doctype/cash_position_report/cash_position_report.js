@@ -14,7 +14,9 @@ frappe.ui.form.on('Cash Position Report', {
 				'jewelry_b', 
 				'non_jewelry',
 				'additional_redeem',
-				'additional_pawn'
+				'additional_pawn',
+				'selling',
+				'gcash'
 			],
 			 is_allowed);
 		if (frm.is_new()) {
