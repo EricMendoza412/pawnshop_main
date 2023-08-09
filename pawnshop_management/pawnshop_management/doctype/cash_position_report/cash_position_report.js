@@ -16,7 +16,8 @@ frappe.ui.form.on('Cash Position Report', {
 				'additional_redeem',
 				'additional_pawn',
 				'selling',
-				'gcash'
+				'gcash',
+				'bank_transfer'
 			],
 			 is_allowed);
 		if (frm.is_new()) {
