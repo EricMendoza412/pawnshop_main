@@ -13,8 +13,6 @@ frappe.ui.form.on('Cash Position Report', {
 				'jewelry_a', 
 				'jewelry_b', 
 				'non_jewelry',
-				'additional_redeem',
-				'additional_pawn',
 				'selling',
 				'gcash',
 				'bank_transfer'
@@ -97,10 +95,12 @@ frappe.ui.form.on('Cash Position Report', {
 		select_naming_series(frm);
 		get_jewelry_b_of_the_day(frm, frm.doc.date);
 		get_jewelry_a_of_the_day(frm, frm.doc.date);
-		get_additional_pawn_records(frm);
-		get_additional_redeem(frm);
-		get_additional_partial_payment(frm);
-		get_total_discount(frm);
+		get_ats_of_the_day(frm, frm.doc.date);
+		get_ar_of_the_day(frm, frm.doc.date);
+		//get_additional_pawn_records(frm);
+		//get_additional_redeem(frm);
+		//get_additional_partial_payment(frm);
+		//get_total_discount(frm);
 	},
 
 	date: function(frm){
@@ -113,10 +113,12 @@ frappe.ui.form.on('Cash Position Report', {
 		select_naming_series(frm);
 		get_jewelry_b_of_the_day(frm, frm.doc.date);
 		get_jewelry_a_of_the_day(frm, frm.doc.date);
-		get_additional_pawn_records(frm);
-		get_additional_redeem(frm);
-		get_additional_partial_payment(frm);
-		get_total_discount(frm);
+		get_ats_of_the_day(frm, frm.doc.date);
+		get_ar_of_the_day(frm, frm.doc.date);
+		//get_additional_pawn_records(frm);
+		//get_additional_redeem(frm);
+		//get_additional_partial_payment(frm);
+		//get_total_discount(frm);
 	},
 
 	validate: function(frm){
@@ -317,7 +319,24 @@ function get_provisional_receipts_of_the_day(frm, date_today = null) {
 			frm.refresh_field('provisional_receipts');
 		})
 }
-
+function get_ats_of_the_day(frm, date_today = null) {
+		frappe.call('pawnshop_management.pawnshop_management.custom_codes.daily_balance.get_all_ATS_total', {
+			date: frm.doc.date,
+			branch: frm.doc.branch
+		}).then(r => {
+			frm.set_value('agreement_to_sell', r.message);
+			frm.refresh_field('agreement_to_sell');
+		})
+}
+function get_ar_of_the_day(frm, date_today = null) {
+	frappe.call('pawnshop_management.pawnshop_management.custom_codes.daily_balance.get_all_AR_total', {
+		date: frm.doc.date,
+		branch: frm.doc.branch
+	}).then(r => {
+		frm.set_value('acknowledgement_receipts', r.message);
+		frm.refresh_field('acknowledgement_receipts');
+	})
+}
 function get_jewelry_a_of_the_day(frm, date_today=null) {
 	frappe.db.get_list('Pawn Ticket Jewelry', {
 		fields: ['net_proceeds'],
@@ -784,683 +803,683 @@ function get_bank_transfer_provisional_receipt(frm, date_today = null) {
 	}
 }
 
-function get_additional_pawn_records(frm) {
-	if (frm.doc.branch == "Rabie's House") {
-		frappe.db.get_list('Pawn Ticket Jewelry', {
-			fields: ['net_proceeds'],
-			filters: {
-				branch: "Rabie's House",
-				docstatus: 1,
-				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records => {
-			let temp_total = 0.00;
-			frm.set_value('additional_pawn', 0.00);
-			for (let index = 0; index < records.length; index++) {
-				temp_total += parseFloat(records[index].net_proceeds);
-			}
-			get_additional_pawn_records_nj(frm, temp_total)
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - TNZ") {
-		frappe.db.get_list('Pawn Ticket Jewelry', {
-			fields: ['net_proceeds'],
-			filters: {
-				branch: "Garcia's Pawnshop - TNZ",
-				docstatus: 1,
-				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records => {
-			let temp_total = 0.00;
-			frm.set_value('additional_pawn', 0.00);
-			for (let index = 0; index < records.length; index++) {
-				temp_total += parseFloat(records[index].net_proceeds);
-			}
-			get_additional_pawn_records_nj(frm, temp_total)
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - POB") {
-		frappe.db.get_list('Pawn Ticket Jewelry', {
-			fields: ['net_proceeds'],
-			filters: {
-				branch: "Garcia's Pawnshop - POB",
-				docstatus: 1,
-				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records => {
-			let temp_total = 0.00;
-			frm.set_value('additional_pawn', 0.00);
-			for (let index = 0; index < records.length; index++) {
-				temp_total += parseFloat(records[index].net_proceeds);
-			}
-			get_additional_pawn_records_nj(frm, temp_total)
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - MOL") {
-		frappe.db.get_list('Pawn Ticket Jewelry', {
-			fields: ['net_proceeds'],
-			filters: {
-				branch: "Garcia's Pawnshop - MOL",
-				docstatus: 1,
-				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records => {
-			let temp_total = 0.00;
-			frm.set_value('additional_pawn', 0.00);
-			for (let index = 0; index < records.length; index++) {
-				temp_total += parseFloat(records[index].net_proceeds);
-			}
-			get_additional_pawn_records_nj(frm, temp_total)
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - GTC") {
-		frappe.call('pawnshop_management.pawnshop_management.custom_codes.daily_balance.get_all_additional_pawn', {
-			date: frm.doc.date
-		}).then(r => {
-			frm.set_value('additional_pawn', r.message);
-			frm.refresh_field('additional_pawn');
-		})
-		// frappe.db.get_all('Pawn Ticket Jewelry', {
-		// 	fields: ['net_proceeds'],
-		// 	filters: {
-		// 		branch: "Garcia's Pawnshop - GTC",
-		// 		docstatus: 1,
-		// 		date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
-		// 	}
-		// }).then(records => {
-		// 	let temp_total = 0.00;
-		// 	frm.set_value('additional_pawn', 0.00);
-		// 	for (let index = 0; index < records.message.length; index++) {
-		// 		temp_total += parseFloat(records[index].net_proceeds);
-		// 		console.log(temp_total);
-		// 	}
-		// 	get_additional_pawn_records_nj(frm, temp_total)
-		// })
-	} else if (frm.doc.branch == "Garcia's Pawnshop - CC") {
-		frappe.db.get_list('Pawn Ticket Jewelry', {
-			fields: ['net_proceeds'],
-			filters: {
-				branch: "Garcia's Pawnshop - CC",
-				docstatus: 1,
-				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records => {
-			let temp_total = 0.00;
-			frm.set_value('additional_pawn', 0.00);
-			for (let index = 0; index < records.length; index++) {
-				temp_total += parseFloat(records[index].net_proceeds);
-			}
-			get_additional_pawn_records_nj(frm, temp_total)
-		})
-	}
-}
+// function get_additional_pawn_records(frm) {
+// 	if (frm.doc.branch == "Rabie's House") {
+// 		frappe.db.get_list('Pawn Ticket Jewelry', {
+// 			fields: ['net_proceeds'],
+// 			filters: {
+// 				branch: "Rabie's House",
+// 				docstatus: 1,
+// 				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records => {
+// 			let temp_total = 0.00;
+// 			frm.set_value('additional_pawn', 0.00);
+// 			for (let index = 0; index < records.length; index++) {
+// 				temp_total += parseFloat(records[index].net_proceeds);
+// 			}
+// 			get_additional_pawn_records_nj(frm, temp_total)
+// 		})
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - TNZ") {
+// 		frappe.db.get_list('Pawn Ticket Jewelry', {
+// 			fields: ['net_proceeds'],
+// 			filters: {
+// 				branch: "Garcia's Pawnshop - TNZ",
+// 				docstatus: 1,
+// 				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records => {
+// 			let temp_total = 0.00;
+// 			frm.set_value('additional_pawn', 0.00);
+// 			for (let index = 0; index < records.length; index++) {
+// 				temp_total += parseFloat(records[index].net_proceeds);
+// 			}
+// 			get_additional_pawn_records_nj(frm, temp_total)
+// 		})
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - POB") {
+// 		frappe.db.get_list('Pawn Ticket Jewelry', {
+// 			fields: ['net_proceeds'],
+// 			filters: {
+// 				branch: "Garcia's Pawnshop - POB",
+// 				docstatus: 1,
+// 				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records => {
+// 			let temp_total = 0.00;
+// 			frm.set_value('additional_pawn', 0.00);
+// 			for (let index = 0; index < records.length; index++) {
+// 				temp_total += parseFloat(records[index].net_proceeds);
+// 			}
+// 			get_additional_pawn_records_nj(frm, temp_total)
+// 		})
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - MOL") {
+// 		frappe.db.get_list('Pawn Ticket Jewelry', {
+// 			fields: ['net_proceeds'],
+// 			filters: {
+// 				branch: "Garcia's Pawnshop - MOL",
+// 				docstatus: 1,
+// 				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records => {
+// 			let temp_total = 0.00;
+// 			frm.set_value('additional_pawn', 0.00);
+// 			for (let index = 0; index < records.length; index++) {
+// 				temp_total += parseFloat(records[index].net_proceeds);
+// 			}
+// 			get_additional_pawn_records_nj(frm, temp_total)
+// 		})
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - GTC") {
+// 		frappe.call('pawnshop_management.pawnshop_management.custom_codes.daily_balance.get_all_additional_pawn', {
+// 			date: frm.doc.date
+// 		}).then(r => {
+// 			frm.set_value('additional_pawn', r.message);
+// 			frm.refresh_field('additional_pawn');
+// 		})
+// 		// frappe.db.get_all('Pawn Ticket Jewelry', {
+// 		// 	fields: ['net_proceeds'],
+// 		// 	filters: {
+// 		// 		branch: "Garcia's Pawnshop - GTC",
+// 		// 		docstatus: 1,
+// 		// 		date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
+// 		// 	}
+// 		// }).then(records => {
+// 		// 	let temp_total = 0.00;
+// 		// 	frm.set_value('additional_pawn', 0.00);
+// 		// 	for (let index = 0; index < records.message.length; index++) {
+// 		// 		temp_total += parseFloat(records[index].net_proceeds);
+// 		// 		console.log(temp_total);
+// 		// 	}
+// 		// 	get_additional_pawn_records_nj(frm, temp_total)
+// 		// })
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - CC") {
+// 		frappe.db.get_list('Pawn Ticket Jewelry', {
+// 			fields: ['net_proceeds'],
+// 			filters: {
+// 				branch: "Garcia's Pawnshop - CC",
+// 				docstatus: 1,
+// 				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records => {
+// 			let temp_total = 0.00;
+// 			frm.set_value('additional_pawn', 0.00);
+// 			for (let index = 0; index < records.length; index++) {
+// 				temp_total += parseFloat(records[index].net_proceeds);
+// 			}
+// 			get_additional_pawn_records_nj(frm, temp_total)
+// 		})
+// 	}
+// }
 
-function get_additional_pawn_records_nj(frm, j_temp_total) {
-	if (frm.doc.branch == "Rabie's House") {
-		frappe.db.get_list('Pawn Ticket Non Jewelry', {
-			fields: ['net_proceeds'],
-			filters: {
-				branch: "Rabie's House",
-				docstatus: 1,
-				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records_nj => {
-			let nj_temp_total = 0.00;
-			let total = 0.00;
-			for (let index = 0; index < records_nj.length; index++) {
-				nj_temp_total += records_nj[index].net_proceeds;
-			}
-			total = j_temp_total + nj_temp_total;
-			frm.set_value('additional_pawn', total);
-			frm.refresh_field('additional_pawn');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - TNZ") {
-		frappe.db.get_list('Pawn Ticket Non Jewelry', {
-			fields: ['net_proceeds'],
-			filters: {
-				branch: "Garcia's Pawnshop - TNZ",
-				docstatus: 1,
-				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records_nj => {
-			let nj_temp_total = 0.00;
-			let total = 0.00;
-			for (let index = 0; index < records_nj.length; index++) {
-				nj_temp_total += records_nj[index].net_proceeds;
-			}
-			total = j_temp_total + nj_temp_total;
-			frm.set_value('additional_pawn', total);
-			frm.refresh_field('additional_pawn');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - POB") {
-		frappe.db.get_list('Pawn Ticket Non Jewelry', {
-			fields: ['net_proceeds'],
-			filters: {
-				branch: "Garcia's Pawnshop - POB",
-				docstatus: 1,
-				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records_nj => {
-			let nj_temp_total = 0.00;
-			let total = 0.00;
-			for (let index = 0; index < records_nj.length; index++) {
-				nj_temp_total += records_nj[index].net_proceeds;
-			}
-			total = j_temp_total + nj_temp_total;
-			frm.set_value('additional_pawn', total);
-			frm.refresh_field('additional_pawn');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - MOL") {
-		frappe.db.get_list('Pawn Ticket Non Jewelry', {
-			fields: ['net_proceeds'],
-			filters: {
-				branch: "Garcia's Pawnshop - MOL",
-				docstatus: 1,
-				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records_nj => {
-			let nj_temp_total = 0.00;
-			let total = 0.00;
-			for (let index = 0; index < records_nj.length; index++) {
-				nj_temp_total += records_nj[index].net_proceeds;
-			}
-			total = j_temp_total + nj_temp_total;
-			frm.set_value('additional_pawn', total);
-			frm.refresh_field('additional_pawn');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - GTC") {
-		// frappe.db.get_all('Pawn Ticket Non Jewelry', {
-		// 	fields: ['net_proceeds'],
-		// 	filters: {
-		// 		branch: "Garcia's Pawnshop - GTC",
-		// 		docstatus: 1,
-		// 		date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
-		// 	}
-		// }).then(records_nj => {
-		// 	let nj_temp_total = 0.00;
-		// 	let total = 0.00;
-		// 	for (let index = 0; index < records_nj.message.length; index++) {
-		// 		nj_temp_total += records_nj[index].net_proceeds;
-		// 	}
-		// 	total = j_temp_total + nj_temp_total;
-		// 	console.log(j_temp_total);
-		// 	console.log(nj_temp_total);
-		// 	frm.set_value('additional_pawn', total);
-		// 	frm.refresh_field('additional_pawn');
-		// })
+// function get_additional_pawn_records_nj(frm, j_temp_total) {
+// 	if (frm.doc.branch == "Rabie's House") {
+// 		frappe.db.get_list('Pawn Ticket Non Jewelry', {
+// 			fields: ['net_proceeds'],
+// 			filters: {
+// 				branch: "Rabie's House",
+// 				docstatus: 1,
+// 				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records_nj => {
+// 			let nj_temp_total = 0.00;
+// 			let total = 0.00;
+// 			for (let index = 0; index < records_nj.length; index++) {
+// 				nj_temp_total += records_nj[index].net_proceeds;
+// 			}
+// 			total = j_temp_total + nj_temp_total;
+// 			frm.set_value('additional_pawn', total);
+// 			frm.refresh_field('additional_pawn');
+// 		})
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - TNZ") {
+// 		frappe.db.get_list('Pawn Ticket Non Jewelry', {
+// 			fields: ['net_proceeds'],
+// 			filters: {
+// 				branch: "Garcia's Pawnshop - TNZ",
+// 				docstatus: 1,
+// 				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records_nj => {
+// 			let nj_temp_total = 0.00;
+// 			let total = 0.00;
+// 			for (let index = 0; index < records_nj.length; index++) {
+// 				nj_temp_total += records_nj[index].net_proceeds;
+// 			}
+// 			total = j_temp_total + nj_temp_total;
+// 			frm.set_value('additional_pawn', total);
+// 			frm.refresh_field('additional_pawn');
+// 		})
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - POB") {
+// 		frappe.db.get_list('Pawn Ticket Non Jewelry', {
+// 			fields: ['net_proceeds'],
+// 			filters: {
+// 				branch: "Garcia's Pawnshop - POB",
+// 				docstatus: 1,
+// 				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records_nj => {
+// 			let nj_temp_total = 0.00;
+// 			let total = 0.00;
+// 			for (let index = 0; index < records_nj.length; index++) {
+// 				nj_temp_total += records_nj[index].net_proceeds;
+// 			}
+// 			total = j_temp_total + nj_temp_total;
+// 			frm.set_value('additional_pawn', total);
+// 			frm.refresh_field('additional_pawn');
+// 		})
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - MOL") {
+// 		frappe.db.get_list('Pawn Ticket Non Jewelry', {
+// 			fields: ['net_proceeds'],
+// 			filters: {
+// 				branch: "Garcia's Pawnshop - MOL",
+// 				docstatus: 1,
+// 				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records_nj => {
+// 			let nj_temp_total = 0.00;
+// 			let total = 0.00;
+// 			for (let index = 0; index < records_nj.length; index++) {
+// 				nj_temp_total += records_nj[index].net_proceeds;
+// 			}
+// 			total = j_temp_total + nj_temp_total;
+// 			frm.set_value('additional_pawn', total);
+// 			frm.refresh_field('additional_pawn');
+// 		})
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - GTC") {
+// 		// frappe.db.get_all('Pawn Ticket Non Jewelry', {
+// 		// 	fields: ['net_proceeds'],
+// 		// 	filters: {
+// 		// 		branch: "Garcia's Pawnshop - GTC",
+// 		// 		docstatus: 1,
+// 		// 		date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
+// 		// 	}
+// 		// }).then(records_nj => {
+// 		// 	let nj_temp_total = 0.00;
+// 		// 	let total = 0.00;
+// 		// 	for (let index = 0; index < records_nj.message.length; index++) {
+// 		// 		nj_temp_total += records_nj[index].net_proceeds;
+// 		// 	}
+// 		// 	total = j_temp_total + nj_temp_total;
+// 		// 	console.log(j_temp_total);
+// 		// 	console.log(nj_temp_total);
+// 		// 	frm.set_value('additional_pawn', total);
+// 		// 	frm.refresh_field('additional_pawn');
+// 		// })
 		
-	} else if (frm.doc.branch == "Garcia's Pawnshop - CC") {
-		frappe.db.get_list('Pawn Ticket Non Jewelry', {
-			fields: ['net_proceeds'],
-			filters: {
-				branch: "Garcia's Pawnshop - CC",
-				docstatus: 1,
-				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records_nj => {
-			let nj_temp_total = 0.00;
-			let total = 0.00;
-			for (let index = 0; index < records_nj.length; index++) {
-				nj_temp_total += records_nj[index].net_proceeds;
-			}
-			total = j_temp_total + nj_temp_total;
-			frm.set_value('additional_pawn', total);
-			frm.refresh_field('additional_pawn');
-		})
-	}
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - CC") {
+// 		frappe.db.get_list('Pawn Ticket Non Jewelry', {
+// 			fields: ['net_proceeds'],
+// 			filters: {
+// 				branch: "Garcia's Pawnshop - CC",
+// 				docstatus: 1,
+// 				date_loan_granted: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records_nj => {
+// 			let nj_temp_total = 0.00;
+// 			let total = 0.00;
+// 			for (let index = 0; index < records_nj.length; index++) {
+// 				nj_temp_total += records_nj[index].net_proceeds;
+// 			}
+// 			total = j_temp_total + nj_temp_total;
+// 			frm.set_value('additional_pawn', total);
+// 			frm.refresh_field('additional_pawn');
+// 		})
+// 	}
 	
-}
+// }
 
-function get_total_discount(frm) {
+// function get_total_discount(frm) {
 
-	if (frm.doc.branch == "Garcia's Pawnshop - GTC") {
-		frappe.db.get_list('Provisional Receipt', {
-			fields: ['total', 'additional_amortization', 'interest_payment', 'principal_amount', 'transaction_type', 'discount'],
-			filters: {
-				transaction_type: [
-					'in',
-					[
-						'Redemption',
-						'Renewal',
-						'Renewal w/ Amortization',
-						'Amortization'
-					]
-				],
-				branch: "Garcia's Pawnshop - GTC",
-				docstatus: 1,
-				date_issued: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records_pr => {
-			let temp_total = 0.00;
+// 	if (frm.doc.branch == "Garcia's Pawnshop - GTC") {
+// 		frappe.db.get_list('Provisional Receipt', {
+// 			fields: ['total', 'additional_amortization', 'interest_payment', 'principal_amount', 'transaction_type', 'discount'],
+// 			filters: {
+// 				transaction_type: [
+// 					'in',
+// 					[
+// 						'Redemption',
+// 						'Renewal',
+// 						'Renewal w/ Amortization',
+// 						'Amortization'
+// 					]
+// 				],
+// 				branch: "Garcia's Pawnshop - GTC",
+// 				docstatus: 1,
+// 				date_issued: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records_pr => {
+// 			let temp_total = 0.00;
 			
-			for (let index = 0; index < records_pr.length; index++) {
-					temp_total += parseFloat(records_pr[index].discount)
-			}
-			frm.set_value('total_discount', temp_total);
-			frm.refresh_field('total_discount');
-		})
-	} else {
-			let temp_total = 0.00;
-			frm.set_value('total_discount', temp_total);
-			frm.refresh_field('total_discount');
+// 			for (let index = 0; index < records_pr.length; index++) {
+// 					temp_total += parseFloat(records_pr[index].discount)
+// 			}
+// 			frm.set_value('total_discount', temp_total);
+// 			frm.refresh_field('total_discount');
+// 		})
+// 	} else {
+// 			let temp_total = 0.00;
+// 			frm.set_value('total_discount', temp_total);
+// 			frm.refresh_field('total_discount');
 
-			}
-}
+// 			}
+// }
 
 
-function get_additional_redeem(frm) {
+// function get_additional_redeem(frm) {
 	
-	if (frm.doc.branch == "Rabie's House") {
-		frappe.db.get_list('Provisional Receipt', {
-			fields: ['total', 'additional_amortization', 'interest_payment', 'principal_amount', 'transaction_type'],
-			filters: {
-				transaction_type: [
-					'in',
-					[
-						'Redemption',
-						'Renewal',
-						'Renewal w/ Amortization',
-						'Amortization'
-					]
-				],
-				branch: "Rabie's House",
-				docstatus: 1,
-				date_issued: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records_pr => {
-			let temp_total = 0.00;
-			frm.set_value('additional_redeem', 0.00);
-			for (let index = 0; index < records_pr.length; index++) {
-				if (records_pr[index].transaction_type == "Redemption") {
-					temp_total += parseFloat(records_pr[index].total)
-				}
-				if (records_pr[index].transaction_type == "Renewal") {
-					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
-				}
-				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
-					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
-				}
-				if (records_pr[index].transaction_type == "Amortization") {
-					temp_total += parseFloat(records_pr[index].total)
-				}
-			}
-			frm.set_value('additional_redeem', temp_total);
-			frm.refresh_field('additional_redeem');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - TNZ") {
-		frappe.db.get_list('Provisional Receipt', {
-			fields: ['total', 'additional_amortization', 'interest_payment', 'principal_amount', 'transaction_type'],
-			filters: {
-				transaction_type: [
-					'in',
-					[
-						'Redemption',
-						'Renewal',
-						'Renewal w/ Amortization',
-						'Amortization'
-					]
-				],
-				branch: "Garcia's Pawnshop - TNZ",
-				docstatus: 1,
-				date_issued: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records_pr => {
-			let temp_total = 0.00;
-			frm.set_value('additional_redeem', 0.00);
-			for (let index = 0; index < records_pr.length; index++) {
-				if (records_pr[index].transaction_type == "Redemption") {
-					temp_total += parseFloat(records_pr[index].total)
-				}
-				if (records_pr[index].transaction_type == "Renewal") {
-					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
-				}
-				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
-					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
-				}
+// 	if (frm.doc.branch == "Rabie's House") {
+// 		frappe.db.get_list('Provisional Receipt', {
+// 			fields: ['total', 'additional_amortization', 'interest_payment', 'principal_amount', 'transaction_type'],
+// 			filters: {
+// 				transaction_type: [
+// 					'in',
+// 					[
+// 						'Redemption',
+// 						'Renewal',
+// 						'Renewal w/ Amortization',
+// 						'Amortization'
+// 					]
+// 				],
+// 				branch: "Rabie's House",
+// 				docstatus: 1,
+// 				date_issued: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records_pr => {
+// 			let temp_total = 0.00;
+// 			frm.set_value('additional_redeem', 0.00);
+// 			for (let index = 0; index < records_pr.length; index++) {
+// 				if (records_pr[index].transaction_type == "Redemption") {
+// 					temp_total += parseFloat(records_pr[index].total)
+// 				}
+// 				if (records_pr[index].transaction_type == "Renewal") {
+// 					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
+// 				}
+// 				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
+// 					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
+// 				}
+// 				if (records_pr[index].transaction_type == "Amortization") {
+// 					temp_total += parseFloat(records_pr[index].total)
+// 				}
+// 			}
+// 			frm.set_value('additional_redeem', temp_total);
+// 			frm.refresh_field('additional_redeem');
+// 		})
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - TNZ") {
+// 		frappe.db.get_list('Provisional Receipt', {
+// 			fields: ['total', 'additional_amortization', 'interest_payment', 'principal_amount', 'transaction_type'],
+// 			filters: {
+// 				transaction_type: [
+// 					'in',
+// 					[
+// 						'Redemption',
+// 						'Renewal',
+// 						'Renewal w/ Amortization',
+// 						'Amortization'
+// 					]
+// 				],
+// 				branch: "Garcia's Pawnshop - TNZ",
+// 				docstatus: 1,
+// 				date_issued: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records_pr => {
+// 			let temp_total = 0.00;
+// 			frm.set_value('additional_redeem', 0.00);
+// 			for (let index = 0; index < records_pr.length; index++) {
+// 				if (records_pr[index].transaction_type == "Redemption") {
+// 					temp_total += parseFloat(records_pr[index].total)
+// 				}
+// 				if (records_pr[index].transaction_type == "Renewal") {
+// 					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
+// 				}
+// 				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
+// 					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
+// 				}
 
-				if (records_pr[index].transaction_type == "Amortization") {
-					temp_total += parseFloat(records_pr[index].total)
-				}
-			}
-			frm.set_value('additional_redeem', temp_total);
-			frm.refresh_field('additional_redeem');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - POB") {
-		frappe.db.get_list('Provisional Receipt', {
-			fields: ['total', 'additional_amortization', 'interest_payment', 'principal_amount', 'transaction_type'],
-			filters: {
-				transaction_type: [
-					'in',
-					[
-						'Redemption',
-						'Renewal',
-						'Renewal w/ Amortization',
-						'Amortization'
-					]
-				],
-				branch: "Garcia's Pawnshop - POB",
-				docstatus: 1,
-				date_issued: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records_pr => {
-			let temp_total = 0.00;
-			frm.set_value('additional_redeem', 0.00);
-			for (let index = 0; index < records_pr.length; index++) {
-				if (records_pr[index].transaction_type == "Redemption") {
-					temp_total += parseFloat(records_pr[index].total)
-				}
-				if (records_pr[index].transaction_type == "Renewal") {
-					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
-				}
-				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
-					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
-				}
-				if (records_pr[index].transaction_type == "Amortization") {
-					temp_total += parseFloat(records_pr[index].total)
-				}
-			}
-			frm.set_value('additional_redeem', temp_total);
-			frm.refresh_field('additional_redeem');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - MOL") {
-		frappe.db.get_list('Provisional Receipt', {
-			fields: ['total', 'additional_amortization', 'interest_payment', 'principal_amount', 'transaction_type'],
-			filters: {
-				transaction_type: [
-					'in',
-					[
-						'Redemption',
-						'Renewal',
-						'Renewal w/ Amortization',
-						'Amortization'
-					]
-				],
-				branch: "Garcia's Pawnshop - MOL",
-				docstatus: 1,
-				date_issued: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records_pr => {
-			let temp_total = 0.00;
-			frm.set_value('additional_redeem', 0.00);
-			for (let index = 0; index < records_pr.length; index++) {
-				if (records_pr[index].transaction_type == "Redemption") {
-					temp_total += parseFloat(records_pr[index].total)
-				}
-				if (records_pr[index].transaction_type == "Renewal") {
-					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
-				}
-				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
-					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
-				}
-				if (records_pr[index].transaction_type == "Amortization") {
-					temp_total += parseFloat(records_pr[index].total)
-				}
-			}
-			frm.set_value('additional_redeem', temp_total);
-			frm.refresh_field('additional_redeem');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - GTC") {
-		frappe.db.get_list('Provisional Receipt', {
-			fields: ['total', 'additional_amortization', 'interest_payment', 'principal_amount', 'transaction_type', 'discount'],
-			filters: {
-				transaction_type: [
-					'in',
-					[
-						'Redemption',
-						'Renewal',
-						'Renewal w/ Amortization',
-						'Amortization'
-					]
-				],
-				branch: "Garcia's Pawnshop - GTC",
-				docstatus: 1,
-				date_issued: frm.doc.date //frappe.datetime.nowdate()
-			},
-			limit: 500
-		}).then(records_pr => {
-			let temp_total = 0.00;
-			frm.set_value('additional_redeem', 0.00);
-			for (let index = 0; index < records_pr.length; index++) {
-				if (records_pr[index].transaction_type == "Redemption") {
-					temp_total += parseFloat(records_pr[index].total) + parseFloat(records_pr[index].discount)
-				}
-				if (records_pr[index].transaction_type == "Renewal") {
-					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount ) + parseFloat(records_pr[index].discount)
-				} 
-				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
-					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount) + parseFloat(records_pr[index].discount)	
-				}
-				if (records_pr[index].transaction_type == "Amortization") {
-					temp_total += parseFloat(records_pr[index].total) + parseFloat(records_pr[index].discount)
-				}
-			}
-			frm.set_value('additional_redeem', temp_total);
-			frm.refresh_field('additional_redeem');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - CC") {
-		frappe.db.get_list('Provisional Receipt', {
-			fields: ['total', 'additional_amortization', 'interest_payment', 'principal_amount', 'transaction_type'],
-			filters: {
-				transaction_type: [
-					'in',
-					[
-						'Redemption',
-						'Renewal',
-						'Renewal w/ Amortization',
-						'Amortization'
-					]
-				],
-				branch: "Garcia's Pawnshop - CC",
-				docstatus: 1,
-				date_issued: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records_pr => {
-			let temp_total = 0.00;
-			frm.set_value('additional_redeem', 0.00);
-			for (let index = 0; index < records_pr.length; index++) {
-				if (records_pr[index].transaction_type == "Redemption") {
-					temp_total += parseFloat(records_pr[index].total)
-				}
-				if (records_pr[index].transaction_type == "Renewal") {
-					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
-				}
-				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
-					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
-				}
-				if (records_pr[index].transaction_type == "Amortization") {
-					temp_total += parseFloat(records_pr[index].total)
-				}
-			}
-			frm.set_value('additional_redeem', temp_total);
-			frm.refresh_field('additional_redeem');
-		})
-	}
-}
+// 				if (records_pr[index].transaction_type == "Amortization") {
+// 					temp_total += parseFloat(records_pr[index].total)
+// 				}
+// 			}
+// 			frm.set_value('additional_redeem', temp_total);
+// 			frm.refresh_field('additional_redeem');
+// 		})
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - POB") {
+// 		frappe.db.get_list('Provisional Receipt', {
+// 			fields: ['total', 'additional_amortization', 'interest_payment', 'principal_amount', 'transaction_type'],
+// 			filters: {
+// 				transaction_type: [
+// 					'in',
+// 					[
+// 						'Redemption',
+// 						'Renewal',
+// 						'Renewal w/ Amortization',
+// 						'Amortization'
+// 					]
+// 				],
+// 				branch: "Garcia's Pawnshop - POB",
+// 				docstatus: 1,
+// 				date_issued: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records_pr => {
+// 			let temp_total = 0.00;
+// 			frm.set_value('additional_redeem', 0.00);
+// 			for (let index = 0; index < records_pr.length; index++) {
+// 				if (records_pr[index].transaction_type == "Redemption") {
+// 					temp_total += parseFloat(records_pr[index].total)
+// 				}
+// 				if (records_pr[index].transaction_type == "Renewal") {
+// 					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
+// 				}
+// 				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
+// 					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
+// 				}
+// 				if (records_pr[index].transaction_type == "Amortization") {
+// 					temp_total += parseFloat(records_pr[index].total)
+// 				}
+// 			}
+// 			frm.set_value('additional_redeem', temp_total);
+// 			frm.refresh_field('additional_redeem');
+// 		})
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - MOL") {
+// 		frappe.db.get_list('Provisional Receipt', {
+// 			fields: ['total', 'additional_amortization', 'interest_payment', 'principal_amount', 'transaction_type'],
+// 			filters: {
+// 				transaction_type: [
+// 					'in',
+// 					[
+// 						'Redemption',
+// 						'Renewal',
+// 						'Renewal w/ Amortization',
+// 						'Amortization'
+// 					]
+// 				],
+// 				branch: "Garcia's Pawnshop - MOL",
+// 				docstatus: 1,
+// 				date_issued: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records_pr => {
+// 			let temp_total = 0.00;
+// 			frm.set_value('additional_redeem', 0.00);
+// 			for (let index = 0; index < records_pr.length; index++) {
+// 				if (records_pr[index].transaction_type == "Redemption") {
+// 					temp_total += parseFloat(records_pr[index].total)
+// 				}
+// 				if (records_pr[index].transaction_type == "Renewal") {
+// 					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
+// 				}
+// 				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
+// 					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
+// 				}
+// 				if (records_pr[index].transaction_type == "Amortization") {
+// 					temp_total += parseFloat(records_pr[index].total)
+// 				}
+// 			}
+// 			frm.set_value('additional_redeem', temp_total);
+// 			frm.refresh_field('additional_redeem');
+// 		})
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - GTC") {
+// 		frappe.db.get_list('Provisional Receipt', {
+// 			fields: ['total', 'additional_amortization', 'interest_payment', 'principal_amount', 'transaction_type', 'discount'],
+// 			filters: {
+// 				transaction_type: [
+// 					'in',
+// 					[
+// 						'Redemption',
+// 						'Renewal',
+// 						'Renewal w/ Amortization',
+// 						'Amortization'
+// 					]
+// 				],
+// 				branch: "Garcia's Pawnshop - GTC",
+// 				docstatus: 1,
+// 				date_issued: frm.doc.date //frappe.datetime.nowdate()
+// 			},
+// 			limit: 500
+// 		}).then(records_pr => {
+// 			let temp_total = 0.00;
+// 			frm.set_value('additional_redeem', 0.00);
+// 			for (let index = 0; index < records_pr.length; index++) {
+// 				if (records_pr[index].transaction_type == "Redemption") {
+// 					temp_total += parseFloat(records_pr[index].total) + parseFloat(records_pr[index].discount)
+// 				}
+// 				if (records_pr[index].transaction_type == "Renewal") {
+// 					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount ) + parseFloat(records_pr[index].discount)
+// 				} 
+// 				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
+// 					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount) + parseFloat(records_pr[index].discount)	
+// 				}
+// 				if (records_pr[index].transaction_type == "Amortization") {
+// 					temp_total += parseFloat(records_pr[index].total) + parseFloat(records_pr[index].discount)
+// 				}
+// 			}
+// 			frm.set_value('additional_redeem', temp_total);
+// 			frm.refresh_field('additional_redeem');
+// 		})
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - CC") {
+// 		frappe.db.get_list('Provisional Receipt', {
+// 			fields: ['total', 'additional_amortization', 'interest_payment', 'principal_amount', 'transaction_type'],
+// 			filters: {
+// 				transaction_type: [
+// 					'in',
+// 					[
+// 						'Redemption',
+// 						'Renewal',
+// 						'Renewal w/ Amortization',
+// 						'Amortization'
+// 					]
+// 				],
+// 				branch: "Garcia's Pawnshop - CC",
+// 				docstatus: 1,
+// 				date_issued: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records_pr => {
+// 			let temp_total = 0.00;
+// 			frm.set_value('additional_redeem', 0.00);
+// 			for (let index = 0; index < records_pr.length; index++) {
+// 				if (records_pr[index].transaction_type == "Redemption") {
+// 					temp_total += parseFloat(records_pr[index].total)
+// 				}
+// 				if (records_pr[index].transaction_type == "Renewal") {
+// 					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
+// 				}
+// 				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
+// 					temp_total += parseFloat(records_pr[index].interest_payment) + parseFloat(records_pr[index].principal_amount)
+// 				}
+// 				if (records_pr[index].transaction_type == "Amortization") {
+// 					temp_total += parseFloat(records_pr[index].total)
+// 				}
+// 			}
+// 			frm.set_value('additional_redeem', temp_total);
+// 			frm.refresh_field('additional_redeem');
+// 		})
+// 	}
+// }
 
-function get_additional_partial_payment(frm) {
-	if (frm.doc.branch == "Rabie's House") {
-		frappe.db.get_list('Provisional Receipt', {
-			fields: ['total' ,'additional_amortization', 'transaction_type'],
-			filters:{
-				branch: "Rabie's House",
-				transaction_type: [
-					'in',
-					[
-						'Amortization',
-						'Renewal w/ Amortization'
-					]
-				],
-				docstatus: 1,
-				date_issued: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records_pr => {
-			let temp_total = 0.00;
-			frm.set_value('additional_partial_payment', 0.00);
-			for (let index = 0; index < records_pr.length; index++) {
-				if (records_pr[index].transaction_type == "Amortization") {
-					temp_total += parseFloat(records_pr[index].total);
-				}
-				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
-					temp_total += parseFloat(records_pr[index].additional_amortization)
-				}
-			}
-			frm.set_value('additional_partial_payment', temp_total);
-			frm.refresh_field('additional_partial_payment');
-			frm.set_value('additional_redeem', parseFloat(frm.doc.additional_redeem) - temp_total);
-			frm.refresh_field('additional_redeem');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - TNZ") {
-		frappe.db.get_list('Provisional Receipt', {
-			fields: ['total' ,'additional_amortization', 'transaction_type'],
-			filters:{
-				branch: "Garcia's Pawnshop - TNZ",
-				transaction_type: [
-					'in',
-					[
-						'Amortization',
-						'Renewal w/ Amortization'
-					]
-				],
-				docstatus: 1,
-				date_issued: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records_pr => {
-			let temp_total = 0.00;
-			frm.set_value('additional_partial_payment', 0.00);
-			for (let index = 0; index < records_pr.length; index++) {
-				if (records_pr[index].transaction_type == "Amortization") {
-					temp_total += parseFloat(records_pr[index].total);
-				}
-				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
-					temp_total += parseFloat(records_pr[index].additional_amortization)
-				}
-			}
-			frm.set_value('additional_partial_payment', temp_total);
-			frm.refresh_field('additional_partial_payment');
-			frm.set_value('additional_redeem', parseFloat(frm.doc.additional_redeem) - temp_total);
-			frm.refresh_field('additional_redeem');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - POB") {
-		frappe.db.get_list('Provisional Receipt', {
-			fields: ['total' ,'additional_amortization', 'transaction_type'],
-			filters:{
-				branch: "Garcia's Pawnshop - POB",
-				transaction_type: [
-					'in',
-					[
-						'Amortization',
-						'Renewal w/ Amortization'
-					]
-				],
-				docstatus: 1,
-				date_issued: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records_pr => {
-			let temp_total = 0.00;
-			frm.set_value('additional_partial_payment', 0.00);
-			for (let index = 0; index < records_pr.length; index++) {
-				if (records_pr[index].transaction_type == "Amortization") {
-					temp_total += parseFloat(records_pr[index].total);
-				}
-				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
-					temp_total += parseFloat(records_pr[index].additional_amortization)
-				}
-			}
-			frm.set_value('additional_partial_payment', temp_total);
-			frm.refresh_field('additional_partial_payment');
-			frm.set_value('additional_redeem', parseFloat(frm.doc.additional_redeem) - temp_total);
-			frm.refresh_field('additional_redeem');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - MOL") {
-		frappe.db.get_list('Provisional Receipt', {
-			fields: ['total' ,'additional_amortization', 'transaction_type'],
-			filters:{
-				branch: "Garcia's Pawnshop - MOL",
-				transaction_type: [
-					'in',
-					[
-						'Amortization',
-						'Renewal w/ Amortization'
-					]
-				],
-				docstatus: 1,
-				date_issued: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records_pr => {
-			let temp_total = 0.00;
-			frm.set_value('additional_partial_payment', 0.00);
-			for (let index = 0; index < records_pr.length; index++) {
-				if (records_pr[index].transaction_type == "Amortization") {
-					temp_total += parseFloat(records_pr[index].total);
-				}
-				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
-					temp_total += parseFloat(records_pr[index].additional_amortization)
-				}
-			}
-			frm.set_value('additional_partial_payment', temp_total);
-			frm.refresh_field('additional_partial_payment');
-			frm.set_value('additional_redeem', parseFloat(frm.doc.additional_redeem) - temp_total);
-			frm.refresh_field('additional_redeem');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - GTC") {
-		frappe.db.get_list('Provisional Receipt', {
-			fields: ['total' ,'additional_amortization', 'transaction_type'],
-			filters:{
-				branch: "Garcia's Pawnshop - GTC",
-				transaction_type: [
-					'in',
-					[
-						'Amortization',
-						'Renewal w/ Amortization',
-					]
-				],
-				docstatus: 1,
-				date_issued: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records_pr => {
-			let temp_total = 0.00;
-			frm.set_value('additional_partial_payment', 0.00);
-			for (let index = 0; index < records_pr.length; index++) {
-				if (records_pr[index].transaction_type == "Amortization") {
-					temp_total += parseFloat(records_pr[index].total);
-				}
-				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
-					temp_total += parseFloat(records_pr[index].additional_amortization)
-				}
-			}
-			frm.set_value('additional_partial_payment', temp_total);
-			frm.refresh_field('additional_partial_payment');
-			frm.set_value('additional_redeem', parseFloat(frm.doc.additional_redeem) - temp_total);
-			frm.refresh_field('additional_redeem');
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - CC") {
-		frappe.db.get_list('Provisional Receipt', {
-			fields: ['total' ,'additional_amortization', 'transaction_type'],
-			filters:{
-				branch: "Garcia's Pawnshop - CC",
-				transaction_type: [
-					'in',
-					[
-						'Amortization',
-						'Renewal w/ Amortization'
-					]
-				],
-				docstatus: 1,
-				date_issued: frm.doc.date //frappe.datetime.nowdate()
-			}
-		}).then(records_pr => {
-			let temp_total = 0.00;
-			frm.set_value('additional_partial_payment', 0.00);
-			for (let index = 0; index < records_pr.length; index++) {
+// function get_additional_partial_payment(frm) {
+// 	if (frm.doc.branch == "Rabie's House") {
+// 		frappe.db.get_list('Provisional Receipt', {
+// 			fields: ['total' ,'additional_amortization', 'transaction_type'],
+// 			filters:{
+// 				branch: "Rabie's House",
+// 				transaction_type: [
+// 					'in',
+// 					[
+// 						'Amortization',
+// 						'Renewal w/ Amortization'
+// 					]
+// 				],
+// 				docstatus: 1,
+// 				date_issued: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records_pr => {
+// 			let temp_total = 0.00;
+// 			frm.set_value('additional_partial_payment', 0.00);
+// 			for (let index = 0; index < records_pr.length; index++) {
+// 				if (records_pr[index].transaction_type == "Amortization") {
+// 					temp_total += parseFloat(records_pr[index].total);
+// 				}
+// 				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
+// 					temp_total += parseFloat(records_pr[index].additional_amortization)
+// 				}
+// 			}
+// 			frm.set_value('additional_partial_payment', temp_total);
+// 			frm.refresh_field('additional_partial_payment');
+// 			frm.set_value('additional_redeem', parseFloat(frm.doc.additional_redeem) - temp_total);
+// 			frm.refresh_field('additional_redeem');
+// 		})
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - TNZ") {
+// 		frappe.db.get_list('Provisional Receipt', {
+// 			fields: ['total' ,'additional_amortization', 'transaction_type'],
+// 			filters:{
+// 				branch: "Garcia's Pawnshop - TNZ",
+// 				transaction_type: [
+// 					'in',
+// 					[
+// 						'Amortization',
+// 						'Renewal w/ Amortization'
+// 					]
+// 				],
+// 				docstatus: 1,
+// 				date_issued: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records_pr => {
+// 			let temp_total = 0.00;
+// 			frm.set_value('additional_partial_payment', 0.00);
+// 			for (let index = 0; index < records_pr.length; index++) {
+// 				if (records_pr[index].transaction_type == "Amortization") {
+// 					temp_total += parseFloat(records_pr[index].total);
+// 				}
+// 				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
+// 					temp_total += parseFloat(records_pr[index].additional_amortization)
+// 				}
+// 			}
+// 			frm.set_value('additional_partial_payment', temp_total);
+// 			frm.refresh_field('additional_partial_payment');
+// 			frm.set_value('additional_redeem', parseFloat(frm.doc.additional_redeem) - temp_total);
+// 			frm.refresh_field('additional_redeem');
+// 		})
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - POB") {
+// 		frappe.db.get_list('Provisional Receipt', {
+// 			fields: ['total' ,'additional_amortization', 'transaction_type'],
+// 			filters:{
+// 				branch: "Garcia's Pawnshop - POB",
+// 				transaction_type: [
+// 					'in',
+// 					[
+// 						'Amortization',
+// 						'Renewal w/ Amortization'
+// 					]
+// 				],
+// 				docstatus: 1,
+// 				date_issued: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records_pr => {
+// 			let temp_total = 0.00;
+// 			frm.set_value('additional_partial_payment', 0.00);
+// 			for (let index = 0; index < records_pr.length; index++) {
+// 				if (records_pr[index].transaction_type == "Amortization") {
+// 					temp_total += parseFloat(records_pr[index].total);
+// 				}
+// 				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
+// 					temp_total += parseFloat(records_pr[index].additional_amortization)
+// 				}
+// 			}
+// 			frm.set_value('additional_partial_payment', temp_total);
+// 			frm.refresh_field('additional_partial_payment');
+// 			frm.set_value('additional_redeem', parseFloat(frm.doc.additional_redeem) - temp_total);
+// 			frm.refresh_field('additional_redeem');
+// 		})
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - MOL") {
+// 		frappe.db.get_list('Provisional Receipt', {
+// 			fields: ['total' ,'additional_amortization', 'transaction_type'],
+// 			filters:{
+// 				branch: "Garcia's Pawnshop - MOL",
+// 				transaction_type: [
+// 					'in',
+// 					[
+// 						'Amortization',
+// 						'Renewal w/ Amortization'
+// 					]
+// 				],
+// 				docstatus: 1,
+// 				date_issued: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records_pr => {
+// 			let temp_total = 0.00;
+// 			frm.set_value('additional_partial_payment', 0.00);
+// 			for (let index = 0; index < records_pr.length; index++) {
+// 				if (records_pr[index].transaction_type == "Amortization") {
+// 					temp_total += parseFloat(records_pr[index].total);
+// 				}
+// 				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
+// 					temp_total += parseFloat(records_pr[index].additional_amortization)
+// 				}
+// 			}
+// 			frm.set_value('additional_partial_payment', temp_total);
+// 			frm.refresh_field('additional_partial_payment');
+// 			frm.set_value('additional_redeem', parseFloat(frm.doc.additional_redeem) - temp_total);
+// 			frm.refresh_field('additional_redeem');
+// 		})
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - GTC") {
+// 		frappe.db.get_list('Provisional Receipt', {
+// 			fields: ['total' ,'additional_amortization', 'transaction_type'],
+// 			filters:{
+// 				branch: "Garcia's Pawnshop - GTC",
+// 				transaction_type: [
+// 					'in',
+// 					[
+// 						'Amortization',
+// 						'Renewal w/ Amortization',
+// 					]
+// 				],
+// 				docstatus: 1,
+// 				date_issued: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records_pr => {
+// 			let temp_total = 0.00;
+// 			frm.set_value('additional_partial_payment', 0.00);
+// 			for (let index = 0; index < records_pr.length; index++) {
+// 				if (records_pr[index].transaction_type == "Amortization") {
+// 					temp_total += parseFloat(records_pr[index].total);
+// 				}
+// 				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
+// 					temp_total += parseFloat(records_pr[index].additional_amortization)
+// 				}
+// 			}
+// 			frm.set_value('additional_partial_payment', temp_total);
+// 			frm.refresh_field('additional_partial_payment');
+// 			frm.set_value('additional_redeem', parseFloat(frm.doc.additional_redeem) - temp_total);
+// 			frm.refresh_field('additional_redeem');
+// 		})
+// 	} else if (frm.doc.branch == "Garcia's Pawnshop - CC") {
+// 		frappe.db.get_list('Provisional Receipt', {
+// 			fields: ['total' ,'additional_amortization', 'transaction_type'],
+// 			filters:{
+// 				branch: "Garcia's Pawnshop - CC",
+// 				transaction_type: [
+// 					'in',
+// 					[
+// 						'Amortization',
+// 						'Renewal w/ Amortization'
+// 					]
+// 				],
+// 				docstatus: 1,
+// 				date_issued: frm.doc.date //frappe.datetime.nowdate()
+// 			}
+// 		}).then(records_pr => {
+// 			let temp_total = 0.00;
+// 			frm.set_value('additional_partial_payment', 0.00);
+// 			for (let index = 0; index < records_pr.length; index++) {
 				
-				if (records_pr[index].transaction_type == "Amortization") {
-					temp_total += parseFloat(records_pr[index].total);
-				}
-				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
-					temp_total += parseFloat(records_pr[index].additional_amortization)
-				}
-			}
-			frm.set_value('additional_partial_payment', temp_total);
-			frm.refresh_field('additional_partial_payment');
-			frm.set_value('additional_redeem', parseFloat(frm.doc.additional_redeem) - temp_total);
-			frm.refresh_field('additional_redeem');
-		})
-	}
+// 				if (records_pr[index].transaction_type == "Amortization") {
+// 					temp_total += parseFloat(records_pr[index].total);
+// 				}
+// 				if (records_pr[index].transaction_type == "Renewal w/ Amortization") {
+// 					temp_total += parseFloat(records_pr[index].additional_amortization)
+// 				}
+// 			}
+// 			frm.set_value('additional_partial_payment', temp_total);
+// 			frm.refresh_field('additional_partial_payment');
+// 			frm.set_value('additional_redeem', parseFloat(frm.doc.additional_redeem) - temp_total);
+// 			frm.refresh_field('additional_redeem');
+// 		})
+// 	}
 	
-}
+// }

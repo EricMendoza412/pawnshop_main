@@ -48,12 +48,6 @@
   "column_break_29",
   "total_cash",
   "shortage_overage",
-  "daily_balance_section",
-  "additional_pawn",
-  "additional_redeem",
-  "column_break_40",
-  "additional_partial_payment",
-  "total_discount",
   "amended_from"
  ],
  "fields": [
@@ -269,13 +263,15 @@
    "default": "0.00",
    "fieldname": "agreement_to_sell",
    "fieldtype": "Currency",
-   "label": "Agreement to Sell"
+   "label": "Agreement to Sell",
+   "read_only": 1
   },
   {
    "default": "0.00",
    "fieldname": "acknowledgement_receipts",
    "fieldtype": "Currency",
-   "label": "Acknowledgement Receipts"
+   "label": "Acknowledgement Receipts",
+   "read_only": 1
   },
   {
    "default": "0.00",
@@ -289,48 +285,6 @@
    "fieldname": "bank_transfer",
    "fieldtype": "Currency",
    "label": "Bank Transfer",
-   "read_only": 1
-  },
-  {
-   "fieldname": "daily_balance_section",
-   "fieldtype": "Section Break",
-   "label": "Daily Balance"
-  },
-  {
-   "default": "0",
-   "fieldname": "additional_pawn",
-   "fieldtype": "Currency",
-   "hidden": 1,
-   "label": "Additional Pawn",
-   "read_only": 1
-  },
-  {
-   "default": "0.00",
-   "fieldname": "additional_redeem",
-   "fieldtype": "Currency",
-   "hidden": 1,
-   "label": "Additional Redeem",
-   "read_only": 1
-  },
-  {
-   "default": "0",
-   "fieldname": "column_break_40",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "0",
-   "fieldname": "additional_partial_payment",
-   "fieldtype": "Currency",
-   "hidden": 1,
-   "label": "Additional Partial Payment",
-   "read_only": 1
-  },
-  {
-   "default": "0",
-   "fieldname": "total_discount",
-   "fieldtype": "Currency",
-   "hidden": 1,
-   "label": "Total Discount",
    "read_only": 1
   },
   {
@@ -369,7 +323,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-07-15 02:50:51.721766",
+ "modified": "2023-08-17 14:07:12.752137",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Cash Position Report",
