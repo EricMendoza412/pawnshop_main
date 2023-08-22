@@ -46,9 +46,10 @@ def execute(filters=None):
 		pt_type = "Pawn Ticket Non Jewelry"
 
 
-	data_act = frappe.get_all(pt_type, filters={'branch': branch, 'workflow_state': "Active", 'item_series': item_series}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'expiry_date'])
-	data_exp = frappe.get_all(pt_type, filters={'branch': branch, 'workflow_state': "Expired", 'item_series': item_series}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'expiry_date'])
-	data_active = data_act + data_exp
+	data_act = frappe.get_all(pt_type, filters={'branch': branch, 'workflow_state': "Active", 'item_series': item_series}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'maturity_date', 'expiry_date', 'branch', 'item_series'])
+	data_exp = frappe.get_all(pt_type, filters={'branch': branch, 'workflow_state': "Expired", 'item_series': item_series}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'maturity_date', 'expiry_date', 'branch', 'item_series'])
+	data_ret = frappe.get_all(pt_type, filters={'branch': branch, 'workflow_state': "Returned", 'item_series': item_series}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'maturity_date', 'expiry_date', 'branch', 'item_series'])
+	data_active = data_act + data_exp + data_ret
 
 	for i in range(len(data_active)):
 		description = ""
@@ -114,10 +115,10 @@ def execute(filters=None):
 def get_columns():
 	columns = [
 		{
-			'fieldname': 'pawn_ticket',
-			'label': _('Pawn Ticket'),
+			'fieldname': 'inventory_tracking_no',
+			'label': _('Inventory Tracker'),
 			'fieldtype': 'Link',
-			'options': 'Pawn Ticket Jewelry',
+			'options': 'Jewelry Batch',
 			'width': 100
 		},
 
@@ -130,10 +131,10 @@ def get_columns():
 		},
 
 		{
-			'fieldname': 'inventory_tracking_no',
-			'label': _('Inventory Tracker'),
+			'fieldname': 'pawn_ticket',
+			'label': _('Pawn Ticket'),
 			'fieldtype': 'Link',
-			'options': 'Jewelry Batch',
+			'options': 'Pawn Ticket Jewelry',
 			'width': 100
 		},
 
@@ -141,7 +142,7 @@ def get_columns():
 			'fieldname': 'description',
 			'label': _('Item Description'),
 			'fieldtype': 'Small Text',
-			'width': 600
+			'width': 500
 		},
 
 		{
@@ -159,10 +160,17 @@ def get_columns():
 		},
 
 		{
+			'fieldname': 'maturity_date',
+			'label': _('Maturity Date'),
+			'fieldtype': 'Date',
+			'width': 150
+		},
+
+		{
 			'fieldname': 'expiry_date',
 			'label': _('Expiry Date'),
-			'fieldtype': 'Data',
-			'width': 100
+			'fieldtype': 'Date',
+			'width': 150
 		}
 		
 	]

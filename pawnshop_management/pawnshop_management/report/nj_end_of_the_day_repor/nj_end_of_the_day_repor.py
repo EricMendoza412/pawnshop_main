@@ -16,22 +16,28 @@ import json
 
 
 def execute(filters=None):
-	# current_ip = frappe.local.request_ip
-	# branch_ip = get_ip_from_settings()
-	# # if str(current_ip) == str(branch_ip['cavite_city']):
-	# # 	branch = "Garcia's Pawnshop - CC"
-	# # elif str(current_ip) == str(branch_ip['poblacion']):
-	# # 	branch = "Garcia's Pawnshop - POB"
-	# # elif str(current_ip) == str(branch_ip['molino']):
-	# # 	branch = "Garcia's Pawnshop - MOL"
-	# # elif str(current_ip) == str(branch_ip['gtc']):
-	# # 	branch = "Garcia's Pawnshop - GTC"
-	# # elif str(current_ip) == str(branch_ip['tanza']):
-	# # 	branch = "Garcia's Pawnshop - TNZ"
+	current_ip = frappe.local.request_ip
+	branch_ip = get_ip_from_settings()
+	if str(current_ip) == str(branch_ip['cavite_city']):
+		branch = "Garcia's Pawnshop - CC"
+	elif str(current_ip) == str(branch_ip['poblacion']):
+		branch = "Garcia's Pawnshop - POB"
+	elif str(current_ip) == str(branch_ip['molino']):
+		branch = "Garcia's Pawnshop - MOL"
+	elif str(current_ip) == str(branch_ip['gtc']):
+		branch = "Garcia's Pawnshop - GTC"
+	elif str(current_ip) == str(branch_ip['tanza']):
+		branch = "Garcia's Pawnshop - TNZ"
 	
 	columns, data = [], []
 	columns = get_columns()
-	data = frappe.get_all("Pawn Ticket Non Jewelry", filters=filters, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'expiry_date', 'workflow_state', 'change_status_date', '_comments'])
+
+	workflow = getattr(filters, 'workflow_state')
+	branch_filter = getattr(filters, 'branch')
+	if branch_filter != None:
+		branch = branch_filter
+
+	data = frappe.get_all("Pawn Ticket Non Jewelry", filters={'branch': branch, 'workflow_state': workflow}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'expiry_date', 'workflow_state', 'change_status_date', '_comments'])
 	comments = string_extractor
 	for i in range(len(data)):
 		description = ""

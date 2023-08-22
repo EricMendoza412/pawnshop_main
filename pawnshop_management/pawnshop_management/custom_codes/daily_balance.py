@@ -35,4 +35,29 @@ def get_all_PR_total(date, branch):
         sum += record
     return sum
 
+@frappe.whitelist()
+def get_all_ATS_total(date, branch):
+
+    total_ats = frappe.db.get_all('Agreement to Sell', filters={
+                "branch": branch,
+                "docstatus": 1,
+                "date_of_sale": date
+            }, fields=['total_value'], pluck='total_value')
+    sum = 0
+    for record in total_ats:
+        sum += record
+    return sum
+
+@frappe.whitelist()
+def get_all_AR_total(date, branch):
+
+    total_ar = frappe.db.get_all('Acknowledgement Receipt', filters={
+                "branch": branch,
+                "docstatus": 1,
+                "date_issued": date
+            }, fields=['total'], pluck='total')
+    sum = 0
+    for record in total_ar:
+        sum += record
+    return sum
 

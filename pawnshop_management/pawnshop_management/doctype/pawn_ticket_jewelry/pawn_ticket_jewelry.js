@@ -96,7 +96,6 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 	},
 
 	branch: function(frm){
-		// show_tracking_no(frm);
 		if (frm.is_new() && frm.doc.amended_from == null) {
 			frm.set_value('date_loan_granted', frappe.datetime.nowdate())
 		}
@@ -124,7 +123,6 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 	},
 
 	customers_tracking_no: function(frm){
-		// show_tracking_no(frm)
         let html = ``;
         frappe.call({
             method: "pawnshop_management.pawnshop_management.utils.get_contact_image_by_customer",
@@ -146,10 +144,6 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 		if (frm.is_new()){
 			show_tracking_no(frm);
 		}		
-	},
-
-	amended_from: function(frm){
-		// show_tracking_no(frm)
 	}
 });
 
@@ -204,8 +198,6 @@ function set_series(frm) { //Set the pawn ticket series
 			frm.set_value('item_series', "A")
 		}
 		frm.refresh_field('item_series');
-		//redundant
-		//show_tracking_no(frm);
 	}	
 }
 
@@ -231,7 +223,6 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 					let tracking_no = value.message;
 					jewelry_inv_count = parseInt(tracking_no.jewelry_inventory_count);
 					let new_ticket_no = parseInt(tracking_no.a_series);
-					// frm.set_value('pawn_ticket', "1-"+ new_ticket_no + frm.doc.item_series);
 					frm.set_value('pawn_ticket', branch_code+"-"+ new_ticket_no);
 					frm.set_value('inventory_tracking_no', branch_code+"-"+ jewelry_inv_count + 'J');
 					frm.refresh_field('pawn_ticket');

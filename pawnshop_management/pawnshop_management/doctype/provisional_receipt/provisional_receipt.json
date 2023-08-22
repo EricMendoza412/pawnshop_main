@@ -8,24 +8,29 @@
  "engine": "InnoDB",
  "field_order": [
   "naming_series",
+  "branch",
+  "date_issued",
+  "transaction_type",
   "pawn_ticket_type",
   "pawn_ticket_no",
+  "subasta_sales_no",
   "new_pawn_ticket_no",
-  "transaction_type",
   "mode_of_payment",
-  "amortization",
-  "previous_interest_payment",
   "series",
   "column_break_10",
-  "date_issued",
-  "branch",
+  "buyer_name",
+  "date_sold",
+  "total_amount",
   "complete_name",
   "date_loan_granted",
   "maturity_date",
   "expiry_date",
   "principal_amount",
   "interest",
+  "amortization",
+  "previous_interest_payment",
   "redeemables_section",
+  "inventory_tracking",
   "items",
   "for_dummy_accounts_section",
   "customer_tracking_no",
@@ -34,12 +39,16 @@
   "actual_items_nj",
   "payments_section",
   "interest_payment",
-  "discount",
   "additional_amortization",
   "advance_interest",
   "number_of_months_to_pay_in_advance",
+  "discount",
+  "other_discount_tawad",
   "total",
   "column_break_28",
+  "other_discount",
+  "other_discount_st",
+  "column_break_38",
   "cash",
   "gcash_amount_payment",
   "gcash_ref",
@@ -58,8 +67,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Pawn Ticket No",
-   "options": "pawn_ticket_type",
-   "reqd": 1
+   "options": "pawn_ticket_type"
   },
   {
    "fetch_from": "pawn_ticket_no.desired_principal",
@@ -80,6 +88,7 @@
   {
    "fieldname": "naming_series",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "No",
    "options": "No-1-.######\nNo-3-.######\nNo-4-.######\nNo-5-.######\nNo-6-.######\nNo-20-.######",
    "read_only": 1
@@ -111,26 +120,24 @@
    "fieldtype": "Select",
    "in_standard_filter": 1,
    "label": "Transaction Type",
-   "options": "-Select-\nRenewal\nRedemption\nInterest Payment\nAmortization\nRenewal w/ Amortization",
+   "options": "-Select-\nRenewal\nRedemption\nInterest Payment\nAmortization\nRenewal w/ Amortization\nOthers",
    "reqd": 1
   },
   {
    "fetch_from": "pawn_ticket_no.customers_full_name",
    "fieldname": "complete_name",
    "fieldtype": "Data",
-   "label": "Complete Name",
-   "read_only": 1,
-   "reqd": 1
+   "label": "Pawner Name",
+   "read_only": 1
   },
   {
    "fetch_from": "pawn_ticket_no.interest",
    "fieldname": "interest",
    "fieldtype": "Currency",
-   "label": "Interest",
+   "label": "Monthly Interest",
    "read_only": 1
   },
   {
-   "default": "0",
    "fieldname": "amortization",
    "fieldtype": "Currency",
    "label": "Total Amortizations",
@@ -140,31 +147,32 @@
    "default": "0",
    "fieldname": "interest_payment",
    "fieldtype": "Currency",
-   "label": "Interest Payment",
+   "label": "(+) Accrued Interest ",
    "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "discount",
    "fieldtype": "Currency",
-   "label": "Discount"
+   "label": "(-) Discount (Short term loan)",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "additional_amortization",
    "fieldtype": "Currency",
-   "label": "Additional Amortization"
+   "label": "(+) Additional Amortization"
   },
   {
    "fieldname": "payments_section",
    "fieldtype": "Section Break",
-   "label": "Payments"
+   "label": "Payment Details"
   },
   {
    "fieldname": "pawn_ticket_type",
-   "fieldtype": "Link",
-   "label": "Pawn Ticket Type",
-   "options": "DocType",
+   "fieldtype": "Select",
+   "label": "Document Type",
+   "options": "-Select-\nPawn Ticket Jewelry\nPawn Ticket Non Jewelry\nSubastado Sales Commissions",
    "reqd": 1
   },
   {
@@ -181,14 +189,14 @@
    "fieldname": "total",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Total ",
+   "label": "Total Amount",
    "read_only": 1,
    "reqd": 1
   },
   {
    "fieldname": "redeemables_section",
    "fieldtype": "Section Break",
-   "label": "Redeemables"
+   "label": "Items"
   },
   {
    "fieldname": "items",
@@ -200,7 +208,6 @@
   {
    "fieldname": "new_pawn_ticket_no",
    "fieldtype": "Data",
-   "hidden": 1,
    "label": "New Pawn Ticket No",
    "read_only": 1
   },
@@ -208,7 +215,7 @@
    "default": "0",
    "fieldname": "advance_interest",
    "fieldtype": "Currency",
-   "label": "Advance Interest",
+   "label": "(+) Advance Interest",
    "read_only": 1
   },
   {
@@ -216,13 +223,12 @@
    "fieldname": "number_of_months_to_pay_in_advance",
    "fieldtype": "Int",
    "hidden": 1,
-   "label": "Accrued month interest to pay (Input number of Months)"
+   "label": "Interest to pay (Input number of Months)"
   },
   {
-   "default": "0.00",
    "fieldname": "previous_interest_payment",
    "fieldtype": "Currency",
-   "label": "Accrued Interest Payment",
+   "label": "Total Interest Payments",
    "read_only": 1
   },
   {
@@ -230,7 +236,8 @@
    "fieldname": "mode_of_payment",
    "fieldtype": "Select",
    "label": "Mode of Payment",
-   "options": "-Select-\nCash\nBank Transfer\nGCash\nCash & GCash\nCash & Bank Transfer\nGCash & Bank Transfer"
+   "options": "-Select-\nCash\nBank Transfer\nGCash\nCash & GCash\nCash & Bank Transfer\nGCash & Bank Transfer",
+   "reqd": 1
   },
   {
    "fieldname": "bank",
@@ -310,6 +317,7 @@
    "fetch_from": "pawn_ticket_no.item_series",
    "fieldname": "series",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Series",
    "read_only": 1
   },
@@ -318,12 +326,69 @@
    "fieldtype": "Data",
    "hidden": 1,
    "label": "Gcash Reference#"
+  },
+  {
+   "fieldname": "subasta_sales_no",
+   "fieldtype": "Link",
+   "label": "Subasta Sales No",
+   "options": "Subastado Sales Commissions"
+  },
+  {
+   "fetch_from": "subasta_sales_no.customer_name",
+   "fieldname": "buyer_name",
+   "fieldtype": "Data",
+   "label": "Buyer Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "subasta_sales_no.date_bought_or_returned",
+   "fieldname": "date_sold",
+   "fieldtype": "Date",
+   "label": "Date Sold",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "subasta_sales_no.total_amount",
+   "fieldname": "total_amount",
+   "fieldtype": "Data",
+   "label": "Total Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_38",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "other_discount",
+   "fieldtype": "Select",
+   "label": "Other Discount",
+   "options": "None\nSenior discount\nHoliday discount\nEmergency closure\nManager's discount (With Approval)"
+  },
+  {
+   "default": "0",
+   "fieldname": "other_discount_tawad",
+   "fieldtype": "Currency",
+   "label": "(-) Other Discount ( Extra tawad)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "other_discount_st",
+   "fieldtype": "Select",
+   "label": "Short term loan Discount",
+   "options": "None\n3%\n4%"
+  },
+  {
+   "fetch_from": "pawn_ticket_no.inventory_tracking_no",
+   "fieldname": "inventory_tracking",
+   "fieldtype": "Data",
+   "label": "Inventory Tracking No",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-07-15 02:13:12.915878",
+ "modified": "2023-08-15 13:15:00.246502",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Provisional Receipt",

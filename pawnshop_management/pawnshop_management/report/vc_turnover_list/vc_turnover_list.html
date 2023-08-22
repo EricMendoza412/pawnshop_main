@@ -1,0 +1,58 @@
+<!-- Your HTML code -->
+<script type="text/html" id="item_tmpl"></script>
+<h1 text-align="center">{%= data[0].branch %}</h1>
+<h2>Vault Inventory Master List</h2>
+<br>
+<h5>Series: <b>{{ data[0].item_series }} </b></h5>
+<h5>Total Count: <b>{{ data.length-1 }}</b></h5>
+<h5>Total Principal: <b>{{ data[data.length-1].desired_principal }}</b> </h5>
+<br>
+<p> Date of turn over:____/____/________ </p>
+<br>
+<p>New Vault Custodian:__________________________________</p>  
+<br>
+<p>Operations Manager:__________________________________</p>
+<br>
+<br>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th style="width: 9%">{%= __("Inventory Tracker") %}</th>
+            <th style="width: 9%">{%= __("Customer Name") %}</th>
+            <th style="width: 10%">{%= __("Pawn Ticket") %}</th>
+            <th style="width: 35%">{%= __("Item Description") %}</th>
+            <th style="width: 7%">{%= __("Principal") %}</th>
+            <th style="width: 10%">{%= __("Date Loan Granted") %}</th>
+            <th style="width: 10%">{%= __("Maturity Date") %}</th>
+            <th style="width: 10%">{%= __("Expiry Date") %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% let sumNS = 0 %}
+        {% let count = 0 %}
+        {% for(var i=0, l=data.length; i<l; i++) { %}
+            <tr>
+                {% if(data[i].date_loan_granted != null) { %}
+                <td>{%= data[i].inventory_tracking_no %}</td>
+                <td>{%= data[i].customers_full_name %}</td>
+                <td>{%= data[i].pawn_ticket %}</td>
+                <td>{%= data[i].description %}</td>
+                <td>{%= data[i].desired_principal %}</td>
+                <td>{%= data[i].date_loan_granted %}</td>                
+                <td>{%= data[i].maturity_date %}</td>
+                <td>{%= data[i].expiry_date %}</td>
+                {% sumNS += data[i].desired_principal %}
+                {% count += 1 %}
+                {% } %}
+            </tr>
+        {% } %}
+            <tr>
+                <td></td>
+                <td><b>Total Count: </b></td>
+                <td>{{ count }}</td>
+                <td style="text-align: right"><b>Total Principal:</b></td>
+                <td>{{ sumNS }}</td>
+            </tr>
+    </tbody>
+  </table>

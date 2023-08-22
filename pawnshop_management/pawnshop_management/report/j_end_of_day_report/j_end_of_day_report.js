@@ -55,8 +55,8 @@ frappe.query_reports["J End of Day Report"] = {
 			fieldname: "workflow_state",
 			label: __("work flow"),
 			fieldtype: "Select",
-			options: ["Active", "Renewed", "Redeemed", "Expired", "Returned", "Pulled Out", "Rejected"],
-			default: "Active"
+			options: ["Active", "Expired"],
+			default: "Expired"
 	   	}
 	]
 }
@@ -64,11 +64,19 @@ frappe.query_reports["J End of Day Report"] = {
 frappe.query_reports["J End of Day Report"] = {
 	"filters": [
 		{
-			fieldname: "branch",
-			label: __("Branch"),
-			fieldtype: "Data",
-			default: default_branch
-		}
+			fieldname: "item_series",
+			label: __("Series"),
+			fieldtype: "Select",
+		   options: ["A", "B"],
+		   default: "A"
+	   },
+	   {
+		   fieldname: "workflow_state",
+		   label: __("work flow"),
+		   fieldtype: "Select",
+		   options: ["Active", "Expired"],
+		   default: "Expired"
+		  }
 	]
 }
 

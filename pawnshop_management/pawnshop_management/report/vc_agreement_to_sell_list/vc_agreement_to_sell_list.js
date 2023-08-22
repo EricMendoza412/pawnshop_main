@@ -1,6 +1,7 @@
-// Copyright (c) 2016, Rabie Moses Santillan and contributors
+// Copyright (c) 2023, Rabie Moses Santillan and contributors
 // For license information, please see license.txt
 /* eslint-disable */
+
 var default_branch = [];
 
 frappe.call({
@@ -27,9 +28,18 @@ frappe.call({
     }
 });
 
+
+const date = new Date();
+let day = date.getDate();
+let month = date.getMonth() + 1;
+let year = date.getFullYear();
+
+// This arrangement can be altered based on how we want the date's format to appear.
+let currentDate = `${year}-${month}-${day}`;
+
 let is_allowed = frappe.user_roles.includes('Auditor') || frappe.user_roles.includes('Administrator');
 if(is_allowed){
-    frappe.query_reports["NJ End of the Day Repor"] = {
+    frappe.query_reports["VC Agreement to Sell List"] = {
         "filters": [
             {
                 fieldname: "branch",
@@ -43,32 +53,7 @@ if(is_allowed){
                     "Garcia's Pawnshop - TNZ",
                 ],
                 default: default_branch
-            },
-            {
-                fieldname: "workflow_state",
-                label: __("work flow"),
-                fieldtype: "Select",
-                options: ["Active", "Expired"],
-                default: "Expired"
-            }
-
-            // ,{
-            // 	fieldname: "date_loan_granted",
-            // 	label: __("Date Loan Granted"),
-            // 	fieldtype: "Date"
-            // }
-        ]
-    }
-}else{
-    frappe.query_reports["NJ End of the Day Repor"] = {
-        "filters": [
-            {
-                fieldname: "workflow_state",
-                label: __("work flow"),
-                fieldtype: "Select",
-                options: ["Active", "Expired"],
-                default: "Expired"
             }
         ]
-    }
+    };
 }

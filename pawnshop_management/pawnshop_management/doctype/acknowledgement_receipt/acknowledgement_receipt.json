@@ -1,0 +1,192 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2023-08-16 14:15:38.010665",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "branch",
+  "date_issued",
+  "pawn_ticket_type",
+  "pawn_ticket_no",
+  "subasta_sales_no",
+  "column_break_10",
+  "buyer_name",
+  "date_sold",
+  "total_amount",
+  "complete_name",
+  "date_loan_granted",
+  "maturity_date",
+  "expiry_date",
+  "principal_amount",
+  "payments_section",
+  "total",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "No",
+   "options": "AR-1-.######\nAR-3-.######\nAR-4-.######\nAR-5-.######\nAR-6-.######\nAR-20-.######",
+   "read_only": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch",
+   "read_only": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "date_issued",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date Issued",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "pawn_ticket_type",
+   "fieldtype": "Select",
+   "label": "Document Type",
+   "options": "-Select-\nPawn Ticket Jewelry\nPawn Ticket Non Jewelry\nSubastado Sales Commissions",
+   "reqd": 1
+  },
+  {
+   "fieldname": "pawn_ticket_no",
+   "fieldtype": "Dynamic Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Pawn Ticket No",
+   "options": "pawn_ticket_type"
+  },
+  {
+   "fieldname": "subasta_sales_no",
+   "fieldtype": "Link",
+   "label": "Subasta Sales No",
+   "options": "Subastado Sales Commissions"
+  },
+  {
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "subasta_sales_no.customer_name",
+   "fieldname": "buyer_name",
+   "fieldtype": "Data",
+   "label": "Buyer Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "subasta_sales_no.date_bought_or_returned",
+   "fieldname": "date_sold",
+   "fieldtype": "Date",
+   "label": "Date Sold",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "subasta_sales_no.total_amount",
+   "fieldname": "total_amount",
+   "fieldtype": "Data",
+   "label": "Total Amount",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "pawn_ticket_no.customers_full_name",
+   "fieldname": "complete_name",
+   "fieldtype": "Data",
+   "label": "Pawner Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "pawn_ticket_no.date_loan_granted",
+   "fieldname": "date_loan_granted",
+   "fieldtype": "Date",
+   "label": "Date Loan Granted",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "pawn_ticket_no.maturity_date",
+   "fieldname": "maturity_date",
+   "fieldtype": "Date",
+   "label": "Maturity Date",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "pawn_ticket_no.expiry_date",
+   "fieldname": "expiry_date",
+   "fieldtype": "Date",
+   "label": "Expiry Date",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "pawn_ticket_no.desired_principal",
+   "fieldname": "principal_amount",
+   "fieldtype": "Currency",
+   "label": "Principal Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "payments_section",
+   "fieldtype": "Section Break",
+   "label": "Payment Details"
+  },
+  {
+   "default": "0.00",
+   "fieldname": "total",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total Amount",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Acknowledgement Receipt",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Acknowledgement Receipt",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2023-08-16 16:33:23.093367",
+ "modified_by": "Administrator",
+ "module": "Pawnshop Management",
+ "name": "Acknowledgement Receipt",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

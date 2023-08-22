@@ -62,6 +62,24 @@
   {
    "hidden": 0,
    "is_query_report": 0,
+   "label": "Agreement to Sell",
+   "link_to": "Agreement to Sell",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Acknowledgement Receipt",
+   "link_to": "Acknowledgement Receipt",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
    "label": "Envelope Items",
    "link_to": "Models",
    "link_type": "DocType",
@@ -105,7 +123,7 @@
    "type": "Link"
   }
  ],
- "modified": "2023-05-03 12:24:39.373824",
+ "modified": "2023-08-22 12:31:23.311098",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Pawnshop Management",
@@ -129,6 +147,18 @@
    "doc_view": "New",
    "label": "New Provisional Receipt",
    "link_to": "Provisional Receipt",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "New",
+   "label": "New Agreement to Sell",
+   "link_to": "Agreement to Sell",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "New",
+   "label": "New Acknowledgement Receipt",
+   "link_to": "Acknowledgement Receipt",
    "type": "DocType"
   },
   {
@@ -177,6 +207,12 @@
    "doc_view": "Report Builder",
    "label": "VC Turnover List",
    "link_to": "VC Turnover List",
+   "type": "Report"
+  },
+  {
+   "doc_view": "Report Builder",
+   "label": "VC Agreement to Sell List",
+   "link_to": "VC Agreement to Sell List",
    "type": "Report"
   }
  ],

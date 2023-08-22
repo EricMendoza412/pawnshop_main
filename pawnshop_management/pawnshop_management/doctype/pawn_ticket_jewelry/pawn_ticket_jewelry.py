@@ -10,7 +10,8 @@ from pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket imp
     update_fields_after_status_change_pull_out_pawn_ticket,
 	update_fields_after_status_change_return_pawn_ticket,
 	update_fields_after_status_change_renew_pawn_ticket,
-	update_fields_after_status_change_redeem_pawn_ticket
+	update_fields_after_status_change_redeem_pawn_ticket,
+	update_fields_after_status_change_reject_pawn_ticket
 )
 
 class PawnTicketJewelry(Document):
@@ -25,6 +26,8 @@ class PawnTicketJewelry(Document):
 			update_fields_after_status_change_renew_pawn_ticket("Pawn Ticket Jewelry", self.inventory_tracking_no, self.pawn_ticket)	
 		elif self.workflow_state == "Redeemed":
 			update_fields_after_status_change_redeem_pawn_ticket("Pawn Ticket Jewelry", self.inventory_tracking_no, self.pawn_ticket)	
+		elif self.workflow_state == "Rejected":
+			update_fields_after_status_change_reject_pawn_ticket("Pawn Ticket Jewelry", self.inventory_tracking_no, self.pawn_ticket)
 
 
 	def on_update(self):
