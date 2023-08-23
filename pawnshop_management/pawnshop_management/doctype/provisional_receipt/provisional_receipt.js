@@ -72,7 +72,7 @@ frappe.ui.form.on('Provisional Receipt', {
 		frm.toggle_display(['cash'], frm.doc.mode_of_payment === 'Cash & Bank Transfer' || frm.doc.mode_of_payment === 'Cash & GCash');
 		frm.toggle_display(['gcash_amount_payment'], frm.doc.mode_of_payment === 'GCash & Bank Transfer' || frm.doc.mode_of_payment === 'Cash & GCash');
 		let is_allowed = frappe.user_roles.includes('Administrator');
-		frm.toggle_enable(['date_loan_granted' ,'expiry_date', 'maturity_date', 'branch'], is_allowed);
+		frm.toggle_enable(['date_loan_granted' ,'expiry_date', 'maturity_date', 'branch', 'new_pawn_ticket_no'], is_allowed);
 		if (frm.doc.discount > 0 ) {
 			frm.set_df_property('discount', 'hidden', 0)
 		}
