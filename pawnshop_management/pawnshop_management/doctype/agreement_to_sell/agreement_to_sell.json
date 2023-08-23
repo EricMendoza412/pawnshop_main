@@ -16,6 +16,7 @@
   "customer_name",
   "section_break_6",
   "ats_tracking_no",
+  "agreement",
   "jewelry_items",
   "total_value",
   "people_involved_section",
@@ -83,6 +84,7 @@
    "fieldname": "ats_tracking_no",
    "fieldtype": "Data",
    "label": "ATS Tracking No",
+   "print_hide": 1,
    "read_only": 1,
    "reqd": 1
   },
@@ -106,19 +108,19 @@
    "read_only": 1
   },
   {
-   "default": "_______________________________",
+   "default": "____________________________",
    "fieldname": "seller_name_and_signature",
    "fieldtype": "Data",
    "hidden": 1,
-   "label": "Seller Name and Signature",
+   "label": "Seller name and signature",
    "read_only": 1
   },
   {
-   "default": "____________________________",
+   "default": "_________________________",
    "fieldname": "cashier_name_and_signature",
    "fieldtype": "Data",
    "hidden": 1,
-   "label": "Cashier Name and Signature",
+   "label": "Cashier name and signature",
    "read_only": 1
   },
   {
@@ -135,12 +137,20 @@
    "fieldtype": "Date",
    "label": "Change Status Date",
    "read_only": 1
+  },
+  {
+   "default": "Seller agrees to sell the items listed below to Joyas de Garcia at the price indicated. Seller agrees that the price/s of the items as agreed are final. Buyer will give the full amount of payment in cash upon signing of this agreement",
+   "fieldname": "agreement",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Agreement",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-08-22 19:26:26.108503",
+ "modified": "2023-08-23 12:19:10.878827",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Agreement to Sell",
