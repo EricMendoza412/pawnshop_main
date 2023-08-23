@@ -132,7 +132,7 @@
   },
   {
    "fieldname": "change_status_date",
-   "fieldtype": "Data",
+   "fieldtype": "Date",
    "label": "Change Status Date",
    "read_only": 1
   }
@@ -140,7 +140,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-08-22 11:47:41.355613",
+ "modified": "2023-08-22 19:26:26.108503",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Agreement to Sell",

@@ -7,6 +7,9 @@ var branch_name;
 frappe.ui.form.on('Agreement to Sell', {
 	refresh: function(frm) {
 
+		let is_allowed = frappe.user_roles.includes('Administrator');
+		frm.toggle_enable(['date_of_sale', 'branch'], is_allowed);
+
 	   if (frm.is_new()) {
 		   frm.set_value('date_of_sale', frappe.datetime.nowdate())
 		   frappe.call({
@@ -58,27 +61,26 @@ frappe.ui.form.on('Agreement to Sell', {
 			}
 		}
 
-		//Filter of Jewelry items table
-
-
-				frappe.db.get_value('Pawnshop Naming Series', frm.doc.branch, 'jewelry_inventory_count')
-				.then(r =>{
-					let jewelry_inventory_count = r.message.jewelry_inventory_count
-					frm.set_query('item_no', 'jewelry_items', function(){
-						return {
-							filters: {
-								batch_number: String(jewelry_inventory_count),
-								branch: frm.doc.branch
-							}
-						}
-					})
-				})
-
 		},
 
 	branch: function(frm){
 	   show_form_no(frm);
 	   show_tracking_no(frm);
+
+		//Filter of Jewelry items table
+		frappe.db.get_value('Pawnshop Naming Series', frm.doc.branch, 'jewelry_inventory_count')
+		.then(r =>{
+			let jewelry_inventory_count = r.message.jewelry_inventory_count
+			frm.set_query('item_no', 'jewelry_items', function(){
+				return {
+					filters: {
+						batch_number: String(jewelry_inventory_count),
+						branch: frm.doc.branch
+					}
+				}
+			})
+		})
+
 	}
 
 });
