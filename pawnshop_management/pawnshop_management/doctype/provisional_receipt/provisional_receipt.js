@@ -309,7 +309,9 @@ frappe.ui.form.on('Provisional Receipt', {
 	},
 
 	transaction_type: function(frm){
+		if(frm.doc.transaction_type != "-Select-"){
 		frm.set_df_property('transaction_type', 'read_only', 1)
+		}
 		frm.toggle_display(['pawn_ticket_type'], frm.doc.transaction_type !== "-Select-");
 		frm.toggle_display(['new_pawn_ticket_no'], frm.doc.transaction_type == 'Renewal' || frm.doc.transaction_type == 'Renewal w/ Amortization');
 		show_fields_for_dummy(frm);
