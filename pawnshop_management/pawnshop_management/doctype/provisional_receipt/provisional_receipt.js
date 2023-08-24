@@ -14,7 +14,9 @@ frappe.ui.form.on('Provisional Receipt', {
 		frm.set_df_property('pawn_ticket_type', 'hidden', 1)
 		frm.set_df_property('discount', 'hidden', 1)
 		frm.set_df_property('additional_amortization', 'hidden', 1)
-		frm.set_df_property('mode_of_payment', 'hidden', 1)
+		if (frm.is_new()) {
+			frm.set_df_property('mode_of_payment', 'hidden', 1)
+		}
 		frm.set_df_property('subasta_sales_no', 'hidden', 1)
 		frm.set_df_property('other_discount', 'hidden', 1);
 		frm.set_df_property('other_discount_tawad', 'hidden', 1);

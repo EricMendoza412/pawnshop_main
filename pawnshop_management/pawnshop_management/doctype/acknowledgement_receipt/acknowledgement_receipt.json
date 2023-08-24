@@ -24,6 +24,10 @@
   "principal_amount",
   "payments_section",
   "total",
+  "people_involved_section",
+  "cashier_name_and_signature",
+  "column_break_20",
+  "customer_name_and_signature",
   "amended_from"
  ],
  "fields": [
@@ -162,12 +166,37 @@
    "options": "Acknowledgement Receipt",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "people_involved_section",
+   "fieldtype": "Section Break",
+   "label": "People Involved"
+  },
+  {
+   "default": "_________________________",
+   "fieldname": "cashier_name_and_signature",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Cashier name and signature",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_20",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "_________________________",
+   "fieldname": "customer_name_and_signature",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Customer name and signature",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-08-16 16:33:23.093367",
+ "modified": "2023-08-23 17:35:13.417881",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Acknowledgement Receipt",
