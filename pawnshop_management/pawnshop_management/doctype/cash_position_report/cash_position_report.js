@@ -492,7 +492,11 @@ function get_subastado_sales(frm, date_today=null) {
 function get_pr_mops(frm, date_today=null){
 	frappe.db.get_list('Provisional Receipt', {
 		fields: ['gcash_amount_payment','bank_payment','total','mode_of_payment'],
-		filters: { date_issued: date_today, branch: frm.doc.branch},
+		filters: { 
+				date_issued: date_today, 
+				branch: frm.doc.branch,
+				docstatus: 1,
+				},
 		limit: 500
 	}).then(records => {
 		let gcash2 = 0;
