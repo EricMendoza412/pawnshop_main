@@ -812,7 +812,7 @@
 			</tr>
 			<tr>
 				<td>{%= __("Additional Redeem") %}</td>
-				<td>{{ sum + sumAIRDA - sumODTA + sumB + sumAIRDB - sumODTB + sumBNJ + sumAIRDBNJ - sumODTBNJ + sumRN + sumAI - sumD + sumRNB + sumAIB - sumDB + sumRNNJ + sumAINJ - sumDNJ + sumwRN + sumwAI - sumwD + sumwRNB + sumwAIB - sumwDB + sumwRNNJ + sumwAINJ - sumwDNJ - (sumwNPRA - sumwRN)}}</td>
+				<td>{% let totalHulogWithRn = sumwRN + sumwRNB + sumwRNNJ - sumwNPRA - sumwNPRB - sumwNPRNJ %}{{ sum + sumAIRDA - sumODTA + sumB + sumAIRDB - sumODTB + sumBNJ + sumAIRDBNJ - sumODTBNJ + sumRN + sumAI - sumD + sumRNB + sumAIB - sumDB + sumRNNJ + sumAINJ - sumDNJ + sumwRN + sumwAI - sumwD + sumwRNB + sumwAIB - sumwDB + sumwRNNJ + sumwAINJ - sumwDNJ - totalHulogWithRn}}</td>
 			</tr>
 			<tr>
 				<td>{%= __("Additional Partial Payment") %}</td>
@@ -824,7 +824,7 @@
 			</tr>
 			<tr>
 				<td>{%= __("Hulog w/ Renew") %}</td>
-				<td>{{ sumwRN + sumwRNB + sumwRNNJ - sumwNPRA - sumwNPRB - sumwNPRNJ}}</td>
+				<td>{{ totalHulogWithRn }}</td>
 			</tr>
 	</tbody>
   </table>
