@@ -14,30 +14,17 @@ frappe.ui.form.on('Acknowledgement Receipt', {
 				method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip',
 				callback: function(data){
 					let current_ip = data.message
-					frappe.call({
-						method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip_from_settings',
-						callback: (result) => {
-							let ip = result.message;
-							if (current_ip == ip["cavite_city"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - CC");
-								frm.refresh_field('branch');
-							} else if (current_ip == ip["poblacion"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - POB");
-								frm.refresh_field('branch');
-							} else if (current_ip == ip["molino"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - MOL");
-								frm.refresh_field('branch');
-							} else if (current_ip == ip["gtc"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - GTC");
-								frm.refresh_field('branch');
-							} else if (current_ip == ip["tanza"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - TNZ");
-								frm.refresh_field('branch');
-							} else if (current_ip == ip["rabies_house"]) {
-								frm.set_value('branch', "Rabie's House");
-								frm.refresh_field('branch');
-							}
+
+					frappe.db.get_list('Branch IP Addressing', {
+						fields: ['name'],
+						filters: {
+							ip_address: current_ip
 						}
+					}).then(records => {
+
+						console.log (records[0].name);
+						frm.set_value('branch', records[0].name);
+						frm.refresh_field('branch');
 					})
 				}
 			})
@@ -89,7 +76,10 @@ function select_naming_series(frm) { //Select naming series with regards to the 
 		frm.set_value('naming_series', "AR-3-.######")
 	} else if (frm.doc.branch == "Garcia's Pawnshop - TNZ") {
 		frm.set_value('naming_series', "AR-5-.######")
+	} else if (frm.doc.branch == "Garcia's Pawnshop - ALP") {
+		frm.set_value('naming_series', "AR-7-.######")
 	}
+	
 	console.log(frm.doc.naming_series)
 	frm.refresh_field('naming_series')
 	

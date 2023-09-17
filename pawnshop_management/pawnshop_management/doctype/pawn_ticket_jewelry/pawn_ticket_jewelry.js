@@ -14,53 +14,36 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 
 		let is_allowed = frappe.user_roles.includes('Administrator');
 		frm.toggle_enable(['date_loan_granted', 'branch'], is_allowed)
-		//frm.toggle_display(['old_pawn_ticket'], frm.doc.old_pawn_ticket != '')
+
 		if (frm.is_new()) {
-			show_tracking_no(frm);
+
 			frm.set_value('date_loan_granted', frappe.datetime.nowdate())
-			//frm.set_value('change_status_date', frappe.datetime.nowdate())
+
 			frappe.call({
 				method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip',
 				callback: function(data){
 					let current_ip = data.message
-					frappe.call({
-						method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip_from_settings',
-						callback: (result) => {
-							let ip = result.message;
-							if (current_ip == ip["cavite_city"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - CC");
-								frm.refresh_field('branch');
-							} else if (current_ip == ip["poblacion"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - POB");
-								frm.refresh_field('branch');
-							} else if (current_ip == ip["molino"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - MOL");
-								frm.refresh_field('branch');
-							} else if (current_ip == ip["gtc"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - GTC");
-								frm.refresh_field('branch');
-							} else if (current_ip == ip["tanza"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - TNZ");
-								frm.refresh_field('branch');
-							} else if (current_ip == ip["rabies_house"]) {
-								frm.set_value('branch', "Rabie's House");
-								frm.refresh_field('branch');
-							}
+
+					frappe.db.get_list('Branch IP Addressing', {
+						fields: ['name'],
+						filters: {
+							ip_address: current_ip
 						}
+					}).then(records => {
+
+						console.log (records[0].name);
+						frm.set_value('branch', records[0].name);
+						frm.refresh_field('branch');
 					})
 				}
 			})
 		}
 		
-		frm.fields_dict["jewelry_items"].grid.grid_buttons.find(".grid-add-row")[0].innerHTML = "Add Item"		//Change "Add Row" button of jewelry_items table into "Add Item"
-		frappe.call({
-			method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip_from_settings'
-		}).then(result => {
-			let branch_ip_settings = result.message;
+		frm.fields_dict["jewelry_items"].grid.grid_buttons.find(".grid-add-row")[0].innerHTML = "Add Item"	//Change "Add Row" button of jewelry_items table into "Add Item"
+
 			frappe.call({
 				method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip'
 			}).then(ip => {
-
 				frappe.db.get_value('Pawnshop Naming Series', frm.doc.branch, 'jewelry_inventory_count')
 				.then(r =>{
 					let jewelry_inventory_count = r.message.jewelry_inventory_count
@@ -74,7 +57,7 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 					})
 				})
 			})
-		})
+		
 
 		if(frm.customers_tracking_no != null)
 		{
@@ -204,17 +187,14 @@ function set_series(frm) { //Set the pawn ticket series
 function show_tracking_no(frm){ //Sets inventory tracking number
 	let branch_code = 0;
 
-	if (frm.doc.branch == "Garcia's Pawnshop - CC") {
-		branch_code = 1;
-	}else if(frm.doc.branch == "Garcia's Pawnshop - POB") {
-		branch_code = 3;
-	}else if(frm.doc.branch == "Garcia's Pawnshop - GTC") {
-		branch_code = 4;
-	}else if(frm.doc.branch == "Garcia's Pawnshop - TNZ") {
-		branch_code = 5;
-	}else if(frm.doc.branch == "Garcia's Pawnshop - MOL") {
-		branch_code = 6;
-	}
+	frappe.db.get_list('Branch IP Addressing', {
+		fields: ['branch_code'],
+		filters: {
+			name: frm.doc.branch
+		}
+	}).then(records => {
+		branch_code = records[0].branch_code;
+
 		if (frm.doc.amended_from == null) {
 			let jewelry_inv_count;
 			if (frm.doc.item_series == "A") {
@@ -258,6 +238,10 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 				frm.refresh_field('pawn_ticket');
 			}
 		}
+
+
+
+	})
 }
 
 

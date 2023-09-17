@@ -42,48 +42,59 @@ class PawnTicketJewelry(Document):
 	def before_save(self):
 		if frappe.db.exists('Pawn Ticket Jewelry', self.name) == None:
 			if self.amended_from == None:
-				if self.branch == "Garcia's Pawnshop - CC":
-					settings = frappe.get_doc('Pawnshop Naming Series', "Garcia's Pawnshop - CC")
-					if self.item_series == 'A':
-						settings.a_series += 1
-					elif self.item_series == 'B':
-						settings.b_series += 1
-					settings.save(ignore_permissions=True)
-				elif self.branch == "Garcia's Pawnshop - GTC":
-					settings = frappe.get_doc('Pawnshop Naming Series', "Garcia's Pawnshop - GTC")
-					if self.item_series == 'A':
-						settings.a_series += 1
-					elif self.item_series == 'B':
-						settings.b_series += 1
-					settings.save(ignore_permissions=True)
-				elif self.branch == "Garcia's Pawnshop - MOL":
-					settings = frappe.get_doc('Pawnshop Naming Series', "Garcia's Pawnshop - MOL")
-					if self.item_series == 'A':
-						settings.a_series += 1
-					elif self.item_series == 'B':
-						settings.b_series += 1
-					settings.save(ignore_permissions=True)
-				elif self.branch == "Garcia's Pawnshop - POB":
-					settings = frappe.get_doc('Pawnshop Naming Series', "Garcia's Pawnshop - POB")
-					if self.item_series == 'A':
-						settings.a_series += 1
-					elif self.item_series == 'B':
-						settings.b_series += 1
-					settings.save(ignore_permissions=True)
-				elif self.branch == "Garcia's Pawnshop - TNZ":
-					settings = frappe.get_doc('Pawnshop Naming Series', "Garcia's Pawnshop - TNZ")
-					if self.item_series == 'A':
-						settings.a_series += 1
-					elif self.item_series == 'B':
-						settings.b_series += 1
-					settings.save(ignore_permissions=True)
-				elif self.branch == "Rabie's House":
-					settings = frappe.get_doc('Pawnshop Naming Series', "Rabie's House")
-					if self.item_series == 'A':
-						settings.a_series += 1
-					elif self.item_series == 'B':
-						settings.b_series += 1
-					settings.save(ignore_permissions=True)
+				settings = frappe.get_doc('Pawnshop Naming Series', self.branch)
+				if self.item_series == 'A':
+					settings.a_series += 1
+				elif self.item_series == 'B':
+					settings.b_series += 1
+				settings.save(ignore_permissions=True)
+
+
+
+				# if self.branch == "Garcia's Pawnshop - CC":
+				# 	settings = frappe.get_doc('Pawnshop Naming Series', "Garcia's Pawnshop - CC")
+				# 	if self.item_series == 'A':
+				# 		settings.a_series += 1
+				# 	elif self.item_series == 'B':
+				# 		settings.b_series += 1
+				# 	settings.save(ignore_permissions=True)
+				# elif self.branch == "Garcia's Pawnshop - GTC":
+				# 	settings = frappe.get_doc('Pawnshop Naming Series', "Garcia's Pawnshop - GTC")
+				# 	if self.item_series == 'A':
+				# 		settings.a_series += 1
+				# 	elif self.item_series == 'B':
+				# 		settings.b_series += 1
+				# 	settings.save(ignore_permissions=True)
+				# elif self.branch == "Garcia's Pawnshop - MOL":
+				# 	settings = frappe.get_doc('Pawnshop Naming Series', "Garcia's Pawnshop - MOL")
+				# 	if self.item_series == 'A':
+				# 		settings.a_series += 1
+				# 	elif self.item_series == 'B':
+				# 		settings.b_series += 1
+				# 	settings.save(ignore_permissions=True)
+				# elif self.branch == "Garcia's Pawnshop - POB":
+				# 	settings = frappe.get_doc('Pawnshop Naming Series', "Garcia's Pawnshop - POB")
+				# 	if self.item_series == 'A':
+				# 		settings.a_series += 1
+				# 	elif self.item_series == 'B':
+				# 		settings.b_series += 1
+				# 	settings.save(ignore_permissions=True)
+				# elif self.branch == "Garcia's Pawnshop - TNZ":
+				# 	settings = frappe.get_doc('Pawnshop Naming Series', "Garcia's Pawnshop - TNZ")
+				# 	if self.item_series == 'A':
+				# 		settings.a_series += 1
+				# 	elif self.item_series == 'B':
+				# 		settings.b_series += 1
+				# 	settings.save(ignore_permissions=True)
+				# elif self.branch == "Garcia's Pawnshop - ALP":
+				# 	settings = frappe.get_doc('Pawnshop Naming Series', "Garcia's Pawnshop - ALP")
+				# 	if self.item_series == 'A':
+				# 		settings.a_series += 1
+				# 	elif self.item_series == 'B':
+				# 		settings.b_series += 1
+				# 	settings.save(ignore_permissions=True)
+
+
 
 	def on_submit(self):
 		if frappe.db.exists('Jewelry Batch', self.inventory_tracking_no) == None:#Copies Items table from pawnt ticket to non jewelry batch doctype
@@ -205,7 +216,7 @@ class PawnTicketJewelry(Document):
 			row_values3.debit_in_account_currency = flt(0)
 			row_values3.credit_in_account_currency = flt(self.net_proceeds)
 			
-			doc1.save(ignore_permissions=True)
+			# doc1.save(ignore_permissions=True)
 
 	# def before_cancel(self):
 	# 	name = frappe.db.get_value('Journal Entry', {'reference_document': self.name, "document_status": "Active"}, 'name')

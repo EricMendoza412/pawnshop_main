@@ -8,7 +8,8 @@
  "engine": "InnoDB",
  "field_order": [
   "branch",
-  "ip_address"
+  "ip_address",
+  "branch_code"
  ],
  "fields": [
   {
@@ -21,11 +22,16 @@
    "fieldtype": "Data",
    "label": "Branch",
    "unique": 1
+  },
+  {
+   "fieldname": "branch_code",
+   "fieldtype": "Data",
+   "label": "Branch code"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-28 14:37:20.640164",
+ "modified": "2023-09-13 16:53:32.306894",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Branch IP Addressing",

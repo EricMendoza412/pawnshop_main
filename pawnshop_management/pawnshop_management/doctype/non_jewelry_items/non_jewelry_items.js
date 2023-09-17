@@ -21,30 +21,17 @@ frappe.ui.form.on('Non Jewelry Items', {
 				method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip',
 				callback: function(data){
 					let current_ip = data.message
-					frappe.call({
-						method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip_from_settings',
-						callback: (result) => {
-							let ip = result.message;
-							if (current_ip == ip["cavite_city"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - CC");
-								frm.refresh_field('branch');
-							} else if (current_ip == ip["poblacion"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - POB");
-								frm.refresh_field('branch');
-							} else if (current_ip == ip["molino"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - MOL");
-								frm.refresh_field('branch');
-							} else if (current_ip == ip["gtc"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - GTC");
-								frm.refresh_field('branch');
-							} else if (current_ip == ip["tanza"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - TNZ");
-								frm.refresh_field('branch');
-							} else if (current_ip == ip["rabies_house"]) {
-								frm.set_value('branch', "Rabie's House");
-								frm.refresh_field('branch');
-							}
+
+					frappe.db.get_list('Branch IP Addressing', {
+						fields: ['name'],
+						filters: {
+							ip_address: current_ip
 						}
+					}).then(records => {
+
+						console.log (records[0].name);
+						frm.set_value('branch', records[0].name);
+						frm.refresh_field('branch');
 					})
 				}
 			})
@@ -278,69 +265,6 @@ frappe.ui.form.on('Non Jewelry Items', {
 		compute_nj_av(frm);
 	},
 
-	// assistant_appraiser: function(frm){
-	// 	if (frm.doc.assistant_appraiser != null) {
-	// 		frappe.prompt({
-	// 			label: 'Password',
-	// 			fieldname: 'password',
-	// 			fieldtype: 'Password'
-	// 		}, (password) => {
-	// 			frappe.call({
-	// 				method: 'pawnshop_management.pawnshop_management.custom_codes.passwords.check_password',
-	// 				args: {
-	// 					user: String(frm.doc.assistant_appraiser),
-	// 					pwd: password.password
-	// 				},
-	// 				callback: function(usr){
-	// 					if (frm.doc.assistant_appraiser == usr.message) {
-	// 						frappe.msgprint({
-	// 							title: __('Approved!'),
-	// 							indicator: 'green',
-	// 							message: __('Appraisal Approved')
-	// 						});
-	// 						frm.set_df_property('type', 'read_only', 1);
-	// 						frm.set_df_property('brand', 'read_only', 1);
-	// 						frm.set_df_property('model', 'read_only', 1);
-	// 						frm.set_df_property('model_number', 'read_only', 1);
-	// 						frm.set_df_property('ram', 'read_only', 1);
-	// 						frm.set_df_property('internal_memory', 'read_only', 1);
-	// 						frm.set_df_property('disk_type', 'read_only', 1);
-	// 						frm.set_df_property('color', 'read_only', 1);
-	// 						frm.set_df_property('category', 'read_only', 1);
-	// 						frm.set_df_property('charger', 'read_only', 1);
-	// 						frm.set_df_property('case_box_or_bag', 'read_only', 1);
-	// 						frm.set_df_property('appraisal_value', 'read_only', 1);
-	// 						frm.set_df_property('assistant_appraiser', 'read_only', 1);
-	// 						frm.set_df_property('comments', 'read_only', 1);
-	// 						frm.set_df_property('charger', 'read_only', 1);
-	// 						frm.set_df_property('case', 'read_only', 1);
-	// 						frm.set_df_property('box', 'read_only', 1);
-	// 						frm.set_df_property('earphones', 'read_only', 1);
-	// 						frm.set_df_property('others', 'read_only', 1);
-	// 						frm.set_df_property('pin', 'read_only', 1);
-	// 						frm.set_df_property('manual', 'read_only', 1);
-	// 						frm.set_df_property('sim_card', 'read_only', 1);
-	// 						frm.set_df_property('sd_card', 'read_only', 1);
-	// 						frm.set_df_property('bag', 'read_only', 1);
-	// 						frm.set_df_property('extra_battery', 'read_only', 1);
-	// 						frm.set_df_property('extra_lens', 'read_only', 1);
-	// 						frm.set_df_property('not_openline', 'read_only', 1);
-	// 						frm.enable_save();
-	// 					} else {
-	// 						frm.set_value('assistant_appraiser', null);
-	// 						frm.refresh_field('assistant_appraiser');
-	// 						frappe.msgprint({
-	// 							title: __('Password Invalid'),
-	// 							indicator: 'red',
-	// 							message: __(usr.message)
-	// 						});
-	// 					}
-	// 				}
-	// 			})
-	// 		})
-	// 	}
-	// },
-
 	charger: function(frm){
 		compute_nj_av(frm)
 	},
@@ -381,56 +305,21 @@ function compute_nj_av(frm) {
 }
 
 function show_item_no(frm) {
-	if (frm.doc.branch == "Garcia's Pawnshop - CC") {
-		frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - CC",['item_count', 'inventory_count'])
-		.then(value => {
+	frappe.db.get_value('Pawnshop Naming Series', frm.doc.branch,['item_count', 'inventory_count'])
+	.then(value => {
+		frappe.db.get_list('Branch IP Addressing', {
+			fields: ['branch_code'],
+			filters: {
+				name: frm.doc.branch
+			}
+		}).then(records => {
+			let branch_code = records[0].branch_code;
 			let non_jewelry_inventory_count = parseInt(value.message.inventory_count);
 			let non_jewelry_count = parseInt(value.message.item_count)
 			frm.set_value('batch_number', non_jewelry_inventory_count)
-			frm.set_value('item_no', '1-' + non_jewelry_inventory_count + 'NJ' + '-' + non_jewelry_count)
-			
+			frm.set_value('item_no', branch_code+ '-' + non_jewelry_inventory_count + 'NJ' + '-' + non_jewelry_count)
 		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - GTC") {
-		frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - GTC",['item_count', 'inventory_count'])
-		.then(value => {
-			let non_jewelry_inventory_count = parseInt(value.message.inventory_count);
-			let non_jewelry_count = parseInt(value.message.item_count)
-			frm.set_value('batch_number', non_jewelry_inventory_count)
-			frm.set_value('item_no', '4-' + non_jewelry_inventory_count + 'NJ' + '-' + non_jewelry_count)
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - MOL") {
-		frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - MOL",['item_count', 'inventory_count'])
-		.then(value => {
-			let non_jewelry_inventory_count = parseInt(value.message.inventory_count);
-			let non_jewelry_count = parseInt(value.message.item_count)
-			frm.set_value('batch_number', non_jewelry_inventory_count)
-			frm.set_value('item_no', '6-' + non_jewelry_inventory_count + 'NJ' + '-' + non_jewelry_count)
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - POB") {
-		frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - POB",['item_count', 'inventory_count'])
-		.then(value => {
-			let non_jewelry_inventory_count = parseInt(value.message.inventory_count);
-			let non_jewelry_count = parseInt(value.message.item_count)
-			frm.set_value('batch_number', non_jewelry_inventory_count)
-			frm.set_value('item_no', '3-' + non_jewelry_inventory_count + 'NJ' + '-' + non_jewelry_count)
-		})
-	} else if (frm.doc.branch == "Garcia's Pawnshop - TNZ") {
-		frappe.db.get_value('Pawnshop Naming Series', "Garcia's Pawnshop - TNZ",['item_count', 'inventory_count'])
-		.then(value => {
-			let non_jewelry_inventory_count = parseInt(value.message.inventory_count);
-			let non_jewelry_count = parseInt(value.message.item_count)
-			frm.set_value('batch_number', non_jewelry_inventory_count)
-			frm.set_value('item_no', '5-' + non_jewelry_inventory_count + 'NJ' + '-' + non_jewelry_count)
-		})
-	} else if (frm.doc.branch == "Rabie's House") {
-		frappe.db.get_value('Pawnshop Naming Series', "Rabie's House",['item_count', 'inventory_count'])
-		.then(value => {
-			let non_jewelry_inventory_count = parseInt(value.message.inventory_count);
-			let non_jewelry_count = parseInt(value.message.item_count)
-			frm.set_value('batch_number', non_jewelry_inventory_count)
-			frm.set_value('item_no', '20-' + non_jewelry_inventory_count + 'NJ' + '-' + non_jewelry_count)
-		})
-	} 
+	})
 }
 
 function unhide_hidden_fields(frm) {

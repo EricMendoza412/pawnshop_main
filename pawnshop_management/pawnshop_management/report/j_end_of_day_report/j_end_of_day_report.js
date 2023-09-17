@@ -7,22 +7,14 @@ frappe.call({
     method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip',
     callback: function(data){
         let current_ip = data.message
-        frappe.call({
-            method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip_from_settings',
-            callback: (result) => {
-                let ip = result.message;
-                if (current_ip == ip["cavite_city"]) {
-                    default_branch.push("Garcia's Pawnshop - CC"); 
-                } else if (current_ip == ip["poblacion"]) {
-                    default_branch.push("Garcia's Pawnshop - POB");
-                } else if (current_ip == ip["molino"]) {
-                    default_branch.push("Garcia's Pawnshop - MOL");
-                } else if (current_ip == ip["gtc"]) {
-                    default_branch.push("Garcia's Pawnshop - GTC");
-                } else if (current_ip == ip["tanza"]) {
-                    default_branch.push("Garcia's Pawnshop - TNZ");
-                }
+        frappe.db.get_list('Branch IP Addressing', {
+            fields: ['name'],
+            filters: {
+                ip_address: current_ip
             }
+        }).then(records => {
+            console.log (records[0].name);
+            default_branch.push(records[0].name); 
         })
     }
 });
@@ -41,6 +33,7 @@ frappe.query_reports["J End of Day Report"] = {
 				"Garcia's Pawnshop - MOL",
 				"Garcia's Pawnshop - POB",
 				"Garcia's Pawnshop - TNZ",
+				"Garcia's Pawnshop - ALP"
 			],
 			default: default_branch
 		},

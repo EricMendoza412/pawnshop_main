@@ -28,7 +28,9 @@ def execute(filters=None):
 		branch = "Garcia's Pawnshop - GTC"
 	elif str(current_ip) == str(branch_ip['tanza']):
 		branch = "Garcia's Pawnshop - TNZ"
-	
+	elif str(current_ip) == str(branch_ip['alapan']):
+		branch = "Garcia's Pawnshop - ALP"	
+
 	columns, data = [], []
 	columns = get_columns()
 

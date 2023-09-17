@@ -23,30 +23,17 @@ frappe.ui.form.on('Cash Position Report', {
 				method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip',
 				callback: function(data){
 					let current_ip = data.message
-					frappe.call({
-						method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip_from_settings',
-						callback: (result) => {
-							let ip = result.message;
-							if (current_ip == ip["cavite_city"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - CC");
-								frm.refresh_field('branch');
-							} else if (current_ip == ip["poblacion"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - POB");
-								frm.refresh_field('branch');
-							} else if (current_ip == ip["molino"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - MOL");
-								frm.refresh_field('branch');
-							} else if (current_ip == ip["gtc"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - GTC");
-								frm.refresh_field('branch');f
-							} else if (current_ip == ip["tanza"]) {
-								frm.set_value('branch', "Garcia's Pawnshop - TNZ");
-								frm.refresh_field('branch');
-							} else if (current_ip == ip["rabies_house"]) {
-								frm.set_value('branch', "Rabie's House");
-								frm.refresh_field('branch');
-							}
+
+					frappe.db.get_list('Branch IP Addressing', {
+						fields: ['name'],
+						filters: {
+							ip_address: current_ip
 						}
+					}).then(records => {
+
+						console.log (records[0].name);
+						frm.set_value('branch', records[0].name);
+						frm.refresh_field('branch');
 					})
 				}
 			})
@@ -286,7 +273,10 @@ function get_beginning_balance(frm) {
 	}).then(record => {
 		let beginning_balance = parseFloat(record.message);
 		frm.set_value('beginning_balance', 0.00);
-		frm.set_value('beginning_balance', beginning_balance);
+		console.log(beginning_balance + "pumasok dito");
+		if(!isNaN(beginning_balance)){
+			frm.set_value('beginning_balance', beginning_balance);
+		}
 		frm.refresh_field('beginning_balance');
 	})
 }
@@ -567,8 +557,8 @@ function total_cash_breakdown(frm) {
 
 
 function select_naming_series(frm) { //Select naming series with regards to the branch
-	if (frm.doc.branch == "Rabie's House") {
-		frm.set_value('naming_series', "No.20-.######")
+	if (frm.doc.branch == "Garcia's Pawnshop - ALP") {
+		frm.set_value('naming_series', "No.7-.######")
 	} else if (frm.doc.branch == "Garcia's Pawnshop - CC") {
 		frm.set_value('naming_series', "No.1-.######")
 	} else if (frm.doc.branch == "Garcia's Pawnshop - GTC") {

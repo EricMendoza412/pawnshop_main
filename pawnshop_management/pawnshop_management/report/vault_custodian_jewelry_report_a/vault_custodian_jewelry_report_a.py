@@ -22,6 +22,9 @@ def execute(filters=None):
 			branch = "Garcia's Pawnshop - GTC"
 		elif str(current_ip) == str(branch_ip['tanza']):
 			branch = "Garcia's Pawnshop - TNZ"
+		elif str(current_ip) == str(branch_ip['alapan']):
+			branch = "Garcia's Pawnshop - ALP"
+
 		data = frappe.get_all('Inventory Count', filters={'branch':branch}, fields=['date', 'in_count_a','principal_in_a', 'out_count_a','principal_out_a', 'returned_a','principal_ret_a', 'pulled_out_a','principal_po_a', 'total_a', 'principal_totala'], order_by='date desc')
 	else:
 		data = frappe.get_all('Inventory Count', filters=filters, fields=['date', 'in_count_a','principal_in_a', 'out_count_a','principal_out_a', 'returned_a','principal_ret_a', 'pulled_out_a','principal_po_a', 'total_a', 'principal_totala'], order_by='date desc')

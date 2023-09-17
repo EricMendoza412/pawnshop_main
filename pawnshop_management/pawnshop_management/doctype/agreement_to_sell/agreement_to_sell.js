@@ -13,40 +13,25 @@ frappe.ui.form.on('Agreement to Sell', {
 	   if (frm.is_new()) {
 		   frm.set_value('date_of_sale', frappe.datetime.nowdate())
 		   frappe.call({
-			   method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip',
-			   callback: function(data){
-				   let current_ip = data.message
-				   frappe.call({
-					   method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip_from_settings',
-					   callback: (result) => {
-						   let ip = result.message;
-						   if (current_ip == ip["cavite_city"]) {
-							   frm.set_value('branch', "Garcia's Pawnshop - CC");
-							   frm.refresh_field('branch');
-						   } else if (current_ip == ip["poblacion"]) {
-							   frm.set_value('branch', "Garcia's Pawnshop - POB");
-							   frm.refresh_field('branch');
-						   } else if (current_ip == ip["molino"]) {
-							   frm.set_value('branch', "Garcia's Pawnshop - MOL");
-							   frm.refresh_field('branch');
-						   } else if (current_ip == ip["gtc"]) {
-							   frm.set_value('branch', "Garcia's Pawnshop - GTC");
-							   frm.refresh_field('branch');
-						   } else if (current_ip == ip["tanza"]) {
-							   frm.set_value('branch', "Garcia's Pawnshop - TNZ");
-							   frm.refresh_field('branch');
-						   } else if (current_ip == ip["rabies_house"]) {
-							   frm.set_value('branch', "Rabie's House");
-							   frm.refresh_field('branch');
-							   
-						   }
-					   }
-				   })
-			   }
-		   })
+			method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip',
+			callback: function(data){
+				let current_ip = data.message
+
+				frappe.db.get_list('Branch IP Addressing', {
+					fields: ['name'],
+					filters: {
+						ip_address: current_ip
+					}
+				}).then(records => {
+
+					console.log (records[0].name);
+					frm.set_value('branch', records[0].name);
+					frm.refresh_field('branch');
+				})
+			}
+		})
 		   }
 		if (frm.doc.amended_from != null){
-			console.log("nandito");
 			var previous_pt = frm.doc.amended_from      //Naming for the next document created of amend
 			const separator = previous_pt.split("-");
 			
@@ -103,6 +88,9 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 	}else if(frm.doc.branch == "Garcia's Pawnshop - MOL") {
 		branch_code = 6;
 		branch_name = "MOL";
+	}else if(frm.doc.branch == "Garcia's Pawnshop - ALP") {
+		branch_code = 7;
+		branch_name = "ALP";
 	}
 
 	let jewelry_inv_count;

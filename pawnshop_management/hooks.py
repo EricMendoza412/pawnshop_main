@@ -80,7 +80,8 @@ permission_query_conditions = {
 	"Pawn Ticket Non Jewelry": "pawnshop_management.pawnshop_management.custom_codes.pawn_ticket_nj_list_filter.filter_nj_based_on_banch",
 	"Provisional Receipt": "pawnshop_management.pawnshop_management.custom_codes.pr_list_filter.filter_pr_based_on_banch",
 	"Cash Position Report": "pawnshop_management.pawnshop_management.custom_codes.cpr_list_filter.filter_cpr_based_on_banch",
-    "Agreement to Sell": "pawnshop_management.pawnshop_management.custom_codes.ats_list_filter.filter_ats_based_on_banch"
+    "Agreement to Sell": "pawnshop_management.pawnshop_management.custom_codes.ats_list_filter.filter_ats_based_on_banch",
+	"Acknowledgement Receipt": "pawnshop_management.pawnshop_management.custom_codes.ar_list_filter.filter_ar_based_on_banch"	
 }
 #
 # has_permission = {

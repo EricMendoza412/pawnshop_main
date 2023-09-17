@@ -17,6 +17,6 @@ def filter_pr_based_on_banch(user):
         return "(`tabProvisional Receipt`.branch = 'Garcia''s Pawnshop - GTC')"
     elif str(current_ip) == str(branch_ip['tanza']) and (user_role.role_profile_name == "Cashier" or user_role.role_profile_name == "Supervisor/Cashier" or user_role.role_profile_name == "Appraiser/Cashier" or user_role.role_profile_name == "Appraiser" or user_role.role_profile_name == "Supervisor" or user_role.role_profile_name == "Vault Custodian"):
         return "(`tabProvisional Receipt`.branch = 'Garcia''s Pawnshop - TNZ')"
-    elif str(current_ip) == str(branch_ip['rabies_house']) and (user_role.role_profile_name == "Cashier" or user_role.role_profile_name == "Supervisor/Cashier" or user_role.role_profile_name == "Appraiser/Cashier" or user_role.role_profile_name == "Appraiser" or user_role.role_profile_name == "Supervisor" or user_role.role_profile_name == "Vault Custodian"):
-        return "(`tabProvisional Receipt`.branch = 'Rabie''s House')"
+    elif str(current_ip) == str(branch_ip['alapan']) and (user_role.role_profile_name == "Cashier" or user_role.role_profile_name == "Supervisor/Cashier" or user_role.role_profile_name == "Appraiser/Cashier" or user_role.role_profile_name == "Appraiser" or user_role.role_profile_name == "Supervisor" or user_role.role_profile_name == "Vault Custodian"):
+        return "(`tabProvisional Receipt`.branch = 'Garcia''s Pawnshop - ALP')"
         
