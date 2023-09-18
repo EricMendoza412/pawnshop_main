@@ -15,7 +15,7 @@ frappe.ui.form.on('Provisional Receipt', {
 		frm.set_df_property('discount', 'hidden', 1)
 		frm.set_df_property('additional_amortization', 'hidden', 1)
 		if (frm.is_new()) {
-			if(frm.doc.amended_from == ''){
+			if(frm.doc.amended_from == null){
 			frm.set_df_property('mode_of_payment', 'hidden', 1)
 			}
 		}
