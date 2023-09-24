@@ -39,7 +39,7 @@ def execute(filters=None):
 	series = getattr(filters, 'item_series')
 
 
-	data = frappe.get_all("Pawn Ticket Jewelry", filters={'workflow_state': workflow, 'branch': branch, 'item_series': series}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'expiry_date', 'workflow_state', 'change_status_date', '_comments'])
+	data = frappe.get_all("Pawn Ticket Jewelry", filters={'workflow_state': workflow, 'branch': branch, 'item_series': series}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'maturity_date', 'expiry_date', 'workflow_state', '_comments'])
 	for i in range(len(data)):
 		description = ""
 		comments = string_extractor(data[i]["_comments"])
@@ -111,6 +111,13 @@ def get_columns():
 			'fieldtype': 'Date',
 			'width': 100
 		},
+		
+		{
+			'fieldname': 'maturity_date',
+			'label': _('Maturity Date'),
+			'fieldtype': 'Date',
+			'width': 100
+		},
 
 		{
 			'fieldname': 'expiry_date',
@@ -124,13 +131,6 @@ def get_columns():
 			'label': _('Status'),
 			'fieldtype': 'Data',
 			'width': 100
-		},
-
-		{
-			'fieldname': 'change_status_date',
-			'label': _('Date of Status Change'),
-			'fieldtype': 'Date',
-			'width': 150
 		},
 
 		{
