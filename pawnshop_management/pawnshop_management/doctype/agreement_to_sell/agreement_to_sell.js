@@ -93,6 +93,7 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 		branch_name = "ALP";
 	}
 
+	if (frm.doc.amended_from == null) {
 	let jewelry_inv_count;
 	frappe.db.get_value('Pawnshop Naming Series', frm.doc.branch,['jewelry_inventory_count'])
 	.then(value => {
@@ -100,6 +101,7 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 		jewelry_inv_count = parseInt(tracking_no.jewelry_inventory_count);
 		frm.set_value('ats_tracking_no', 'ATS-'+branch_code+"-"+ jewelry_inv_count + 'J');
 	})
+	}
 }
 
 
