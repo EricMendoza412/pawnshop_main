@@ -41,9 +41,7 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 		
 		frm.fields_dict["jewelry_items"].grid.grid_buttons.find(".grid-add-row")[0].innerHTML = "Add Item"	//Change "Add Row" button of jewelry_items table into "Add Item"
 
-			frappe.call({
-				method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip'
-			}).then(ip => {
+
 				frappe.db.get_value('Pawnshop Naming Series', frm.doc.branch, 'jewelry_inventory_count')
 				.then(r =>{
 					let jewelry_inventory_count = r.message.jewelry_inventory_count
@@ -56,7 +54,7 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 						}
 					})
 				})
-			})
+			
 		
 
 		if(frm.customers_tracking_no != null)

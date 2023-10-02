@@ -17,6 +17,7 @@ def get_ip_from_settings():
     gtc = frappe.get_doc('Branch IP Addressing', "Garcia's Pawnshop - GTC")
     tanza = frappe.get_doc('Branch IP Addressing', "Garcia's Pawnshop - TNZ")
     alapan = frappe.get_doc('Branch IP Addressing', "Garcia's Pawnshop - ALP")
+    test = frappe.get_doc('Branch IP Addressing', "TEST")
 
     return {
         "cavite_city" : cavite_city.ip_address, 
@@ -24,5 +25,6 @@ def get_ip_from_settings():
         "molino": molino.ip_address,
         "gtc": gtc.ip_address,
         "tanza": tanza.ip_address,
-        "alapan": alapan.ip_address
+        "alapan": alapan.ip_address,
+        "test": test.ip_address
         }
