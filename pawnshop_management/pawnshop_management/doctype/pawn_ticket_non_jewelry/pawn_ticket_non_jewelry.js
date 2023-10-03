@@ -44,6 +44,19 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 						console.log (records[0].name);
 						frm.set_value('branch', records[0].name);
 						frm.refresh_field('branch');
+
+						frappe.db.get_value('Pawnshop Naming Series', records[0].name, 'inventory_count')
+						.then(r =>{
+							let nj_inventory_count = r.message.inventory_count
+							frm.set_query('item_no', 'non_jewelry_items', function(){
+								return {
+									filters: {
+										batch_number: String(nj_inventory_count),
+										branch: records[0].name
+									}
+								}
+							})
+						})
 					})
 				}
 			})
@@ -51,31 +64,6 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 
 
 		frm.fields_dict["non_jewelry_items"].grid.grid_buttons.find(".grid-add-row")[0].innerHTML = "Add Item"	//Change "Add Row" button of jewelry_items table into "Add Item"
-
-		// frm.add_custom_button('Skip Pawn Ticket No', () => {
-		// 	frappe.call('pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.increment_b_series',{
-		// 		branch: frm.doc.branch
-		// 	}).then(r => {
-		// 		show_tracking_no(frm)
-		// 	})
-		// })
-		
-		frappe.call({
-			method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip'
-		}).then(ip => {
-			frappe.db.get_value('Pawnshop Naming Series', frm.doc.branch, 'inventory_count')
-			.then(r =>{
-				let nj_inventory_count = r.message.inventory_count
-				frm.set_query('item_no', 'non_jewelry_items', function(){
-					return {
-						filters: {
-							batch_number: String(nj_inventory_count),
-							branch: frm.doc.branch
-						}
-					}
-				})
-			})
-		})
 
 	},
 

@@ -34,28 +34,25 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 						console.log (records[0].name);
 						frm.set_value('branch', records[0].name);
 						frm.refresh_field('branch');
+
+						frappe.db.get_value('Pawnshop Naming Series', records[0].name, 'jewelry_inventory_count')
+						.then(r =>{
+							let jewelry_inventory_count = r.message.jewelry_inventory_count
+							frm.set_query('item_no', 'jewelry_items', function(){
+								return {
+									filters: {
+										batch_number: String(jewelry_inventory_count),
+										branch: records[0].name
+									}
+								}
+							})
+						})
 					})
 				}
 			})
 		}
 		
-		frm.fields_dict["jewelry_items"].grid.grid_buttons.find(".grid-add-row")[0].innerHTML = "Add Item"	//Change "Add Row" button of jewelry_items table into "Add Item"
-
-
-				frappe.db.get_value('Pawnshop Naming Series', frm.doc.branch, 'jewelry_inventory_count')
-				.then(r =>{
-					let jewelry_inventory_count = r.message.jewelry_inventory_count
-					frm.set_query('item_no', 'jewelry_items', function(){
-						return {
-							filters: {
-								batch_number: String(jewelry_inventory_count),
-								branch: frm.doc.branch
-							}
-						}
-					})
-				})
-			
-		
+		frm.fields_dict["jewelry_items"].grid.grid_buttons.find(".grid-add-row")[0].innerHTML = "Add Item"	//Change "Add Row" button of jewelry_items table into "Add Item"		
 
 		if(frm.customers_tracking_no != null)
 		{
