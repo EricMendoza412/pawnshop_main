@@ -1027,6 +1027,9 @@ function select_naming_series(frm) { //Select naming series with regards to the 
 	} else if (frm.doc.branch == "Garcia's Pawnshop - ALP") {
 		branch_code_no = 7;
 		frm.set_value('naming_series', "No-7-.######")
+	} else if (frm.doc.branch == "TEST") {
+		branch_code_no = 20;
+		frm.set_value('naming_series', "No-20-.######")
 	}
 
 }
