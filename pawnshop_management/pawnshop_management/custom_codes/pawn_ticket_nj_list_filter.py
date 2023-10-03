@@ -19,3 +19,5 @@ def filter_nj_based_on_banch(user):
         return "(`tabPawn Ticket Non Jewelry`.branch = 'Garcia''s Pawnshop - TNZ')"
     elif str(current_ip) == str(branch_ip['alapan']) and (user_role.role_profile_name == "Cashier" or user_role.role_profile_name == "Supervisor/Cashier" or user_role.role_profile_name == "Appraiser/Cashier" or user_role.role_profile_name == "Appraiser" or user_role.role_profile_name == "Supervisor" or user_role.role_profile_name == "Vault Custodian"):
         return "(`tabPawn Ticket Non Jewelry`.branch = 'Garcia''s Pawnshop - ALP')"
+    elif str(current_ip) == str(branch_ip['test']) and (user_role.role_profile_name == "Cashier" or user_role.role_profile_name == "Supervisor/Cashier" or user_role.role_profile_name == "Appraiser/Cashier" or user_role.role_profile_name == "Appraiser" or user_role.role_profile_name == "Supervisor" or user_role.role_profile_name == "Vault Custodian"):
+        return "(`tabPawn Ticket Non Jewelry`.branch = 'TEST')"
