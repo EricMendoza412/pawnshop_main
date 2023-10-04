@@ -34,7 +34,8 @@ if(is_allowed){
                     "Garcia's Pawnshop - MOL",
                     "Garcia's Pawnshop - POB",
                     "Garcia's Pawnshop - TNZ",
-                    "Garcia's Pawnshop - ALP"
+                    "Garcia's Pawnshop - ALP",
+                    "TEST"
                 ],
                 default: default_branch
             },

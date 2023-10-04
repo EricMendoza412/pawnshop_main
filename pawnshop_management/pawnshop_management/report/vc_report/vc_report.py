@@ -25,6 +25,8 @@ def execute(filters=None):
 		branch_fr_ip = "Garcia\\'s Pawnshop - TNZ"
 	elif str(current_ip) == str(branch_ip['alapan']):
 		branch_fr_ip = "Garcia\\'s Pawnshop - ALP"
+	elif str(current_ip) == str(branch_ip['test']):
+		branch_fr_ip = "TEST"
 
 	if status_value == None:
 		branch = branch_fr_ip
