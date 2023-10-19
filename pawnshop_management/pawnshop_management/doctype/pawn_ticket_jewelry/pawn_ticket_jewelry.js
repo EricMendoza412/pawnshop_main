@@ -15,6 +15,11 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 		let is_allowed = frappe.user_roles.includes('Administrator');
 		frm.toggle_enable(['date_loan_granted', 'branch'], is_allowed)
 
+		if(frappe.user_roles.includes('Support Team')){
+			frm.set_df_property('date_loan_granted', 'read_only', 0);
+			frm.set_df_property('branch', 'read_only', 0);
+		}
+
 		if (frm.is_new()) {
 
 			frm.set_value('date_loan_granted', frappe.datetime.nowdate())
