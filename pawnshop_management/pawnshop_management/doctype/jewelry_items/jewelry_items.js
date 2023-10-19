@@ -22,6 +22,7 @@ frappe.ui.form.on('Jewelry Items', {
 				frm.set_df_property('comments', 'read_only', 1);
 				frm.set_df_property('karats', 'read_only', 1);
 			}
+
 		}
 	},
 
@@ -44,12 +45,10 @@ frappe.ui.form.on('Jewelry Items', {
 	},
 
 	refresh: function(frm){
+
 		let is_allowed = frappe.user_roles.includes('Administrator');
-		frm.toggle_enable(
-			[
-				"branch"
-			],
-			 is_allowed);
+		frm.toggle_enable(["branch"],is_allowed);
+
 		frm.toggle_display(['sizelength', 'selling_price', 'selling_price_per_gram'], frm.doc.workflow_state === "Pulled Out" || frm.doc.workflow_state === "Scrap" || frm.doc.workflow_state === "On Display" || frm.doc.workflow_state === "Sold")
 		if (frm.is_new()) {
 			frappe.call({
@@ -85,6 +84,22 @@ frappe.ui.form.on('Jewelry Items', {
 				frm.set_df_property('assistant_appraiser', 'read_only', 1);
 				frm.set_df_property('comments', 'read_only', 1);
 				frm.set_df_property('karats', 'read_only', 1);
+			}
+			if(frappe.user_roles.includes('Support Team')){
+				frm.set_df_property('type', 'read_only', 0);
+				frm.set_df_property('total_weight', 'read_only', 0);
+				frm.set_df_property('karat', 'read_only', 0);
+				frm.set_df_property('karat_category', 'read_only', 0);
+				frm.set_df_property('densi', 'read_only', 0);
+				frm.set_df_property('additional_for_stone', 'read_only', 0);
+				frm.set_df_property('color', 'read_only', 0);
+				frm.set_df_property('colors_if_multi', 'read_only', 0);
+				frm.set_df_property('appraisal_value', 'read_only', 0);
+				frm.set_df_property('desired_principal', 'read_only', 0);
+				frm.set_df_property('assistant_appraiser', 'read_only', 0);
+				frm.set_df_property('comments', 'read_only', 0);
+				frm.set_df_property('karats', 'read_only', 0);
+				frm.set_df_property('branch', 'read_only', 0);
 			}
 		}
 		frm.set_query('assistant_appraiser', function() {
