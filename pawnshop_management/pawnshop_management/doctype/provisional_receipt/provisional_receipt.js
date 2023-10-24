@@ -10,19 +10,31 @@ var og_total_no_discount;
 frappe.ui.form.on('Provisional Receipt', {
 
 	onload: function(frm) {
+
+		if(frappe.user_roles.includes('Administrator')){
+			frm.set_df_property('other_discount_st', 'hidden', 0);
+		}else{
+			frm.set_df_property('other_discount_st', 'hidden', 1);
+		}
+
 		frm.toggle_display(['pawn_ticket_no'], frm.doc.pawn_ticket_type !== "-Select-");
 		frm.set_df_property('pawn_ticket_type', 'hidden', 1)
 		frm.set_df_property('discount', 'hidden', 1)
 		frm.set_df_property('additional_amortization', 'hidden', 1)
+		with_other_discount = false;
+		og_total_no_discount = null;
+		
 		if (frm.is_new()) {
 			if(frm.doc.amended_from == null){
-			frm.set_df_property('mode_of_payment', 'hidden', 1)
+				frm.set_df_property('mode_of_payment', 'hidden', 1)
+			}else{
+				og_total_no_discount = frm.doc.total;
 			}
 		}
 		frm.set_df_property('subasta_sales_no', 'hidden', 1)
 		frm.set_df_property('other_discount', 'hidden', 1);
 		frm.set_df_property('other_discount_tawad', 'hidden', 1);
-		frm.set_df_property('other_discount_st', 'hidden', 1);
+
 		frm.set_query('pawn_ticket_no', () => {
 			return {
 				"filters": {
@@ -31,8 +43,6 @@ frappe.ui.form.on('Provisional Receipt', {
 				}
 			}
 		})
-		with_other_discount = false;
-		og_total_no_discount = null;
 	},
 
 	validate: function(frm){
@@ -576,6 +586,9 @@ function calculate_total_amount(frm){
 			console.log("2nd pasok");
 			frm.set_df_property('other_discount', 'hidden', 0);
 			frm.set_df_property('other_discount_st', 'hidden', 1);
+			if(frappe.user_roles.includes('Administrator')){
+				frm.set_df_property('other_discount_st', 'hidden', 0);
+			}
 		}
 	} else if (frm.doc.transaction_type == "Renewal w/ Amortization") {
 		if (frm.doc.additional_amortization == 0) {
