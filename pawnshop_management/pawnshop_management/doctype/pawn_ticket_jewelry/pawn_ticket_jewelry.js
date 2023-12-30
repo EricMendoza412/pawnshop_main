@@ -175,7 +175,8 @@ frappe.ui.form.on('Jewelry List', {
 function set_series(frm) { //Set the pawn ticket series
 	if (frm.is_new()){
 
-		if(parseInt(frm.doc.desired_principal) > 8000 || parseInt(frm.doc.desired_principal) < 1500){
+		// if(parseInt(frm.doc.desired_principal) > 8000 || parseInt(frm.doc.desired_principal) < 1500){
+		if(parseInt(frm.doc.desired_principal) > 15000){
 			frm.set_value('item_series', "B")
 		}else{
 			frm.set_value('item_series', "A")
