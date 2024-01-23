@@ -35,7 +35,6 @@ frappe.ui.form.on('Provisional Receipt', {
 			}
 		}
 		frm.set_df_property('subasta_sales_no', 'hidden', 1)
-		frm.set_df_property('other_discount', 'hidden', 1);
 		frm.set_df_property('other_discount_tawad', 'hidden', 1);
 
 		frm.set_query('pawn_ticket_no', () => {
