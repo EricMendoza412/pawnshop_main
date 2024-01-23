@@ -13,8 +13,11 @@ frappe.ui.form.on('Provisional Receipt', {
 
 		if(frappe.user_roles.includes('Administrator')){
 			frm.set_df_property('other_discount_st', 'hidden', 0);
+			frm.set_df_property('other_discount', 'hidden', 0);
+			frm.set_df_property('interest_payment', 'read_only', 0);
 		}else{
 			frm.set_df_property('other_discount_st', 'hidden', 1);
+			frm.set_df_property('other_discount', 'hidden', 1);
 		}
 
 		frm.toggle_display(['pawn_ticket_no'], frm.doc.pawn_ticket_type !== "-Select-");
