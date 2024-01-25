@@ -4,8 +4,8 @@
 frappe.ui.form.on('Jewelry Items', {
 	onload: function(frm) {
 		if (frm.is_new()) {
-			frm.set_value('main_appraiser', frappe.user_info().fullname);
-			frm.disable_save();
+			//frm.set_value('main_appraiser', frappe.user_info().fullname);
+			//frm.disable_save();
 		}else{
 			if(!frappe.user_roles.includes('Administrator')){
 				frm.set_df_property('type', 'read_only', 1);
@@ -120,39 +120,39 @@ frappe.ui.form.on('Jewelry Items', {
 	},
 
 	assistant_appraiser: function(frm){
-		if (frm.doc.assistant_appraiser != null) {
-			frappe.prompt({
-				label: 'Password',
-				fieldname: 'password',
-				fieldtype: 'Password'
-			}, (password) => {
-				frappe.call({
-					method: 'pawnshop_management.pawnshop_management.custom_codes.passwords.check_password',
-					args: {
-						user: String(frm.doc.assistant_appraiser),
-						pwd: password.password
-					},
-					callback: function(usr){
-						if (frm.doc.assistant_appraiser == usr.message) {
-							frappe.msgprint({
-								title: __('Approved!'),
-								indicator: 'green',
-								message: __('Appraisal Approved')
-							});
-							frm.enable_save();
-						} else {
-							frm.set_value('assistant_appraiser', null);
-							frm.refresh_field('assistant_appraiser');
-							frappe.msgprint({
-								title: __('Password Invalid'),
-								indicator: 'red',
-								message: __(usr.message)
-							});
-						}
-					}
-				})
-			})
-		}
+		// if (frm.doc.assistant_appraiser != null) {
+		// 	frappe.prompt({
+		// 		label: 'Password',
+		// 		fieldname: 'password',
+		// 		fieldtype: 'Password'
+		// 	}, (password) => {
+		// 		frappe.call({
+		// 			method: 'pawnshop_management.pawnshop_management.custom_codes.passwords.check_password',
+		// 			args: {
+		// 				user: String(frm.doc.assistant_appraiser),
+		// 				pwd: password.password
+		// 			},
+		// 			callback: function(usr){
+		// 				if (frm.doc.assistant_appraiser == usr.message) {
+		// 					frappe.msgprint({
+		// 						title: __('Approved!'),
+		// 						indicator: 'green',
+		// 						message: __('Appraisal Approved')
+		// 					});
+		// 					frm.enable_save();
+		// 				} else {
+		// 					frm.set_value('assistant_appraiser', null);
+		// 					frm.refresh_field('assistant_appraiser');
+		// 					frappe.msgprint({
+		// 						title: __('Password Invalid'),
+		// 						indicator: 'red',
+		// 						message: __(usr.message)
+		// 					});
+		// 				}
+		// 			}
+		// 		})
+		// 	})
+		// }
 	},
 
 	branch: function(frm){
