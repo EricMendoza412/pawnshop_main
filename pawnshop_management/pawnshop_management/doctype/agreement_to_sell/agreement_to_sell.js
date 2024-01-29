@@ -7,7 +7,7 @@ var branch_name;
 frappe.ui.form.on('Agreement to Sell', {
 	refresh: function(frm) {
 
-		let is_allowed = frappe.user_roles.includes('Administrator');
+		let is_allowed = frappe.user_roles.includes('Administrator') || frappe.user_roles.includes('Support Team');
 		frm.toggle_enable(['date_of_sale', 'branch'], is_allowed);
 
 	   if (frm.is_new()) {
