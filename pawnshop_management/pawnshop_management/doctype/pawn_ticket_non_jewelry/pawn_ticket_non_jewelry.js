@@ -15,6 +15,10 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 		if (frm.doc.desired_principal > temp_principal) {
 			frappe.throw(__('Desired Principal is greater than the total value of items'));
 		}
+
+		if (frm.doc.desired_principal <= 0){
+			frappe.throw(__('Desired Principal cannot be zero'));
+		}
 	},
 	after_save: function(frm){
 		frm.set_df_property('customers_tracking_no', 'read_only', 1);

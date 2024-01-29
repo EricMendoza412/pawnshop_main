@@ -48,6 +48,12 @@ frappe.ui.form.on('Agreement to Sell', {
 
 		},
 
+	validate: function(frm, cdt, cdn){
+			if (frm.doc.total_value <= 0){
+				frappe.throw(__('Total value cannot be zero'));
+			}
+		},
+
 	branch: function(frm){
 	   show_form_no(frm);
 	   show_tracking_no(frm);

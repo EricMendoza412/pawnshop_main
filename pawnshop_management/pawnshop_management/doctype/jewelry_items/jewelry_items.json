@@ -31,8 +31,10 @@
   "column_break_19",
   "desired_principal",
   "appraisers_section",
+  "main_appraiser_acct",
   "main_appraiser",
   "column_break_16",
+  "assistant_appraiser_acct",
   "assistant_appraiser",
   "section_break_18",
   "amended_from"
@@ -125,10 +127,11 @@
    "label": "Appraisers"
   },
   {
+   "fetch_from": "main_appraiser_acct.full_name",
    "fieldname": "main_appraiser",
-   "fieldtype": "Link",
-   "label": "Main Appraiser",
-   "options": "User",
+   "fieldtype": "Data",
+   "label": "Main Appraiser Name",
+   "read_only": 1,
    "reqd": 1
   },
   {
@@ -147,13 +150,6 @@
    "options": "Jewelry Items",
    "print_hide": 1,
    "read_only": 1
-  },
-  {
-   "fieldname": "assistant_appraiser",
-   "fieldtype": "Link",
-   "label": "Assistant Appraiser",
-   "options": "User",
-   "reqd": 1
   },
   {
    "fieldname": "branch",
@@ -219,11 +215,33 @@
   {
    "fieldname": "column_break_11",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "main_appraiser_acct",
+   "fieldtype": "Link",
+   "label": "Main Appraiser",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "assistant_appraiser_acct",
+   "fieldtype": "Link",
+   "label": "Assistant Appraiser",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "assistant_appraiser_acct.full_name",
+   "fieldname": "assistant_appraiser",
+   "fieldtype": "Data",
+   "label": "Assistant Appraiser Name",
+   "read_only": 1,
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-25 10:57:33.552907",
+ "modified": "2024-01-29 12:53:53.146075",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Jewelry Items",

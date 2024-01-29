@@ -18,7 +18,7 @@ frappe.ui.form.on('Jewelry Items', {
 				frm.set_df_property('colors_if_multi', 'read_only', 1);
 				frm.set_df_property('appraisal_value', 'read_only', 1);
 				frm.set_df_property('desired_principal', 'read_only', 1);
-				frm.set_df_property('assistant_appraiser', 'read_only', 1);
+				frm.set_df_property('assistant_appraiser_acct', 'read_only', 1);
 				frm.set_df_property('comments', 'read_only', 1);
 				frm.set_df_property('karats', 'read_only', 1);
 			}
@@ -81,7 +81,7 @@ frappe.ui.form.on('Jewelry Items', {
 				frm.set_df_property('colors_if_multi', 'read_only', 1);
 				frm.set_df_property('appraisal_value', 'read_only', 1);
 				frm.set_df_property('desired_principal', 'read_only', 1);
-				frm.set_df_property('assistant_appraiser', 'read_only', 1);
+				frm.set_df_property('assistant_appraiser_acct', 'read_only', 1);
 				frm.set_df_property('comments', 'read_only', 1);
 				frm.set_df_property('karats', 'read_only', 1);
 			}
@@ -96,14 +96,14 @@ frappe.ui.form.on('Jewelry Items', {
 				frm.set_df_property('colors_if_multi', 'read_only', 0);
 				frm.set_df_property('appraisal_value', 'read_only', 0);
 				frm.set_df_property('desired_principal', 'read_only', 0);
-				frm.set_df_property('main_appraiser', 'read_only', 0);
-				frm.set_df_property('assistant_appraiser', 'read_only', 0);
+				frm.set_df_property('main_appraiser_acct', 'read_only', 0);
+				frm.set_df_property('assistant_appraiser_acct', 'read_only', 0);
 				frm.set_df_property('comments', 'read_only', 0);
 				frm.set_df_property('karats', 'read_only', 0);
 				frm.set_df_property('branch', 'read_only', 0);
 			}
 		}
-		frm.set_query('assistant_appraiser', function() {
+		frm.set_query('assistant_appraiser_acct', function() {
 			return {
 				"filters": {
 					"role_profile_name": [
@@ -120,7 +120,7 @@ frappe.ui.form.on('Jewelry Items', {
 		});
 	},
 
-	assistant_appraiser: function(frm){
+	//assistant_appraiser: function(frm){
 		// if (frm.doc.assistant_appraiser != null) {
 		// 	frappe.prompt({
 		// 		label: 'Password',
@@ -154,7 +154,7 @@ frappe.ui.form.on('Jewelry Items', {
 		// 		})
 		// 	})
 		// }
-	},
+	//},
 
 	branch: function(frm){
 		show_item_no(frm);
