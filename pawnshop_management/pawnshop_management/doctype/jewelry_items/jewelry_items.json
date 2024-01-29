@@ -131,8 +131,7 @@
    "fieldname": "main_appraiser",
    "fieldtype": "Data",
    "label": "Main Appraiser Name",
-   "read_only": 1,
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "column_break_16",
@@ -235,13 +234,12 @@
    "fieldname": "assistant_appraiser",
    "fieldtype": "Data",
    "label": "Assistant Appraiser Name",
-   "read_only": 1,
-   "reqd": 1
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-29 12:53:53.146075",
+ "modified": "2024-01-29 13:17:06.700214",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Jewelry Items",
