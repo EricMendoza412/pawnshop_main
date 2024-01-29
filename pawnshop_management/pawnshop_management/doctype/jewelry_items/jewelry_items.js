@@ -96,6 +96,7 @@ frappe.ui.form.on('Jewelry Items', {
 				frm.set_df_property('colors_if_multi', 'read_only', 0);
 				frm.set_df_property('appraisal_value', 'read_only', 0);
 				frm.set_df_property('desired_principal', 'read_only', 0);
+				frm.set_df_property('main_appraiser', 'read_only', 0);
 				frm.set_df_property('assistant_appraiser', 'read_only', 0);
 				frm.set_df_property('comments', 'read_only', 0);
 				frm.set_df_property('karats', 'read_only', 0);
