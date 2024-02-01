@@ -44,6 +44,7 @@
   "comments",
   "appraisers_section",
   "main_appraiser",
+  "main_appraiser_name",
   "column_break_36",
   "assistant_appraiser"
  ],
@@ -281,10 +282,11 @@
    "label": "Appraisers"
   },
   {
-   "default": "user",
+   "default": "User",
    "fieldname": "main_appraiser",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "Main Appraiser",
+   "options": "User",
    "read_only": 1
   },
   {
@@ -310,11 +312,19 @@
    "fieldname": "not_openline",
    "fieldtype": "Check",
    "label": "Not Openline"
+  },
+  {
+   "fetch_from": "main_appraiser.first_name",
+   "fieldname": "main_appraiser_name",
+   "fieldtype": "Data",
+   "label": "Main Appraiser Name",
+   "read_only": 1,
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-09-14 13:08:14.574436",
+ "modified": "2024-02-01 14:53:33.927578",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",
