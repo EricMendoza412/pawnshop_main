@@ -12,6 +12,14 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 
 	refresh: function(frm){
 
+		frm.add_custom_button('Paper Jammed', function(){
+					frappe.show_alert({
+						message:__('Feature not yet available'),
+						//message:__('Details transferred to next Pawn Ticket'),
+						indicator:'orange'
+					}, 5)
+		});
+
 		let is_allowed = frappe.user_roles.includes('Administrator');
 		frm.toggle_enable(['date_loan_granted', 'branch'], is_allowed)
 
