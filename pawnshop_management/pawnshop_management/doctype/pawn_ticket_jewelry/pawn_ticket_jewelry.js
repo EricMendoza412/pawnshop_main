@@ -12,13 +12,74 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 
 	refresh: function(frm){
 
-		frm.add_custom_button('Paper Jammed', function(){
-					frappe.show_alert({
-						message:__('Feature not yet available'),
-						//message:__('Details transferred to next Pawn Ticket'),
-						indicator:'orange'
-					}, 5)
-		});
+		
+		let dlg_workf_good = false
+		if((frm.doc.date_loan_granted == frappe.datetime.get_today()) && (frm.doc.workflow_state == 'Active')){
+			dlg_workf_good = true
+		} 
+		let role_good = false
+		if(frappe.user_roles.includes('Operations Manager') || frappe.user_roles.includes('Administrator')){
+			role_good = true
+		}
+
+
+		if(dlg_workf_good && role_good){
+			frm.add_custom_button('Printing Error', function(){
+				frappe.msgprint({
+					title: __('Notification'),
+					message: __('Tranfer this PT to the next available PT?'),
+					primary_action:{
+						'label': 'Yes',
+						action(values) {
+						
+							let series;
+							if (frm.doc.item_series == "A") {
+								series = "a_series";
+							} else if (frm.doc.item_series == "B") {
+								series = "b_series";
+							}
+
+							if(series){
+								frappe.db.get_value("Pawnshop Naming Series", frm.doc.branch, series)
+								.then(r => {
+									let current_count
+									let pta = r.message.a_series;
+									let ptb = r.message.b_series;
+
+									let branchCode
+									frappe.db.get_value("Branch IP Addressing", frm.doc.branch, "branch_code")
+									.then(r => {
+										branchCode = r.message.branch_code;
+									
+										if(pta){
+											current_count = branchCode + "-" + pta}
+										else{
+											current_count = branchCode + "-" + ptb + "B"}
+
+										frappe.call({
+											method: 'pawnshop_management.pawnshop_management.custom_codes.paper_jammed.transfer_to_next_pt_j',
+											args: {
+												pawn_ticket: String(frm.doc.name),
+												nxt_pt: String(current_count)
+											},
+											callback: (r) =>{
+												frappe.msgprint({
+													title:__('Notification'),
+													indicator:'green',
+													message: __('Successfully transferred to Pawn Ticket# ' + current_count)
+												});
+											}
+										})
+									})
+								})
+							}
+
+						}
+					}
+				});
+				
+			});
+		}
 
 		let is_allowed = frappe.user_roles.includes('Administrator');
 		frm.toggle_enable(['date_loan_granted', 'branch'], is_allowed)

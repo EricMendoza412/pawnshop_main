@@ -13,6 +13,7 @@
   "maturity_date",
   "expiry_date",
   "change_status_date",
+  "transfer_pt",
   "column_break_6",
   "branch",
   "old_pawn_ticket",
@@ -191,6 +192,12 @@
    "fieldtype": "Data",
    "label": "Customer Birthday",
    "read_only": 1
+  },
+  {
+   "fieldname": "transfer_pt",
+   "fieldtype": "Data",
+   "label": "Transferred to PT",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -201,7 +208,7 @@
    "link_fieldname": "inventory_tracking_no"
   }
  ],
- "modified": "2023-03-24 12:52:20.966082",
+ "modified": "2024-02-20 13:10:47.988762",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Pawn Ticket Non Jewelry",

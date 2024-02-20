@@ -25,6 +25,66 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 	},
 
 	refresh: function(frm){
+
+		if(frappe.user_roles.includes('Operations Manager') || frappe.user_roles.includes('Administrator')){
+			frm.add_custom_button('Printing Error', function(){
+
+				frappe.msgprint({
+					title: __('Notification'),
+					message: __('Tranfer this PT to the next available PT?'),
+					primary_action:{
+						'label': 'Yes',
+						action(values) {
+						
+							let series;
+							if (frm.doc.item_series == "A") {
+								series = "a_series";
+							} else if (frm.doc.item_series == "B") {
+								series = "b_series";
+							}
+
+							if(series){
+								frappe.db.get_value("Pawnshop Naming Series", frm.doc.branch, series)
+								.then(r => {
+									let current_count
+									let pta = r.message.a_series;
+									let ptb = r.message.b_series;
+
+									let branchCode
+									frappe.db.get_value("Branch IP Addressing", frm.doc.branch, "branch_code")
+									.then(r => {
+										branchCode = r.message.branch_code;
+									
+										if(pta){
+											current_count = branchCode + "-" + pta}
+										else{
+											current_count = branchCode + "-" + ptb + "B"}
+
+										frappe.call({
+											method: 'pawnshop_management.pawnshop_management.custom_codes.paper_jammed.transfer_to_next_pt_nj',
+											args: {
+												pawn_ticket: String(frm.doc.name),
+												nxt_pt: String(current_count)
+											},
+											callback: (r) =>{
+												frappe.msgprint({
+													title:__('Notification'),
+													indicator:'green',
+													message: __('Successfully transferred to Pawn Ticket# ' + current_count)
+												});
+											}
+										})
+									})
+								})
+							}
+
+						}
+					}
+				});
+				
+			});
+		}
+
 		let is_allowed = frappe.user_roles.includes('Administrator');
 		frm.toggle_enable(['date_loan_granted', 'branch'], is_allowed)
 		frm.fields_dict["non_jewelry_items"].grid.grid_buttons.find(".grid-add-row")[0].style.visibility = "hidden";
