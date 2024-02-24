@@ -126,7 +126,9 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 			})
 		}
 
-
+		if(frm.doc.interest_rate == "0"){
+			frm.set_df_property('interest_rate', 'hidden', 1);
+		}
 		frm.fields_dict["non_jewelry_items"].grid.grid_buttons.find(".grid-add-row")[0].innerHTML = "Add Item"	//Change "Add Row" button of jewelry_items table into "Add Item"
 
 	},
@@ -411,7 +413,8 @@ function set_item_interest(frm) {
 		interest = parseFloat(value)/100 * principal;
 		frm.set_value('interest', interest);
 		net_proceeds = principal - interest;
-		frm.set_value('net_proceeds', net_proceeds)
+		frm.set_value('net_proceeds', net_proceeds);
+		frm.set_value('interest_rate',value);
 	});
 }
 

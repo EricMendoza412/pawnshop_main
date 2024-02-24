@@ -177,6 +177,7 @@ class ProvisionalReceipt(Document):
 				new_pawn_ticket.inventory_tracking_no = previous_pawn_ticket.inventory_tracking_no
 				new_pawn_ticket.created_by_pr = self.name
 				if self.pawn_ticket_type == "Pawn Ticket Non Jewelry":
+					new_pawn_ticket.interest_rate = previous_pawn_ticket.interest_rate
 					previous_items = previous_pawn_ticket.non_jewelry_items
 					new_pawn_ticket.expiry_date = add_to_date(self.date_issued, days=90)
 					for i in range(len(previous_items)):
@@ -224,8 +225,12 @@ class ProvisionalReceipt(Document):
 		elif self.transaction_type == "Amortization":
 			interest_rate = frappe.get_doc('Pawnshop Management Settings')
 			if self.pawn_ticket_type == "Pawn Ticket Non Jewelry":
+				used_int_rate = frappe.db.get_value(self.pawn_ticket_type, self.pawn_ticket_no, "interest_rate")
 				desired_principal = self.principal_amount - self.additional_amortization
-				interest = desired_principal * (interest_rate.gadget_interest_rate/100)
+				if not used_int_rate:
+					interest = desired_principal * (7/100)					
+				else:
+					interest = desired_principal * (used_int_rate/100)
 				net_proceeds = desired_principal - interest
 				frappe.db.set_value(self.pawn_ticket_type, self.pawn_ticket_no, {
 					'desired_principal': desired_principal,

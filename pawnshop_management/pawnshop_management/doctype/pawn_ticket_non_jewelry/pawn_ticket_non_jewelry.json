@@ -29,6 +29,8 @@
   "desired_principal",
   "interest",
   "net_proceeds",
+  "column_break_cjh7h",
+  "interest_rate",
   "amended_from",
   "comments"
  ],
@@ -198,6 +200,16 @@
    "fieldtype": "Data",
    "label": "Transferred to PT",
    "read_only": 1
+  },
+  {
+   "fieldname": "column_break_cjh7h",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "interest_rate",
+   "fieldtype": "Percent",
+   "label": "Interest rate used",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -208,7 +220,7 @@
    "link_fieldname": "inventory_tracking_no"
   }
  ],
- "modified": "2024-02-20 13:10:47.988762",
+ "modified": "2024-02-22 12:28:56.129366",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Pawn Ticket Non Jewelry",

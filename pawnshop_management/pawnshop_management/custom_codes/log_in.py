@@ -29,6 +29,12 @@ def login_feed(login_manager):
                 msg='You are not authorized to log in at this station',
                 exc=RuntimeError
             )
+    else:
+        if user.role_profile_name:
+            frappe.msgprint(
+                msg='Welcome, ' + user.full_name + ' (' + user.role_profile_name + ')',
+            )
+
 
 def post_login(login_manager):
     if login_feed(login_manager) == 0:

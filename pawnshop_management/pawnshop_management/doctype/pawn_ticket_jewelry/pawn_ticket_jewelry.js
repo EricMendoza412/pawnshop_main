@@ -2,6 +2,23 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Pawn Ticket Jewelry', {
+
+	onload: function(frm) {
+		// frappe.msgprint('Printing...');
+        // frm.page.set_primary_action(__('Print'), function() {
+        //     // Display a message when print button is clicked
+        //     frappe.confirm(
+        //         'Are you sure you want to print?', 
+        //         function() {
+        //             frappe.msgprint('Printing...'); // Show message
+        //             setTimeout(function() {
+        //                 frm.print_doc(); // Perform default print action after delay
+        //             }, 1000); // Delay in milliseconds
+        //         }
+        //     );
+        // });
+    },
+
 	after_save: function(frm){
 		frm.set_df_property('customers_tracking_no', 'read_only', 1);
 	},
@@ -11,7 +28,6 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 	},
 
 	refresh: function(frm){
-
 		
 		let dlg_workf_good = false
 		if((frm.doc.date_loan_granted == frappe.datetime.get_today()) && (frm.doc.workflow_state == 'Active')){

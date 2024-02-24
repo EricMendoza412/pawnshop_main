@@ -9,6 +9,7 @@ def transfer_to_next_pt_j(pawn_ticket, nxt_pt):
 	frappe.db.set_value('Pawn Ticket Jewelry', pawn_ticket, 'workflow_state', 'Rejected')
 	frappe.db.set_value('Pawn Ticket Jewelry', pawn_ticket, 'change_status_date', today())
 	frappe.db.set_value('Pawn Ticket Jewelry', pawn_ticket, 'transfer_pt', nxt_pt)
+	frappe.db.set_value('Pawn Ticket Jewelry', pawn_ticket, 'docstatus', 2)
 	frappe.db.commit()
 
     # transfer paper jammed PT details to the next PT
@@ -71,6 +72,7 @@ def transfer_to_next_pt_nj(pawn_ticket, nxt_pt):
 	new_pawn_ticket.customers_full_name = previous_pawn_ticket.customers_full_name
 	new_pawn_ticket.inventory_tracking_no = previous_pawn_ticket.inventory_tracking_no
 	new_pawn_ticket.created_by_pr = previous_pawn_ticket.created_by_pr
+	new_pawn_ticket.interest_rate = previous_pawn_ticket.interest_rate
 	previous_items = previous_pawn_ticket.non_jewelry_items
 	for i in range(len(previous_items)):
 		new_pawn_ticket.append("non_jewelry_items", {

@@ -1090,12 +1090,40 @@ function calculate_new_interest(frm) {
 	frm.set_value('advance_interest', 0.00);
 	frm.refresh_field('advance_interest');
 	if (frm.doc.pawn_ticket_type == "Pawn Ticket Non Jewelry") {
-		frappe.db.get_single_value('Pawnshop Management Settings', 'gadget_interest_rate')
-		.then(rate => {
-			let new_interest = (parseFloat(frm.doc.principal_amount) - parseFloat(frm.doc.additional_amortization)) * (rate/100);
-			frm.set_value('advance_interest', new_interest);
-			frm.refresh_field('advance_interest');
+
+		//Use recorded rate from the PT ( PT w/ recorded interest_Rate, "None"/"0", are old PTs and 7% should be used)
+
+		frappe.db.get_value('Pawn Ticket Non Jewelry', frm.doc.pawn_ticket_no, 'interest_rate')
+		.then(data => {
+			let int_rate;
+			frappe.db.get_single_value('Pawnshop Management Settings', 'gadget_interest_rate')
+			.then(rate => {
+				if(data.message.interest_rate != rate){
+
+					//old rate of gadgets is 7%
+					int_rate = data.message.interest_rate;
+					if(int_rate == 0){
+						int_rate = 7;
+					}
+				}else{
+					int_rate = data.message.interest_rate;
+				}
+	
+				let new_interest = (parseFloat(frm.doc.principal_amount) - parseFloat(frm.doc.additional_amortization)) * (int_rate/100);
+				frm.set_value('advance_interest', new_interest);
+				frm.refresh_field('advance_interest');
+
+			})
+
 		})
+
+		// frappe.db.get_single_value('Pawnshop Management Settings', 'gadget_interest_rate')
+		// .then(rate => {
+		// 	let new_interest = (parseFloat(frm.doc.principal_amount) - parseFloat(frm.doc.additional_amortization)) * (rate/100);
+		// 	frm.set_value('advance_interest', new_interest);
+		// 	frm.refresh_field('advance_interest');
+		// })
+
 	} else {
 		frappe.db.get_single_value('Pawnshop Management Settings', 'jewelry_interest_rate')
 		.then(rate => {
