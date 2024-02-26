@@ -47,6 +47,11 @@ def transfer_to_next_pt_j(pawn_ticket, nxt_pt):
 	new_pawn_ticket.net_proceeds = previous_pawn_ticket.net_proceeds
 	new_pawn_ticket.save(ignore_permissions=True)
 	new_pawn_ticket.submit()
+	
+	# check if from Renewal, replace the New Pawn ticket field with the correct PT
+	pr_renewal_check = frappe.get_all("Provisional Receipt", filters={"new_pawn_ticket_no": pawn_ticket, "date_issued": today()}, fields=["name"])
+	if pr_renewal_check:
+		frappe.db.set_value('Provisional Receipt',pr_renewal_check[0].name, 'new_pawn_ticket_no',nxt_pt)
 
 @frappe.whitelist()
 def transfer_to_next_pt_nj(pawn_ticket, nxt_pt):
@@ -88,3 +93,8 @@ def transfer_to_next_pt_nj(pawn_ticket, nxt_pt):
 	new_pawn_ticket.net_proceeds = previous_pawn_ticket.net_proceeds
 	new_pawn_ticket.save(ignore_permissions=True)
 	new_pawn_ticket.submit()
+
+	# check if from Renewal, replace the New Pawn ticket field with the correct PT
+	pr_renewal_check = frappe.get_all("Provisional Receipt", filters={"new_pawn_ticket_no": pawn_ticket, "date_issued": today()}, fields=["name"])
+	if pr_renewal_check:
+		frappe.db.set_value('Provisional Receipt',pr_renewal_check[0].name, 'new_pawn_ticket_no',nxt_pt)

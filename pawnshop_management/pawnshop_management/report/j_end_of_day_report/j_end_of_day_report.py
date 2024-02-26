@@ -45,17 +45,21 @@ def execute(filters=None):
 	for i in range(len(data)):
 		description = ""
 		comments = string_extractor(data[i]["_comments"])
-		details = frappe.db.get_list("Jewelry List", filters={'parent': data[i]['pawn_ticket']}, fields=['item_no', 'type', 'karat_category', 'karat', 'weight', 'color', 'colors_if_multi', 'additional_for_stone', 'comments'])
+		details = frappe.db.get_list("Jewelry List", filters={'parent': data[i]['pawn_ticket']}, fields=['item_no', 'type', 'karat_category', 'karat', 'weight', 'color', 'colors_if_multi', 'additional_for_stone', 'comments', 'densi'])
 		customer = frappe.get_doc('Customer', data[i]['customers_tracking_no'])
 		data[i]['contact_no'] = customer.mobile_no
 		for j in range(len(details)):
 			if details[j]["colors_if_multi"] == None:
 				details[j]["colors_if_multi"] = ''
-
 			if details[j]['additional_for_stone'] == None:
 				details[j]['additional_for_stone'] = ''
+			if details[j]['densi'] == None:
+				details[j]['densi'] = ''
+			else:
+				densi_reading = details[j]['densi']
+				details[j]['densi'] = 'D('+ densi_reading +')'
 				
-			description += str(details[j]["item_no"]) + ", " + details[j]["type"] + ", " + str(details[j]["karat_category"]) + ", " + str(details[j]["karat"]) + ", " + str(details[j]["weight"]) + ", " + str(details[j]["color"]) + ", " + str(details[j]["colors_if_multi"]) + ", " + str(details[j]["additional_for_stone"]) + str(details[j]["comments"]) + "; "
+			description += str(details[j]["item_no"]) + ", " + details[j]["type"] + ", " + str(details[j]["karat_category"]) + ", " + str(details[j]["karat"]) + ", " + str(details[j]["weight"]) + ", " + str(details[j]["color"]) + " " + str(details[j]["colors_if_multi"]) + " " + str(details[j]["additional_for_stone"]) + " " + str(details[j]["densi"]) + " comments: " + str(details[j]["comments"]) + "; "
 		data[i]['description'] = description
 		data[i]["comments"] = comments
 	return columns, data
