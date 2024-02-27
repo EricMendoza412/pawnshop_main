@@ -112,7 +112,26 @@ frappe.ui.form.on('Jewelry Items', {
 							"Appraiser",
 							"Supervisor",
 							"Appraiser/Cashier",
-							"Vault Custodian"
+							"Vault Custodian",
+							"Operations Manager",
+							"Area Manager"
+						]
+					]
+				}
+			};
+		});
+		frm.set_query('main_appraiser_acct', function() {
+			return {
+				"filters": {
+					"role_profile_name": [
+						"in", 
+						[
+							"Appraiser",
+							"Supervisor",
+							"Appraiser/Cashier",
+							"Vault Custodian",
+							"Operations Manager",
+							"Area Manager"
 						]
 					]
 				}
