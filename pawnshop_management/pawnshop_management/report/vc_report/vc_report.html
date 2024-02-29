@@ -146,13 +146,14 @@
   <table class="table table-bordered">
 	<thead>
 		<tr>
-			<th style="width: 17%">{%= __("Date Redeemed") %}</th>
-			<th style="width: 17%">{%= __("Pawn Ticket (A)") %}</th>
-			<th style="width: 17%">{%= __("Principal") %}</th>
-			<th style="width: 17%">{%= __("Net Proceeds") %}</th>
-			<th style="width: 16%">{%= __("Accrued Interest") %}</th>
-			<th style="width: 16%">{%= __("Short Term Discount") %}</th>
-			<th style="width: 16%">{%= __("Other Discount") %}</th>
+			<th style="width: 13%">{%= __("Date Redeemed") %}</th>
+			<th style="width: 12%">{%= __("Inventory#") %}</th>
+			<th style="width: 12%">{%= __("Pawn Ticket (A)") %}</th>
+			<th style="width: 12%">{%= __("Principal") %}</th>
+			<th style="width: 10%">{%= __("Net Proceeds") %}</th>
+			<th style="width: 10%">{%= __("Accrued Interest") %}</th>
+			<th style="width: 12%">{%= __("Short Term Discount") %}</th>
+			<th style="width: 9%">{%= __("Other Discount") %}</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -166,6 +167,7 @@
 				<tr>
 				{% if((data[i].workflow_state == "Redemption") && (data[i].item_series == "A")) { %}
 				<td>{%= data[i].date_loan_granted %}</td>
+				<td>{%= data[i].inventory_tracking %}</td>
 				<td>{%= data[i].pawn_ticket %}</td>
 				<td>{%= data[i].change_status_date %}</td>
 				<td>{% let netRDP = data[i].change_status_date - data[i].interest %}
@@ -185,6 +187,7 @@
 		{% } %}
 			<tr>
 				<td><b>Count: </b>{{ countRD}}</td>
+				<td></td>
 				<td style="text-align: right"><b>Total:</b></td>
 				<td>{{ sum }}</td>
 				<td>{{ sumNPRDA }}</td>
@@ -198,13 +201,14 @@
   <table class="table table-bordered">
 	<thead>
 		<tr>
-			<th style="width: 17%">{%= __("Date Redeemed") %}</th>
-			<th style="width: 17%">{%= __("Pawn Ticket (B)") %}</th>
-			<th style="width: 17%">{%= __("Principal") %}</th>
-			<th style="width: 17%">{%= __("Net Proceeds") %}</th>
-			<th style="width: 16%">{%= __("Accrued Interest") %}</th>
-			<th style="width: 16%">{%= __("Short Term Discount") %}</th>
-			<th style="width: 16%">{%= __("Other Discount") %}</th>
+			<th style="width: 13%">{%= __("Date Redeemed") %}</th>
+			<th style="width: 12%">{%= __("Inventory#") %}</th>
+			<th style="width: 12%">{%= __("Pawn Ticket (B)") %}</th>
+			<th style="width: 12%">{%= __("Principal") %}</th>
+			<th style="width: 10%">{%= __("Net Proceeds") %}</th>
+			<th style="width: 10%">{%= __("Accrued Interest") %}</th>
+			<th style="width: 12%">{%= __("Short Term Discount") %}</th>
+			<th style="width: 9%">{%= __("Other Discount") %}</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -218,6 +222,7 @@
 				<tr>
 				{% if((data[i].workflow_state == "Redemption") && (data[i].item_series == "B") && (data[i].inventory_tracking_no == "Pawn Ticket Jewelry")) { %}
 				<td>{%= data[i].date_loan_granted %}</td>
+				<td>{%= data[i].inventory_tracking %}</td>
 				<td>{%= data[i].pawn_ticket %}</td>
 				<td>{%= data[i].change_status_date %}</td>
 				<td>{% let netRDPB = data[i].change_status_date - data[i].interest %}
@@ -237,6 +242,7 @@
 		{% } %}
 			<tr>
 				<td><b>Count: </b>{{ countRDB}}</td>
+				<td></td>
 				<td style="text-align: right"><b>Total:</b></td>
 				<td>{{ sumB }}</td>
 				<td>{{ sumNPRDB }}</td>
@@ -250,13 +256,14 @@
   <table class="table table-bordered">
 	<thead>
 		<tr>
-			<th style="width: 17%">{%= __("Date Redeemed") %}</th>
-			<th style="width: 17%">{%= __("Pawn Ticket (NJ)") %}</th>
-			<th style="width: 17%">{%= __("Principal") %}</th>
-			<th style="width: 17%">{%= __("Net Proceeds") %}</th>
-			<th style="width: 16%">{%= __("Accrued Interest") %}</th>
-			<th style="width: 16%">{%= __("Short Term Discount") %}</th>
-			<th style="width: 16%">{%= __("Other Discount") %}</th>
+			<th style="width: 13%">{%= __("Date Redeemed") %}</th>
+			<th style="width: 12%">{%= __("Inventory#") %}</th>
+			<th style="width: 12%">{%= __("Pawn Ticket (NJ)") %}</th>
+			<th style="width: 12%">{%= __("Principal") %}</th>
+			<th style="width: 10%">{%= __("Net Proceeds") %}</th>
+			<th style="width: 10%">{%= __("Accrued Interest") %}</th>
+			<th style="width: 12%">{%= __("Short Term Discount") %}</th>
+			<th style="width: 9%">{%= __("Other Discount") %}</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -270,6 +277,7 @@
 				<tr>
 				{% if((data[i].workflow_state == "Redemption") && (data[i].item_series == "B") && (data[i].inventory_tracking_no == "Pawn Ticket Non Jewelry")) { %}
 				<td>{%= data[i].date_loan_granted %}</td>
+				<td>{%= data[i].inventory_tracking %}</td>
 				<td>{%= data[i].pawn_ticket %}</td>
 				<td>{%= data[i].change_status_date %}</td>
 				<td>{% let netRDPBNJ = data[i].change_status_date - data[i].interest %}
@@ -289,6 +297,7 @@
 		{% } %}
 			<tr>
 				<td><b>Count: </b>{{ countRDBNJ}}</td>
+				<td></td>
 				<td style="text-align: right"><b>Total:</b></td>
 				<td>{{ sumBNJ }}</td>
 				<td>{{ sumNPRDBNJ }}</td>
@@ -318,6 +327,7 @@
 		{% let sumNPA = 0 %}
 		{% let sumAI = 0 %}
 		{% let sumD = 0 %}
+		{% let countRN = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
 			<tr>
 				{% if((data[i].workflow_state == "Renewal") && (data[i].item_series == "A")) { %} 	
@@ -334,11 +344,12 @@
 				{% sumRN += data[i].change_status_date %}
 				{% sumAI += data[i].interest_payment %}
 				{% sumD += data[i].other_discount_tawad %}
-				{% sumNPA += netP } %}
+				{% sumNPA += netP %}
+				{% countRN += 1 } %}
 			</tr>
 		{% } %}
 			<tr>
-				<td></td>
+				<td><b>Count: </b>{{ countRN}}</td>
 				<td></td>
 				<td></td>
 				<td style="text-align: right"><b>Total:</b></td>
@@ -368,6 +379,7 @@
 		{% let sumNPB = 0 %}
 		{% let sumAIB = 0 %}
 		{% let sumDB = 0 %}
+		{% let countRNA = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
 			<tr>
 				{% if((data[i].workflow_state == "Renewal") && (data[i].item_series == "B") && (data[i].inventory_tracking_no == "Pawn Ticket Jewelry")) { %} 	
@@ -385,11 +397,12 @@
 				{% sumAIB += data[i].interest_payment %}
 				{% sumDB += data[i].other_discount_tawad %}
 				{% sumNPB += netPB %}
+				{% countRNA += 1 %}
 				{% } %}
 			</tr>
 		{% } %}
 			<tr>
-				<td></td>
+				<td><b>Count: </b>{{ countRNA}}</td>
 				<td></td>
 				<td></td>
 				<td style="text-align: right"><b>Total:</b></td>
@@ -419,6 +432,7 @@
 		{% let sumNPNJ = 0 %}
 		{% let sumAINJ = 0 %}
 		{% let sumDNJ = 0 %}
+		{% let countRNNJ = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
 			<tr>
 				{% if((data[i].workflow_state == "Renewal") && (data[i].item_series == "B") && (data[i].inventory_tracking_no == "Pawn Ticket Non Jewelry")) { %} 	
@@ -435,11 +449,12 @@
 				{% sumRNNJ += data[i].change_status_date %}
 				{% sumAINJ += data[i].interest_payment %}
 				{% sumDNJ += data[i].other_discount_tawad %}
-				{% sumNPNJ += netPNJ } %}
+				{% sumNPNJ += netPNJ %}
+				{% countRNNJ += 1 } %}
 			</tr>
 		{% } %}
 			<tr>
-				<td></td>
+				<td><b>Count: </b>{{ countRNNJ}}</td>
 				<td></td>
 				<td></td>
 				<td style="text-align: right"><b>Total:</b></td>
@@ -472,6 +487,7 @@
 		{% let sumwNPRA = 0 %}
 		{% let sumwAI = 0 %}
 		{% let sumwD = 0 %}
+		{% let countRNWA = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
 			<tr>
 				{% if((data[i].workflow_state == "Renewal w/ Amortization") && (data[i].item_series == "A")) { %} 	
@@ -492,11 +508,12 @@
 				{% sumwAI += data[i].interest_payment %}
 				{% sumwD += data[i].other_discount_tawad %}
 				{% sumwNPRA += newwP %}
-				{% sumwNPA += netwP } %}
+				{% sumwNPA += netwP %}
+				{% countRNWA += 1 } %}
 			</tr>
 		{% } %}
 			<tr>
-				<td></td>
+				<td><b>Count: </b>{{ countRNWA}}</td>
 				<td></td>
 				<td></td>
 				<td style="text-align: right"><b>Total:</b></td>
@@ -529,6 +546,7 @@
 		{% let sumwNPRB = 0 %}
 		{% let sumwAIB = 0 %}
 		{% let sumwDB = 0 %}
+		{% let countRNWAB = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
 			<tr>
 				{% if((data[i].workflow_state == "Renewal w/ Amortization") && (data[i].item_series == "B") && (data[i].inventory_tracking_no == "Pawn Ticket Jewelry")) { %} 	
@@ -549,11 +567,12 @@
 				{% sumwAIB += data[i].interest_payment %}
 				{% sumwDB += data[i].other_discount_tawad %}
 				{% sumwNPB += netwPB %}
-				{% sumwNPRB += newwPB } %}
+				{% sumwNPRB += newwPB %}
+				{% countRNWAB += 1 } %}
 			</tr>
 		{% } %}
 			<tr>
-				<td></td>
+				<td><b>Count: </b>{{ countRNWAB}}</td>
 				<td></td>
 				<td></td>
 				<td style="text-align: right"><b>Total:</b></td>
@@ -586,6 +605,7 @@
 		{% let sumwNPRNJ = 0 %}
 		{% let sumwAINJ = 0 %}
 		{% let sumwDNJ = 0 %}
+		{% let countRNWANJ = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
 			<tr>
 				{% if((data[i].workflow_state == "Renewal w/ Amortization") && (data[i].item_series == "B") && (data[i].inventory_tracking_no == "Pawn Ticket Non Jewelry")) { %} 	
@@ -606,11 +626,12 @@
 				{% sumwAINJ += data[i].interest_payment %}
 				{% sumwDNJ += data[i].other_discount_tawad %}
 				{% sumwNPRNJ += newwPNJ %}
-				{% sumwNPNJ += netwPNJ } %}
+				{% sumwNPNJ += netwPNJ %}
+				{% countRNWANJ += 1 } %}
 			</tr>
 		{% } %}
 			<tr>
-				<td></td>
+				<td><b>Count: </b>{{ countRNWANJ}}</td>
 				<td></td>
 				<td></td>
 				<td style="text-align: right"><b>Total:</b></td>
@@ -623,11 +644,10 @@
 	</tbody>
   </table>
 
-  <h3>Amortizations</h3>
+  <h3>Amortizations only</h3>
   <table class="table table-bordered">
 	<thead>
 		<tr>
-			<th style="width: 16%">{%= __("Type") %}</th>
 			<th style="width: 17%">{%= __("Date of Amortization") %}</th>
 			<th style="width: 17%">{%= __("Pawn Ticket (A)") %}</th>
 			<th style="width: 17%">{%= __("Inventory#") %}</th>
@@ -640,10 +660,7 @@
 		{% let sumPrincipal = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
 			<tr>
-				{% if((data[i].item_series == "A") && ((data[i].workflow_state == "Amortization") || (data[i].workflow_state == "Renewal w/ Amortization"))) { %}
-				<td>{% if(data[i].inventory_tracking_no == "Pawn Ticket Non Jewelry"){ %}
-					{%= __("Gadget") %}
-					{%}%}</td>
+				{% if((data[i].item_series == "A") && (data[i].workflow_state == "Amortization")) { %}
 				<td>{%= data[i].date_loan_granted %}</td>
 				<td>{%= data[i].pawn_ticket %}</td>
 				<td>{%= data[i].inventory_tracking %}</td>
@@ -659,7 +676,6 @@
 			<tr>
 				<td></td>
 				<td></td>
-				<td></td>
 				<td style="text-align: right"><b>Total:</b></td>
 				<td> {{ sumAmort }}</td>
 				<td> {{ sumPrincipal }}</td>
@@ -670,7 +686,6 @@
   <table class="table table-bordered">
 	<thead>
 		<tr>
-			<th style="width: 16%">{%= __("Type") %}</th>
 			<th style="width: 17%">{%= __("Date of Amortization") %}</th>
 			<th style="width: 17%">{%= __("Pawn Ticket (B)") %}</th>
 			<th style="width: 17%">{%= __("Inventory#") %}</th>
@@ -683,10 +698,7 @@
 		{% let sumPrincipalB = 0 %}
 		{% for(var i=0, l=data.length; i<l; i++) { %}
 			<tr>
-				{% if((data[i].item_series == "B") && ((data[i].workflow_state == "Amortization") || (data[i].workflow_state == "Renewal w/ Amortization"))) { %}
-				<td>{% if(data[i].inventory_tracking_no == "Pawn Ticket Non Jewelry"){ %}
-					{%= __("Gadget") %}
-					{%}%}</td>
+				{% if((data[i].item_series == "B") && (data[i].workflow_state == "Amortization") && (data[i].inventory_tracking_no == "Pawn Ticket Jewelry")) { %}
 				<td>{%= data[i].date_loan_granted %}</td>
 				<td>{%= data[i].pawn_ticket %}</td>
 				<td>{%= data[i].inventory_tracking %}</td>
@@ -702,10 +714,47 @@
 			<tr>
 				<td></td>
 				<td></td>
-				<td></td>
 				<td style="text-align: right"><b>Total:</b></td>
 				<td> {{ sumAmortB }}</td>
 				<td> {{ sumPrincipalB }}</td>
+			</tr>
+	</tbody>
+  </table>
+
+  <table class="table table-bordered">
+	<thead>
+		<tr>
+			<th style="width: 17%">{%= __("Date of Amortization") %}</th>
+			<th style="width: 17%">{%= __("Pawn Ticket (NJ)") %}</th>
+			<th style="width: 17%">{%= __("Inventory#") %}</th>
+			<th style="width: 16%">{%= __("Amortization Amount") %}</th>
+			<th style="width: 17%">{%= __("New Principal") %}</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% let sumAmortBNJ = 0 %}
+		{% let sumPrincipalBNJ = 0 %}
+		{% for(var i=0, l=data.length; i<l; i++) { %}
+			<tr>
+				{% if((data[i].item_series == "B") && (data[i].workflow_state == "Amortization") && (data[i].inventory_tracking_no == "Pawn Ticket Non Jewelry")) { %}
+				<td>{%= data[i].date_loan_granted %}</td>
+				<td>{%= data[i].pawn_ticket %}</td>
+				<td>{%= data[i].inventory_tracking %}</td>
+				<td>{%= data[i].desired_principal %}</td>
+				<td>{% let newPrincipalBNJ = data[i].change_status_date - data[i].desired_principal %}
+					{{newPrincipalBNJ}}
+				</td>
+				{% sumAmortBNJ += data[i].desired_principal %}
+				{% sumPrincipalBNJ += newPrincipalBNJ %}
+				{% } %}
+			</tr>
+		{% } %}
+			<tr>
+				<td></td>
+				<td></td>
+				<td style="text-align: right"><b>Total:</b></td>
+				<td> {{ sumAmortBNJ }}</td>
+				<td> {{ sumPrincipalBNJ }}</td>
 			</tr>
 	</tbody>
   </table>
@@ -804,7 +853,7 @@
 			</tr>
 			<tr>
 				<td>{%= __("Hulog w/out Renew (Amortization Only)") %}</td>
-				<td>{{ sumAmort + sumAmortB - (sumwRN + sumwRNB + sumwRNNJ - sumwNPRA - sumwNPRB - sumwNPRNJ)}}</td>
+				<td>{{ sumAmort + sumAmortB + sumAmortBNJ}}</td>
 			</tr>
 			<tr>
 				<td>{%= __("Additional Pawn") %}</td>
@@ -813,6 +862,14 @@
 			<tr>
 				<td>{%= __("Additional Redeem") %}</td>
 				<td>{% let totalHulogWithRn = sumwRN + sumwRNB + sumwRNNJ - sumwNPRA - sumwNPRB - sumwNPRNJ %}{{ sum + sumAIRDA - sumODTA + sumB + sumAIRDB - sumODTB + sumBNJ + sumAIRDBNJ - sumODTBNJ + sumRN + sumAI - sumD + sumRNB + sumAIB - sumDB + sumRNNJ + sumAINJ - sumDNJ + sumwRN + sumwAI - sumwD + sumwRNB + sumwAIB - sumwDB + sumwRNNJ + sumwAINJ - sumwDNJ - totalHulogWithRn}}</td>
+			</tr>
+			<tr>
+				<td>{%= __("J Principal(Tubos)") %}</td>
+				<td>{{ sumAmort + sumAmortB + sum + sumB + (sumwRN - sumwNPRA) + (sumwRNB - sumwNPRB)}}</td>
+			</tr>
+			<tr>
+				<td>{%= __("NJ Principal(Tubos)") %}</td>
+				<td>{{ sumAmortBNJ + sumBNJ + (sumwRNNJ - sumwNPRNJ)}}</td>
 			</tr>
 			<tr>
 				<td>{%= __("Additional Partial Payment") %}</td>
@@ -825,6 +882,16 @@
 			<tr>
 				<td>{%= __("Hulog w/ Renew") %}</td>
 				<td>{{ totalHulogWithRn }}</td>
+			</tr>
+			<tr>
+				<td>{%= __("Completion of Accrued Interest") %}</td>
+				{% let sumComAccInt = 0 %}
+				{% for(var i=0, l=data.length; i<l; i++) { %}
+					{% if(data[i].previous_interest_payment > 0) { %}
+						{% sumComAccInt += data[i].previous_interest_payment %}
+					{% } %}
+				{% } %}
+				<td>{{ sumComAccInt}}</td>
 			</tr>
 	</tbody>
   </table>

@@ -4,6 +4,7 @@
 import frappe
 from frappe import _
 from pawnshop_management.pawnshop_management.custom_codes.get_ip import get_ip_from_settings
+from frappe import get_list
 
 
 def execute(filters=None):
@@ -58,24 +59,37 @@ def execute(filters=None):
 		conditions5 += f" AND `tabProvisional Receipt`.date_issued = '{filters.get('change_status_date')}' "
 		conditions5 += f" AND `tabProvisional Receipt`.branch = '{branch}' "
 
+	
 	data_rejected_J = frappe.db.sql(f"""
-        SELECT branch, change_status_date, '' as old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, '' as inventory_tracking_no, desired_principal, net_proceeds, '' as item_series, 'J' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking
+        SELECT branch, change_status_date, '' as old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, '' as inventory_tracking_no, desired_principal, net_proceeds, '' as item_series, 'J' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking, '' as previous_interest_payment
         FROM `tabPawn Ticket Jewelry`
         WHERE `tabPawn Ticket Jewelry`.docstatus=2
         AND `tabPawn Ticket Jewelry`.workflow_state = 'Rejected'
         {conditions}
     """, as_dict=True)
 
+	for pt in data_rejected_J:
+		pt_match = frappe.db.get_value('Pawn Ticket Jewelry',{'amended_from':pt.pawn_ticket},'name')
+		if pt_match:
+			#delete pt from data_rejected_J
+			data_rejected_J.remove(pt)
+
 	data_rejected_NJ = frappe.db.sql(f"""
-        SELECT branch, change_status_date, '' as old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, '' as inventory_tracking_no, desired_principal, net_proceeds, '' as item_series, 'NJ' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking
+        SELECT branch, change_status_date, '' as old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, '' as inventory_tracking_no, desired_principal, net_proceeds, '' as item_series, 'NJ' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking, '' as previous_interest_payment
         FROM `tabPawn Ticket Non Jewelry`
         WHERE `tabPawn Ticket Non Jewelry`.docstatus=2
         AND `tabPawn Ticket Non Jewelry`.workflow_state = 'Rejected'
         {conditions3}
     """, as_dict=True)
 
+	for ptNJ in data_rejected_NJ:
+		pt_match_NJ = frappe.db.get_value('Pawn Ticket Non Jewelry',{'amended_from':ptNJ.pawn_ticket},'name')
+		if pt_match_NJ:
+			#delete pt from data_rejected_J
+			data_rejected_NJ.remove(ptNJ)
+
 	data_redeemed_J = frappe.db.sql(f"""
-        SELECT branch, change_status_date, old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, '' as net_proceeds, item_series, 'J' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking
+        SELECT branch, change_status_date, old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, '' as net_proceeds, item_series, 'J' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking, '' as previous_interest_payment
         FROM `tabPawn Ticket Jewelry`
         WHERE `tabPawn Ticket Jewelry`.docstatus=1
         AND `tabPawn Ticket Jewelry`.workflow_state = 'Redeemed'
@@ -83,7 +97,7 @@ def execute(filters=None):
     """, as_dict=True)
 	
 	data_renewed_J = frappe.db.sql(f"""
-		SELECT branch, change_status_date, old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, '' as net_proceeds, item_series, 'J' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking
+		SELECT branch, change_status_date, old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, '' as net_proceeds, item_series, 'J' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking, '' as previous_interest_payment
 		FROM `tabPawn Ticket Jewelry`
 		WHERE `tabPawn Ticket Jewelry`.docstatus=1
 		AND `tabPawn Ticket Jewelry`.old_pawn_ticket IS NOT NULL
@@ -91,7 +105,7 @@ def execute(filters=None):
 	""", as_dict=True)
 
 	data_new_sangla_J = frappe.db.sql(f"""
-		SELECT branch, change_status_date, '' as old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, net_proceeds, item_series, 'J' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking
+		SELECT branch, change_status_date, '' as old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, net_proceeds, item_series, 'J' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking, '' as previous_interest_payment
 		FROM `tabPawn Ticket Jewelry`
 		WHERE `tabPawn Ticket Jewelry`.docstatus=1
 		AND `tabPawn Ticket Jewelry`.old_pawn_ticket IS NULL		
@@ -99,7 +113,7 @@ def execute(filters=None):
 	""", as_dict=True)
 
 	data_redeemed_NJ = frappe.db.sql(f"""
-        SELECT branch, change_status_date, old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, '' as net_proceeds, item_series, 'NJ' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking
+        SELECT branch, change_status_date, old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, '' as net_proceeds, item_series, 'NJ' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking, '' as previous_interest_payment
         FROM `tabPawn Ticket Non Jewelry`
         WHERE `tabPawn Ticket Non Jewelry`.docstatus=1
         AND `tabPawn Ticket Non Jewelry`.workflow_state = 'Redeemed'
@@ -107,7 +121,7 @@ def execute(filters=None):
     """, as_dict=True)
 	
 	data_renewed_NJ = frappe.db.sql(f"""
-		SELECT branch, change_status_date, old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, '' as net_proceeds, item_series, 'NJ' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking
+		SELECT branch, change_status_date, old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, '' as net_proceeds, item_series, 'NJ' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking, '' as previous_interest_payment
 		FROM `tabPawn Ticket Non Jewelry`
 		WHERE `tabPawn Ticket Non Jewelry`.docstatus=1
 		AND `tabPawn Ticket Non Jewelry`.old_pawn_ticket IS NOT NULL
@@ -115,7 +129,7 @@ def execute(filters=None):
 	""", as_dict=True)
 
 	data_new_sangla_NJ = frappe.db.sql(f"""
-		SELECT branch, change_status_date, '' as old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, net_proceeds, item_series, 'NJ' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking
+		SELECT branch, change_status_date, '' as old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, net_proceeds, item_series, 'NJ' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking, '' as previous_interest_payment
 		FROM `tabPawn Ticket Non Jewelry`
 		WHERE `tabPawn Ticket Non Jewelry`.docstatus=1
 		AND `tabPawn Ticket Non Jewelry`.old_pawn_ticket IS NULL
@@ -123,7 +137,7 @@ def execute(filters=None):
 	""", as_dict=True)
 
 	data_pr = frappe.db.sql(f"""
-		SELECT branch, principal_amount as change_status_date, new_pawn_ticket_no as old_pawn_ticket, transaction_type as workflow_state, pawn_ticket_no as pawn_ticket, date_issued as date_loan_granted, pawn_ticket_type as inventory_tracking_no, additional_amortization as desired_principal, total as net_proceeds, series as item_series, '' as pt_type, interest, interest_payment, discount, other_discount_tawad, inventory_tracking
+		SELECT branch, principal_amount as change_status_date, new_pawn_ticket_no as old_pawn_ticket, transaction_type as workflow_state, pawn_ticket_no as pawn_ticket, date_issued as date_loan_granted, pawn_ticket_type as inventory_tracking_no, additional_amortization as desired_principal, total as net_proceeds, series as item_series, '' as pt_type, interest, interest_payment, discount, other_discount_tawad, inventory_tracking, previous_interest_payment 
 		FROM `tabProvisional Receipt`
 		WHERE `tabProvisional Receipt`.docstatus=1
 		{conditions5}

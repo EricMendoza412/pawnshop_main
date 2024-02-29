@@ -17,6 +17,24 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
         //         }
         //     );
         // });
+			//show print reminder if there is no existing Access log with method: Print for this document yet
+			frappe.call('pawnshop_management.pawnshop_management.custom_codes.get_pt_info.if_printed', {
+				pawn_ticket: frm.doc.name
+			}).then(record => {
+				//console.log(record.message);
+				if((!record.message) && frm.doc.workflow_state == "Active"){		
+					 let pt_name = frm.doc.name.split("-")
+					 let actual_pt_name = pt_name[1]
+					 if(frm.doc.item_series == "A"){
+						actual_pt_name = actual_pt_name + "A"
+					 }
+
+					frappe.msgprint({
+						title:__('Reminder for printing'),
+						message: __('Please insert Pawn Ticket '+ actual_pt_name +' into the printer')
+					})
+				}
+			})
     },
 
 	after_save: function(frm){
