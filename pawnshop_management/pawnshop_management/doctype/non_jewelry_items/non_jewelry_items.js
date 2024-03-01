@@ -83,17 +83,17 @@ frappe.ui.form.on('Non Jewelry Items', {
 		frm.set_df_property('bag', 'hidden', 1);
 		frm.set_df_property('extra_battery', 'hidden', 1);
 		frm.set_df_property('extra_lens', 'hidden', 1);
-		frm.add_custom_button('Update Data', function(){
-			frappe.call({
-				method: 'pawnshop_management.pawnshop_management.custom_codes.import_gadgets_info.update_gadgets_data',
-				callback: (r) =>{
-					frappe.show_alert({
-						message:__('Update Successful'),
-						indicator:'green'
-					}, 5)
-				}
-			})
-		});
+		// frm.add_custom_button('Update Data', function(){
+		// 	frappe.call({
+		// 		method: 'pawnshop_management.pawnshop_management.custom_codes.import_gadgets_info.update_gadgets_data',
+		// 		callback: (r) =>{
+		// 			frappe.show_alert({
+		// 				message:__('Update Successful'),
+		// 				indicator:'green'
+		// 			}, 5)
+		// 		}
+		// 	})
+		// });
 
 		frm.set_query('brand', function(){
 			if (frm.doc.type == "Cellphone") {

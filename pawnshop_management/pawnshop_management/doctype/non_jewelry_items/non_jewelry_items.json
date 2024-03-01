@@ -65,8 +65,7 @@
    "in_list_view": 1,
    "label": "Type",
    "options": "Cellphone\nTablet\nLaptop\nCamera",
-   "reqd": 1,
-   "set_only_once": 1
+   "reqd": 1
   },
   {
    "fieldname": "brand",
@@ -74,8 +73,7 @@
    "in_list_view": 1,
    "label": "Brand",
    "options": "Brands",
-   "reqd": 1,
-   "set_only_once": 1
+   "reqd": 1
   },
   {
    "fieldname": "column_break_4",
@@ -86,8 +84,7 @@
    "fieldname": "category",
    "fieldtype": "Select",
    "label": "Category",
-   "options": "Defective\nMinimum\nMaximum",
-   "set_only_once": 1
+   "options": "Defective\nMinimum\nMaximum"
   },
   {
    "default": "0.00",
@@ -117,24 +114,21 @@
    "in_list_view": 1,
    "label": "Model",
    "options": "Models",
-   "reqd": 1,
-   "set_only_once": 1
+   "reqd": 1
   },
   {
    "fieldname": "ram",
    "fieldtype": "Select",
    "label": "RAM",
    "options": "Not Shown\n1 GB\n2 GB\n3 GB\n4 GB\n6 GB\n8 GB\n12 GB\n16 GB",
-   "reqd": 1,
-   "set_only_once": 1
+   "reqd": 1
   },
   {
    "fieldname": "internal_memory",
    "fieldtype": "Select",
    "label": "Internal Memory",
    "options": "32 GB\n64 GB\n128 GB\n237 GB\n256 GB\n512 GB\n930 GB\n1 TB\n2 TB",
-   "reqd": 1,
-   "set_only_once": 1
+   "reqd": 1
   },
   {
    "fieldname": "disk_type",
@@ -147,8 +141,7 @@
    "fieldname": "color",
    "fieldtype": "Data",
    "label": "Color",
-   "reqd": 1,
-   "set_only_once": 1
+   "reqd": 1
   },
   {
    "fieldname": "accessories_section",
@@ -160,15 +153,13 @@
    "default": "0",
    "fieldname": "charger",
    "fieldtype": "Check",
-   "label": "Charger",
-   "set_only_once": 1
+   "label": "Charger"
   },
   {
    "fieldname": "model_number",
    "fieldtype": "Data",
    "label": "Model Number",
-   "reqd": 1,
-   "set_only_once": 1
+   "reqd": 1
   },
   {
    "fieldname": "internet_connection_capability",
@@ -188,8 +179,7 @@
    "default": "0",
    "fieldname": "case",
    "fieldtype": "Check",
-   "label": "Case",
-   "set_only_once": 1
+   "label": "Case"
   },
   {
    "default": "0",
@@ -324,7 +314,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-01 14:53:33.927578",
+ "modified": "2024-03-01 10:10:09.092293",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",
