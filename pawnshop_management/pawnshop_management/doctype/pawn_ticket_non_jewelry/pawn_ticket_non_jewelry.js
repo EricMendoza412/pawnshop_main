@@ -26,7 +26,17 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 
 	refresh: function(frm){
 
+		let dlg_workf_good = false
+		if((frm.doc.date_loan_granted == frappe.datetime.get_today()) && (frm.doc.workflow_state == 'Active')){
+			dlg_workf_good = true
+		} 
+		let role_good = false
 		if(frappe.user_roles.includes('Operations Manager') || frappe.user_roles.includes('Administrator')){
+			role_good = true
+		}
+
+
+		if(dlg_workf_good && role_good){
 			frm.add_custom_button('Printing Error', function(){
 
 				frappe.msgprint({
