@@ -60,6 +60,7 @@ def transfer_to_next_pt_nj(pawn_ticket, nxt_pt):
 	frappe.db.set_value('Pawn Ticket Non Jewelry', pawn_ticket, 'workflow_state', 'Rejected')
 	frappe.db.set_value('Pawn Ticket Non Jewelry', pawn_ticket, 'change_status_date', today())
 	frappe.db.set_value('Pawn Ticket Non Jewelry', pawn_ticket, 'transfer_pt', nxt_pt)
+	frappe.db.set_value('Pawn Ticket Non Jewelry', pawn_ticket, 'docstatus', 2)
 	frappe.db.commit()
 
     # transfer paper jammed PT details to the next PT

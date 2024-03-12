@@ -14,8 +14,8 @@
   "expiry_date",
   "change_status_date",
   "transfer_pt",
-  "texted_upon_maturity_gp_app",
-  "texted_upon_expiry_gp_app",
+  "texted_upon_maturity",
+  "texted_upon_expiry",
   "column_break_6",
   "branch",
   "old_pawn_ticket",
@@ -209,15 +209,17 @@
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "default": "0",
-   "fieldname": "texted_upon_maturity_gp_app",
+   "fieldname": "texted_upon_maturity",
    "fieldtype": "Check",
    "label": "Texted upon maturity (GP app)",
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "default": "0",
-   "fieldname": "texted_upon_expiry_gp_app",
+   "fieldname": "texted_upon_expiry",
    "fieldtype": "Check",
    "label": "Texted upon expiry (GP app)",
    "read_only": 1
@@ -231,7 +233,7 @@
    "link_fieldname": "inventory_tracking_no"
   }
  ],
- "modified": "2024-03-07 11:21:59.714513",
+ "modified": "2024-03-12 10:25:50.398010",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Pawn Ticket Jewelry",
