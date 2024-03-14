@@ -85,7 +85,7 @@ frappe.ui.form.on('Jewelry Items', {
 				frm.set_df_property('karats', 'read_only', 0);
 				frm.set_df_property('branch', 'read_only', 0);
 			}
-			if(frappe.user_roles.includes('Operations Manager')){
+			if(frappe.user_roles.includes('Operations Manager') && frm.doc.workflow_state == "Pawned"){
 				frm.set_df_property('type', 'read_only', 0);
 				frm.set_df_property('karat_category', 'read_only', 0);
 				frm.set_df_property('densi', 'read_only', 0);
