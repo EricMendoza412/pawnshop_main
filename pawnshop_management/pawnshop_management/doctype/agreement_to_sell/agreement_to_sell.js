@@ -97,6 +97,9 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 	}else if(frm.doc.branch == "Garcia's Pawnshop - ALP") {
 		branch_code = 7;
 		branch_name = "ALP";
+	}else if(frm.doc.branch == "Garcia's Pawnshop - NOV") {
+		branch_code = 8;
+		branch_name = "NOV";
 	}else if(frm.doc.branch == "TEST") {
 		branch_code = 20;
 		branch_name = "TEST";
