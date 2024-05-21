@@ -175,7 +175,23 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 	customers_tracking_no: function(frm){
 		if (frm.is_new()){
 			show_tracking_no(frm);
-		}	
+		}
+		frappe.db.get_value('Customer', frm.doc.customers_tracking_no, 'disabled')
+		.then(r =>{
+
+			if (r.message) {
+				const isDisabled = r.message.disabled;
+				if(isDisabled){
+					const message = 'This customer record is disabled';
+					frappe.msgprint(message);
+					setTimeout(function(){
+						frm.set_value('customers_full_name', "");
+						frm.set_value('customer_birthday', "");
+						frm.set_value('customers_tracking_no', "");
+						},2000);
+				}
+			}
+		})
 	},
 
 	amended_from: function(frm){

@@ -209,6 +209,7 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 	},
 
 	customers_tracking_no: function(frm){
+
         let html = ``;
         frappe.call({
             method: "pawnshop_management.pawnshop_management.utils.get_contact_image_by_customer",
@@ -220,9 +221,24 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
                     $(frm.fields_dict['default_image'].wrapper).html(r.message);
                 }
             }
-
         });
 
+		frappe.db.get_value('Customer', frm.doc.customers_tracking_no, 'disabled')
+		.then(r =>{
+
+			if (r.message) {
+				const isDisabled = r.message.disabled;
+				if(isDisabled){
+					const message = 'This customer record is disabled';
+					frappe.msgprint(message);
+					setTimeout(function(){
+						frm.set_value('customers_full_name', "");
+						frm.set_value('customer_birthday', "");
+						frm.set_value('customers_tracking_no', "");
+						},2000);
+				}
+			}
+		})
 
 	},
 
