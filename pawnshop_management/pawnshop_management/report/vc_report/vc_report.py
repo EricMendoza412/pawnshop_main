@@ -151,19 +151,6 @@ def execute(filters=None):
 
 def get_columns():
 	columns = [
-		{
-			'fieldname': 'pt_type',
-			'label': _('Pawn Type'),
-			'fieldtype': 'Data',
-			'width': 200
-		},
-
-		{
-			'fieldname': 'old_pawn_ticket',
-			'label': _('Old pawn ticket'),
-			'fieldtype': 'Data',
-			'width': 200
-		},
 		
 		{
 			'fieldname': 'pawn_ticket',
@@ -176,13 +163,6 @@ def get_columns():
 			'fieldname': 'date_loan_granted',
 			'label': _('DLG or Change Status Date'),
 			'fieldtype': 'Date',
-			'width': 200
-		},
-
-		{
-			'fieldname': 'net_proceeds',
-			'label': _('Net Proceeds'),
-			'fieldtype': 'Data',
 			'width': 200
 		}
 		
