@@ -857,7 +857,15 @@
 			</tr>
 			<tr>
 				<td>{%= __("Additional Pawn") %}</td>
-				<td>{{ sumNPro + sumNProB + sumNProNJ + sumNPA + sumNPB + sumNPNJ + (((sumwNPRA + sumwNPRB) * 0.95) + (sumwNPRNJ * 0.93))}}</td>
+
+					{% let NJRNA_NP = 0 %}
+					{% for(var i=0, l=data.length; i<l; i++) { %}
+						{% if((data[i].pt_type == "NJ") && (data[i].old_pawn_ticket != "")) { %}
+							{% NJRNA_NP += data[i].net_proceeds %}
+						{% } %}
+					{% } %}
+
+				<td>{{ sumNPro + sumNProB + sumNProNJ + sumNPA + sumNPB + sumNPNJ + (((sumwNPRA + sumwNPRB) * 0.95) + NJRNA_NP)}}</td>
 			</tr>
 			<tr>
 				<td>{%= __("Additional Redeem") %}</td>

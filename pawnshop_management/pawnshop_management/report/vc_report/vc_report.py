@@ -123,7 +123,7 @@ def execute(filters=None):
     """, as_dict=True)
 	
 	data_renewed_NJ = frappe.db.sql(f"""
-		SELECT branch, change_status_date, old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, '' as net_proceeds, item_series, 'NJ' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking, '' as previous_interest_payment
+		SELECT branch, change_status_date, old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, net_proceeds, item_series, 'NJ' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking, '' as previous_interest_payment
 		FROM `tabPawn Ticket Non Jewelry`
 		WHERE `tabPawn Ticket Non Jewelry`.docstatus=1
 		AND `tabPawn Ticket Non Jewelry`.old_pawn_ticket IS NOT NULL

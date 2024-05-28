@@ -78,8 +78,16 @@ class JewelryItems(Document):
 			#recompute for Principal, Interest and Net Proceeds after saving and before submitting
 			new_items = new_pawn_ticket.jewelry_items
 			total_principal = 0
-			for items in new_items:
-				total_principal = total_principal + items.desired_principal
+
+			withAmort = frappe.get_list('Provisional Receipt', filters={"transaction_type": "Amortization", "pawn_ticket_no":previous_pawn_ticket.name})
+			withRNA = frappe.get_list('Provisional Receipt', filters={"transaction_type": "Renewal w/ Amortization", "pawn_ticket_no":previous_pawn_ticket.old_pawn_ticket})
+			if withAmort or withRNA :
+				#has amort or Rn w/ amort, do not recompute principal based on items' desired principal
+				total_principal = previous_pawn_ticket.desired_principal
+			else:
+				for items in new_items:
+					total_principal = total_principal + items.desired_principal
+
 			new_pawn_ticket.desired_principal = total_principal
 			interest_rate = previous_pawn_ticket.interest / previous_pawn_ticket.desired_principal
 			new_interest = (total_principal * interest_rate)
