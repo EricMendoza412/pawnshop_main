@@ -294,7 +294,9 @@ function compute_nj_av(frm) {
 		}
 
 		if(frm.doc.not_openline == 1){
-			initial_price = initial_price - 1500;
+			//initial_price = initial_price - 1500;
+			initial_price = initial_price * 0.85;
+			initial_price = Math.round(initial_price / 100) * 100;
 			if(initial_price < 0){
 				initial_price = 0;
 			}
