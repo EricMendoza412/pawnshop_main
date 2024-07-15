@@ -43,7 +43,7 @@ def execute(filters=None):
 	if branch_filter != None:
 		branch = branch_filter
 
-	data = frappe.get_all("Pawn Ticket Non Jewelry", filters={'branch': branch, 'workflow_state': workflow}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'maturity_date', 'expiry_date', 'workflow_state', '_comments'])
+	data = frappe.get_all("Pawn Ticket Non Jewelry", filters={'branch': branch, 'workflow_state': workflow}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'maturity_date', 'expiry_date', 'workflow_state', 'texted_upon_maturity', 'texted_upon_expiry', '_comments'])
 	comments = string_extractor
 	for i in range(len(data)):
 		description = ""
@@ -131,6 +131,20 @@ def get_columns():
 			'fieldname': 'workflow_state',
 			'label': _('Status'),
 			'fieldtype': 'Data',
+			'width': 100
+		},
+
+		{
+			'fieldname': 'texted_upon_maturity',
+			'label': _('Txted(MD)'),
+			'fieldtype': 'Check',
+			'width': 100
+		},
+
+		{
+			'fieldname': 'texted_upon_expiry',
+			'label': _('Txted(ED)'),
+			'fieldtype': 'Check',
 			'width': 100
 		},
 
