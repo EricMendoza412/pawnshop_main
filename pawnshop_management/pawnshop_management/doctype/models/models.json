@@ -19,7 +19,10 @@
   "no_charger_less",
   "column_break_7",
   "item_image",
-  "preview"
+  "preview",
+  "bn_price",
+  "max_av_percent",
+  "max_sell_price"
  ],
  "fields": [
   {
@@ -102,11 +105,26 @@
    "fieldname": "no_charger_less",
    "fieldtype": "Check",
    "label": "No Charger No Less 300"
+  },
+  {
+   "fieldname": "bn_price",
+   "fieldtype": "Currency",
+   "label": "Brand new price"
+  },
+  {
+   "fieldname": "max_av_percent",
+   "fieldtype": "Percent",
+   "label": "Max AV %"
+  },
+  {
+   "fieldname": "max_sell_price",
+   "fieldtype": "Currency",
+   "label": "Max Selling price"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-08-08 11:25:25.876123",
+ "modified": "2024-08-02 12:00:27.574167",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Models",

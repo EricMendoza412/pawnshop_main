@@ -41,7 +41,8 @@ def get_all_ATS_total(date, branch):
     total_ats = frappe.db.get_all('Agreement to Sell', filters={
                 "branch": branch,
                 "docstatus": 1,
-                "date_of_sale": date
+                "date_of_sale": date,
+                "workflow_state": "Active"
             }, fields=['total_value'], pluck='total_value')
     sum = 0
     for record in total_ats:

@@ -49,7 +49,8 @@ def execute(filters=None):
 		comments = string_extractor(data[i]["_comments"])
 		details = frappe.db.get_list("Jewelry List", filters={'parent': data[i]['pawn_ticket']}, fields=['item_no', 'type', 'karat_category', 'karat', 'weight', 'color', 'colors_if_multi', 'additional_for_stone', 'comments', 'densi'])
 		customer = frappe.get_doc('Customer', data[i]['customers_tracking_no'])
-		data[i]['contact_no'] = customer.mobile_no
+		contact = frappe.get_doc('Contact', customer.customer_primary_contact)
+		data[i]['contact_no'] = contact.mobile_no
 		for j in range(len(details)):
 			if details[j]["colors_if_multi"] == None:
 				details[j]["colors_if_multi"] = ''
