@@ -22,7 +22,8 @@
   "preview",
   "bn_price",
   "max_av_percent",
-  "max_sell_price"
+  "max_sell_price",
+  "model_series"
  ],
  "fields": [
   {
@@ -120,11 +121,17 @@
    "fieldname": "max_sell_price",
    "fieldtype": "Currency",
    "label": "Max Selling price"
+  },
+  {
+   "fieldname": "model_series",
+   "fieldtype": "Link",
+   "label": "Model series",
+   "options": "Model series"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-02 12:00:27.574167",
+ "modified": "2024-08-09 16:49:55.171854",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Models",

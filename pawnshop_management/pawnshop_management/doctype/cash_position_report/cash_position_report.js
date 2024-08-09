@@ -80,8 +80,7 @@ frappe.ui.form.on('Cash Position Report', {
 		get_ps_fund_transfers(frm, frm.doc.date);
 		get_subastado_sales(frm, frm.doc.date);
 		select_naming_series(frm);
-		get_jewelry_b_of_the_day(frm, frm.doc.date);
-		get_jewelry_a_of_the_day(frm, frm.doc.date);
+		get_jewelry_ab_of_the_day(frm, frm.doc.date);
 		get_ats_of_the_day(frm, frm.doc.date);
 		get_ar_of_the_day(frm, frm.doc.date);
 		//get_additional_pawn_records(frm);
@@ -98,8 +97,7 @@ frappe.ui.form.on('Cash Position Report', {
 		get_ps_fund_transfers(frm, frm.doc.date);
 		get_subastado_sales(frm, frm.doc.date);
 		select_naming_series(frm);
-		get_jewelry_b_of_the_day(frm, frm.doc.date);
-		get_jewelry_a_of_the_day(frm, frm.doc.date);
+		get_jewelry_ab_of_the_day(frm, frm.doc.date);
 		get_ats_of_the_day(frm, frm.doc.date);
 		get_ar_of_the_day(frm, frm.doc.date);
 		//get_additional_pawn_records(frm);
@@ -327,53 +325,65 @@ function get_ar_of_the_day(frm, date_today = null) {
 		frm.refresh_field('acknowledgement_receipts');
 	})
 }
-function get_jewelry_a_of_the_day(frm, date_today=null) {
-	frappe.db.get_list('Pawn Ticket Jewelry', {
-		fields: ['net_proceeds'],
-		filters: {
-			date_loan_granted: date_today,
-			item_series: 'A',
-			branch: frm.doc.branch,
-			old_pawn_ticket: '',
-			docstatus: 1
-		},
-		limit: 500
-	}).then(records => {
-		let temp_total = 0.00;
-		frm.set_value('jewelry_a', 0.00);
-		for (let index = 0; index < records.length; index++) {
-			temp_total += parseFloat(records[index].net_proceeds)
-		}
-		frm.set_value('jewelry_a', temp_total);
-		frm.refresh_field('jewelry_a');
-	})
+function get_jewelry_ab_of_the_day(frm, date_today=null) {
+    frappe.db.get_list('Pawn Ticket Jewelry', {
+        fields: ['net_proceeds','pawn_ticket','item_series'],
+        filters: {
+            date_loan_granted: date_today,
+            branch: frm.doc.branch,
+            old_pawn_ticket: '',
+            docstatus: 1
+        },
+        limit: 500
+    }).then(records => {
+        let temp_total_a = 0.00;
+		let temp_total_b = 0.00;
+        frm.set_value('jewelry_a', 0.00);
+		frm.set_value('jewelry_b', 0.00);
+        
+        // Create an array of promises
+        let promises = records.map(record => {
+            return frappe.db.get_list('Provisional Receipt', {
+                fields: ['pawn_ticket_no', 'principal_amount', 'interest'],
+                filters: {
+                    transaction_type: 'Amortization',
+                    pawn_ticket_no: record.pawn_ticket,
+                    docstatus: 1
+                }
+            }).then(records2 => {
+                if (records2.length > 0) {
+					if(record.item_series == 'A'){
+						temp_total_a += parseFloat(records2[0].principal_amount) - parseFloat(records2[0].interest);
+					}else{
+						if(record.item_series == 'B'){
+							temp_total_b += parseFloat(records2[0].principal_amount) - parseFloat(records2[0].interest);
+						}
+					}
+                }else{
+					if(record.item_series == 'A'){
+						temp_total_a += parseFloat(record.net_proceeds);
+					}else{
+						if(record.item_series == 'B'){
+							temp_total_b += parseFloat(record.net_proceeds);
+						}
+					}
+				}
+            });
+        });
+        // Wait for all promises to resolve
+        Promise.all(promises).then(() => {
+            frm.set_value('jewelry_a', temp_total_a);
+            frm.refresh_field('jewelry_a');
+			frm.set_value('jewelry_b', temp_total_b);
+            frm.refresh_field('jewelry_b');
+        });
+    });
 }
 
-function get_jewelry_b_of_the_day(frm, date_today=null) {
-	frappe.db.get_list('Pawn Ticket Jewelry', {
-		fields: ['net_proceeds'],
-		filters: {
-			date_loan_granted: date_today,
-			item_series: 'B',
-			branch: frm.doc.branch,
-			old_pawn_ticket: '',
-			docstatus: 1
-		},
-		limit: 500
-	}).then(records => {
-		let temp_total = 0.00;
-		frm.set_value('jewelry_b', 0.00);
-		for (let index = 0; index < records.length; index++) {
-			temp_total += parseFloat(records[index].net_proceeds)
-		}
-		frm.set_value('jewelry_b', temp_total);
-		frm.refresh_field('jewelry_b');
-	})
-}
 
 function get_non_jewelry_of_the_day(frm, date_today=null) {
 		frappe.db.get_list('Pawn Ticket Non Jewelry', {
-			fields: ['net_proceeds'],
+			fields: ['net_proceeds','pawn_ticket'],
 			filters: {
 				date_loan_granted: date_today,
 				branch: frm.doc.branch,
@@ -384,11 +394,29 @@ function get_non_jewelry_of_the_day(frm, date_today=null) {
 		}).then(records => {
 			let temp_total = 0.00;
 			frm.set_value('non_jewelry', 0.00);
-			for (let index = 0; index < records.length; index++) {
-				temp_total += parseFloat(records[index].net_proceeds)
-			}
-			frm.set_value('non_jewelry', temp_total);
-			frm.refresh_field('non_jewelry');
+
+			        // Create an array of promises
+        	let promises = records.map(record => {
+				return frappe.db.get_list('Provisional Receipt', {
+					fields: ['pawn_ticket_no', 'principal_amount', 'interest'],
+					filters: {
+						transaction_type: 'Amortization',
+						pawn_ticket_no: record.pawn_ticket,
+						docstatus: 1
+					}
+				}).then(records2 => {
+					if (records2.length > 0) {
+							temp_total += parseFloat(records2[0].principal_amount) - parseFloat(records2[0].interest);
+					}else{
+							temp_total += parseFloat(record.net_proceeds);
+					}
+				});
+			});
+			// Wait for all promises to resolve
+			Promise.all(promises).then(() => {
+				frm.set_value('non_jewelry', temp_total);
+				frm.refresh_field('non_jewelry');
+			});
 		})
 }
 
