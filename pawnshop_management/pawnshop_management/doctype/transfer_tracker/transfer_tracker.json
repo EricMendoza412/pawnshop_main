@@ -1,0 +1,96 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-08-20 19:31:25.931045",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date_of_transfer",
+  "transfer_no",
+  "origin",
+  "destination",
+  "released_by",
+  "witnessed_by",
+  "rover",
+  "date_received",
+  "received_by",
+  "total_cost"
+ ],
+ "fields": [
+  {
+   "fieldname": "date_of_transfer",
+   "fieldtype": "Date",
+   "label": "Date of Transfer"
+  },
+  {
+   "fieldname": "transfer_no",
+   "fieldtype": "Data",
+   "label": "Transfer No"
+  },
+  {
+   "fieldname": "origin",
+   "fieldtype": "Data",
+   "label": "Origin"
+  },
+  {
+   "fieldname": "destination",
+   "fieldtype": "Data",
+   "label": "Destination"
+  },
+  {
+   "fieldname": "released_by",
+   "fieldtype": "Data",
+   "label": "Released By"
+  },
+  {
+   "fieldname": "witnessed_by",
+   "fieldtype": "Data",
+   "label": "Witnessed By"
+  },
+  {
+   "fieldname": "rover",
+   "fieldtype": "Data",
+   "label": "Rover"
+  },
+  {
+   "fieldname": "date_received",
+   "fieldtype": "Date",
+   "label": "Date Received"
+  },
+  {
+   "fieldname": "received_by",
+   "fieldtype": "Data",
+   "label": "Received By"
+  },
+  {
+   "fieldname": "total_cost",
+   "fieldtype": "Data",
+   "label": "Total Cost"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-08-20 19:34:16.251146",
+ "modified_by": "Administrator",
+ "module": "Pawnshop Management",
+ "name": "Transfer Tracker",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
