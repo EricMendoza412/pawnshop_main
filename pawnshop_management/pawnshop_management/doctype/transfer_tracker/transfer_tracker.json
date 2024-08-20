@@ -16,7 +16,8 @@
   "rover",
   "date_received",
   "received_by",
-  "total_cost"
+  "total_cost",
+  "nj_items"
  ],
  "fields": [
   {
@@ -69,11 +70,17 @@
    "fieldname": "total_cost",
    "fieldtype": "Data",
    "label": "Total Cost"
+  },
+  {
+   "fieldname": "nj_items",
+   "fieldtype": "Table",
+   "label": "NJ items",
+   "options": "Transfer Items"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-20 20:14:29.003350",
+ "modified": "2024-08-20 20:30:46.642747",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Transfer Tracker",
