@@ -20,10 +20,12 @@
   "column_break_7",
   "item_image",
   "preview",
-  "bn_price",
-  "max_av_percent",
+  "section_break_wxxsi",
   "max_sell_price",
-  "model_series"
+  "model_series",
+  "column_break_fzp4h",
+  "bn_price",
+  "max_av_percent"
  ],
  "fields": [
   {
@@ -127,11 +129,20 @@
    "fieldtype": "Link",
    "label": "Model series",
    "options": "Model series"
+  },
+  {
+   "fieldname": "section_break_wxxsi",
+   "fieldtype": "Section Break",
+   "label": "Additional Information"
+  },
+  {
+   "fieldname": "column_break_fzp4h",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-09 16:49:55.171854",
+ "modified": "2024-09-02 19:44:16.666159",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Models",
