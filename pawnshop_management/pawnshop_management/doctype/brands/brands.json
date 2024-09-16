@@ -11,7 +11,8 @@
   "cellphone",
   "tablet",
   "laptop",
-  "camera"
+  "camera",
+  "motorcycle"
  ],
  "fields": [
   {
@@ -43,11 +44,17 @@
    "fieldname": "camera",
    "fieldtype": "Check",
    "label": "Camera"
+  },
+  {
+   "default": "0",
+   "fieldname": "motorcycle",
+   "fieldtype": "Check",
+   "label": "Motorcycle"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-01-14 16:07:58.504629",
+ "modified": "2024-09-16 08:10:58.295691",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Brands",

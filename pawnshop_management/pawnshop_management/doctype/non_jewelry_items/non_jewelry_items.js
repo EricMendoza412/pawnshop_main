@@ -120,6 +120,12 @@ frappe.ui.form.on('Non Jewelry Items', {
 						"camera": 1
 					}
 				}
+			} else if (frm.doc.type == "Motorcycle") {
+				return {
+					"filters": {
+						"motorcycle": 1
+					}
+				}
 			}
 		});
 		frm.set_query('model', function(){
