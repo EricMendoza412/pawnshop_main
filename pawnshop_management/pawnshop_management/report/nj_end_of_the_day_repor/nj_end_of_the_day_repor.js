@@ -20,7 +20,7 @@ frappe.call({
     }
 });
 
-let is_allowed = frappe.user_roles.includes('Auditor') || frappe.user_roles.includes('Administrator');
+let is_allowed = frappe.user_roles.includes('Auditor') || frappe.user_roles.includes('Administrator') || frappe.user_roles.includes('Operations Manager');
 if(is_allowed){
     frappe.query_reports["NJ End of the Day Repor"] = {
         "filters": [
