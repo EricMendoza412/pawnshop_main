@@ -3,9 +3,22 @@
 
 frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 
+	onload: function(frm) {
+		//console.log(record.message);
+		if((frm.doc.expiry_date == frm.doc.expiry_date) && (frm.doc.date_loan_granted == frappe.datetime.get_today())){		
+			
+				frappe.msgprint({
+				title:__('Please tell Customer'),
+				message: __('30 days nalang po tayo sa Sanglang gadgets. Expired na po ang sangla sa '+frm.doc.expiry_date+ ', mareremata po ito pag hindi natubuan o natubos bago ang expiry date.')
+				})
+			}
+			
+    },
+	
 	after_workflow_action: function(frm){
 		frm.reload_doc()
 	},
+
 	validate: function(frm, cdt, cdn){
 		var temp_principal = 0.0;
 		$.each(frm.doc.non_jewelry_items, function(index, item){
@@ -156,7 +169,7 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 		let default_maturity_date = frappe.datetime.add_days(frm.doc.date_loan_granted, 30);
 		frm.set_value('maturity_date', default_maturity_date);
 
-		let defaul_expiry_date = frappe.datetime.add_days(frm.doc.date_loan_granted, 90);
+		let defaul_expiry_date = frappe.datetime.add_days(frm.doc.date_loan_granted, 30);
 		frm.set_value('expiry_date', defaul_expiry_date);
 	},
 
