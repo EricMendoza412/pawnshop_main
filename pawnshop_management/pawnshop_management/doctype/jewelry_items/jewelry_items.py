@@ -79,8 +79,8 @@ class JewelryItems(Document):
 			new_items = new_pawn_ticket.jewelry_items
 			total_principal = 0
 
-			withAmort = frappe.get_list('Provisional Receipt', filters={"transaction_type": "Amortization", "pawn_ticket_no":previous_pawn_ticket.name})
-			withRNA = frappe.get_list('Provisional Receipt', filters={"transaction_type": "Renewal w/ Amortization", "pawn_ticket_no":previous_pawn_ticket.old_pawn_ticket})
+			withAmort = frappe.get_list('Provisional Receipt', filters={"transaction_type": "Amortization", "inventory_tracking":previous_pawn_ticket.inventory_tracking_no})
+			withRNA = frappe.get_list('Provisional Receipt', filters={"transaction_type": "Renewal w/ Amortization", "inventory_tracking":previous_pawn_ticket.inventory_tracking_no})
 			if withAmort or withRNA :
 				#has amort or Rn w/ amort, do not recompute principal based on items' desired principal
 				total_principal = previous_pawn_ticket.desired_principal
