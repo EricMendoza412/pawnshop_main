@@ -1,7 +1,25 @@
 import frappe
 from pawnshop_management.pawnshop_management.custom_codes.get_ip import get_ip_from_settings
+import json
 
 def filter_j_based_on_banch(user):
+    # Check if there are any active standard filters with values
+    filters = frappe.form_dict.get('filters')
+    if filters:
+        try:
+            filters = json.loads(filters)
+            print(f"Filters: {filters}")
+            if isinstance(filters, list):
+                for filter_item in filters:
+                    if isinstance(filter_item, list) and len(filter_item) > 3:
+                        key, operator, value = filter_item[1], filter_item[2], filter_item[3]
+                        print(f"Key: {key}, Operator: {operator}, Value: {value}")
+                        if key == "customers_full_name":
+                            if value:
+                                return ""
+        except json.JSONDecodeError:
+            pass
+
     current_ip = frappe.local.request_ip
     branch_ip = get_ip_from_settings()
     if not user:
