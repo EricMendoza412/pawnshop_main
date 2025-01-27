@@ -29,7 +29,7 @@ let year = date.getFullYear();
 // This arrangement can be altered based on how we want the date's format to appear.
 let currentDate = `${year}-${month}-${day}`;
 
-let is_allowed = frappe.user_roles.includes('Auditor') || frappe.user_roles.includes('Administrator');
+let is_allowed = frappe.user_roles.includes('Auditor') || frappe.user_roles.includes('Administrator') || frappe.user_roles.includes('Operations Manager');
 if(is_allowed){
     frappe.query_reports["VC Agreement to Sell List"] = {
         "filters": [
