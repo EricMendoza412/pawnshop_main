@@ -19,13 +19,13 @@
   "agreement",
   "jewelry_items",
   "total_value",
+  "amended_from",
   "people_involved_section",
   "seller_name_and_signature",
   "column_break_13",
   "cashier_name_and_signature",
   "column_break_17",
-  "appraiser_name_and_signature",
-  "amended_from"
+  "appraiser_name_and_signature"
  ],
  "fields": [
   {
@@ -164,7 +164,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-08-24 17:35:12.532827",
+ "modified": "2025-01-31 18:38:08.764740",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Agreement to Sell",

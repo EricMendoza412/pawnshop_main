@@ -88,12 +88,34 @@ frappe.ui.form.on('Jewelry Items', {
 			if(frappe.user_roles.includes('Operations Manager') && frm.doc.workflow_state == "Pawned"){
 				frm.set_df_property('type', 'read_only', 0);
 				frm.set_df_property('karat_category', 'read_only', 0);
+				frm.set_df_property('color', 'read_only', 0);
 				frm.set_df_property('densi', 'read_only', 0);
 				frm.set_df_property('additional_for_stone', 'read_only', 0);
-				frm.set_df_property('color', 'read_only', 0);
 				frm.set_df_property('colors_if_multi', 'read_only', 0);
 				frm.set_df_property('comments', 'read_only', 0);
 				frm.set_df_property('karats', 'read_only', 0);
+				//if the Jewely Item is created today, the Operations manager can edit the Appraisal Value and Desired Principal
+				// Also check if there is a submitted "Cash Position Report" document for today with the same "branch"
+					frappe.db.count('Cash Position Report', {
+						filters: {
+							branch: frm.doc.branch,
+							date: frappe.datetime.nowdate(),
+							docstatus: 1
+						}
+					}).then(count => {
+						if (count === 0) {
+							//print message count is zero
+							//frappe.msgprint({"message": "count is zero", "title": "Error"});
+
+							let today = new Date();
+							let created_date = new Date(frm.doc.creation);
+							if(today.toDateString() == created_date.toDateString()){
+								frm.set_df_property('appraisal_value', 'read_only', 0);
+								frm.set_df_property('desired_principal', 'read_only', 0);
+							}
+						}
+					})
+				
 			}
 		}
 		frm.set_query('assistant_appraiser_acct', function() {

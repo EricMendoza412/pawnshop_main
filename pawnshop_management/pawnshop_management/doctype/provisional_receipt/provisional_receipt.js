@@ -11,6 +11,9 @@ frappe.ui.form.on('Provisional Receipt', {
 
 	onload: function(frm) {
 
+
+		
+
 		if(frappe.user_roles.includes('Administrator')){
 			frm.set_df_property('other_discount_st', 'hidden', 0);
 			frm.set_df_property('other_discount', 'hidden', 0);
@@ -34,6 +37,9 @@ frappe.ui.form.on('Provisional Receipt', {
 				og_total_no_discount = frm.doc.total;
 			}
 		}
+
+
+
 		frm.set_df_property('subasta_sales_no', 'hidden', 1)
 		frm.set_df_property('other_discount_tawad', 'hidden', 1);
 
@@ -138,6 +144,221 @@ frappe.ui.form.on('Provisional Receipt', {
 				}
 			})
 		}
+
+		
+			//programmatically hide the cancel button
+			//frm.page.clear_primary_action();
+			if(!frappe.user_roles.includes('Administrator')){
+				frm.page.clear_secondary_action();
+			}
+
+			//programmatically hide the Menu items
+			frm.page.clear_menu();
+			
+
+			// Check if there is a submitted "Cash Position Report" document for today with the same "branch"
+			if (!frm.is_new() && frm.doc.docstatus == 1 && frm.doc.date_issued == frappe.datetime.nowdate()) {
+				frappe.db.count('Cash Position Report', {
+					filters: {
+						branch: frm.doc.branch,
+						date: frappe.datetime.nowdate(),
+						docstatus: 1
+					}
+				}).then(count => {
+					if (count === 0) {
+						frm.add_custom_button(__('Change Mode of Payment'), function() {
+							let dialog = new frappe.ui.Dialog({
+								title: 'Select Payment Method',
+								fields: [
+									{
+										label: 'Payment Method',
+										fieldname: 'payment_method',
+										fieldtype: 'Select',
+										options: ['Cash', 'Bank Transfer', 'GCash', 'Cash & GCash', 'Cash & Bank Transfer', 'GCash & Bank Transfer']
+									},
+									{
+										label: 'GCash Reference Number',
+										fieldname: 'gcash_ref',
+										fieldtype: 'Data',
+										hidden: 1
+									},
+									{
+										label: 'Bank',
+										fieldname: 'bank',
+										fieldtype: 'Select',
+										options: ['-Select-', 'BPI', 'BDO', 'East West'],
+										hidden: 1
+									},
+									{
+										label: 'Cash payment',
+										fieldname: 'cash',
+										fieldtype: 'Currency',
+										hidden: 1
+									},
+									{
+										label: 'GCash payment',
+										fieldname: 'gcash_amount_payment',
+										fieldtype: 'Currency',
+										hidden: 1
+									},
+									{
+										label: 'Bank payment',
+										fieldname: 'bank_payment',
+										fieldtype: 'Currency',
+										hidden: 1
+									}
+								],
+								primary_action_label: 'Submit',
+								primary_action(values) {
+									// Check if payment breakdown for multiple payment methods is equal to total
+									if (values.payment_method === 'Cash & GCash' && (parseFloat(values.cash) + parseFloat(values.gcash_amount_payment)) !== frm.doc.total) {
+										frappe.msgprint(__('Payment breakdown does not match total.'));
+										return;
+									} else if (values.payment_method === 'Cash & Bank Transfer' && (parseFloat(values.cash) + parseFloat(values.bank_payment)) !== frm.doc.total) {
+										frappe.msgprint(__('Payment breakdown does not match total.'));
+										return;
+									} else if (values.payment_method === 'GCash & Bank Transfer' && (parseFloat(values.gcash_amount_payment) + parseFloat(values.bank_payment)) !== frm.doc.total) {
+										frappe.msgprint(__('Payment breakdown does not match total.'));
+										return;
+									}
+	
+									dialog.hide();
+	
+									frappe.confirm(__('Are you sure you want to cancel and amend this document?'), function() {
+										// Cancel the document
+										frappe.call({
+											method: 'frappe.client.cancel',
+											args: {
+												doctype: frm.doc.doctype,
+												name: frm.doc.name
+											},
+											callback: function(response) {
+												if (!response.exc) {
+													// Create a new Provisional Receipt as an amended version
+													let new_doc = frappe.model.copy_doc(frm.doc);
+													new_doc.amended_from = frm.doc.name;
+													new_doc.mode_of_payment = values.payment_method;
+													new_doc.gcash_ref = values.gcash_ref;
+													new_doc.bank = values.bank;
+													new_doc.cash = values.cash;
+													new_doc.gcash_amount_payment = values.gcash_amount_payment;
+													new_doc.bank_payment = values.bank_payment;
+													frappe.call({
+														method: 'frappe.client.insert',
+														args: {
+															doc: new_doc
+														},
+														callback: function(response) {
+															if (!response.exc) {
+																// Submit the new document
+																frappe.call({
+																	method: 'frappe.client.submit',
+																	args: {
+																		doc: response.message
+																	},
+																	callback: function(submit_response) {
+																		if (!submit_response.exc) {
+																			frappe.msgprint(__('Provisional Receipt\'s mode of payment was successfully edited!'));
+																			frappe.set_route('Form', frm.doc.doctype, submit_response.message.name);
+																		}
+																	}
+																});
+															}
+														}
+													});
+												}
+											}
+										});
+									});
+								}
+							});
+	
+							dialog.show();
+	
+							// Initialize hidden fields
+							dialog.fields_dict.bank.df.hidden = 1;
+							dialog.fields_dict.bank.refresh();
+							dialog.fields_dict.gcash_ref.df.hidden = 1;
+							dialog.fields_dict.gcash_ref.refresh();
+	
+							// Ensure the event is only attached once
+							let select_field = dialog.fields_dict.payment_method.$input;
+							select_field.off('change').on('change', function() {
+								let selected_method = $(this).val();
+								// Prevent selecting the current mode of payment
+								if (selected_method === frm.doc.mode_of_payment) {
+									frappe.msgprint(__('You cannot select the current mode of payment.'));
+									dialog.get_primary_btn().prop('disabled', true);
+								} else {
+									dialog.get_primary_btn().prop('disabled', false);
+								}
+	
+								// Show or hide fields based on the selected payment method
+								// Ref no and bank name
+								if (selected_method.includes('GCash')) {
+									dialog.fields_dict.gcash_ref.df.hidden = 0;
+									dialog.fields_dict.gcash_ref.refresh();
+									dialog.fields_dict.cash.df.hidden = 1;
+									dialog.fields_dict.gcash_amount_payment.df.hidden = 1;
+									dialog.fields_dict.bank_payment.df.hidden = 1;
+									dialog.fields_dict.cash.refresh();
+									dialog.fields_dict.gcash_amount_payment.refresh();
+									dialog.fields_dict.bank_payment.refresh();
+								} else {
+									dialog.fields_dict.gcash_ref.df.hidden = 1;
+									dialog.fields_dict.gcash_ref.refresh();
+								}
+								if (selected_method.includes('Bank Transfer')) {
+									dialog.fields_dict.bank.df.hidden = 0;
+									dialog.fields_dict.bank.refresh();
+									dialog.fields_dict.cash.df.hidden = 1;
+									dialog.fields_dict.gcash_amount_payment.df.hidden = 1;
+									dialog.fields_dict.bank_payment.df.hidden = 1;
+									dialog.fields_dict.cash.refresh();
+									dialog.fields_dict.gcash_amount_payment.refresh();
+									dialog.fields_dict.bank_payment.refresh();
+								} else {
+									dialog.fields_dict.bank.df.hidden = 1;
+									dialog.fields_dict.bank.refresh();
+								}
+								if (selected_method.includes('Cash')) {
+									dialog.fields_dict.cash.df.hidden = 1;
+									dialog.fields_dict.gcash_amount_payment.df.hidden = 1;
+									dialog.fields_dict.bank_payment.df.hidden = 1;
+									dialog.fields_dict.cash.refresh();
+									dialog.fields_dict.gcash_amount_payment.refresh();
+									dialog.fields_dict.bank_payment.refresh();
+								}
+
+
+								// Payment amounts for multiple payment methods
+								if (selected_method === 'Cash & GCash') {
+									dialog.fields_dict.cash.df.hidden = 0;
+									dialog.fields_dict.gcash_amount_payment.df.hidden = 0;
+									dialog.fields_dict.bank_payment.df.hidden = 1;
+									dialog.fields_dict.cash.refresh();
+									dialog.fields_dict.gcash_amount_payment.refresh();
+									dialog.fields_dict.bank_payment.refresh();
+								} else if (selected_method === 'Cash & Bank Transfer') {
+									dialog.fields_dict.cash.df.hidden = 0;
+									dialog.fields_dict.gcash_amount_payment.df.hidden = 1;
+									dialog.fields_dict.bank_payment.df.hidden = 0;
+									dialog.fields_dict.cash.refresh();
+									dialog.fields_dict.gcash_amount_payment.refresh();
+									dialog.fields_dict.bank_payment.refresh();
+								} else if (selected_method === 'GCash & Bank Transfer') {
+									dialog.fields_dict.cash.df.hidden = 1;
+									dialog.fields_dict.gcash_amount_payment.df.hidden = 0;
+									dialog.fields_dict.bank_payment.df.hidden = 0;
+									dialog.fields_dict.cash.refresh();
+									dialog.fields_dict.gcash_amount_payment.refresh();
+									dialog.fields_dict.bank_payment.refresh();
+								}
+							});
+						});
+					}
+				});
+			}
 	},
 
 	branch: function(frm){
@@ -560,6 +781,20 @@ function show_payment_fields(frm) {
 }
 
 function calculate_interest(frm) {
+
+	// For future overhauled interest calculation
+	//
+	// frappe.call({
+	// 	method: "pawnshop_management.pawnshop_management.doctype.provisional_receipt.provisional_receipt.calculate_interest",
+	// 	callback: function(response) {
+	// 		if (response.message) {
+	// 			// Assuming 'data_field' is a Data field in your Doctype
+	// 			frm.set_value('interest_payment', response.message.value);
+	// 		}
+	// 	}
+	// });
+
+
 	frm.set_value('interest_payment', 0.00);
 	frm.refresh_field('interest_payment');
 	

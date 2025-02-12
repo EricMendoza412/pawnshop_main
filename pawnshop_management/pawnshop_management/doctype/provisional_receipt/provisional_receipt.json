@@ -324,8 +324,8 @@
   {
    "fieldname": "gcash_ref",
    "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Gcash Reference#"
+   "label": "Gcash Reference#",
+   "read_only": 1
   },
   {
    "fieldname": "subasta_sales_no",
@@ -388,7 +388,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-01-23 22:34:01.096864",
+ "modified": "2025-01-31 17:30:07.811083",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Provisional Receipt",
