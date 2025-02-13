@@ -597,11 +597,13 @@ frappe.ui.form.on('Provisional Receipt', {
 		frm.toggle_display(['bank_payment'], frm.doc.mode_of_payment === 'Cash & Bank Transfer' || frm.doc.mode_of_payment === 'GCash & Bank Transfer');
 		frm.toggle_display(['cash'], frm.doc.mode_of_payment === 'Cash & Bank Transfer' || frm.doc.mode_of_payment === 'Cash & GCash');
 		frm.toggle_display(['gcash_amount_payment'], frm.doc.mode_of_payment === 'GCash & Bank Transfer' || frm.doc.mode_of_payment === 'Cash & GCash');
-		frm.toggle_display(['gcash_ref'], frm.doc.mode_of_payment === 'GCash' || frm.doc.mode_of_payment === 'GCash & Bank Transfer' || frm.doc.mode_of_payment === 'Cash & GCash');
+		//frm.toggle_display(['gcash_ref'], frm.doc.mode_of_payment === 'GCash' || frm.doc.mode_of_payment === 'GCash & Bank Transfer' || frm.doc.mode_of_payment === 'Cash & GCash');
 		if(frm.doc.mode_of_payment === 'GCash' || frm.doc.mode_of_payment === 'GCash & Bank Transfer' || frm.doc.mode_of_payment === 'Cash & GCash'){
 			frm.set_df_property('gcash_ref', 'reqd', 1)
+			frm.set_df_property('gcash_ref', 'read_only', 0)
 		}else{
 			frm.set_df_property('gcash_ref', 'reqd', 0)
+			frm.set_df_property('gcash_ref', 'read_only', 1)
 		}
 	},
 
