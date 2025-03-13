@@ -3,6 +3,7 @@
 
 frappe.ui.form.on('Non Jewelry Items', {
 	onload: function(frm) {
+		frm.message_shown = false; // Initialize message_shown
 		if (frm.is_new()) {
 			//frm.set_value('main_appraiser', frappe.user_info().fullname);
 			//frm.disable_save();
@@ -171,6 +172,28 @@ frappe.ui.form.on('Non Jewelry Items', {
 				}
 			};
 		});
+	},
+
+	assistant_appraiser: function(frm){
+		//if all required fields are not yet filled up, do not allow encoding of assistant appraiser
+		let required_fields = ['brand', 'model', 'model_number','color'];
+		let all_filled = required_fields.every(field => frm.doc[field]);
+
+		if (!all_filled) {
+			if (!frm.message_shown) {
+				frappe.msgprint(__('Please fill all required fields before setting the assistant appraiser.'));
+				frm.message_shown = true;
+			}
+			frm.set_value('assistant_appraiser', '');
+			frm.set_value('assistant_appraiser_name', '');
+			frm.refresh_field('assistant_appraiser');
+			frm.refresh_field('assistant_appraiser_name');
+		} else {
+			frm.message_shown = false;
+			//inform assisting appraiser name to perform their duties
+			frappe.msgprint(__('Hello {0}, Please verify the encoded information against the actual gadget, then click Save once confirmed.', [frm.doc.assistant_appraiser_name]));
+			
+		}
 	},
 
 	branch: function(frm){

@@ -46,7 +46,15 @@
   "main_appraiser",
   "main_appraiser_name",
   "column_break_36",
-  "assistant_appraiser"
+  "assistant_appraiser",
+  "assistant_appraiser_name",
+  "subastado_section",
+  "current_location",
+  "person_accountable",
+  "w_audit_finding",
+  "column_break_ouqef",
+  "date_reappraised",
+  "selling_price"
  ],
  "fields": [
   {
@@ -83,7 +91,7 @@
   {
    "fieldname": "category",
    "fieldtype": "Select",
-   "label": "Category",
+   "label": "Category/Item Condition",
    "options": "Defective\nMinimum\nMaximum"
   },
   {
@@ -286,7 +294,6 @@
   {
    "fieldname": "assistant_appraiser",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Assistant Appraiser",
    "options": "User"
   },
@@ -310,11 +317,64 @@
    "label": "Main Appraiser Name",
    "read_only": 1,
    "reqd": 1
+  },
+  {
+   "fieldname": "subastado_section",
+   "fieldtype": "Section Break",
+   "label": "Subastado",
+   "read_only": 1
+  },
+  {
+   "fieldname": "current_location",
+   "fieldtype": "Link",
+   "label": "Current Location",
+   "options": "Branch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "person_accountable",
+   "fieldtype": "Link",
+   "label": "Person Accountable",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "w_audit_finding",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "W/ Audit Finding",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ouqef",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "date_reappraised",
+   "fieldtype": "Date",
+   "label": "Date Reappraised",
+   "read_only": 1
+  },
+  {
+   "fieldname": "selling_price",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Selling Price",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "assistant_appraiser.first_name",
+   "fieldname": "assistant_appraiser_name",
+   "fieldtype": "Data",
+   "label": "Assistant Appraiser Name",
+   "read_only": 1,
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-16 08:16:37.409462",
+ "modified": "2025-03-13 23:36:49.340816",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",
