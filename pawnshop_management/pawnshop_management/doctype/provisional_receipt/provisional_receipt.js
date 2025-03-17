@@ -6,6 +6,8 @@
 var branch_code_no;
 var with_other_discount = false;
 var og_total_no_discount;
+let msgDisplayed = false; // Global flag
+let msgDisplayedTwo = false; // Global flag
 
 frappe.ui.form.on('Provisional Receipt', {
 
@@ -814,7 +816,7 @@ function calculate_interest(frm) {
 				if (response.message.age >= 60) {
 					Senior = 1;
 				}
-				if (response.message.st_rate == 0){
+				if (!msgDisplayed && response.message.st_rate == 0){
 					frappe.msgprint({
 						title: __('Computation'),
 						message: __('<b>Months accrued: ' + response.message.months_accrued + '</b>' +
@@ -825,14 +827,17 @@ function calculate_interest(frm) {
 						'<br>&nbsp;&nbsp;&nbsp;&nbsp;Holiday: ' + response.message.holiday_ctr
 					)
 					});
+				
+					msgDisplayed = true; // Prevent further calls
 				}
 				
 				
-				if (response.message.st_rate != 0) {
+				if (!msgDisplayedTwo && response.message.st_rate != 0) {
 					frappe.msgprint({
 						title: __('Computation'),
 						message: __('<b>Short term rate:</b> '+ response.message.st_rate + '%')
 					});
+					msgDisplayedTwo = true; // Prevent further calls
 				}
 				calculate_total_amount(frm);
 				if (frm.doc.transaction_type == "Redemption" && response.message.st_rate != 0) {
