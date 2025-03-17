@@ -362,7 +362,7 @@
    "fieldname": "other_discount",
    "fieldtype": "Select",
    "label": "Other Discount",
-   "options": "None\nSenior discount\nHoliday discount\nEmergency closure\nERPNEXT Wrong Computation\nManager's discount (With Approval)"
+   "options": "None\nManager's discount (With Approval)"
   },
   {
    "default": "0",
@@ -375,7 +375,8 @@
    "fieldname": "other_discount_st",
    "fieldtype": "Select",
    "label": "Short term loan Discount",
-   "options": "None\n3%\n4%"
+   "options": "None\n3%\n4%",
+   "read_only": 1
   },
   {
    "fetch_from": "pawn_ticket_no.inventory_tracking_no",
@@ -388,7 +389,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-31 17:30:07.811083",
+ "modified": "2025-03-18 02:07:57.315013",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Provisional Receipt",

@@ -11,9 +11,6 @@ frappe.ui.form.on('Provisional Receipt', {
 
 	onload: function(frm) {
 
-
-		
-
 		if(frappe.user_roles.includes('Administrator')){
 			frm.set_df_property('other_discount_st', 'hidden', 0);
 			frm.set_df_property('other_discount', 'hidden', 0);
@@ -396,17 +393,19 @@ frappe.ui.form.on('Provisional Receipt', {
 
 	other_discount: function(frm){
 		let new_total = frm.doc.total;
-		frm.set_value('other_discount_tawad', frm.doc.interest);
+		
 		if(frm.doc.other_discount != "None"){
 			if(!with_other_discount){
 				frm.set_df_property('other_discount_tawad', 'hidden', 0);
 				new_total -= frm.doc.interest;
 				with_other_discount = true;
+				frm.set_value('other_discount_tawad', frm.doc.interest);
 			}
 		}else{
 			frm.set_df_property('other_discount_tawad', 'hidden', 1);
 			new_total += frm.doc.interest;
 			with_other_discount = false;
+			frm.set_value('other_discount_tawad', 0);
 		}
 
 		frm.set_value('total', new_total);
@@ -676,6 +675,13 @@ frappe.ui.form.on('Provisional Receipt', {
 			frm.set_value('additional_amortization', parseFloat(frm.doc.cash) + parseFloat(frm.doc.gcash_amount_payment) + parseFloat(frm.doc.bank_payment))
 			frm.refresh_field('additional_amortization')
 		} 
+	},
+
+	date_issued: function(frm){
+
+	//for testing purposes
+		calculate_interest(frm);
+
 	}
 });
 
@@ -785,31 +791,73 @@ function show_payment_fields(frm) {
 function calculate_interest(frm) {
 
 	// For future overhauled interest calculation
-	//
-	// frappe.call({
-	// 	method: "pawnshop_management.pawnshop_management.doctype.provisional_receipt.provisional_receipt.calculate_interest",
-	// 	callback: function(response) {
-	// 		if (response.message) {
-	// 			// Assuming 'data_field' is a Data field in your Doctype
-	// 			frm.set_value('interest_payment', response.message.value);
-	// 		}
-	// 	}
-	// });
-
-
-	frm.set_value('interest_payment', 0.00);
-	frm.refresh_field('interest_payment');
 	
-	var date_today = frm.doc.date_issued;											//frappe.datetime.get_today()
-	if (date_today > frm.doc.maturity_date && date_today < frm.doc.expiry_date) {
-		calculate_maturity_date_interest(frm);
-		console.log("F1");
-	} else if (date_today >= frm.doc.expiry_date) {
-		calculate_expiry_date_interest(frm);
-		console.log("F2");
-	} else if (date_today <= frm.doc.maturity_date){
-		calculate_total_amount(frm);
-	}
+	frappe.call({
+		method: "pawnshop_management.pawnshop_management.doctype.provisional_receipt.provisional_receipt.calculate_interest",
+		args: { date_issued: frm.doc.date_issued, 
+				maturity_date: frm.doc.maturity_date,
+				expiry_date: frm.doc.expiry_date, 
+				interest: frm.doc.interest,
+				pawn_ticket_no: frm.doc.pawn_ticket_no,
+				pawn_ticket_type: frm.doc.pawn_ticket_type,
+				branch: frm.doc.branch,
+				date_loan_granted: frm.doc.date_loan_granted
+		},
+		callback: function(response) {
+			if (response.message) {
+				// Assuming 'data_field' is a Data field in your Doctype
+				frm.set_value('interest_payment', response.message.value);
+				let Sunday = 0, Senior = 0;
+				if (response.message.withSunday == 'Yes') {
+					Sunday = 1;
+				}
+				if (response.message.age >= 60) {
+					Senior = 1;
+				}
+				if (response.message.st_rate == 0){
+					frappe.msgprint({
+						title: __('Computation'),
+						message: __('<b>Months accrued: ' + response.message.months_accrued + '</b>' +
+						'<br><br><b>Total "Tawad" days: ' + response.message.tawad_days + '</b>' + 
+						'<br>&nbsp;&nbsp;&nbsp;&nbsp;Standard: 2' +
+						'<br>&nbsp;&nbsp;&nbsp;&nbsp;Sunday: '+ Sunday +
+						'<br>&nbsp;&nbsp;&nbsp;&nbsp;Senior Citizen: '+ Senior + ' (Age: '+ response.message.age +')'+
+						'<br>&nbsp;&nbsp;&nbsp;&nbsp;Holiday: ' + response.message.holiday_ctr
+					)
+					});
+				}
+				
+				
+				if (response.message.st_rate != 0) {
+					frappe.msgprint({
+						title: __('Computation'),
+						message: __('<b>Short term rate:</b> '+ response.message.st_rate + '%')
+					});
+				}
+				calculate_total_amount(frm);
+				if (frm.doc.transaction_type == "Redemption" && response.message.st_rate != 0) {
+					frm.set_value('other_discount_st',response.message.st_rate+'%');
+				}else{
+					frm.set_value('other_discount_st','None');
+				}
+			}
+		}
+	});
+
+//Old codes of Rabie
+	// frm.set_value('interest_payment', 0.00);
+	// frm.refresh_field('interest_payment');
+	
+	// var date_today = frm.doc.date_issued;											//frappe.datetime.get_today()
+	// if (date_today > frm.doc.maturity_date && date_today < frm.doc.expiry_date) {
+	// 	calculate_maturity_date_interest(frm);
+	// 	console.log("F1");
+	// } else if (date_today >= frm.doc.expiry_date) {
+	// 	calculate_expiry_date_interest(frm);
+	// 	console.log("F2");
+	// } else if (date_today <= frm.doc.maturity_date){
+	// 	calculate_total_amount(frm);
+	// }
 }
 
 function calculate_total_amount(frm){
@@ -818,11 +866,9 @@ function calculate_total_amount(frm){
 		frm.set_value('total', parseFloat(frm.doc.interest_payment) + parseFloat(frm.doc.principal_amount) - parseFloat(frm.doc.previous_interest_payment) - parseFloat(frm.doc.discount));
 		frm.refresh_field('total');
 		if(frm.doc.interest_payment == 0){
-			console.log("dito pumasok");
 			frm.set_df_property('other_discount_st', 'hidden', 0);
 			frm.set_df_property('other_discount', 'hidden', 1);
 		}else{
-			console.log("2nd pasok");
 			frm.set_df_property('other_discount', 'hidden', 0);
 			frm.set_df_property('other_discount_st', 'hidden', 1);
 			if(frappe.user_roles.includes('Administrator')){

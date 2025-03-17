@@ -8,7 +8,176 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import flt
 
+
+@frappe.whitelist()
+def calculate_interest(date_issued, date_loan_granted, maturity_date, expiry_date, interest, pawn_ticket_no, pawn_ticket_type,branch):
+	# e-mail: Regarding Accrued interest computation
+	# e-mail: Short-term loan computation
+
+	# Convert string dates to Python date objects
+	from datetime import datetime, timedelta
+	from dateutil.relativedelta import relativedelta
+
+	date_issued = datetime.strptime(date_issued, "%Y-%m-%d")
+	maturity_date = datetime.strptime(maturity_date, "%Y-%m-%d")
+	expiry_date = datetime.strptime(expiry_date, "%Y-%m-%d")
+	date_loan_granted = datetime.strptime(date_loan_granted, "%Y-%m-%d")
+	di_year = date_issued.year
+	di_month = date_issued.month
+	di_day = date_issued.day
+	date_issued_datetime = datetime(di_year,di_month,di_day)
+	maturity_date_datetime = datetime(maturity_date.year,maturity_date.month,maturity_date.day)
+	expiry_date_datetime = datetime(expiry_date.year,expiry_date.month,expiry_date.day)
+	months_accrued = 0
+	add_initial_mo_acc = 0
+	past_adv_interest = 1
+	tawad_days = 2 #default 2 tawad days
+	holiday_ctr = 0
+
+	# check if customer is a senior, if yes make tawad days 3
+	customer_birthday = frappe.get_value(pawn_ticket_type, pawn_ticket_no, "customer_birthday")
+	customer_birthday = datetime.strptime(customer_birthday, "%Y-%m-%d")
+	today = datetime.today()
+	age = today.year - customer_birthday.year - ((today.month, today.day) < (customer_birthday.month, customer_birthday.day))
+	is_senior = age >= 60
+	if is_senior:
+		tawad_days += 1
+	compare_date = 0
+
+	# Get the assigned Holiday List for this pawn ticket type
+	holiday_list = frappe.get_value("Holiday List", {"name": "Holidays"}, "name")
+	# Get holidays only from the selected Holiday List
+	holiday_records = frappe.get_all(
+		"Holiday",
+		filters={"branch": branch,"parent": holiday_list},  # Filter by the correct branch and use correct holiday list
+		fields=["holiday_date", "branch"]
+		)
+	holiday_set = {(h["holiday_date"], h["branch"]) for h in holiday_records}# Convert to a set for fast lookup
+
+    
+	# Compare dates and compute interest category
+	short_term_rate = 0
+	if date_issued < maturity_date:
+		# Eligible for short-term loan, for Redemption only
+		compare_year = date_loan_granted.year
+		compare_month = date_loan_granted.month
+		compare_day = date_loan_granted.day
+		compare_date = f"{compare_year}-{compare_month:02d}-{compare_day:02d}"
+		closest_month = datetime.strptime(compare_date, "%Y-%m-%d")
+		past_adv_interest = 0 # make sure interest is zero
+
+		x = 5  
+		i = 0  # Start checking from the same day
+		st_ctr = 0 # 0-2 days for 4% discount and 3-5 days for 3% (0-5)
+		withSunday = 'No'
+		apply_short_term = False
+
+		while i <= x and not(apply_short_term):  # Check for Sundays and Holidays dynamically
+			next_day = closest_month + timedelta(days=i)
+			if next_day.date() == date_issued_datetime.date():
+				apply_short_term = True
+				if st_ctr <= 2:
+					short_term_rate = 4
+				elif st_ctr <= 5:
+					short_term_rate = 3
+
+			sundayCtr = 0
+			# Check if it's a Sunday
+			if next_day.weekday() == 6:  # Sunday is 6 in Python
+				withSunday = 'Yes'
+				sundayCtr = 1
+				x += 1  # Increase the range to check newly added days
+				st_ctr -= 1 # offset. Hindi kasama sa bilang ang Sunday
+			
+			# Check if it's a holiday AND belongs to the specified branch
+			if (next_day.date(), branch) in holiday_set:
+				if sundayCtr == 0: #to avoid double increment for x loop
+					x += 1  # Extend loop range
+					st_ctr -= 1 # offset. Hindi kasama sa bilang ang Holiday
+					holiday_ctr += 1
+			st_ctr +=1
+			i += 1  # Move to the next day
+
+	elif date_issued > expiry_date:
+		# Use expiry date for interest computation. check starting Months accrued
+		compare_year = expiry_date.year
+		compare_month = expiry_date.month
+		compare_day = expiry_date.day
+		add_initial_mo_acc= (expiry_date_datetime - maturity_date_datetime).days /30
+		months_accrued += add_initial_mo_acc
+	else: 
+		# Use maturity date for interest computation. Months accrued always start w/ "0"
+		compare_year = maturity_date.year
+		compare_month = maturity_date.month
+		compare_day = maturity_date.day
+
+	#check if different year	
+	addmonth_year_diff = (di_year - compare_year) * 12
+	months_accrued += di_month - compare_month + addmonth_year_diff
+	
+	
+	compare_date = f"{compare_year}-{compare_month:02d}-{compare_day:02d}"
+	closest_month = datetime.strptime(compare_date, "%Y-%m-%d")
+	#get closest month to Date Issued
+	if di_day > compare_day:
+		closest_month_ctr = di_month - compare_month + addmonth_year_diff
+		months_accrued += 1
+	else:
+		closest_month_ctr = di_month - compare_month + addmonth_year_diff - 1
+	closest_month = closest_month + relativedelta(months=closest_month_ctr)
+	# if the month shift caused an adjustment in days, use accurate counting of 30 days
+	if closest_month.day < compare_day:
+		closest_month_thirtydays = datetime.strptime(compare_date, "%Y-%m-%d")
+		if closest_month_ctr >= 1:
+			closest_month_ctr -= 1			
+		closest_month_thirtydays = closest_month_thirtydays + relativedelta(months=closest_month_ctr)
+		closest_month = closest_month_thirtydays + timedelta(days=30)
+	# check all days from closest month to closest month + tawad days, if any are Sundays or holidays.
+	# add 1 day tawad for each positive match
+
+	x = tawad_days  # Initial tawad days
+	i = 0  # Start checking from the same day
+	withSunday = 'No'
+
+	while i <= x:  # Check for Sundays and Holidays dynamically
+		next_day = closest_month + timedelta(days=i)
+		sundayCtr = 0
+		
+		# Check if it's a Sunday
+		if next_day.weekday() == 6:  # Sunday is 6 in Python
+			tawad_days += 1  # Increase tawad days dynamically
+			withSunday = 'Yes'
+			sundayCtr = 1
+			x += 1  # Increase the range to check newly added days
+		
+		# Check if it's a holiday AND belongs to the specified branch
+		if (next_day.date(), branch) in holiday_set:
+			if sundayCtr == 0: #to avoid double increment for Tawad days and x loop
+				tawad_days += 1  # Increase tawad days for holidays
+				x += 1  # Extend loop range
+				holiday_ctr += 1
+		
+		i += 1  # Move to the next day
+		
+	closest_month = closest_month + timedelta(days=tawad_days)
+	if closest_month >= date_issued_datetime: #check if MD or ED is at the end of the month and the DI is start of the month
+		months_accrued -= 1
+	
+	months_accrued = months_accrued * past_adv_interest # this ensures the months accrued is zero if Adv int is still paid
+	value = months_accrued * int(interest)
+
+	return {
+        "value": value,
+		"months_accrued": months_accrued,
+		"age": age,
+		"withSunday": withSunday,
+		"tawad_days": tawad_days,
+		"st_rate": short_term_rate,
+		"holiday_ctr": holiday_ctr
+    }
+
 class ProvisionalReceipt(Document):
+
 	def validate(self):
 		if self.mode_of_payment == "Cash & GCash" and self.transaction_type == "Renewal" and self.total != self.cash + self.gcash_amount_payment:
 			frappe.throw(
