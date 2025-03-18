@@ -30,7 +30,6 @@ def calculate_interest(date_issued, date_loan_granted, maturity_date, expiry_dat
 	expiry_date_datetime = datetime(expiry_date.year,expiry_date.month,expiry_date.day)
 	months_accrued = 0
 	add_initial_mo_acc = 0
-	past_adv_interest = 1
 	tawad_days = 2 #default 2 tawad days
 	holiday_ctr = 0
 
@@ -64,7 +63,6 @@ def calculate_interest(date_issued, date_loan_granted, maturity_date, expiry_dat
 		compare_day = date_loan_granted.day
 		compare_date = f"{compare_year}-{compare_month:02d}-{compare_day:02d}"
 		closest_month = datetime.strptime(compare_date, "%Y-%m-%d")
-		past_adv_interest = 0 # make sure interest is zero
 
 		x = 5  
 		i = 0  # Start checking from the same day
@@ -97,6 +95,15 @@ def calculate_interest(date_issued, date_loan_granted, maturity_date, expiry_dat
 					holiday_ctr += 1
 			st_ctr +=1
 			i += 1  # Move to the next day
+		return {
+			"value": 0,
+			"months_accrued": months_accrued,
+			"age": age,
+			"withSunday": withSunday,
+			"tawad_days": tawad_days,
+			"st_rate": short_term_rate,
+			"holiday_ctr": holiday_ctr
+			}
 
 	elif date_issued > expiry_date:
 		# Use expiry date for interest computation. check starting Months accrued
@@ -163,7 +170,7 @@ def calculate_interest(date_issued, date_loan_granted, maturity_date, expiry_dat
 	if closest_month >= date_issued_datetime: #check if MD or ED is at the end of the month and the DI is start of the month
 		months_accrued -= 1
 	
-	months_accrued = months_accrued * past_adv_interest # this ensures the months accrued is zero if Adv int is still paid
+	months_accrued = months_accrued
 	value = months_accrued * int(interest)
 
 	return {

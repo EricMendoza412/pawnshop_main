@@ -835,7 +835,12 @@ function calculate_interest(frm) {
 				if (!msgDisplayedTwo && response.message.st_rate != 0) {
 					frappe.msgprint({
 						title: __('Computation'),
-						message: __('<b>Short term rate:</b> '+ response.message.st_rate + '%')
+						message: __('<b>Short term rate: '+ response.message.st_rate + '% </b>' +
+							'<br><b>Skipped days:</b>' +
+							'<br>&nbsp;&nbsp;&nbsp;&nbsp;Sunday: '+ Sunday +
+							'<br>&nbsp;&nbsp;&nbsp;&nbsp;Holiday: ' + response.message.holiday_ctr +
+							'<br><br>Note: 1-3 days = 4%, 4-6 days = 3%' 
+						)
 					});
 					msgDisplayedTwo = true; // Prevent further calls
 				}
