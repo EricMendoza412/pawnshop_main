@@ -83,6 +83,7 @@ def calculate_interest(date_issued, date_loan_granted, maturity_date, expiry_dat
 			# Check if it's a Sunday
 			if next_day.weekday() == 6:  # Sunday is 6 in Python
 				withSunday = 'Yes'
+				tawad_days += 1
 				sundayCtr = 1
 				x += 1  # Increase the range to check newly added days
 				st_ctr -= 1 # offset. Hindi kasama sa bilang ang Sunday
@@ -93,6 +94,7 @@ def calculate_interest(date_issued, date_loan_granted, maturity_date, expiry_dat
 					x += 1  # Extend loop range
 					st_ctr -= 1 # offset. Hindi kasama sa bilang ang Holiday
 					holiday_ctr += 1
+					tawad_days += 1
 			st_ctr +=1
 			i += 1  # Move to the next day
 		return {
