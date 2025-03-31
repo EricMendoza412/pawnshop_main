@@ -128,6 +128,7 @@ def calculate_interest(date_issued, date_loan_granted, maturity_date, expiry_dat
 	compare_date = f"{compare_year}-{compare_month:02d}-{compare_day:02d}"
 	closest_month = datetime.strptime(compare_date, "%Y-%m-%d")
 	#get closest month to Date Issued
+	closest_month_ctr = 0
 	if di_day > compare_day:
 		closest_month_ctr = di_month - compare_month + addmonth_year_diff
 		months_accrued += 1
@@ -137,8 +138,7 @@ def calculate_interest(date_issued, date_loan_granted, maturity_date, expiry_dat
 	# if the month shift caused an adjustment in days, use accurate counting of 30 days
 	if closest_month.day < compare_day:
 		closest_month_thirtydays = datetime.strptime(compare_date, "%Y-%m-%d")
-		if closest_month_ctr >= 1:
-			closest_month_ctr -= 1			
+		closest_month_ctr -= 1			
 		closest_month_thirtydays = closest_month_thirtydays + relativedelta(months=closest_month_ctr)
 		closest_month = closest_month_thirtydays + timedelta(days=30)
 	# check all days from closest month to closest month + tawad days, if any are Sundays or holidays.
@@ -169,6 +169,7 @@ def calculate_interest(date_issued, date_loan_granted, maturity_date, expiry_dat
 		i += 1  # Move to the next day
 		
 	closest_month = closest_month + timedelta(days=tawad_days)
+	print("hello! " + closest_month.strftime("%Y-%m-%d"))
 	if closest_month >= date_issued_datetime: #check if MD or ED is at the end of the month and the DI is start of the month
 		months_accrued -= 1
 	
