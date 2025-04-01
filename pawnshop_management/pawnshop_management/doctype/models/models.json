@@ -22,10 +22,10 @@
   "preview",
   "section_break_wxxsi",
   "max_sell_price",
-  "model_series",
+  "max_av_percent",
   "column_break_fzp4h",
-  "bn_price",
-  "max_av_percent"
+  "model_series",
+  "year_released"
  ],
  "fields": [
   {
@@ -110,11 +110,6 @@
    "label": "No Charger No Less 300"
   },
   {
-   "fieldname": "bn_price",
-   "fieldtype": "Currency",
-   "label": "Brand new price"
-  },
-  {
    "fieldname": "max_av_percent",
    "fieldtype": "Percent",
    "label": "Max AV %"
@@ -138,11 +133,16 @@
   {
    "fieldname": "column_break_fzp4h",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "year_released",
+   "fieldtype": "Data",
+   "label": "Year released"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-16 08:13:56.050260",
+ "modified": "2025-04-02 07:17:19.790618",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Models",

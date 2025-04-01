@@ -10,7 +10,11 @@ frappe.ui.form.on('Models', {
 	},
 
 	max_sell_price: function(frm){
-		frm.set_value('maximum', Math.ceil(frm.doc.max_sell_price * 0.8 / 100) * 100);
+		if(frm.doc.max_av_percent != 0){
+			frm.set_value('maximum', Math.ceil(frm.doc.max_sell_price * (frm.doc.max_av_percent * 0.01) / 100) * 100);
+		}else{
+			frm.set_value('maximum', Math.ceil(frm.doc.max_sell_price * 0.8 / 100) * 100);
+		}
 	}
 
 	// refresh: function(frm) {
