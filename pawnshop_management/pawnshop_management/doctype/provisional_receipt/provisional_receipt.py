@@ -91,10 +91,12 @@ def calculate_interest(date_issued, date_loan_granted, maturity_date, expiry_dat
 			# Check if it's a holiday AND belongs to the specified branch
 			if (next_day.date(), branch) in holiday_set:
 				if sundayCtr == 0: #to avoid double increment for x loop
-					x += 1  # Extend loop range
-					st_ctr -= 1 # offset. Hindi kasama sa bilang ang Holiday
-					holiday_ctr += 1
-					tawad_days += 1
+					#check if DLG is a holiday, if yes, do not include in Holiday tawad
+					if i != 0:
+						x += 1  # Extend loop range
+						st_ctr -= 1 # offset. Hindi kasama sa bilang ang Holiday
+						holiday_ctr += 1
+						tawad_days += 1
 			st_ctr +=1
 			i += 1  # Move to the next day
 		return {
