@@ -78,16 +78,14 @@
    "fieldname": "returned_a",
    "fieldtype": "Int",
    "in_list_view": 1,
-   "label": "Returned(A)",
-   "read_only": 1
+   "label": "Returned(A)"
   },
   {
    "default": "0",
    "fieldname": "pulled_out_a",
    "fieldtype": "Int",
    "in_list_view": 1,
-   "label": "Pulled Out(A)",
-   "read_only": 1
+   "label": "Pulled Out(A)"
   },
   {
    "default": "0",
@@ -264,7 +262,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-05-17 15:35:16.385202",
+ "modified": "2025-04-24 16:09:20.818403",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Inventory Count",

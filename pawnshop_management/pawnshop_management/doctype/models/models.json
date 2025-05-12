@@ -25,7 +25,8 @@
   "max_av_percent",
   "column_break_fzp4h",
   "model_series",
-  "year_released"
+  "year_released",
+  "last_srp_update"
  ],
  "fields": [
   {
@@ -69,7 +70,8 @@
    "fieldname": "maximum",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Maximum"
+   "label": "Maximum",
+   "read_only": 1
   },
   {
    "fieldname": "preview",
@@ -112,7 +114,7 @@
   {
    "fieldname": "max_av_percent",
    "fieldtype": "Percent",
-   "label": "Max AV %"
+   "label": "Max AV (SRP%)"
   },
   {
    "fieldname": "max_sell_price",
@@ -138,11 +140,17 @@
    "fieldname": "year_released",
    "fieldtype": "Data",
    "label": "Year released"
+  },
+  {
+   "fieldname": "last_srp_update",
+   "fieldtype": "Date",
+   "label": "Last selling price update",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-04-02 07:17:19.790618",
+ "modified": "2025-04-24 23:00:36.456838",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Models",
