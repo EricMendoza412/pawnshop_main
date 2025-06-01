@@ -35,6 +35,7 @@ frappe.query_reports["J End of Day Report"] = {
 				"Garcia's Pawnshop - TNZ",
 				"Garcia's Pawnshop - ALP",
 				"Garcia's Pawnshop - NOV",
+				"Garcia's Pawnshop - PSC",
 				"TEST"
 			],
 			default: default_branch

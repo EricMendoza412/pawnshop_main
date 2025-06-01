@@ -29,5 +29,6 @@ def get_ip_from_settings():
         "tanza": tanza.ip_address,
         "alapan": alapan.ip_address,
         "noveleta": noveleta.ip_address,
+        "pascam": pascam.ip_address,
         "test": test.ip_address
         }
