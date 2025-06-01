@@ -32,6 +32,8 @@ def execute(filters=None):
 		branch = "Garcia's Pawnshop - ALP"
 	elif str(current_ip) == str(branch_ip['noveleta']):
 		branch = "Garcia's Pawnshop - NOV"	
+	elif str(current_ip) == str(branch_ip['pascam']):
+		branch = "Garcia's Pawnshop - PSC"	
 	elif str(current_ip) == str(branch_ip['test']):
 		branch = "TEST"	
 

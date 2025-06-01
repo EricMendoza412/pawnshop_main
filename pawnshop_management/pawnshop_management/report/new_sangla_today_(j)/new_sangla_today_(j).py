@@ -21,6 +21,12 @@ def execute(filters=None):
 		branch = "Garcia's Pawnshop - GTC"
 	elif str(current_ip) == str(branch_ip['tanza']):
 		branch = "Garcia's Pawnshop - TNZ"
+	elif str(current_ip) == str(branch_ip['alapan']):
+		branch = "Garcia's Pawnshop - ALP"
+	elif str(current_ip) == str(branch_ip['noveleta']):
+		branch = "Garcia's Pawnshop - NOV"
+	elif str(current_ip) == str(branch_ip['pascam']):
+		branch = "Garcia's Pawnshop - PSC"
 
 	
 	data = frappe.db.sql("""

@@ -39,6 +39,8 @@ def filter_j_based_on_banch(user):
         return "(`tabPawn Ticket Jewelry`.branch = 'Garcia''s Pawnshop - ALP')"
     elif str(current_ip) == str(branch_ip['noveleta']) and (user_role.role_profile_name == "Cashier" or user_role.role_profile_name == "Supervisor/Cashier" or user_role.role_profile_name == "Appraiser/Cashier" or user_role.role_profile_name == "Appraiser" or user_role.role_profile_name == "Supervisor" or user_role.role_profile_name == "Vault Custodian"):
         return "(`tabPawn Ticket Jewelry`.branch = 'Garcia''s Pawnshop - NOV')"
+    elif str(current_ip) == str(branch_ip['pascam']) and (user_role.role_profile_name == "Cashier" or user_role.role_profile_name == "Supervisor/Cashier" or user_role.role_profile_name == "Appraiser/Cashier" or user_role.role_profile_name == "Appraiser" or user_role.role_profile_name == "Supervisor" or user_role.role_profile_name == "Vault Custodian"):
+        return "(`tabPawn Ticket Jewelry`.branch = 'Garcia''s Pawnshop - PSC')"
     elif str(current_ip) == str(branch_ip['test']) and (user_role.role_profile_name == "Cashier" or user_role.role_profile_name == "Supervisor/Cashier" or user_role.role_profile_name == "Appraiser/Cashier" or user_role.role_profile_name == "Appraiser" or user_role.role_profile_name == "Supervisor" or user_role.role_profile_name == "Vault Custodian"):
         return "(`tabPawn Ticket Jewelry`.branch = 'TEST')"
         
