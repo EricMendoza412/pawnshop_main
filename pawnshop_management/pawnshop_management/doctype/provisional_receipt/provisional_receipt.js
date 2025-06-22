@@ -165,6 +165,8 @@ frappe.ui.form.on('Provisional Receipt', {
 					}
 				}).then(count => {
 					if (count === 0) {
+						// Only show button for Area Manager or Operations Manager
+						if (frappe.user_roles.includes('Area Manager') || frappe.user_roles.includes('Operations Manager')) {
 						frm.add_custom_button(__('Change Mode of Payment'), function() {
 							let dialog = new frappe.ui.Dialog({
 								title: 'Select Payment Method',
@@ -356,6 +358,7 @@ frappe.ui.form.on('Provisional Receipt', {
 							});
 						});
 					}
+				}
 				});
 			}
 	},
