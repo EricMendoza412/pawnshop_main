@@ -75,6 +75,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 				frm.set_df_property('extra_battery', 'read_only', 1);
 				frm.set_df_property('extra_lens', 'read_only', 1);
 				frm.set_df_property('not_openline', 'read_only', 1);
+				frm.set_df_property('selling_price', 'read_only', 1);
 			}
 		}
 

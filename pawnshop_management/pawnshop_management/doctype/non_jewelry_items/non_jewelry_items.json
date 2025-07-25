@@ -180,8 +180,8 @@
   {
    "fieldname": "videocard",
    "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Videocard"
+   "label": "Videocard",
+   "read_only": 1
   },
   {
    "default": "0",
@@ -359,9 +359,7 @@
   {
    "fieldname": "selling_price",
    "fieldtype": "Currency",
-   "hidden": 1,
-   "label": "Selling Price",
-   "read_only": 1
+   "label": "Selling Price"
   },
   {
    "fetch_from": "assistant_appraiser.first_name",
@@ -374,7 +372,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-13 23:36:49.340816",
+ "modified": "2025-07-25 14:05:36.753971",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",

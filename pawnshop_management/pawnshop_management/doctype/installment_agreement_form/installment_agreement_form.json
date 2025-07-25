@@ -1,0 +1,395 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2025-07-16 17:51:46.420157",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "branch",
+  "start_date",
+  "column_break_mlf0g",
+  "customer_tracking_no",
+  "customer_name",
+  "contact_number",
+  "amended_from",
+  "item_details_section",
+  "item_no",
+  "type",
+  "brand",
+  "model",
+  "column_break_7niht",
+  "model_number",
+  "color",
+  "ram",
+  "internal_memory",
+  "column_break_vw9tk",
+  "disk_type",
+  "internet_connection_capability",
+  "videocard",
+  "locked_to_a_network",
+  "accessories_section",
+  "charger",
+  "case",
+  "box",
+  "earphones",
+  "pin",
+  "others",
+  "column_break_qymzc",
+  "manual",
+  "sd_card",
+  "bag",
+  "extra_battery",
+  "extra_lens",
+  "comments",
+  "section_break_92bfs",
+  "due_date",
+  "total_price",
+  "down_payment",
+  "down_payment_receipt",
+  "outstanding_balance",
+  "payments",
+  "customer_signature",
+  "seller_signature"
+ ],
+ "fields": [
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Start Date",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Installment Agreement Form",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Data",
+   "label": "No",
+   "print_hide": 1,
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fetch_from": "customer_tracking_no.customer_name",
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "Customer Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "item_no",
+   "fieldtype": "Link",
+   "label": "Item No",
+   "options": "Non Jewelry Items",
+   "reqd": 1
+  },
+  {
+   "fieldname": "customer_tracking_no",
+   "fieldtype": "Link",
+   "label": "Customer Tracking No",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "item_no.selling_price",
+   "fieldname": "total_price",
+   "fieldtype": "Currency",
+   "label": "Total Price",
+   "read_only": 1
+  },
+  {
+   "fieldname": "payments",
+   "fieldtype": "Table",
+   "label": "Payments",
+   "options": "Installment Payments"
+  },
+  {
+   "fieldname": "outstanding_balance",
+   "fieldtype": "Currency",
+   "label": "Outstanding Balance",
+   "read_only": 1
+  },
+  {
+   "fieldname": "due_date",
+   "fieldtype": "Date",
+   "label": "Due Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "contact_number",
+   "fieldtype": "Data",
+   "label": "Contact Number",
+   "read_only": 1
+  },
+  {
+   "fieldname": "down_payment",
+   "fieldtype": "Currency",
+   "label": "Down Payment",
+   "read_only": 1
+  },
+  {
+   "fieldname": "down_payment_receipt",
+   "fieldtype": "Data",
+   "label": "Down Payment Receipt",
+   "read_only": 1
+  },
+  {
+   "fieldname": "customer_signature",
+   "fieldtype": "Signature",
+   "label": "Customer Signature"
+  },
+  {
+   "fieldname": "seller_signature",
+   "fieldtype": "Signature",
+   "label": "Seller Signature"
+  },
+  {
+   "fetch_from": "item_no.brand",
+   "fieldname": "brand",
+   "fieldtype": "Data",
+   "label": "Brand",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_no.model",
+   "fieldname": "model",
+   "fieldtype": "Data",
+   "label": "Model",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_no.model_number",
+   "fieldname": "model_number",
+   "fieldtype": "Data",
+   "label": "Model Number",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_no.color",
+   "fieldname": "color",
+   "fieldtype": "Data",
+   "label": "Color",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_no.ram",
+   "fieldname": "ram",
+   "fieldtype": "Data",
+   "label": "RAM",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_no.internal_memory",
+   "fieldname": "internal_memory",
+   "fieldtype": "Data",
+   "label": "Internal Memory",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_no.disk_type",
+   "fieldname": "disk_type",
+   "fieldtype": "Data",
+   "label": "Disk Type",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_no.internet_connection_capability",
+   "fieldname": "internet_connection_capability",
+   "fieldtype": "Data",
+   "label": "Internet Connection Capability",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_no.videocard",
+   "fieldname": "videocard",
+   "fieldtype": "Data",
+   "label": "Videocard",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fetch_from": "item_no.not_openline",
+   "fieldname": "locked_to_a_network",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Locked to a network?",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fetch_from": "item_no.charger",
+   "fieldname": "charger",
+   "fieldtype": "Check",
+   "label": "Charger",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fetch_from": "item_no.case",
+   "fieldname": "case",
+   "fieldtype": "Check",
+   "label": "Case",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fetch_from": "item_no.box",
+   "fieldname": "box",
+   "fieldtype": "Check",
+   "label": "Box",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fetch_from": "item_no.earphones",
+   "fieldname": "earphones",
+   "fieldtype": "Check",
+   "label": "Earphones",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fetch_from": "item_no.pin",
+   "fieldname": "pin",
+   "fieldtype": "Check",
+   "label": "Pin",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fetch_from": "item_no.manual",
+   "fieldname": "manual",
+   "fieldtype": "Check",
+   "label": "Manual",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fetch_from": "item_no.sd_card",
+   "fieldname": "sd_card",
+   "fieldtype": "Check",
+   "label": "SD Card",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_no.others",
+   "fieldname": "others",
+   "fieldtype": "Data",
+   "label": "Others",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fetch_from": "item_no.bag",
+   "fieldname": "bag",
+   "fieldtype": "Check",
+   "label": "Bag",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fetch_from": "item_no.extra_battery",
+   "fieldname": "extra_battery",
+   "fieldtype": "Check",
+   "label": "Extra Battery",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fetch_from": "item_no.extra_lens",
+   "fieldname": "extra_lens",
+   "fieldtype": "Check",
+   "label": "Extra Lens",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_no.comments",
+   "fieldname": "comments",
+   "fieldtype": "Small Text",
+   "label": "Comments",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_mlf0g",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "item_details_section",
+   "fieldtype": "Section Break",
+   "label": "Item Details"
+  },
+  {
+   "fetch_from": "item_no.type",
+   "fieldname": "type",
+   "fieldtype": "Data",
+   "label": "Type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_7niht",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "accessories_section",
+   "fieldtype": "Section Break",
+   "label": "Accessories"
+  },
+  {
+   "fieldname": "column_break_qymzc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_92bfs",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_vw9tk",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-07-25 17:35:40.045406",
+ "modified_by": "Administrator",
+ "module": "Pawnshop Management",
+ "name": "Installment Agreement Form",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
