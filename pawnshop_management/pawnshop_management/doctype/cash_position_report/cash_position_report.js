@@ -455,7 +455,7 @@ function get_ps_fund_transfers(frm, date_today=null) {
 
 function get_subastado_sales(frm, date_today=null) {
 	frappe.db.get_list('Subastado Sales Commissions', {
-		fields: ['mop_1','payment_1','mop_2','payment_2'],
+		fields: ['mop_1','payment_1','mop_2','payment_2','comments'],
 		filters: { date_bought_or_returned: date_today, branch: frm.doc.branch},
 		limit: 500
 	}).then(records => {
@@ -465,10 +465,12 @@ function get_subastado_sales(frm, date_today=null) {
 		let bankTransRet = 0;
 		let bankTrans = 0;
 		for (let index = 0; index < records.length; index++) {
-			if(records[index].mop_1 == "Cash"){
+
+			//Do not include Subastado Sales with comments "Subasta"
+			if(records[index].mop_1 == "Cash" && records[index].comments != "Subasta"){
 				cash += parseInt(records[index].payment_1);	
 			}
-			if(records[index].mop_2 == "Cash"){
+			if(records[index].mop_2 == "Cash" && records[index].comments != "Subasta"){
 				cash += parseInt(records[index].payment_2);	
 			}
 			if(records[index].mop_1 == "Gcash"){
