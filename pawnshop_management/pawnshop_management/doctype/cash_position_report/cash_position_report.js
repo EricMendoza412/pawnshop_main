@@ -473,7 +473,7 @@ function get_subastado_sales(frm, date_today=null) {
 			if(records[index].mop_2 == "Cash" && records[index].comments != "Subasta"){
 				cash += parseInt(records[index].payment_2);	
 			}
-			if(records[index].mop_1 == "Gcash"){
+			if(records[index].mop_1 == "Gcash" && records[index].comments != "Subasta"){
 				if(records[index].payment_1 > 0){
 					gcash += parseInt(records[index].payment_1);		
 				}else{
@@ -481,7 +481,7 @@ function get_subastado_sales(frm, date_today=null) {
 					cash += parseInt(records[index].payment_1);
 				}
 			}
-			if(records[index].mop_2 == "Gcash"){
+			if(records[index].mop_2 == "Gcash" && records[index].comments != "Subasta"){
 				if(records[index].payment_2 > 0){
 					gcash += parseInt(records[index].payment_2);		
 				}else{
@@ -489,7 +489,7 @@ function get_subastado_sales(frm, date_today=null) {
 					cash += parseInt(records[index].payment_2);
 				}
 			}
-			if(records[index].mop_1 == "BPI" || records[index].mop_1 == "BDO" || records[index].mop_1 == "EASTWEST"){
+			if((records[index].mop_1 == "BPI" || records[index].mop_1 == "BDO" || records[index].mop_1 == "EASTWEST") && records[index].comments != "Subasta"){
 				if(records[index].payment_1 > 0){
 					bankTrans += parseInt(records[index].payment_1);
 				}else{
@@ -497,7 +497,7 @@ function get_subastado_sales(frm, date_today=null) {
 					cash += parseInt(records[index].payment_1);
 				}
 			}
-			if(records[index].mop_2 == "BPI" || records[index].mop_2 == "BDO" || records[index].mop_2 == "EASTWEST"){
+			if((records[index].mop_2 == "BPI" || records[index].mop_2 == "BDO" || records[index].mop_2 == "EASTWEST") && records[index].comments != "Subasta"){
 				if(records[index].payment_2 > 0){
 					bankTrans += parseInt(records[index].payment_2);
 				}else{
