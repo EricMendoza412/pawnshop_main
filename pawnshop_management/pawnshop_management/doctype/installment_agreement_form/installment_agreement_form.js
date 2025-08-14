@@ -4,7 +4,7 @@
 frappe.ui.form.on('Installment Agreement Form', {
 
 	refresh: function(frm) {
-		if (frm.doc.docstatus === 1 && frm.doc.down_payment === 0) { // 1 = Submitted
+		if (frm.doc.down_payment === 0) {
             // Hide the print icon (top right of the form header)
             frm.page.hide_icon_group('print');
 			//programmatically hide the Menu items
