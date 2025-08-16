@@ -98,13 +98,16 @@ frappe.ui.form.on('Installment Agreement Form', {
 			}
 	},
 
-	down_payment: function(frm) {
-		if ((frm.doc.total_price * 0.25) > frm.doc.down_payment) {
-			frappe.msgprint(__('Down Payment must be at least 25% of the Total Price.\n In this case, it must be at least: {0}', [Math.ceil(frm.doc.total_price * 0.25)]));
-			frm.set_value('down_payment', Math.ceil(frm.doc.total_price * 0.25));
-		}
-		frm.set_value('outstanding_balance', frm.doc.total_price - frm.doc.down_payment);
-	}
+	// down_payment: function(frm) {
+	// 	if ((frm.doc.total_price * 0.25) > frm.doc.down_payment) {
+	// 		frappe.msgprint(__('Down Payment must be at least 25% of the Total Price.\n In this case, it must be at least: {0}', [Math.ceil(frm.doc.total_price * 0.25)]));
+	// 		frm.set_value('down_payment', Math.ceil(frm.doc.total_price * 0.25));
+	// 	}
+	// 	frm.set_value('outstanding_balance', frm.doc.total_price - frm.doc.down_payment);
+	// }
+	total_price: function(frm) {
+		//put value of total_price in outstanding_balance
+		frm.set_value('outstanding_balance', frm.doc.total_price);
 
-	
+	},
 });
