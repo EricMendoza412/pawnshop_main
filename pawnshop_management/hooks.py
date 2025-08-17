@@ -2,11 +2,11 @@ from . import __version__ as app_version
 
 app_name = "pawnshop_management"
 app_title = "Pawnshop Management"
-app_publisher = "Rabie Moses Santillan"
+app_publisher = "Rabie Santillan and Eric Mendoza"
 app_description = "Pawnshop Management System"
 app_icon = "octicon octicon-file-directory"
 app_color = "grey"
-app_email = "gprabiemosessantillan@gmail.com"
+app_email = "gpericmendoza@gmail.com"
 app_license = "MIT"
 
 # Includes in <head>

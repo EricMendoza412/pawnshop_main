@@ -369,8 +369,9 @@
   }
  ],
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2025-08-14 22:48:22.334645",
+ "modified": "2025-08-17 18:02:19.758629",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Installment Agreement Form",
