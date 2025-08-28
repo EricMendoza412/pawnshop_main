@@ -52,9 +52,11 @@
   "current_location",
   "person_accountable",
   "w_audit_finding",
+  "date_when_audit_was_reflected",
   "column_break_ouqef",
   "date_reappraised",
-  "selling_price"
+  "selling_price",
+  "pt_principal"
  ],
  "fields": [
   {
@@ -104,8 +106,7 @@
   {
    "fieldname": "comments",
    "fieldtype": "Small Text",
-   "label": "Comments",
-   "set_only_once": 1
+   "label": "Comments"
   },
   {
    "fieldname": "section_break_11",
@@ -342,9 +343,7 @@
    "default": "0",
    "fieldname": "w_audit_finding",
    "fieldtype": "Check",
-   "hidden": 1,
-   "label": "W/ Audit Finding",
-   "read_only": 1
+   "label": "W/ Audit Finding"
   },
   {
    "fieldname": "column_break_ouqef",
@@ -368,11 +367,21 @@
    "label": "Assistant Appraiser Name",
    "read_only": 1,
    "reqd": 1
+  },
+  {
+   "fieldname": "pt_principal",
+   "fieldtype": "Data",
+   "label": "Principal upon Pull out"
+  },
+  {
+   "fieldname": "date_when_audit_was_reflected",
+   "fieldtype": "Date",
+   "label": "Date when Audit was reflected"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-25 14:05:36.753971",
+ "modified": "2025-08-28 15:10:18.182564",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",

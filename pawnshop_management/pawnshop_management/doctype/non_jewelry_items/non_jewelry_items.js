@@ -47,7 +47,8 @@ frappe.ui.form.on('Non Jewelry Items', {
 
 			//frm.disable_save();
 		}else{
-			if(!frappe.user_roles.includes('Administrator')){
+			//if(!frappe.user_roles.includes('Administrator') && (frm.doc.workflow_state != "Unprocessed" && !frappe.user_roles.includes('Subastado member'))){
+			if(!frappe.user_roles.includes('Administrator')){	
 				frm.set_df_property('type', 'read_only', 1);
 				frm.set_df_property('brand', 'read_only', 1);
 				frm.set_df_property('model', 'read_only', 1);
@@ -76,6 +77,9 @@ frappe.ui.form.on('Non Jewelry Items', {
 				frm.set_df_property('extra_lens', 'read_only', 1);
 				frm.set_df_property('not_openline', 'read_only', 1);
 				frm.set_df_property('selling_price', 'read_only', 1);
+				frm.set_df_property('pt_principal', 'read_only', 1);
+				frm.set_df_property('w_audit_finding', 'read_only', 1);
+				frm.set_df_property('date_when_audit_was_reflected', 'read_only', 1);
 			}
 		}
 
@@ -96,6 +100,12 @@ frappe.ui.form.on('Non Jewelry Items', {
 		// 		}
 		// 	})
 		// });
+		if(frm.doc.workflow_state == "Unprocessed" && frappe.user_roles.includes('Subastado member')){
+			//make comments field editable and make it appear
+			frm.set_df_property('comments', 'read_only', 0);
+			frm.set_df_property('comments', 'hidden', 0);
+		}
+
 
 		frm.set_query('brand', function(){
 			if (frm.doc.type == "Cellphone") {
