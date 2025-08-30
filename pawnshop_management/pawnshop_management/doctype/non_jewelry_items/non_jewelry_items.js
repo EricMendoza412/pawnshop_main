@@ -44,6 +44,10 @@ frappe.ui.form.on('Non Jewelry Items', {
 				frm.set_value('charger', 0)
 				frm.refresh_field('charger')
 			}
+				frm.set_df_property('selling_price', 'read_only', 0);
+				frm.set_df_property('pt_principal', 'read_only', 0);
+				frm.set_df_property('w_audit_finding', 'read_only', 0);
+				frm.set_df_property('date_when_audit_was_reflected', 'read_only', 0);
 
 			//frm.disable_save();
 		}else{

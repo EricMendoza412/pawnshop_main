@@ -47,6 +47,22 @@ frappe.ui.form.on('Installment Agreement Form', {
 		}
 	},
 
+	type: function(frm) {
+	//if type is laptop, hide locked_to_a_network and internet_connection_capability
+		if(frm.doc.type == 'Laptop'){
+			frm.set_df_property('locked_to_a_network', 'hidden', 1);
+			frm.set_df_property('internet_connection_capability', 'hidden', 1);
+			frm.set_df_property('disk_type', 'hidden', 0);
+		}else{
+			//hide disk_type
+			frm.set_df_property('locked_to_a_network', 'hidden', 0);
+			frm.set_df_property('internet_connection_capability', 'hidden', 0);
+			frm.set_df_property('disk_type', 'hidden', 1);
+		}
+	},
+
+
+
 	customer_tracking_no: function(frm) {
 		//Get the mobile_no from the customer_primary_contact from the customer using the customer_tracking_no field
 		frappe.db.get_value('Customer', frm.doc.customer_tracking_no, 'customer_primary_contact', (r) => {
