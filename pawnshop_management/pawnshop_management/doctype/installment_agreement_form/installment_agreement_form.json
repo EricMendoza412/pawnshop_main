@@ -50,6 +50,7 @@
   "down_payment",
   "total_price",
   "outstanding_balance",
+  "cost",
   "payments",
   "agreement",
   "signatures_section",
@@ -413,12 +414,21 @@
    "hidden": 1,
    "label": "TandCs",
    "read_only": 1
+  },
+  {
+   "fetch_from": "item_no.pt_principal",
+   "fieldname": "cost",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Cost",
+   "print_hide": 1,
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-08-30 15:05:11.864129",
+ "modified": "2025-08-31 09:16:27.579129",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Installment Agreement Form",

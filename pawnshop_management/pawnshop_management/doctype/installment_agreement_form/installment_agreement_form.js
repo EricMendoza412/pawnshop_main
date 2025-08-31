@@ -53,11 +53,19 @@ frappe.ui.form.on('Installment Agreement Form', {
 			frm.set_df_property('locked_to_a_network', 'hidden', 1);
 			frm.set_df_property('internet_connection_capability', 'hidden', 1);
 			frm.set_df_property('disk_type', 'hidden', 0);
+			//hide locked_to_a_network and internet_connection_capability in print format
+			frm.set_df_property('locked_to_a_network', 'print_hide', 1);
+			frm.set_df_property('internet_connection_capability', 'print_hide', 1);
+			frm.set_df_property('disk_type', 'print_hide', 0);
 		}else{
 			//hide disk_type
 			frm.set_df_property('locked_to_a_network', 'hidden', 0);
 			frm.set_df_property('internet_connection_capability', 'hidden', 0);
 			frm.set_df_property('disk_type', 'hidden', 1);
+			//hide disk_type in print format
+			frm.set_df_property('locked_to_a_network', 'print_hide', 0);
+			frm.set_df_property('internet_connection_capability', 'print_hide', 0);
+			frm.set_df_property('disk_type', 'print_hide', 1);
 		}
 	},
 
