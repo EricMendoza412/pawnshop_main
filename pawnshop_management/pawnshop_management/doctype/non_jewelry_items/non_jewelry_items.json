@@ -56,7 +56,13 @@
   "column_break_ouqef",
   "date_reappraised",
   "selling_price",
-  "pt_principal"
+  "pt_principal",
+  "sold_for",
+  "date_sold",
+  "live_selling",
+  "reference_document",
+  "document_number",
+  "ptn_number"
  ],
  "fields": [
   {
@@ -377,11 +383,45 @@
    "fieldname": "date_when_audit_was_reflected",
    "fieldtype": "Date",
    "label": "Date when Audit was reflected"
+  },
+  {
+   "fieldname": "sold_for",
+   "fieldtype": "Currency",
+   "label": "Sold For",
+   "read_only": 1
+  },
+  {
+   "fieldname": "date_sold",
+   "fieldtype": "Date",
+   "label": "Date Sold",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "live_selling",
+   "fieldtype": "Check",
+   "label": "Live selling"
+  },
+  {
+   "fieldname": "reference_document",
+   "fieldtype": "Select",
+   "label": "Reference Document",
+   "options": "Credit Memo\nBranch Receipt\nLoan Form"
+  },
+  {
+   "fieldname": "document_number",
+   "fieldtype": "Data",
+   "label": "Document Number"
+  },
+  {
+   "fieldname": "ptn_number",
+   "fieldtype": "Data",
+   "label": "PTN Number"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-28 15:10:18.182564",
+ "modified": "2025-09-03 17:27:49.962441",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",

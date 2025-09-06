@@ -11,7 +11,8 @@
   "brand",
   "model",
   "model_number",
-  "suggested_appraisal_value"
+  "suggested_appraisal_value",
+  "main_appraiser"
  ],
  "fields": [
   {
@@ -73,12 +74,18 @@
    "label": "Model Number",
    "read_only": 1,
    "width": "100px"
+  },
+  {
+   "fetch_from": "item_no.main_appraiser",
+   "fieldname": "main_appraiser",
+   "fieldtype": "Data",
+   "label": "Main Appraiser"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-03-04 09:28:45.569213",
+ "modified": "2025-09-03 16:06:26.341715",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry List",

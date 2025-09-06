@@ -50,6 +50,7 @@
   "down_payment",
   "total_price",
   "outstanding_balance",
+  "date_fully_paid",
   "cost",
   "payments",
   "agreement",
@@ -408,7 +409,7 @@
    "label": "Terms and Coniditons"
   },
   {
-   "default": "<div style=\"page-break-before: always;\"></div>\n<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>\n<div style=\"text-align: center; font-weight: bold;\">\n  <p>INSTALMENT SALES AGREEMENT</p>\n  <p>TERMS AND CONDITIONS</p>\n</div>\n\n<ol>\n  <li>\n    <b>INSTALMENT OPTION</b><br>\n    Instalment payment option is available for gadgets with price of four thousand (PHP 4,000) and above.\n    <br><br>\n    <table border=\"1\" cellpadding=\"3\" cellspacing=\"0\" style=\"border-collapse: collapse; width: 100%; text-align: center;\">\n      <tbody><tr>\n        <th>Price</th>\n        <th>Maximum Period of Installment</th>\n      </tr>\n      <tr>\n        <td>PHP 4,000 to PHP 9,999</td>\n        <td>2 months</td>\n      </tr>\n      <tr>\n        <td>PHP 10,000 to PHP 19,999</td>\n        <td>3 months</td>\n      </tr>\n      <tr>\n        <td>PHP 20,000 and above</td>\n        <td>4 months</td>\n      </tr>\n    </tbody></table>\n    <p>All gadgets with the price of PHP 3,999 and below should be paid in full.</p>\n  </li>\n\n  <li>\n    <b>INITIAL DEPOSIT</b><br>\n    At the start of the agreement, a minimum deposit of 25% of the price is required.\n  </li>\n\n  <li>\n    <b>INSTALMENT DATES AND AMOUNT</b><br>\n    The dates of instalment for the remaining balance after deposit are up to the buyer. Minimum amount for the instalment payment is PHP 100.\n  </li>\n\n  <li>\n    <b>PREPAYMENT</b><br>\n    The buyer may prepay the outstanding balance in full at any time before the full payment due date, by then the item can be released.\n  </li>\n\n  <li>\n    <b>PLACE AND MANNER OF PAYMENT</b><br>\n    Payments under this Installment Sales Agreement may be made at any branch or remotely via bank transfer or e-wallet. If the down payment is made remotely, the Buyer must first submit a duly signed instruction slip (clear photo). The Instruction Slip authorizes the Seller to apply the funds to this Agreement.\n  </li>\n\n  <li>\n    <b>LATE PAYMENT</b><br>\n    Buyer is given until two (2) days after the agreed full payment due date to pay the instalment amount. Failure to pay the full amount after the grace period will terminate the agreement and the buyer will be considered in default.\n  </li>\n\n  <li>\n    <b>DEFAULT ON PAYMENT</b><br>\n    When the buyer is considered in default, the gadget is already made available to other customers. The deposit of 25% of price is no longer returned to the customer as penalty for default. Other amounts paid will be returned to the buyer.\n  </li>\n</ol>",
+   "default": "<div style=\"page-break-before: always;\"></div>\n<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>\n<div style=\"text-align: center; font-weight: bold;\">\n  <p>INSTALMENT SALES AGREEMENT</p>\n  <p>TERMS AND CONDITIONS</p>\n</div>\n\n<ol>\n  <li>\n    <b>INSTALMENT OPTION</b><br>\n    Instalment payment option is available for gadgets with price of four thousand (PHP 4,000) and above.\n    <br><br>\n    <table border=\"1\" cellpadding=\"3\" cellspacing=\"0\" style=\"border-collapse: collapse; width: 100%; text-align: center;\">\n      <tbody><tr>\n        <th>Price</th>\n        <th>Maximum Period of Installment</th>\n      </tr>\n      <tr>\n        <td>PHP 4,000 to PHP 9,999</td>\n        <td>2 months</td>\n      </tr>\n      <tr>\n        <td>PHP 10,000 to PHP 19,999</td>\n        <td>3 months</td>\n      </tr>\n      <tr>\n        <td>PHP 20,000 and above</td>\n        <td>4 months</td>\n      </tr>\n    </tbody></table>\n    <p>All gadgets with the price of PHP 3,999 and below should be paid in full.</p>\n  </li>\n\n  <li>\n    <b>INITIAL DEPOSIT</b><br>\n    At the start of the agreement, a minimum deposit of 25% of the price is required.\n  </li>\n\n  <li>\n    <b>INSTALMENT DATES AND AMOUNT</b><br>\n    The dates of instalment for the remaining balance after deposit are up to the buyer. Minimum amount for the instalment payment is PHP 100.\n  </li>\n\n  <li>\n    <b>PREPAYMENT</b><br>\n    The buyer may prepay the outstanding balance in full at any time before the full payment due date, by then the item can be released.\n  </li>\n\n  <li>\n    <b>PLACE AND MANNER OF PAYMENT</b><br>\n    Payments under this Installment Sales Agreement may be made at the branch or remotely via bank transfer or e-wallet. If the down payment is made remotely, the Buyer must first submit a duly signed instruction slip (clear photo). The Instruction Slip authorizes the Seller to apply the funds to this Agreement.\n  </li>\n\n  <li>\n    <b>LATE PAYMENT</b><br>\n    Buyer is given until two (2) days after the agreed full payment due date to pay the instalment amount. Failure to pay the full amount after the grace period will terminate the agreement and the buyer will be considered in default.\n  </li>\n\n  <li>\n    <b>DEFAULT ON PAYMENT</b><br>\n    When the buyer is considered in default, the gadget is already made available to other customers. The deposit of 25% of price is no longer returned to the customer as penalty for default. Other amounts paid will be returned to the buyer.\n  </li>\n</ol>",
    "fieldname": "text_editor_518xd",
    "fieldtype": "Text Editor",
    "hidden": 1,
@@ -423,12 +424,18 @@
    "label": "Cost",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "date_fully_paid",
+   "fieldtype": "Date",
+   "label": "Date Fully Paid",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-08-31 09:16:27.579129",
+ "modified": "2025-09-03 17:03:35.270348",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Installment Agreement Form",
