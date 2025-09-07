@@ -2,6 +2,12 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Non Jewelry Items', {
+
+	validate: function(frm){
+		if (!frm.doc.assistant_appraiser){
+			frappe.throw('Please input assistant appraiser before saving.')
+		}
+	},
 	onload: function(frm) {
 		frm.message_shown = false; // Initialize message_shown
 		if (frm.is_new()) {
