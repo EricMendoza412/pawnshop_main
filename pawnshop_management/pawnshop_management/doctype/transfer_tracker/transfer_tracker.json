@@ -8,79 +8,127 @@
  "engine": "InnoDB",
  "field_order": [
   "date_of_transfer",
-  "transfer_no",
   "origin",
+  "transfer_no",
+  "item_type",
+  "transfer_type",
   "destination",
   "released_by",
   "witnessed_by",
   "rover",
   "date_received",
   "received_by",
+  "nj_items",
   "total_cost",
-  "nj_items"
+  "amended_from"
  ],
  "fields": [
   {
    "fieldname": "date_of_transfer",
    "fieldtype": "Date",
-   "label": "Date of Transfer"
+   "label": "Date of Transfer",
+   "read_only": 1
   },
   {
    "fieldname": "transfer_no",
    "fieldtype": "Data",
    "label": "Transfer No",
+   "read_only": 1,
    "unique": 1
   },
   {
    "fieldname": "origin",
    "fieldtype": "Data",
-   "label": "Origin"
+   "label": "Origin",
+   "read_only": 1
   },
   {
    "fieldname": "destination",
-   "fieldtype": "Data",
-   "label": "Destination"
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Destination",
+   "options": "Branch",
+   "reqd": 1
   },
   {
    "fieldname": "released_by",
    "fieldtype": "Data",
-   "label": "Released By"
+   "label": "Released By",
+   "read_only": 1
   },
   {
    "fieldname": "witnessed_by",
-   "fieldtype": "Data",
-   "label": "Witnessed By"
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Witnessed By",
+   "options": "User",
+   "reqd": 1
   },
   {
    "fieldname": "rover",
-   "fieldtype": "Data",
-   "label": "Rover"
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Rover",
+   "options": "User",
+   "reqd": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "date_received",
    "fieldtype": "Date",
-   "label": "Date Received"
+   "label": "Date Received",
+   "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "received_by",
    "fieldtype": "Data",
-   "label": "Received By"
+   "label": "Received By",
+   "read_only": 1
   },
   {
+   "default": "0",
    "fieldname": "total_cost",
-   "fieldtype": "Data",
-   "label": "Total Cost"
+   "fieldtype": "Currency",
+   "label": "Total Cost",
+   "read_only": 1
   },
   {
    "fieldname": "nj_items",
    "fieldtype": "Table",
    "label": "NJ items",
-   "options": "Transfer Items"
+   "options": "Transfer Items",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Transfer Tracker",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "default": "Non Jewelry Items",
+   "fieldname": "item_type",
+   "fieldtype": "Select",
+   "label": "Item type",
+   "options": "Non Jewelry Items\nJewelry Items",
+   "read_only": 1
+  },
+  {
+   "fieldname": "transfer_type",
+   "fieldtype": "Select",
+   "label": "Transfer Type",
+   "options": "\nPull out of Expired Sangla\nTransfer of Display Items",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2024-08-20 20:30:46.642747",
+ "modified": "2025-09-07 13:12:49.009034",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Transfer Tracker",

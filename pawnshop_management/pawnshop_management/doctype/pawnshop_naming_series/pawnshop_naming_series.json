@@ -20,7 +20,11 @@
   "jewelry_series_section",
   "jewelry_inventory_count",
   "column_break_12",
-  "jewelry_item_count"
+  "jewelry_item_count",
+  "subastado_section",
+  "j_transfer_form",
+  "column_break_sa5vg",
+  "nj_transfer_form"
  ],
  "fields": [
   {
@@ -96,11 +100,30 @@
    "fieldname": "ats_jewelry_count",
    "fieldtype": "Int",
    "label": "ATS Series"
+  },
+  {
+   "fieldname": "subastado_section",
+   "fieldtype": "Section Break",
+   "label": "Subastado"
+  },
+  {
+   "fieldname": "j_transfer_form",
+   "fieldtype": "Int",
+   "label": "J transfer form"
+  },
+  {
+   "fieldname": "column_break_sa5vg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "nj_transfer_form",
+   "fieldtype": "Int",
+   "label": "NJ transfer form"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-07-24 17:11:53.141820",
+ "modified": "2025-09-06 13:56:11.734300",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Pawnshop Naming Series",

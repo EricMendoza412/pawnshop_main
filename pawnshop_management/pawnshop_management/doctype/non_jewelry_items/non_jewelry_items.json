@@ -53,10 +53,11 @@
   "person_accountable",
   "w_audit_finding",
   "date_when_audit_was_reflected",
+  "pt_principal",
+  "date_received",
   "column_break_ouqef",
   "date_reappraised",
   "selling_price",
-  "pt_principal",
   "sold_for",
   "date_sold",
   "live_selling",
@@ -335,7 +336,8 @@
    "fieldname": "current_location",
    "fieldtype": "Link",
    "label": "Current Location",
-   "options": "Branch"
+   "options": "Branch",
+   "read_only": 1
   },
   {
    "fieldname": "person_accountable",
@@ -357,7 +359,7 @@
   {
    "fieldname": "date_reappraised",
    "fieldtype": "Date",
-   "label": "Date Reappraised",
+   "label": "Date Reappraised by Subastado",
    "read_only": 1
   },
   {
@@ -405,22 +407,31 @@
    "fieldname": "reference_document",
    "fieldtype": "Select",
    "label": "Reference Document",
-   "options": "Credit Memo\nBranch Receipt\nLoan Form"
+   "options": "Credit Memo\nBranch Receipt\nLoan Form",
+   "read_only": 1
   },
   {
    "fieldname": "document_number",
    "fieldtype": "Data",
-   "label": "Document Number"
+   "label": "Document Number",
+   "read_only": 1
   },
   {
    "fieldname": "ptn_number",
    "fieldtype": "Data",
-   "label": "PTN Number"
+   "label": "PTN Number",
+   "read_only": 1
+  },
+  {
+   "fieldname": "date_received",
+   "fieldtype": "Date",
+   "label": "Date Received by Subastado",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-06 13:15:57.218422",
+ "modified": "2025-09-07 15:32:07.939879",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",
