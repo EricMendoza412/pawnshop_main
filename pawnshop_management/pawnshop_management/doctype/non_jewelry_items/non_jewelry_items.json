@@ -376,7 +376,7 @@
   },
   {
    "fieldname": "pt_principal",
-   "fieldtype": "Float",
+   "fieldtype": "Data",
    "label": "Principal upon Pull out"
   },
   {
@@ -430,7 +430,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-08 19:47:14.302383",
+ "modified": "2025-09-08 19:55:09.314595",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",
