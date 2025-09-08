@@ -137,23 +137,23 @@ frappe.ui.form.on('Installment Agreement Form', {
 
 	branch: function(frm) { //Select naming series with regards to the branch
 			if (frm.doc.branch == "Garcia's Pawnshop - CC") {
-				frm.set_value('naming_series', "1-.######.NJIS")
+				frm.set_value('naming_series', "1-NJIS.######")
 			} else if (frm.doc.branch == "Garcia's Pawnshop - GTC") {
-				frm.set_value('naming_series', "4-.######.NJIS")
+				frm.set_value('naming_series', "4-NJIS.######")
 			} else if (frm.doc.branch == "Garcia's Pawnshop - MOL") {
-				frm.set_value('naming_series', "6-.######.NJIS")
+				frm.set_value('naming_series', "6-NJIS.######")
 			} else if (frm.doc.branch == "Garcia's Pawnshop - POB") {
-				frm.set_value('naming_series', "3-.######.NJIS")
+				frm.set_value('naming_series', "3-NJIS.######")
 			} else if (frm.doc.branch == "Garcia's Pawnshop - TNZ") {
-				frm.set_value('naming_series', "5-.######.NJIS")
+				frm.set_value('naming_series', "5-NJIS.######")
 			} else if (frm.doc.branch == "Garcia's Pawnshop - ALP") {
-				frm.set_value('naming_series', "7-.######.NJIS")
+				frm.set_value('naming_series', "7-NJIS.######")
 			} else if (frm.doc.branch == "Garcia's Pawnshop - NOV") {
-				frm.set_value('naming_series', "8-.######.NJIS")
+				frm.set_value('naming_series', "8-NJIS.######")
 			} else if (frm.doc.branch == "Garcia's Pawnshop - PSC") {
-				frm.set_value('naming_series', "9-.######.NJIS")
+				frm.set_value('naming_series', "9-NJIS.######")
 			} else if (frm.doc.branch == "TEST") {
-				frm.set_value('naming_series', "20-.######.NJIS")
+				frm.set_value('naming_series', "20-NJIS.######")
 			}
 		
 	}
