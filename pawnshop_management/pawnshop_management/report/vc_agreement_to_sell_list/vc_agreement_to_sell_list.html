@@ -1,0 +1,52 @@
+<!-- Your HTML code -->
+<script type="text/html" id="item_tmpl"></script>
+<h1 text-align="center">{%= data[0].branch %}</h1>
+<h2>Vault Inventory Master List</h2>
+<br>
+<h5>Sanglang Benta (Agreement to Sell) </b></h5>
+<h5>Total Count: <b>{{ data.length-1 }}</b></h5>
+<h5>Total Principal: <b>{{ data[data.length-1].total_value }}</b> </h5>
+<br>
+<p> Date of turn over:____/____/________ </p>
+<br>
+<p>New Vault Custodian:__________________________________</p>  
+<br>
+<p>Operations Manager:__________________________________</p>
+<br>
+<br>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th style="width: 9%">{%= __("Inventory Tracker") %}</th>
+            <th style="width: 9%">{%= __("Customer Name") %}</th>
+            <th style="width: 10%">{%= __("Form Name") %}</th>
+            <th style="width: 35%">{%= __("Item Description") %}</th>
+            <th style="width: 7%">{%= __("Total Value") %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% let sumNS = 0 %}
+        {% let count = 0 %}
+        {% for(var i=0, l=data.length; i<l; i++) { %}
+            <tr>
+                {% if(data[i].date_of_sale != null) { %}
+                <td>{%= data[i].ats_tracking_no %}</td>
+                <td>{%= data[i].customer_name %}</td>
+                <td>{%= data[i].form_number %}</td>
+                <td>{%= data[i].description %}</td>
+                <td>{%= data[i].total_value %}</td>
+                {% sumNS += data[i].total_value %}
+                {% count += 1 %}
+                {% } %}
+            </tr>
+        {% } %}
+            <tr>
+                <td></td>
+                <td><b>Total Count: </b></td>
+                <td>{{ count }}</td>
+                <td style="text-align: right"><b>Total Value:</b></td>
+                <td>{{ sumNS }}</td>
+            </tr>
+    </tbody>
+  </table>

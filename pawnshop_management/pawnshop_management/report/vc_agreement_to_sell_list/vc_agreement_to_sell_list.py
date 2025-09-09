@@ -102,7 +102,8 @@ def get_columns():
 			'fieldname': 'total_value',
 			'label': _('Total amount'),
 			'fieldtype': 'Currency',
-			'width': 100
+			'width': 100,
+			'sum': 1
 		},
 
 		{
