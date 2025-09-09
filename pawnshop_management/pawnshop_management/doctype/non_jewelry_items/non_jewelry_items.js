@@ -90,6 +90,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 				frm.set_df_property('pt_principal', 'read_only', 1);
 				frm.set_df_property('w_audit_finding', 'read_only', 1);
 				frm.set_df_property('date_when_audit_was_reflected', 'read_only', 1);
+				frm.set_df_property('subastado_category', 'read_only', 1);
 			}
 		}
 
@@ -111,9 +112,11 @@ frappe.ui.form.on('Non Jewelry Items', {
 		// 	})
 		// });
 		if(frm.doc.workflow_state == "Unprocessed" && frappe.user_roles.includes('Subastado member')){
-			//make comments field editable and make it appear
+			//make comments and subastado category fields editable and make it appear
 			frm.set_df_property('comments', 'read_only', 0);
 			frm.set_df_property('comments', 'hidden', 0);
+			frm.set_df_property('subastado_category', 'read_only', 0);
+			frm.set_df_property('subastado_category', 'hidden', 0);
 		}
 
 
@@ -197,6 +200,19 @@ frappe.ui.form.on('Non Jewelry Items', {
 			};
 		});
 	},
+
+	subastado_category: function(frm){
+		//if the subastado_category is Maximum and the category is Defective or vice versa, tick the w_audit_finding
+		if ((frm.doc.subastado_category == "Maximum" && frm.doc.category == "Defective") || (frm.doc.subastado_category == "Defective" && frm.doc.category == "Maximum")) {
+			frm.set_value('w_audit_finding', 1);
+			frm.refresh_field('w_audit_finding');
+			frappe.msgprint(__('Audit Finding has been ticked due to discrepancy between Subastado Category and Category.'));
+		} else {
+			frm.set_value('w_audit_finding', 0);
+			frm.refresh_field('w_audit_finding');
+		}
+	},
+
 
 	assistant_appraiser: function(frm){
 		//if all required fields are not yet filled up, do not allow encoding of assistant appraiser
