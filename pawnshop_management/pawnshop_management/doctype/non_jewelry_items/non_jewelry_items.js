@@ -91,6 +91,8 @@ frappe.ui.form.on('Non Jewelry Items', {
 				frm.set_df_property('w_audit_finding', 'read_only', 1);
 				frm.set_df_property('date_when_audit_was_reflected', 'read_only', 1);
 				frm.set_df_property('subastado_category', 'read_only', 1);
+				frm.set_df_property('subastado_comment', 'read_only', 1);
+				frm.set_df_property('live_selling', 'read_only', 1);
 			}
 		}
 
@@ -100,6 +102,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 		frm.set_df_property('bag', 'hidden', 1);
 		frm.set_df_property('extra_battery', 'hidden', 1);
 		frm.set_df_property('extra_lens', 'hidden', 1);
+
 		// frm.add_custom_button('Update Data', function(){
 		// 	frappe.call({
 		// 		method: 'pawnshop_management.pawnshop_management.custom_codes.import_gadgets_info.update_gadgets_data',
@@ -111,13 +114,18 @@ frappe.ui.form.on('Non Jewelry Items', {
 		// 		}
 		// 	})
 		// });
+
 		if(frm.doc.workflow_state == "Unprocessed" && frappe.user_roles.includes('Subastado member')){
-			//make comments and subastado category fields editable and make it appear
-			frm.set_df_property('comments', 'read_only', 0);
-			frm.set_df_property('comments', 'hidden', 0);
+			//make comments, subastado_comment and subastado category fields editable and make it appear
 			frm.set_df_property('subastado_category', 'read_only', 0);
 			frm.set_df_property('subastado_category', 'hidden', 0);
+			frm.set_df_property('subastado_comment', 'read_only', 0);
+			frm.set_df_property('subastado_comment', 'hidden', 0);
 		}
+		if(frm.doc.workflow_state == "For Sale" && frappe.user_roles.includes('Subastado member')){
+			frm.set_df_property('live_selling', 'read_only', 0);
+		}
+		
 
 
 		frm.set_query('brand', function(){

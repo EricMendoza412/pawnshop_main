@@ -56,6 +56,7 @@
   "pt_principal",
   "subastado_category",
   "date_received",
+  "subastado_comment",
   "column_break_ouqef",
   "date_reappraised",
   "selling_price",
@@ -401,7 +402,8 @@
    "default": "0",
    "fieldname": "live_selling",
    "fieldtype": "Check",
-   "label": "Live selling"
+   "label": "Live selling",
+   "read_only": 1
   },
   {
    "fieldname": "reference_document",
@@ -433,11 +435,16 @@
    "fieldtype": "Select",
    "label": "Subastado Category",
    "options": "Defective\nMinimum\nMaximum"
+  },
+  {
+   "fieldname": "subastado_comment",
+   "fieldtype": "Small Text",
+   "label": "Subastado Comment"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-09 20:16:05.457418",
+ "modified": "2025-09-12 12:59:46.008153",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",
