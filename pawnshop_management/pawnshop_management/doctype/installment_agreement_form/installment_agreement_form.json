@@ -425,6 +425,7 @@
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "date_fully_paid",
    "fieldtype": "Date",
    "label": "Date Fully Paid",
@@ -434,7 +435,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-09-08 18:06:21.202154",
+ "modified": "2025-09-13 12:18:55.662267",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Installment Agreement Form",

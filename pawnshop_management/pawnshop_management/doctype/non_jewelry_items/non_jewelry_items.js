@@ -57,6 +57,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 
 			//frm.disable_save();
 		}else{
+
 			//if(!frappe.user_roles.includes('Administrator') && (frm.doc.workflow_state != "Unprocessed" && !frappe.user_roles.includes('Subastado member'))){
 			if(!frappe.user_roles.includes('Administrator')){	
 				frm.set_df_property('type', 'read_only', 1);
@@ -93,6 +94,28 @@ frappe.ui.form.on('Non Jewelry Items', {
 				frm.set_df_property('subastado_category', 'read_only', 1);
 				frm.set_df_property('subastado_comment', 'read_only', 1);
 				frm.set_df_property('live_selling', 'read_only', 1);
+
+
+			//if workflow_state is "In Transit" or "For Sale" disable Actions. The Transfer Tracker doctype controls the workflow state
+			if (frm.doc.workflow_state == "In Transit" || frm.doc.workflow_state == "For Sale") {
+				//programmatically hide the Menu items
+				frm.page.clear_menu();
+				frm.page.hide_icon_group('print');
+
+				 // hide/clear the Actions dropdown
+				if (frm.page.clear_actions_menu) {
+					frm.page.clear_actions_menu();           // Frappe API: clears Actions items
+				}
+
+				// some versions still render the empty button—hide it via DOM as fallback
+				const $actions = $(frm.page.wrapper).find('.actions-btn-group');
+				if ($actions.length) $actions.hide();
+			}else {
+				// optional: show back if state changes
+				$(frm.page.wrapper).find('.actions-btn-group').show();
+				}
+
+
 			}
 		}
 

@@ -24,6 +24,9 @@ class TransferTracker(Document):
 				item_doc = frappe.get_doc('Non Jewelry Items', item.item_no)
 				item_doc.workflow_state = "In Transit"
 				item_doc.save(ignore_permissions=True)
+				item_pawnticket = frappe.get_doc('Pawn Ticket Non Jewelry', item.last_pawn_ticket)
+				item_pawnticket.db_set('workflow_state', 'Pulled Out', update_modified=True)
+				item_pawnticket.db_set('change_status_date', now_datetime(), update_modified=True)
 			
 	#Do something when document changes status from For Receiving to Complete
 	def on_update_after_submit(self):
@@ -38,8 +41,7 @@ class TransferTracker(Document):
 					item_doc.workflow_state = "Unprocessed"
 					item_doc.date_received = now_datetime()
 					item_doc.save(ignore_permissions=True)
-					item_pawnticket = frappe.get_doc('Pawn Ticket Non Jewelry', item.last_pawn_ticket)
-					item_pawnticket.db_set('workflow_state', 'Pulled Out', update_modified=True)
+					
 			elif self.transfer_type == "Transfer of Display Items":
 				#change current_location of all items in the child table to destination
 				for item in self.nj_items:
