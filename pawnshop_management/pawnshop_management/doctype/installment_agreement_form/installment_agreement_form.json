@@ -417,6 +417,7 @@
    "read_only": 1
   },
   {
+   "fetch_from": "item_no.pt_principal",
    "fieldname": "cost",
    "fieldtype": "Currency",
    "hidden": 1,
@@ -435,7 +436,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-09-13 12:18:55.662267",
+ "modified": "2025-09-14 21:47:06.117238",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Installment Agreement Form",
