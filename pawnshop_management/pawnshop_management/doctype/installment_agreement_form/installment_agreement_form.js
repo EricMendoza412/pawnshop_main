@@ -37,7 +37,8 @@ frappe.ui.form.on('Installment Agreement Form', {
 						frm.set_query('item_no', function() {
 							return {
 								filters: {
-									workflow_state: 'For Sale'
+									workflow_state: 'For Sale',
+									branch: records[0].name
 								}
 							};
 						});
