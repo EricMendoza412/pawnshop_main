@@ -38,7 +38,7 @@ frappe.ui.form.on('Installment Agreement Form', {
 							return {
 								filters: {
 									workflow_state: 'For Sale',
-									branch: records[0].name
+									current_location: records[0].name
 								}
 							};
 						});
