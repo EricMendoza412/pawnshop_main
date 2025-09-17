@@ -5,6 +5,7 @@ from hashlib import new
 from tokenize import String
 from unittest.util import strclass
 import frappe
+import re
 from frappe import _ # _ for to set the string into literal string
 from pawnshop_management.pawnshop_management.custom_codes.get_ip import get_ip_from_settings
 
@@ -58,8 +59,9 @@ def execute(filters=None):
 	data_active = data_act + data_exp + data_ret
 
 	for i in range(len(data_active)):
+		
 		description = ""
-
+	
 		if pt_type == "Pawn Ticket Non Jewelry":
 			detailsL = frappe.db.get_list("Non Jewelry List", filters={'parent': data_active[i]['pawn_ticket']}, fields=['item_no'])
 			njItem = frappe.get_doc('Non Jewelry Items', detailsL[0]['item_no'])
@@ -115,8 +117,21 @@ def execute(filters=None):
 						description += "One " + doc.type + ", " + doc.karat_category + ", " + doc.karat + ", " + str(doc.total_weight) + ", " + doc.color + colorMulti + densi + comments + colorMulti + addForStone + "; "
 		data_active[i]['description'] = description
 
-	data = data_active
+		# # remove the first 2 characters from pawn_ticket
+		# if data_active[i]['pawn_ticket']:
+		# 	data_active[i]['pawn_ticket'] = data_active[i]['pawn_ticket'][2:]
+
+	# after your loop where pawn_ticket values are shortened and description is built
+	data = sorted(data_active, key=middle_numeric_key)
 	return columns, data
+
+def middle_numeric_key(val):
+    parts = val['pawn_ticket'].split('-')
+    if len(parts) >= 2:
+        # take the middle part and remove all non-digits
+        middle = re.sub(r'\D', '', parts[1])
+        return int(middle) if middle else 0
+    return 0
 
 def get_columns():
 	columns = [
