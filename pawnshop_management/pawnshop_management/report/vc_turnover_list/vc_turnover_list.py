@@ -122,11 +122,22 @@ def execute(filters=None):
 		# 	data_active[i]['pawn_ticket'] = data_active[i]['pawn_ticket'][2:]
 
 	# after your loop where pawn_ticket values are shortened and description is built
-	data = sorted(data_active, key=middle_numeric_key)
+	if pt_type == "Pawn Ticket Non Jewelry":
+		data = sorted(data_active, key=nj_numeric_key)
+	else:
+		data = sorted(data_active, key=middle_numeric_key)
 	return columns, data
 
 def middle_numeric_key(val):
     parts = val['pawn_ticket'].split('-')
+    if len(parts) >= 2:
+        # take the middle part and remove all non-digits
+        middle = re.sub(r'\D', '', parts[1])
+        return int(middle) if middle else 0
+    return 0
+
+def nj_numeric_key(val):
+    parts = val['inventory_tracking_no'].split('-')
     if len(parts) >= 2:
         # take the middle part and remove all non-digits
         middle = re.sub(r'\D', '', parts[1])
