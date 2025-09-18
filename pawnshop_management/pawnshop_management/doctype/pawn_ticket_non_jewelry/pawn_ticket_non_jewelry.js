@@ -154,6 +154,22 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 		}
 		frm.fields_dict["non_jewelry_items"].grid.grid_buttons.find(".grid-add-row")[0].innerHTML = "Add Item"	//Change "Add Row" button of jewelry_items table into "Add Item"
 
+		//if workflow_state is "In Transit" or "For Sale" disable Actions. The Transfer Tracker doctype controls the workflow state
+		if (frm.doc.workflow_state == "Expired" && !frappe.user_roles.includes('Administrator')) {
+
+			 // hide/clear the Actions dropdown
+			if (frm.page.clear_actions_menu) {
+				frm.page.clear_actions_menu();           // Frappe API: clears Actions items
+			}
+
+			// some versions still render the empty button—hide it via DOM as fallback
+			const $actions = $(frm.page.wrapper).find('.actions-btn-group');
+			if ($actions.length) $actions.hide();
+		}else {
+			// optional: show back if state changes
+			$(frm.page.wrapper).find('.actions-btn-group').show();
+			}
+
 	},
 
 	branch: function(frm){
