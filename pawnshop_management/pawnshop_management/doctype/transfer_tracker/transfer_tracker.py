@@ -25,10 +25,10 @@ class TransferTracker(Document):
 				item_doc.workflow_state = "In Transit"
 				item_doc.save(ignore_permissions=True)
 				#change workflow state of all pawn tickets in the child table to Pulled Out if the transfer type is Pull out of Expired Sangla
-				if self.transfer_type == "Pull out of Expired Sangla":
-					item_pawnticket = frappe.get_doc('Pawn Ticket Non Jewelry', item.last_pawn_ticket)
-					item_pawnticket.db_set('workflow_state', 'Pulled Out', update_modified=True)
-					item_pawnticket.db_set('change_status_date', now_datetime(), update_modified=True)
+				# if self.transfer_type == "Pull out of Expired Sangla":
+				# 	item_pawnticket = frappe.get_doc('Pawn Ticket Non Jewelry', item.last_pawn_ticket)
+				# 	item_pawnticket.db_set('workflow_state', 'Pulled Out', update_modified=True)
+				# 	item_pawnticket.db_set('change_status_date', now_datetime(), update_modified=True)
 			
 	#Do something when document changes status from For Receiving to Complete
 	def on_update_after_submit(self):
