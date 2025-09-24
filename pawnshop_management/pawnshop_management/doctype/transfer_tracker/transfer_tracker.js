@@ -232,12 +232,12 @@ frappe.ui.form.on('Transfer Tracker', {
 			});
 			const parents = childRows.map(r => r.parent);
 
-			// 2) Get the latest PTNJ by expiry_date
+			// 2) Get the latest PTNJ by expiry_date with workflow status expired
 			let latest = null;
 			if (parents.length) {
 			const ptnj = await frappe.db.get_list('Pawn Ticket Non Jewelry', {
 				fields: ['name', 'expiry_date', 'desired_principal'],
-				filters: { name: ['in', parents] },
+				filters: { name: ['in', parents], workflow_state: ['!=', 'Rejected'] },
 				order_by: 'expiry_date desc',
 				limit: 1
 			});
