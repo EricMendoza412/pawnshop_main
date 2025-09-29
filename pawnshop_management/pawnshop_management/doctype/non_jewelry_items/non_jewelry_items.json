@@ -389,14 +389,12 @@
   {
    "fieldname": "sold_for",
    "fieldtype": "Currency",
-   "label": "Sold For",
-   "read_only": 1
+   "label": "Sold For"
   },
   {
    "fieldname": "date_sold",
    "fieldtype": "Date",
-   "label": "Date Sold",
-   "read_only": 1
+   "label": "Date Sold"
   },
   {
    "default": "0",
@@ -409,14 +407,12 @@
    "fieldname": "reference_document",
    "fieldtype": "Select",
    "label": "Reference Document",
-   "options": "\nCredit Memo\nBranch Receipt\nLoan Form",
-   "read_only": 1
+   "options": "\nCredit Memo\nBranch Receipt\nLoan Form"
   },
   {
    "fieldname": "document_number",
    "fieldtype": "Data",
-   "label": "Document Number",
-   "read_only": 1
+   "label": "Document Number"
   },
   {
    "fieldname": "ptn_number",
@@ -444,7 +440,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-14 22:40:02.064095",
+ "modified": "2025-09-29 19:55:19.781893",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",

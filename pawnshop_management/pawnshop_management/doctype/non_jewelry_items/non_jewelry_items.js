@@ -94,6 +94,11 @@ frappe.ui.form.on('Non Jewelry Items', {
 				frm.set_df_property('subastado_category', 'read_only', 1);
 				frm.set_df_property('subastado_comment', 'read_only', 1);
 				frm.set_df_property('live_selling', 'read_only', 1);
+				
+				frm.set_df_property('sold_for', 'read_only', 1);
+				frm.set_df_property('date_sold', 'read_only', 1);
+				frm.set_df_property('reference_document', 'read_only', 1);
+				frm.set_df_property('document_number', 'read_only', 1);
 
 
 			//if workflow_state is "In Transit" or "For Sale" disable Actions. The Transfer Tracker doctype controls the workflow state
