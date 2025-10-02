@@ -2,6 +2,13 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Cash Position Report', {
+	onload(frm) {
+		// store a per-session timestamp (not saved to DB)
+		frm._loaded_at = frappe.datetime.now_datetime(); // "YYYY-MM-DD HH:mm:ss"
+		// Optional: show user when the check will anchor from
+		frappe.show_alert({message: `Loaded at: ${frm._loaded_at}`, indicator: 'blue'});
+  	},
+
 	refresh: function(frm) {
 		let is_allowed = frappe.user_roles.includes('Administrator');
 		frm.toggle_enable(
@@ -106,13 +113,36 @@ frappe.ui.form.on('Cash Position Report', {
 		//get_total_discount(frm);
 	},
 
-	validate: function(frm){
-		// if (frm.doc.total_cash != frm.doc.ending_balance) {
-		// 	frappe.throw("Cash on hand is not equal to the Ending Balance")
-		// }
+	validate: async function(frm){
 		if (frm.doc.total_cash == 0){
 			frappe.throw("Cash on hand should not be zero")
 		}
+
+
+		const loaded_at = frm._loaded_at || frappe.datetime.now_datetime();
+		// (Optional) pass branch/company if you want to scope the check
+    	const args = { loaded_at , branch: frm.doc.branch };
+
+    	const r = await frappe.call({
+			method: 'pawnshop_management.pawnshop_management.doctype.cash_position_report.cash_position_report.check_new_submissions',
+			args
+		});
+
+    	if (r.message && r.message.has_new) {
+			const { details } = r.message;
+			// You can customize this message
+			// change title from Error to Warning
+
+			frappe.throw({
+				title: __('Warning'),
+				message: __(
+				`There are submitted/modified documents after this report was loaded:<br><br>
+				${details.map(d => `${d.doctype}: <b>${d.name}</b> at ${d.modified}`).join('<br>')}
+				<br><br>Please reload the report and try again.`
+				)
+			});
+		}
+
 	},
 
 	after_save: function(frm) {

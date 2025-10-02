@@ -6,6 +6,40 @@ from frappe.utils import flt
 from frappe.model.document import Document
 from frappe.utils import today
 
+@frappe.whitelist()
+def check_new_submissions(loaded_at: str, branch: str = None):
+	"""
+	Returns whether there are any submitted docs after `loaded_at`.
+	Uses `modified` as a practical proxy for 'submitted time' (submit updates modified).
+	"""
+	doctypes_to_check = ["Pawn Ticket Jewelry", "Pawn Ticket Non Jewelry", "Agreement to Sell", "Provisional Receipt", "Subastado Sales Commissions", "Fund Transfer", "Acknowledgement Receipt" ]
+	filters_common = {"docstatus": ["!=", 2]}
+	details = []
+
+	# Optional scoping
+	if branch:
+		filters_common["branch"] = branch
+
+	for dt in doctypes_to_check:
+		# clone base filters and add modified > loaded_at
+		filters = filters_common.copy()
+		filters["modified"] = [">", loaded_at]
+
+		# If you only need to know existence, db.exists is super fast:
+		# name = frappe.db.exists(dt, filters)
+		# If you want details for the message:
+		rows = frappe.get_all(
+			dt,
+			filters=filters,
+			fields=["name", "modified"],
+			order_by="modified asc",
+			limit=10,  # cap for message; increase if needed
+		)
+		for row in rows:
+			details.append({"doctype": dt, "name": row.name, "modified": row.modified})
+
+	return {"has_new": len(details) > 0, "details": details}
+
 class CashPositionReport(Document):
 	def create_inventory_count_document(self):
 #A IN count
@@ -85,6 +119,7 @@ class CashPositionReport(Document):
 		sum_rn_amort_b = 0
 		for record in b_in_principal_rnwam:
 			sum_rn_amort_b += record	
+			#if a pawnticket was renewed only and then amortized after, in the same day. This would create a discrepancy. Must also add back Amortization only for PTs renewed only same day
 		b_in_principal = sum_active_in_b - sum_renewed_in_b + sum_rd_in_b + sum_rn_amort_b
 #B OUT count
 		b_out_count = frappe.db.count('Pawn Ticket Jewelry', {'change_status_date': self.date, 'workflow_state': 'Redeemed', 'item_series': 'B', 'branch': self.branch})

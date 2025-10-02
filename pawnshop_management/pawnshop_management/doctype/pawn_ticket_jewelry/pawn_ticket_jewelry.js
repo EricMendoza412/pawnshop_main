@@ -46,6 +46,19 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 	},
 
 	refresh: function(frm){
+
+		//make customers_tracking_no and jewelry_items read only after saving
+		if(!frm.is_new() && frm.doc.docstatus == 0){
+			frm.set_df_property('customers_tracking_no', 'read_only', 1);
+			frm.set_df_property('jewelry_items', 'read_only', 1);
+
+			//show message "Pls review details before submitting"
+			frappe.msgprint({
+				title:__('Notification'),
+				indicator:'blue',
+				message: __('Please review all details before submitting the document.')
+			});
+		}
 		
 		let dlg_workf_good = false
 		if((frm.doc.date_loan_granted == frappe.datetime.get_today()) && (frm.doc.workflow_state == 'Active')){
