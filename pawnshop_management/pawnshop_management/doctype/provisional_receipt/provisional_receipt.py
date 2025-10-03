@@ -279,12 +279,12 @@ class ProvisionalReceipt(Document):
 				new_pawn_ticket.interest = previous_pawn_ticket.interest
 				new_pawn_ticket.net_proceeds = previous_pawn_ticket.net_proceeds
 	
-				if self.pawn_ticket_no != "":
-					frappe.db.set_value(self.pawn_ticket_type, self.pawn_ticket_no, 'workflow_state', 'Renewed')
-					frappe.db.set_value(self.pawn_ticket_type, self.pawn_ticket_no, 'change_status_date', today())
-					frappe.db.commit()
-				new_pawn_ticket.save(ignore_permissions=True)
-				new_pawn_ticket.submit()
+			if self.pawn_ticket_no != "":
+				frappe.db.set_value(self.pawn_ticket_type, self.pawn_ticket_no, 'workflow_state', 'Renewed')
+				frappe.db.set_value(self.pawn_ticket_type, self.pawn_ticket_no, 'change_status_date', today())
+				frappe.db.commit()
+			new_pawn_ticket.save(ignore_permissions=True)
+			new_pawn_ticket.submit()
 
 		elif self.transaction_type == "Amortization":
 			interest_rate = frappe.get_doc('Pawnshop Management Settings')
