@@ -196,12 +196,14 @@ class ProvisionalReceipt(Document):
 				title='Insufficient Payment',
 				msg='Payment does not amount to total fee',
 			)
-		# Duplicate check before saving
-		if frappe.db.exists(self.pawn_ticket_type, {"pawn_ticket": self.new_pawn_ticket_no}):
-			frappe.throw(
-				msg=f"Pawn Ticket {self.new_pawn_ticket_no} already exists. Please refresh this page and try again.",
-				title="Duplicate Pawn Ticket"
-			)
+		# check if ameneded
+		if not self.amended_from:
+			# Duplicate check before saving
+			if frappe.db.exists(self.pawn_ticket_type, {"pawn_ticket": self.new_pawn_ticket_no}):
+				frappe.throw(
+					msg=f"Pawn Ticket {self.new_pawn_ticket_no} already exists. Please refresh this page and try again.",
+					title="Duplicate Pawn Ticket"
+				)
 
 		
 
@@ -225,7 +227,7 @@ class ProvisionalReceipt(Document):
 		elif self.transaction_type == "Amortization":
 			self.amortization += self.additional_amortization
 
-		if self.transaction_type == "Renewal" or self.transaction_type == "Renewal w/ Amortization": # Create New Pawn Ticket
+		if (self.transaction_type == "Renewal" or self.transaction_type == "Renewal w/ Amortization") and not self.amended_from: # Create New Pawn Ticket
 			previous_pawn_ticket = frappe.get_doc(self.pawn_ticket_type, self.pawn_ticket_no)
 			new_pawn_ticket = frappe.new_doc(self.pawn_ticket_type)
 			new_pawn_ticket.branch = self.branch
