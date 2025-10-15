@@ -865,7 +865,7 @@
 
 					{% let NJRNA_NP = 0 %}
 					{% for(var i=0, l=data.length; i<l; i++) { %}
-						{% if((data[i].pt_type == "NJ") && (data[i].old_pawn_ticket != "")) { %}
+						{% if((data[i].pt_type == "NJ") && (data[i].old_pawn_ticket != "") && (data[i].workflow_state != "Rejected")) { %}
 							{% 
 								let netProceeds = Number(data[i].net_proceeds);
 								NJRNA_NP += netProceeds %}
