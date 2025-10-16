@@ -99,3 +99,5 @@ def transfer_to_next_pt_nj(pawn_ticket, nxt_pt):
 	pr_renewal_check = frappe.get_all("Provisional Receipt", filters={"new_pawn_ticket_no": pawn_ticket, "date_issued": today()}, fields=["name"])
 	if pr_renewal_check:
 		frappe.db.set_value('Provisional Receipt',pr_renewal_check[0].name, 'new_pawn_ticket_no',nxt_pt)
+	# Return something the client can use
+	return {"status": "ok", "old_pt": pawn_ticket, "new_pt_docname": new_pawn_ticket.name, "new_pt": nxt_pt}
