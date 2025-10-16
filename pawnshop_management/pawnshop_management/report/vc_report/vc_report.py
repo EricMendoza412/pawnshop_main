@@ -141,7 +141,7 @@ def execute(filters=None):
 	""", as_dict=True)
 
 	data_pr = frappe.db.sql(f"""
-		SELECT branch, principal_amount as change_status_date, new_pawn_ticket_no as old_pawn_ticket, transaction_type as workflow_state, pawn_ticket_no as pawn_ticket, date_issued as date_loan_granted, pawn_ticket_type as inventory_tracking_no, additional_amortization as desired_principal, total as net_proceeds, series as item_series, '' as pt_type, interest, interest_payment, discount, other_discount_tawad, inventory_tracking, previous_interest_payment 
+		SELECT branch, principal_amount as change_status_date, new_pawn_ticket_no as old_pawn_ticket, transaction_type as workflow_state, pawn_ticket_no as pawn_ticket, date_issued as date_loan_granted, pawn_ticket_type as inventory_tracking_no, additional_amortization as desired_principal, total as net_proceeds, series as item_series, '' as pt_type, interest, interest_payment, discount, other_discount_tawad, inventory_tracking, previous_interest_payment, date_loan_granted 
 		FROM `tabProvisional Receipt`
 		WHERE `tabProvisional Receipt`.docstatus=1
 		{conditions5}

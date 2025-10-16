@@ -161,7 +161,9 @@ class CashPositionReport(Document):
 		bnj_in_principal_active = frappe.db.get_all('Pawn Ticket Non Jewelry', filters={"branch": self.branch, "date_loan_granted": self.date, 'workflow_state': 'Active'}, fields=['desired_principal'], pluck='desired_principal')
 		bnj_in_principal_renewed = frappe.db.get_all('Pawn Ticket Non Jewelry', filters={"branch": self.branch, "change_status_date": self.date, 'workflow_state': 'Renewed'}, fields=['desired_principal'], pluck='desired_principal')	
 		bnj_in_principal_rnwam = frappe.db.get_all('Provisional Receipt', filters={"docstatus": 1, "branch": self.branch, "date_issued": self.date, "series": 'B', "pawn_ticket_type": 'Pawn Ticket Non Jewelry', "transaction_type": 'Renewal w/ Amortization'}, fields=['additional_amortization'], pluck='additional_amortization')
+		bnj_in_principal_am = frappe.db.get_all('Provisional Receipt', filters={"docstatus": 1, "branch": self.branch, "date_issued": self.date, "series": 'B', "pawn_ticket_type": 'Pawn Ticket Non Jewelry', "transaction_type": 'Amortization', "date_loan_granted": self.date}, fields=['additional_amortization'], pluck='additional_amortization')
 		bnj_in_rd = frappe.db.get_all('Pawn Ticket Non Jewelry', filters={"branch": self.branch, "date_loan_granted": self.date, 'workflow_state': 'Redeemed'}, fields=['desired_principal'], pluck='desired_principal')
+
 		sum_active_in_bnj = 0
 		for record in bnj_in_principal_active:
 			sum_active_in_bnj += record
@@ -173,8 +175,12 @@ class CashPositionReport(Document):
 			sum_rd_in_bnj += record	
 		sum_rn_amort_bnj = 0
 		for record in bnj_in_principal_rnwam:
-			sum_rn_amort_bnj += record	
-		bnj_in_principal = sum_active_in_bnj - sum_renewed_in_bnj + sum_rd_in_bnj + sum_rn_amort_bnj
+			sum_rn_amort_bnj += record
+		sum_amort_bnj = 0
+		for record in bnj_in_principal_am:
+			sum_amort_bnj += record	
+			#if a pawnticket was renewed only and then amortized after, in the same day. This would create a discrepancy. Must also add back Amortization only for PTs renewed only same day	
+		bnj_in_principal = sum_active_in_bnj - sum_renewed_in_bnj + sum_rd_in_bnj + sum_rn_amort_bnj + sum_amort_bnj
 #BNJ OUT count
 		nj_out_count = frappe.db.count('Pawn Ticket Non Jewelry', {'change_status_date': self.date, 'workflow_state': 'Redeemed', 'branch': self.branch})
 #BNJ OUT principal

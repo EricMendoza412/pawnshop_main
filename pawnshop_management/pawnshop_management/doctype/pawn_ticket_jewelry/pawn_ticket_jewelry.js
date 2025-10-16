@@ -35,6 +35,7 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 					})
 				}
 			})
+
     },
 
 	after_save: function(frm){
@@ -71,60 +72,126 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 
 
 		if(dlg_workf_good && role_good){
-			frm.add_custom_button('Printing Error', function(){
+			// frm.add_custom_button('Printing Error', function(){
+			// 	frappe.msgprint({
+			// 		title: __('Notification'),
+			// 		message: __('Tranfer this PT to the next available PT?'),
+			// 		primary_action:{
+			// 			'label': 'Yes',
+			// 			action(values) {
+						
+			// 				let series;
+			// 				if (frm.doc.item_series == "A") {
+			// 					series = "a_series";
+			// 				} else if (frm.doc.item_series == "B") {
+			// 					series = "b_series";
+			// 				}
+
+			// 				if(series){
+			// 					frappe.db.get_value("Pawnshop Naming Series", frm.doc.branch, series)
+			// 					.then(r => {
+			// 						let current_count
+			// 						let pta = r.message.a_series;
+			// 						let ptb = r.message.b_series;
+
+			// 						let branchCode
+			// 						frappe.db.get_value("Branch IP Addressing", frm.doc.branch, "branch_code")
+			// 						.then(r => {
+			// 							branchCode = r.message.branch_code;
+									
+			// 							if(pta){
+			// 								current_count = branchCode + "-" + pta}
+			// 							else{
+			// 								current_count = branchCode + "-" + ptb + "B"}
+
+			// 							frappe.call({
+			// 								method: 'pawnshop_management.pawnshop_management.custom_codes.paper_jammed.transfer_to_next_pt_j',
+			// 								args: {
+			// 									pawn_ticket: String(frm.doc.name),
+			// 									nxt_pt: String(current_count)
+			// 								},
+			// 								callback: (r) =>{
+			// 									frappe.msgprint({
+			// 										title:__('Notification'),
+			// 										indicator:'green',
+			// 										message: __('Successfully transferred to Pawn Ticket# ' + current_count)
+			// 									});
+			// 								}
+			// 							})
+			// 						})
+			// 					})
+			// 				}
+
+			// 			}
+			// 		}
+			// 	});
+				
+			// });
+			frm.add_custom_button('Printing Error J', async function () {
 				frappe.msgprint({
 					title: __('Notification'),
-					message: __('Tranfer this PT to the next available PT?'),
-					primary_action:{
+					message: __('Transfer this PT to the next available PT?'),
+					primary_action: {
 						'label': 'Yes',
-						action(values) {
-						
+						async action() {
+
 							let series;
-							if (frm.doc.item_series == "A") {
-								series = "a_series";
-							} else if (frm.doc.item_series == "B") {
-								series = "b_series";
+							if (frm.doc.item_series === "A") series = "a_series";
+							else if (frm.doc.item_series === "B") series = "b_series";
+
+
+							if (!series) {
+								frappe.msgprint(__('Missing item series (A/B).'));
+								return;
 							}
 
-							if(series){
-								frappe.db.get_value("Pawnshop Naming Series", frm.doc.branch, series)
-								.then(r => {
-									let current_count
-									let pta = r.message.a_series;
-									let ptb = r.message.b_series;
+							try {
+								cur_dialog.hide();  // Close the message box
+								// Prevent spam-clicks while we work
+								frappe.dom.freeze(__('Transferring...'));
 
-									let branchCode
-									frappe.db.get_value("Branch IP Addressing", frm.doc.branch, "branch_code")
-									.then(r => {
-										branchCode = r.message.branch_code;
-									
-										if(pta){
-											current_count = branchCode + "-" + pta}
-										else{
-											current_count = branchCode + "-" + ptb + "B"}
+								const ns = await frappe.db.get_value("Pawnshop Naming Series", frm.doc.branch, [series]);
+								const pta = ns?.message?.a_series;
+								const ptb = ns?.message?.b_series;
 
-										frappe.call({
-											method: 'pawnshop_management.pawnshop_management.custom_codes.paper_jammed.transfer_to_next_pt_j',
-											args: {
-												pawn_ticket: String(frm.doc.name),
-												nxt_pt: String(current_count)
-											},
-											callback: (r) =>{
-												frappe.msgprint({
-													title:__('Notification'),
-													indicator:'green',
-													message: __('Successfully transferred to Pawn Ticket# ' + current_count)
-												});
-											}
-										})
-									})
-								})
+								const bres = await frappe.db.get_value("Branch IP Addressing", frm.doc.branch, ["branch_code"]);
+								const branchCode = bres?.message?.branch_code;
+
+								let current_count;
+								if (pta) current_count = `${branchCode}-${pta}`;
+								else current_count = `${branchCode}-${ptb}B`;
+
+								const r = await frappe.call({
+									method: 'pawnshop_management.pawnshop_management.custom_codes.paper_jammed.transfer_to_next_pt_j',
+									args: {
+										pawn_ticket: String(frm.doc.name),
+										nxt_pt: String(current_count)
+									},
+									freeze: true,
+									freeze_message: __('Transferring...')
+								});
+
+								if (!r.exc) {
+									frappe.show_alert({ message: __('Transferred to Pawn Ticket # {0}', [current_count]), indicator: 'green' });
+
+									// CRITICAL: pull fresh state from server so workflow_state/docstatus update is reflected
+									//await frm.reload_doc();
+
+									// Optional: also route to the new PT
+									//frappe.set_route('Form', 'Pawn Ticket Jewelry', r.message.new_pt_docname);
+									// Then reload and clear cache
+									location.reload();
+								}
+
+							} catch (e) {
+								console.error(e);
+								frappe.msgprint({ title: __('Error'), indicator: 'red', message: e.message || __('Transfer failed') });
+							} finally {
+								frappe.dom.unfreeze();
 							}
-
 						}
 					}
 				});
-				
 			});
 		}
 

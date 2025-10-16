@@ -863,8 +863,19 @@
 			<tr>
 				<td>{%= __("Additional Pawn") %}</td>
 
+				
 					{% let NJRNA_NP = 0 %}
+					{% let TODAY = frappe.datetime.get_today(); %}
+					{% let toYMD = s => (s || '').slice(0, 10); %}
+
 					{% for(var i=0, l=data.length; i<l; i++) { %}
+
+						{% if((toYMD(data[i].date_loan_granted) === TODAY && data[i].workflow_state == "Amortization")) { %}
+
+							{% let netProceeds = Number(data[i].net_proceeds);
+							NJRNA_NP += netProceeds %}
+						{% } %}
+
 						{% if((data[i].pt_type == "NJ") && (data[i].old_pawn_ticket != "")) { %}
 							{% 
 								let netProceeds = Number(data[i].net_proceeds);

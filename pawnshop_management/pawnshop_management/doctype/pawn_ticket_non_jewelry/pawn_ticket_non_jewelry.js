@@ -106,7 +106,7 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 			// 	});
 				
 			// });
-			frm.add_custom_button('Printing Error', async function () {
+			frm.add_custom_button('Printing Error NJ', async function () {
 				frappe.msgprint({
 					title: __('Notification'),
 					message: __('Transfer this PT to the next available PT?'),
@@ -153,10 +153,12 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 									frappe.show_alert({ message: __('Transferred to Pawn Ticket # {0}', [current_count]), indicator: 'green' });
 
 									// CRITICAL: pull fresh state from server so workflow_state/docstatus update is reflected
-									await frm.reload_doc();
+									//await frm.reload_doc();
 
 									// Optional: also route to the new PT
-									// frappe.set_route('Form', 'Pawn Ticket Non Jewelry', r.message.new_pt_docname);
+									//frappe.set_route('Form', 'Pawn Ticket Non Jewelry', r.message.new_pt_docname);
+									// Then reload and clear cache
+									location.reload();
 								}
 
 							} catch (e) {
@@ -164,6 +166,7 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 								frappe.msgprint({ title: __('Error'), indicator: 'red', message: e.message || __('Transfer failed') });
 							} finally {
 								frappe.dom.unfreeze();
+
 							}
 						}
 					}
