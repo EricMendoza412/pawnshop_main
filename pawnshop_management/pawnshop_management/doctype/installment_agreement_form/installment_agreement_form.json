@@ -212,6 +212,7 @@
    "fieldname": "disk_type",
    "fieldtype": "Data",
    "label": "Disk Type",
+   "print_hide": 1,
    "read_only": 1
   },
   {
@@ -219,6 +220,7 @@
    "fieldname": "internet_connection_capability",
    "fieldtype": "Data",
    "label": "Internet Connection Capability",
+   "print_hide": 1,
    "read_only": 1
   },
   {
@@ -436,7 +438,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-09-14 21:47:06.117238",
+ "modified": "2025-10-17 16:45:53.816872",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Installment Agreement Form",

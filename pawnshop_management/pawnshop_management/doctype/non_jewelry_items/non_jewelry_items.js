@@ -7,6 +7,11 @@ frappe.ui.form.on('Non Jewelry Items', {
 		if (!frm.doc.assistant_appraiser){
 			frappe.throw('Please input assistant appraiser before saving.')
 		}
+		if (frm.doc.type == "Laptop" && frm.doc.brand != "Apple") {
+			if (frm.doc.ram == "Not Shown" || frm.doc.internal_memory == "Not Shown" || frm.doc.disk_type == "Not Shown" || frm.doc.disk_type == "") {
+				frappe.throw('Please input RAM and Internal Memory for Windows Laptops/Chromebooks before saving.<br><br> Reminder: <br>Ram is in System Information <br>Internal Memory is in This PC <br>Disk Type is in Optimize Drives')
+			}
+		}
 	},
 	onload: function(frm) {
 		frm.message_shown = false; // Initialize message_shown
@@ -124,9 +129,6 @@ frappe.ui.form.on('Non Jewelry Items', {
 			}
 		}
 
-
-		frm.set_df_property('disk_type', 'hidden', 1);
-		frm.set_df_property('internet_connection_capability', 'hidden', 1);
 		frm.set_df_property('bag', 'hidden', 1);
 		frm.set_df_property('extra_battery', 'hidden', 1);
 		frm.set_df_property('extra_lens', 'hidden', 1);
@@ -279,38 +281,40 @@ frappe.ui.form.on('Non Jewelry Items', {
 	type: function(frm){
 		if (frm.doc.type == "Cellphone") {
 			unhide_hidden_fields(frm);
-			require_unrequired_fields(frm);
 			frm.set_value('model_number', "");
 			frm.refresh_field('model_number')
 			frm.set_df_property('model', 'label', 'Model');
 			frm.set_df_property('model_number', 'label', 'Model Number');
-			frm.set_df_property('disk_type', 'reqd', 0);
 			frm.set_df_property('disk_type', 'hidden', 1);
-			frm.set_df_property('internet_connection_capability', 'reqd', 0);
+			frm.set_value('internet_connection_capability', null);
 			frm.set_df_property('internet_connection_capability', 'hidden', 1);
 			frm.set_df_property('bag', 'hidden', 1);
 			frm.set_df_property('extra_battery', 'hidden', 1);
 			frm.set_df_property('extra_lens', 'hidden', 1);
 		} else if (frm.doc.type == "Tablet") {
 			unhide_hidden_fields(frm);
-			require_unrequired_fields(frm);
 			frm.set_value('model_number', "");
 			frm.refresh_field('model_number')
 			frm.set_df_property('model', 'label', 'Model');
 			frm.set_df_property('model_number', 'label', 'Model Number');
-			frm.set_df_property('disk_type', 'reqd', 0);
 			frm.set_df_property('disk_type', 'hidden', 1);
+			frm.set_df_property('internet_connection_capability', 'hidden', 0);
 			frm.set_df_property('bag', 'hidden', 1);
 			frm.set_df_property('extra_battery', 'hidden', 1);
 			frm.set_df_property('extra_lens', 'hidden', 1);
 		} else if (frm.doc.type == "Laptop") {
-			unhide_hidden_fields();
-			require_unrequired_fields(frm);
+			//if apple set disk_type to Not Shown and make it read only
+			if (frm.doc.brand == "Apple") {
+				frm.set_value('disk_type', "Not Shown");
+				frm.set_df_property('disk_type', 'read_only', 1);
+				frm.refresh_field('disk_type');
+			}
+			unhide_hidden_fields(frm);
 			frm.set_value('model_number', "");
 			frm.refresh_field('model_number')
 			frm.set_df_property('model', 'label', 'Processor & Generation');
 			frm.set_df_property('model_number', 'label', 'Model Name');
-			frm.set_df_property('internet_connection_capability', 'reqd', 0);
+			frm.set_value('internet_connection_capability', null);
 			frm.set_df_property('internet_connection_capability', 'hidden', 1);
 			frm.set_df_property('charger', 'hidden', 1);
 			frm.set_df_property('pin', 'hidden', 1);
@@ -319,21 +323,17 @@ frappe.ui.form.on('Non Jewelry Items', {
 			frm.set_df_property('bag', 'hidden', 1);
 			frm.set_df_property('extra_battery', 'hidden', 1);
 			frm.set_df_property('extra_lens', 'hidden', 1);
+			frm.set_df_property('disk_type', 'hidden', 0);
 		} else if (frm.doc.type == "Camera") {
-			unhide_hidden_fields();
-			require_unrequired_fields(frm);
+			unhide_hidden_fields(frm);
 			frm.set_df_property('model', 'label', 'Model');
 			frm.set_value('model_number', "N/A")
 			frm.refresh_field('model_number')
-			frm.set_df_property('model_number', 'reqd', 0);
 			frm.set_df_property('model_number', 'hidden', 1);
-			frm.set_df_property('ram', 'reqd', 0);
 			frm.set_df_property('ram', 'hidden', 1);
-			frm.set_df_property('internal_memory', 'reqd', 0);
 			frm.set_df_property('internal_memory', 'hidden', 1);
-			frm.set_df_property('disk_type', 'reqd', 0);
 			frm.set_df_property('disk_type', 'hidden', 1);
-			frm.set_df_property('internet_connection_capability', 'reqd', 0);
+			frm.set_value('internet_connection_capability', null);
 			frm.set_df_property('internet_connection_capability', 'hidden', 1);
 			frm.set_df_property('charger', 'hidden', 1);
 			frm.set_df_property('case', 'hidden', 1);
@@ -342,6 +342,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 			frm.set_df_property('pin', 'hidden', 1);
 			frm.set_df_property('manual', 'hidden', 1);
 			frm.set_df_property('sim_card', 'hidden', 1);
+			frm.set_df_property('not_openline', 'hidden', 1);
 		}
 
 		if (frm.doc.type == "Cellphone" || frm.doc.type == "Tablet") {
@@ -351,14 +352,19 @@ frappe.ui.form.on('Non Jewelry Items', {
 	},
 
 	brand: function(frm){
-		if (frm.doc.type == "Laptop" && frm.doc.brand == "Apple") {
-			frm.set_df_property('internal_memory', 'reqd', 0)
-			frm.set_df_property('ram', 'reqd', 0);
-			frm.refresh_field('ram')
-			frm.refresh_field('internal_memory')
-		}else if (frm.doc.brand == "Apple") {
-			frm.set_df_property('ram', 'reqd', 0);
-			frm.refresh_field('ram')
+		if (frm.doc.brand == "Apple") {
+		//if laptop set disk_type to Not Shown and make it read only
+			if (frm.doc.type == "Laptop") {
+				frm.set_value('disk_type', "Not Shown");
+				frm.set_df_property('disk_type', 'read_only', 1);
+				frm.refresh_field('disk_type');
+			}
+		}else{
+			if (frm.doc.type == "Laptop") {
+				frm.set_value('disk_type', null);
+				frm.set_df_property('disk_type', 'read_only', 0);
+				frm.refresh_field('disk_type');
+			}
 		}
 	},
 
@@ -493,12 +499,4 @@ function unhide_hidden_fields(frm) {
 	if (cur_frm.get_docfield('extra_lens').hidden) {
 		cur_frm.set_df_property('extra_lens', 'hidden', 0);
 	}
-}
-
-function require_unrequired_fields(frm) {
-	frm.set_df_property('model_number', 'reqd', 1);
-	frm.set_df_property('ram', 'reqd', 1);
-	frm.set_df_property('internal_memory', 'reqd', 1);
-	frm.set_df_property('disk_type', 'reqd', 1);
-	frm.set_df_property('internet_connection_capability', 'reqd', 1);
 }

@@ -50,13 +50,12 @@
    "unique": 1
   },
   {
-   "default": "-Select-",
    "fieldname": "type",
    "fieldtype": "Select",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Type",
-   "options": "-Select-\nEarrings\nBracelet\nNecklace\nRing\nBangles\nPendant\nSet\nEarcuff\nGold Coin",
+   "options": "\nEarrings\nBracelet\nNecklace\nRing\nBangles\nPendant\nSet\nEarcuff\nGold Coin",
    "reqd": 1
   },
   {
@@ -68,13 +67,12 @@
    "reqd": 1
   },
   {
-   "default": "-Select-",
    "fieldname": "karat_category",
    "fieldtype": "Select",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Karat Category",
-   "options": "-Select-\nDefective\nRegular\nSagad",
+   "options": "\nDefective\nRegular\nSagad",
    "reqd": 1
   },
   {
@@ -86,7 +84,7 @@
    "fieldname": "color",
    "fieldtype": "Select",
    "label": "Color",
-   "options": "YG\nWG\nRG\nYG & WG\nYG & RG\nWG & RG\nTricolor",
+   "options": "\nYG\nWG\nRG\nYG & WG\nYG & RG\nWG & RG\nTricolor\nWhite Platinum",
    "reqd": 1
   },
   {
@@ -239,7 +237,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-29 17:38:56.478757",
+ "modified": "2025-10-18 21:38:59.681878",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Jewelry Items",
@@ -254,7 +252,6 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
-   "select": 1,
    "share": 1,
    "write": 1
   }

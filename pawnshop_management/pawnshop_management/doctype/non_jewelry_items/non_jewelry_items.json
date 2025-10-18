@@ -83,7 +83,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Type",
-   "options": "Cellphone\nTablet\nLaptop\nCamera\nMotorcycle",
+   "options": "\nCellphone\nTablet\nLaptop\nCamera",
    "reqd": 1
   },
   {
@@ -103,7 +103,7 @@
    "fieldname": "category",
    "fieldtype": "Select",
    "label": "Category/Item Condition",
-   "options": "Defective\nMinimum\nMaximum"
+   "options": "Maximum\nMinimum\nDefective"
   },
   {
    "default": "0.00",
@@ -152,7 +152,8 @@
    "fieldname": "disk_type",
    "fieldtype": "Select",
    "label": "Disk Type",
-   "options": "HDD\nSSD\nHDD & SSD",
+   "mandatory_depends_on": "eval:(doc.type||\"\")===\"Laptop\"",
+   "options": "\nNot Shown\nHDD\nSSD\nHDD & SSD",
    "set_only_once": 1
   },
   {
@@ -183,9 +184,8 @@
    "fieldname": "internet_connection_capability",
    "fieldtype": "Select",
    "label": "Internet Connection Capability",
-   "options": "Wifi Only\nWifi with Cellular Data",
-   "reqd": 1,
-   "set_only_once": 1
+   "mandatory_depends_on": "eval:(doc.type||\"\")===\"Tablet\"",
+   "options": "\nWifi Only\nWifi with Cellular Data"
   },
   {
    "fieldname": "videocard",
@@ -440,7 +440,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-29 19:55:19.781893",
+ "modified": "2025-10-18 09:56:59.476912",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",

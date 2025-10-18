@@ -13,15 +13,18 @@ frappe.ui.form.on('Jewelry Items', {
 		if (parseFloat(frm.doc.desired_principal) > parseFloat(frm.doc.appraisal_value)) {
 			frappe.throw(__('Desired principal is greater than appraisal value'));
 		}
-		if(frm.doc.type == "-Select-"){
-			frappe.throw(__('Please choose the item type'));
-		}
+		// if(frm.doc.type == "-Select-"){
+		// 	frappe.throw(__('Please choose the item type'));
+		// }
 		if(frm.doc.karat == "-Select-"){
 			frappe.throw(__('Please input item karat'));
 		}
-		if(frm.doc.karat_category == "-Select-"){
-			frappe.throw(__('Please choose karat category'));
+		if(frm.doc.total_weight == 0){
+			frappe.throw(__('Please input weight(grams)'));
 		}
+		// if(frm.doc.karat_category == "-Select-"){
+		// 	frappe.throw(__('Please choose karat category'));
+		// }
 		if(parseFloat(frm.doc.total_weight) > 500){
 			frappe.throw(__('Inputted grams exceeds limit'));
 		}
