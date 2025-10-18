@@ -153,7 +153,6 @@ def execute(filters=None):
 
 def get_columns():
 	columns = [
-		
 		{
 			'fieldname': 'pawn_ticket',
 			'label': _('Pawn Ticket'),
@@ -167,6 +166,5 @@ def get_columns():
 			'fieldtype': 'Date',
 			'width': 200
 		}
-		
 	]
 	return columns
