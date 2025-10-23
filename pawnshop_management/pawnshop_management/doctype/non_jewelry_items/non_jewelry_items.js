@@ -18,6 +18,19 @@ frappe.ui.form.on('Non Jewelry Items', {
 		if (frm.is_new()) {
 			//frm.set_value('main_appraiser', frappe.user_info().fullname);
 			//frm.disable_save();
+		
+		//hide fields under the Subastado section
+		frm.set_df_property('subastado_category', 'hidden', 1);
+		frm.set_df_property('subastado_comment', 'hidden', 1);
+		frm.set_df_property('live_selling', 'hidden', 1);
+		frm.set_df_property('w_audit_finding', 'hidden', 1);
+		frm.set_df_property('date_when_audit_was_reflected', 'hidden', 1);
+		frm.set_df_property('selling_price', 'hidden', 1);
+		frm.set_df_property('pt_principal', 'hidden', 1);
+		frm.set_df_property('sold_for', 'read_only', 1);
+		frm.set_df_property('date_sold', 'read_only', 1);
+		frm.set_df_property('reference_document', 'read_only', 1);
+		frm.set_df_property('document_number', 'read_only', 1);
 		}
 	},
 
@@ -48,13 +61,9 @@ frappe.ui.form.on('Non Jewelry Items', {
 				}
 			})
 
-			if (frm.doc.type == "Cellphone" || frm.doc.type == "Tablet") {
 				frm.set_value('charger', 1)
 				frm.refresh_field('charger')
-			} else {
-				frm.set_value('charger', 0)
-				frm.refresh_field('charger')
-			}
+
 				frm.set_df_property('selling_price', 'read_only', 0);
 				frm.set_df_property('pt_principal', 'read_only', 0);
 				frm.set_df_property('w_audit_finding', 'read_only', 0);
