@@ -870,12 +870,14 @@
 
 					{% for(var i=0, l=data.length; i<l; i++) { %}
 
-						{% if((toYMD(data[i].dummy_date) === TODAY && data[i].workflow_state == "Amortization")) { %}
+						{% // Must do this because there is no sumwNPRB for Non-Jewelry %}
+						{% if(toYMD(data[i].dummy_date) === TODAY && data[i].workflow_state == "Amortization" && data[i].inventory_tracking_no == "Pawn Ticket Non Jewelry") { %}
 
-							{% let netProceeds = Number(data[i].net_proceeds);
-							NJRNA_NP += netProceeds %}
+							{% let netProceeds = data[i].net_proceeds * (1-(Number(data[i].interest) / Number(data[i].change_status_date))) %}
+							{% NJRNA_NP += netProceeds %}
 						{% } %}
 
+						{% // Must do this because there is no sumNPNJ %}
 						{% if((data[i].pt_type == "NJ") && (data[i].old_pawn_ticket != "")) { %}
 							{% 
 								let netProceeds = Number(data[i].net_proceeds);
