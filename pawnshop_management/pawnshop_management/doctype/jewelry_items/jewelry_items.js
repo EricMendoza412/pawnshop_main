@@ -10,9 +10,7 @@ frappe.ui.form.on('Jewelry Items', {
 	},
 
 	validate: function(frm){
-		if (parseFloat(frm.doc.desired_principal) > parseFloat(frm.doc.appraisal_value)) {
-			frappe.throw(__('Desired principal is greater than appraisal value'));
-		}
+
 		// if(frm.doc.type == "-Select-"){
 		// 	frappe.throw(__('Please choose the item type'));
 		// }
@@ -66,7 +64,6 @@ frappe.ui.form.on('Jewelry Items', {
 				frm.set_df_property('color', 'read_only', 1);
 				frm.set_df_property('colors_if_multi', 'read_only', 1);
 				frm.set_df_property('appraisal_value', 'read_only', 1);
-				frm.set_df_property('desired_principal', 'read_only', 1);
 				frm.set_df_property('assistant_appraiser_acct', 'read_only', 1);
 				frm.set_df_property('main_appraiser_acct', 'read_only', 1);
 				frm.set_df_property('comments', 'read_only', 1);
@@ -82,7 +79,6 @@ frappe.ui.form.on('Jewelry Items', {
 				frm.set_df_property('color', 'read_only', 0);
 				frm.set_df_property('colors_if_multi', 'read_only', 0);
 				frm.set_df_property('appraisal_value', 'read_only', 0);
-				frm.set_df_property('desired_principal', 'read_only', 0);
 				frm.set_df_property('main_appraiser_acct', 'read_only', 0);
 				frm.set_df_property('comments', 'read_only', 0);
 				frm.set_df_property('karats', 'read_only', 0);
@@ -114,7 +110,6 @@ frappe.ui.form.on('Jewelry Items', {
 							let created_date = new Date(frm.doc.creation);
 							if(today.toDateString() == created_date.toDateString()){
 								frm.set_df_property('appraisal_value', 'read_only', 0);
-								frm.set_df_property('desired_principal', 'read_only', 0);
 							}
 						}
 					})
@@ -197,11 +192,20 @@ frappe.ui.form.on('Jewelry Items', {
 		show_item_no(frm);
 	},
 
-	appraisal_value: function(frm){
-		frm.set_value('desired_principal', parseFloat(frm.doc.appraisal_value))
-		frm.refresh_field('desired_principal')
+	assistant_appraiser_acct: function(frm){
+		//check if the assistant appraiser is same as main appraiser
+		if (frm.doc.assistant_appraiser_acct == frm.doc.main_appraiser_acct) {
+			frappe.msgprint({
+				title: __('Error'),
+				indicator: 'red',
+				message: __('Assistant Appraiser cannot be the same as Main Appraiser')
+			});
+			frm.set_value('assistant_appraiser_acct', null);
+			frm.refresh_field('assistant_appraiser_acct');
+			frm.set_value('assistant_appraiser', null);
+			frm.refresh_field('assistant_appraiser');
+		}
 	}
-
 });
 
 frappe.ui.form.on('Jewelry Karat List', {

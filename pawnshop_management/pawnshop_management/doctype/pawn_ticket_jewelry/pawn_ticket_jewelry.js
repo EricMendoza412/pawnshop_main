@@ -42,6 +42,24 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 		frm.set_df_property('customers_tracking_no', 'read_only', 1);
 	},
 
+	validate: function(frm){
+		const pawn_ticket_name = frm.doc.pawn_ticket || frm.doc.name;
+		if (!pawn_ticket_name) {
+			return;
+		}
+
+		return frappe.db.exists('Pawn Ticket Non Jewelry', pawn_ticket_name).then(exists => {
+			if (exists) {
+				frappe.msgprint({
+					title: __('Error'),
+					indicator: 'red',
+					message: __('Pawn Ticket with the same name exists in Pawn Ticket Non Jewelry. Please refresh the document and try again.')
+				});	
+				frappe.validated = false;
+			}
+		});
+	},
+
 	after_workflow_action: function(frm){
 		frm.reload_doc()
 	},
@@ -52,13 +70,6 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 		if(!frm.is_new() && frm.doc.docstatus == 0){
 			frm.set_df_property('customers_tracking_no', 'read_only', 1);
 			frm.set_df_property('jewelry_items', 'read_only', 1);
-
-			//show message "Pls review details before submitting"
-			frappe.msgprint({
-				title:__('Notification'),
-				indicator:'blue',
-				message: __('Please review all details before submitting the document.')
-			});
 		}
 		
 		let dlg_workf_good = false
@@ -279,16 +290,25 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 	},
 
 	desired_principal: function(frm, cdt, cdn) {
+		//check if desired principal is greater than the total suggested_appraisal_value of jewelry items
+		let total_appraised_amount = get_total_appraised_amount(frm, cdt, cdn);
+		if (parseFloat(frm.doc.desired_principal) > parseFloat(total_appraised_amount)) {
+			frappe.msgprint({
+				title: __('Error'),
+				indicator: 'red',
+				message: __('Desired principal cannot be greater than the total appraisal value of jewelry items')
+			});
+			frm.set_value('desired_principal', total_appraised_amount);
+			frm.refresh_field('desired_principal');
+		}
+
 		set_series(frm);
 		frm.refresh_fields('pawn_ticket');
 		set_item_interest(frm)
+		frm.set_value('original_principal', frm.doc.desired_principal);
 	},
 
-	inventory_tracking_no: function(frm, cdt, cdn){
-		set_total_appraised_amount(frm, cdt, cdn);
-	},
-
-	customers_tracking_no: function(frm){
+	customers_tracking_no: async function(frm){
 
         let html = ``;
         frappe.call({
@@ -303,22 +323,66 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
             }
         });
 
-		frappe.db.get_value('Customer', frm.doc.customers_tracking_no, 'disabled')
-		.then(r =>{
+		// if form is not amended
+		if (frm.doc.amended_from == null) {
+			try {
+				const customer = frm.doc.customers_tracking_no;
+				if (!customer) {
+					frm.set_value('last_j_sangla_date_in_gp', null);
+					frm.set_value('last_j_sangla_date_in_branch', null);
+					frm.set_value('last_nj_sangla_date_in_gp', null);
+					frm.set_value('last_nj_sangla_date_in_branch', null);
+					return;
+				}
 
-			if (r.message) {
-				const isDisabled = r.message.disabled;
-				if(isDisabled){
+				const r = await frappe.db.get_value('Customer', customer, 'disabled');
+				if (r?.message?.disabled) {
 					const message = 'This customer record is disabled';
 					frappe.msgprint(message);
 					setTimeout(function(){
 						frm.set_value('customers_full_name', "");
 						frm.set_value('customer_birthday', "");
 						frm.set_value('customers_tracking_no', "");
-						},2000);
+					},2000);
+					return;
 				}
+
+				const getLastLoanDate = (doctype, filters) =>
+					frappe.db.get_list(doctype, {
+						fields: ['date_loan_granted'],
+						filters,
+						order_by: 'date_loan_granted desc',
+						limit: 1
+					}).then(res => (res?.length ? res[0].date_loan_granted : null));
+
+				const baseFilters = {
+					customers_tracking_no: customer,
+					old_pawn_ticket: ''
+				};
+
+				const branchFilters = frm.doc.branch
+					? { ...baseFilters, branch: frm.doc.branch }
+					: null;
+
+				const [[lastJGeneral, lastJBranch], [lastNJGeneral, lastNJBranch]] = await Promise.all([
+					Promise.all([
+						getLastLoanDate('Pawn Ticket Jewelry', baseFilters),
+						branchFilters ? getLastLoanDate('Pawn Ticket Jewelry', branchFilters) : Promise.resolve(null)
+					]),
+					Promise.all([
+						getLastLoanDate('Pawn Ticket Non Jewelry', baseFilters),
+						branchFilters ? getLastLoanDate('Pawn Ticket Non Jewelry', branchFilters) : Promise.resolve(null)
+					])
+				]);
+
+				frm.set_value('last_j_sangla_date_in_gp', lastJGeneral);
+				frm.set_value('last_j_sangla_date_in_branch', branchFilters ? lastJBranch : null);
+				frm.set_value('last_nj_sangla_date_in_gp', lastNJGeneral);
+				frm.set_value('last_nj_sangla_date_in_branch', branchFilters ? lastNJBranch : null);
+			} catch (error) {
+				console.error('Unable to fetch latest pawn ticket dates', error);
 			}
-		})
+		}
 
 	},
 
@@ -343,10 +407,10 @@ frappe.ui.form.on('Jewelry List', {
 						indicator:'red',
 						message: __('Added item is already in the list. Item removed.')
 					});
-					set_total_appraised_amount(frm, cdt, cdn);
 				}
 			}
 		}	
+		set_total_appraised_amount(frm, cdt, cdn);
 
 		
 	},
@@ -355,10 +419,6 @@ frappe.ui.form.on('Jewelry List', {
 		if (table_length > 4) {
 			frm.fields_dict["jewelry_items"].grid.grid_buttons.find(".grid-add-row")[0].style.visibility = "hidden";
 		}
-	},
-
-	suggested_appraisal_value: function(frm, cdt, cdn){
-		set_total_appraised_amount(frm,cdt, cdn);
 	},
 
 	jewelry_items_remove: function(frm, cdt, cdn){ //calculate appraisal value when removing items
@@ -438,9 +498,6 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 				frm.refresh_field('pawn_ticket');
 			}
 		}
-
-
-
 	})
 }
 
@@ -448,10 +505,18 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 function set_total_appraised_amount(frm, cdt, cdn) { // Calculate Principal Amount
 	let temp_principal = 0.00;
 	$.each(frm.doc.jewelry_items, function(index, item){
-		temp_principal += parseFloat(item.desired_principal);
+		temp_principal += parseFloat(item.suggested_appraisal_value);
 	});
 	frm.set_value('desired_principal', temp_principal)
 	set_item_interest(frm)
+	return temp_principal
+}
+
+function get_total_appraised_amount(frm, cdt, cdn) { // Calculate Principal Amount
+	let temp_principal = 0.00;
+	$.each(frm.doc.jewelry_items, function(index, item){
+		temp_principal += parseFloat(item.suggested_appraisal_value);
+	});
 	return temp_principal
 }
 

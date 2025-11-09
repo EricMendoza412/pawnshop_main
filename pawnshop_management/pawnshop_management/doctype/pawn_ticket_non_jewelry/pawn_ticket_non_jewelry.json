@@ -32,9 +32,16 @@
   "interest",
   "net_proceeds",
   "column_break_cjh7h",
+  "original_principal",
   "interest_rate",
-  "amended_from",
-  "comments"
+  "comments",
+  "customer_retention_information_section",
+  "last_j_sangla_date_in_branch",
+  "last_nj_sangla_date_in_branch",
+  "column_break_7eecd",
+  "last_j_sangla_date_in_gp",
+  "last_nj_sangla_date_in_gp",
+  "amended_from"
  ],
  "fields": [
   {
@@ -228,6 +235,47 @@
    "fieldtype": "Check",
    "label": "Texted upon expiry (GP app)",
    "read_only": 1
+  },
+  {
+   "fieldname": "original_principal",
+   "fieldtype": "Currency",
+   "label": "Original Principal (No Amortization)",
+   "read_only": 1,
+   "reqd": 1,
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "customer_retention_information_section",
+   "fieldtype": "Section Break",
+   "label": "Customer Retention Information"
+  },
+  {
+   "fieldname": "last_j_sangla_date_in_branch",
+   "fieldtype": "Date",
+   "label": "Last J Sangla date in branch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_nj_sangla_date_in_branch",
+   "fieldtype": "Date",
+   "label": "Last NJ Sangla date in branch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_j_sangla_date_in_gp",
+   "fieldtype": "Date",
+   "label": "Last J Sangla date in GP",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_nj_sangla_date_in_gp",
+   "fieldtype": "Date",
+   "label": "Last NJ Sangla date in GP",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_7eecd",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -238,7 +286,7 @@
    "link_fieldname": "inventory_tracking_no"
   }
  ],
- "modified": "2025-01-08 15:35:36.516593",
+ "modified": "2025-11-05 14:55:09.123343",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Pawn Ticket Non Jewelry",

@@ -40,7 +40,7 @@ class PawnTicketJewelry(Document):
 		self.update_pawn_ticket_jewelry_statuses()
 
 	def before_save(self):
-		if frappe.db.exists('Pawn Ticket Jewelry', self.name) == None:
+		if frappe.db.exists('Pawn Ticket Jewelry', self.name) == None and frappe.db.exists('Pawn Ticket Non Jewelry', self.name) == None:
 			if self.amended_from == None:
 				settings = frappe.get_doc('Pawnshop Naming Series', self.branch)
 				if self.item_series == 'A':
@@ -48,51 +48,9 @@ class PawnTicketJewelry(Document):
 				elif self.item_series == 'B':
 					settings.b_series += 1
 				settings.save(ignore_permissions=True)
-
-
-
-				# if self.branch == "Garcia's Pawnshop - CC":
-				# 	settings = frappe.get_doc('Pawnshop Naming Series', "Garcia's Pawnshop - CC")
-				# 	if self.item_series == 'A':
-				# 		settings.a_series += 1
-				# 	elif self.item_series == 'B':
-				# 		settings.b_series += 1
-				# 	settings.save(ignore_permissions=True)
-				# elif self.branch == "Garcia's Pawnshop - GTC":
-				# 	settings = frappe.get_doc('Pawnshop Naming Series', "Garcia's Pawnshop - GTC")
-				# 	if self.item_series == 'A':
-				# 		settings.a_series += 1
-				# 	elif self.item_series == 'B':
-				# 		settings.b_series += 1
-				# 	settings.save(ignore_permissions=True)
-				# elif self.branch == "Garcia's Pawnshop - MOL":
-				# 	settings = frappe.get_doc('Pawnshop Naming Series', "Garcia's Pawnshop - MOL")
-				# 	if self.item_series == 'A':
-				# 		settings.a_series += 1
-				# 	elif self.item_series == 'B':
-				# 		settings.b_series += 1
-				# 	settings.save(ignore_permissions=True)
-				# elif self.branch == "Garcia's Pawnshop - POB":
-				# 	settings = frappe.get_doc('Pawnshop Naming Series', "Garcia's Pawnshop - POB")
-				# 	if self.item_series == 'A':
-				# 		settings.a_series += 1
-				# 	elif self.item_series == 'B':
-				# 		settings.b_series += 1
-				# 	settings.save(ignore_permissions=True)
-				# elif self.branch == "Garcia's Pawnshop - TNZ":
-				# 	settings = frappe.get_doc('Pawnshop Naming Series', "Garcia's Pawnshop - TNZ")
-				# 	if self.item_series == 'A':
-				# 		settings.a_series += 1
-				# 	elif self.item_series == 'B':
-				# 		settings.b_series += 1
-				# 	settings.save(ignore_permissions=True)
-				# elif self.branch == "Garcia's Pawnshop - ALP":
-				# 	settings = frappe.get_doc('Pawnshop Naming Series', "Garcia's Pawnshop - ALP")
-				# 	if self.item_series == 'A':
-				# 		settings.a_series += 1
-				# 	elif self.item_series == 'B':
-				# 		settings.b_series += 1
-				# 	settings.save(ignore_permissions=True)
+		else:
+			# Return and show error saying document already exists
+			pass
 
 
 
@@ -113,7 +71,6 @@ class PawnTicketJewelry(Document):
 					"colors_if_multi": items[i].colors_if_multi,
 					"additional_for_stone": items[i].additional_for_stone,
 					"suggested_appraisal_value": items[i].suggested_appraisal_value,
-					"desired_principal": items[i].desired_principal,
 					"comments": items[i].comments
 				})
 			new_jewelry_batch.save(ignore_permissions=True)

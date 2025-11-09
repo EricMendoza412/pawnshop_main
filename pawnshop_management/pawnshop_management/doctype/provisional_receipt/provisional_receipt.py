@@ -239,6 +239,7 @@ class ProvisionalReceipt(Document):
 			new_pawn_ticket.customers_tracking_no = previous_pawn_ticket.customers_tracking_no
 			new_pawn_ticket.customers_full_name = previous_pawn_ticket.customers_full_name
 			new_pawn_ticket.inventory_tracking_no = previous_pawn_ticket.inventory_tracking_no
+			new_pawn_ticket.original_principal = previous_pawn_ticket.original_principal
 			new_pawn_ticket.created_by_pr = self.name
 			if self.pawn_ticket_type == "Pawn Ticket Non Jewelry":
 				new_pawn_ticket.interest_rate = previous_pawn_ticket.interest_rate
@@ -288,7 +289,7 @@ class ProvisionalReceipt(Document):
 			new_pawn_ticket.save(ignore_permissions=True)
 			new_pawn_ticket.submit()
 
-		elif self.transaction_type == "Amortization":
+		elif self.transaction_type == "Amortization" and not self.amended_from:
 			interest_rate = frappe.get_doc('Pawnshop Management Settings')
 			if self.pawn_ticket_type == "Pawn Ticket Non Jewelry":
 				used_int_rate = frappe.db.get_value(self.pawn_ticket_type, self.pawn_ticket_no, "interest_rate")

@@ -28,8 +28,6 @@
   "comments",
   "section_break_12",
   "appraisal_value",
-  "column_break_19",
-  "desired_principal",
   "appraisers_section",
   "main_appraiser_acct",
   "main_appraiser",
@@ -178,16 +176,6 @@
    "label": "Selling Price Per Gram"
   },
   {
-   "fieldname": "column_break_19",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "desired_principal",
-   "fieldtype": "Currency",
-   "label": "Desired Principal",
-   "reqd": 1
-  },
-  {
    "fieldname": "karats",
    "fieldtype": "Table",
    "label": "Karats",
@@ -237,7 +225,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-18 21:38:59.681878",
+ "modified": "2025-11-07 14:57:00.405625",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Jewelry Items",

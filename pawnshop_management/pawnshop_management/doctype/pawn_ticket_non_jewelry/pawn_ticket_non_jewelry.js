@@ -20,18 +20,40 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 	},
 
 	validate: function(frm, cdt, cdn){
-		var temp_principal = 0.0;
-		$.each(frm.doc.non_jewelry_items, function(index, item){
-			temp_principal += parseFloat(item.suggested_appraisal_value);
+		const pawn_ticket_name = frm.doc.pawn_ticket || frm.doc.name;
+		const run_validation = () => {
+			var temp_principal = 0.0;
+			$.each(frm.doc.non_jewelry_items, function(index, item){
+				temp_principal += parseFloat(item.suggested_appraisal_value);
+			});
+
+			if (frm.doc.desired_principal > temp_principal) {
+				frappe.throw(__('Desired Principal is greater than the total value of items'));
+			}
+
+			if (frm.doc.desired_principal <= 0){
+				frappe.throw(__('Desired Principal cannot be zero'));
+			}
+		};
+
+		if (!pawn_ticket_name) {
+			run_validation();
+			return;
+		}
+
+		return frappe.db.exists('Pawn Ticket Jewelry', pawn_ticket_name).then(exists => {
+			if (exists) {
+				frappe.msgprint({
+					title: __('Error'),
+					indicator: 'red',
+					message: __('Pawn Ticket with the same name exists in Pawn Ticket Jewelry. Please refresh the document and try again.')
+				});
+				frappe.validated = false;
+				return;
+			}
+
+			run_validation();
 		});
-
-		if (frm.doc.desired_principal > temp_principal) {
-			frappe.throw(__('Desired Principal is greater than the total value of items'));
-		}
-
-		if (frm.doc.desired_principal <= 0){
-			frappe.throw(__('Desired Principal cannot be zero'));
-		}
 	},
 	after_save: function(frm){
 		frm.set_df_property('customers_tracking_no', 'read_only', 1);
@@ -262,32 +284,79 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 		}	
 		frm.refresh_fields('pawn_ticket');
 		set_item_interest(frm)
+		frm.set_value('original_principal', frm.doc.desired_principal);
 	},
 
 	inventory_tracking_no: function(frm, cdt, cdn){
 		set_total_appraised_amount(frm, cdt, cdn);
 	},
 
-	customers_tracking_no: function(frm){
+	customers_tracking_no: async function(frm){
 		if (frm.is_new()){
 			show_tracking_no(frm);
 		}
-		frappe.db.get_value('Customer', frm.doc.customers_tracking_no, 'disabled')
-		.then(r =>{
 
-			if (r.message) {
-				const isDisabled = r.message.disabled;
-				if(isDisabled){
+		// if form is not amended
+		if (frm.doc.amended_from == null) {
+			try {
+				const customer = frm.doc.customers_tracking_no;
+				if (!customer) {
+					frm.set_value('last_j_sangla_date_in_gp', null);
+					frm.set_value('last_j_sangla_date_in_branch', null);
+					frm.set_value('last_nj_sangla_date_in_gp', null);
+					frm.set_value('last_nj_sangla_date_in_branch', null);
+					return;
+				}
+
+				const r = await frappe.db.get_value('Customer', customer, 'disabled');
+				if (r?.message?.disabled) {
 					const message = 'This customer record is disabled';
 					frappe.msgprint(message);
 					setTimeout(function(){
 						frm.set_value('customers_full_name', "");
 						frm.set_value('customer_birthday', "");
 						frm.set_value('customers_tracking_no', "");
-						},2000);
+					},2000);
+					return;
 				}
+
+				const getLastLoanDate = (doctype, filters) =>
+					frappe.db.get_list(doctype, {
+						fields: ['date_loan_granted'],
+						filters,
+						order_by: 'date_loan_granted desc',
+						limit: 1
+					}).then(res => (res?.length ? res[0].date_loan_granted : null));
+
+				const baseFilters = {
+					customers_tracking_no: customer,
+					old_pawn_ticket: ''
+				};
+
+				const branchFilters = frm.doc.branch
+					? { ...baseFilters, branch: frm.doc.branch }
+					: null;
+
+				const [[lastJGeneral, lastJBranch], [lastNJGeneral, lastNJBranch]] = await Promise.all([
+					Promise.all([
+						getLastLoanDate('Pawn Ticket Jewelry', baseFilters),
+						branchFilters ? getLastLoanDate('Pawn Ticket Jewelry', branchFilters) : Promise.resolve(null)
+					]),
+					Promise.all([
+						getLastLoanDate('Pawn Ticket Non Jewelry', baseFilters),
+						branchFilters ? getLastLoanDate('Pawn Ticket Non Jewelry', branchFilters) : Promise.resolve(null)
+					])
+				]);
+
+				frm.set_value('last_j_sangla_date_in_gp', lastJGeneral);
+				frm.set_value('last_j_sangla_date_in_branch', branchFilters ? lastJBranch : null);
+				frm.set_value('last_nj_sangla_date_in_gp', lastNJGeneral);
+				frm.set_value('last_nj_sangla_date_in_branch', branchFilters ? lastNJBranch : null);
+			} catch (error) {
+				console.error('Unable to fetch latest pawn ticket dates', error);
 			}
-		})
+		}
+
 	},
 
 	amended_from: function(frm){

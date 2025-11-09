@@ -40,7 +40,7 @@ class PawnTicketNonJewelry(Document):
 		self.update_pawn_ticket_jewelry_statuses()
 
 	def before_save(self):
-		if frappe.db.exists('Pawn Ticket Non Jewelry', self.name) == None:
+		if frappe.db.exists('Pawn Ticket Non Jewelry', self.name) == None and frappe.db.exists('Pawn Ticket Jewelry', self.name) == None:
 			if self.amended_from == None:
 				settings = frappe.get_doc('Pawnshop Naming Series', self.branch)
 				settings.b_series += 1
