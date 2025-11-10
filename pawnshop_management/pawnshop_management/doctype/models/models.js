@@ -8,7 +8,7 @@ frappe.ui.form.on('Models', {
 
         if (frm.doc.maximum > 0) {
             frm.set_value('minimum', Math.ceil(frm.doc.maximum * 0.8 / 100) * 100);
-            frm.set_value('defective', Math.ceil(frm.doc.maximum * 0.5 / 100) * 100);
+            frm.set_value('defective', Math.ceil(frm.doc.maximum * 0.6 / 100) * 100);
         }
     },
 
@@ -29,6 +29,18 @@ frappe.ui.form.on('Models', {
             frm.set_value('maximum', Math.ceil(frm.doc.max_sell_price * (frm.doc.max_av_percent * 0.01) / 100) * 100);
         }else{
 			frm.set_value('maximum', Math.ceil(frm.doc.max_sell_price * (80 * 0.01) / 100) * 100);
+		}
+	},
+
+	defective_value: function(frm) {
+		const rawValue = Number(frm.doc.defective_value);
+		if (Number.isNaN(rawValue)) {
+			return;
+		}
+
+		const rounded = Math.round(rawValue / 100) * 100;
+		if (rounded !== rawValue) {
+			frm.set_value('defective_value', rounded);
 		}
 	}
 
