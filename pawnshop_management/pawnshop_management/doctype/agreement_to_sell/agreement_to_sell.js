@@ -135,7 +135,7 @@ function show_form_no(frm) {
 function set_total_appraised_amount(frm) { // Calculate Total Amount
 	let temp_principal = 0.00;
 	$.each(frm.doc.jewelry_items, function(index, item){
-		temp_principal += parseFloat(item.desired_principal);
+		temp_principal += parseFloat(item.suggested_appraisal_value);
 	});
 	frm.set_value('total_value', temp_principal)
 	frm.refresh_field('total_value')
