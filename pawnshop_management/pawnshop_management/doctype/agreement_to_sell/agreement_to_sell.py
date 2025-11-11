@@ -31,7 +31,6 @@ class AgreementtoSell(Document):
 					"colors_if_multi": items[i].colors_if_multi,
 					"additional_for_stone": items[i].additional_for_stone,
 					"suggested_appraisal_value": items[i].suggested_appraisal_value,
-					"desired_principal": items[i].desired_principal,
 					"comments": items[i].comments
 				})
 			new_jewelry_batch.save(ignore_permissions=True)
