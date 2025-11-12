@@ -3,6 +3,23 @@
 
 frappe.ui.form.on('Installment Agreement Form', {
 
+	before_workflow_action: function(frm){
+		if (frm.selected_workflow_action === "Close") { // Change status of item no in Non Jewelry items to "For Sale"
+			
+			frappe.call({
+				method: 'pawnshop_management.pawnshop_management.custom_codes.update_nj_batch.update_fields_after_status_change_close_installment_agreement_form',
+				args: {
+					installment_agreement_no: String(frm.doc.item_no)
+				},
+				callback: function(){
+					frappe.msgprint(__('Process completed successfully.'), __('Success'));
+					frm.reload_doc();
+				}
+			})
+		}
+		
+	},
+	
 	refresh: function(frm) {
 		if (frm.doc.down_payment === 0) {
             // Hide the print icon (top right of the form header)

@@ -67,7 +67,6 @@ class JewelryItems(Document):
 					"colors_if_multi": previous_items[i].colors_if_multi,
 					"additional_for_stone": previous_items[i].additional_for_stone,
 					"suggested_appraisal_value": previous_items[i].suggested_appraisal_value,
-					"desired_principal": previous_items[i].desired_principal,
 					"comments": previous_items[i].comments
 				})
 			new_pawn_ticket.desired_principal = previous_pawn_ticket.desired_principal
@@ -86,7 +85,7 @@ class JewelryItems(Document):
 				total_principal = previous_pawn_ticket.desired_principal
 			else:
 				for items in new_items:
-					total_principal = total_principal + items.desired_principal
+					total_principal = total_principal + items.suggested_appraisal_value
 
 			new_pawn_ticket.desired_principal = total_principal
 			interest_rate = previous_pawn_ticket.interest / previous_pawn_ticket.desired_principal
