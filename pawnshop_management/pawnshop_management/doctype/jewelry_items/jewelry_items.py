@@ -144,7 +144,6 @@ class JewelryItems(Document):
 						"colors_if_multi": previous_items[i].colors_if_multi,
 						"additional_for_stone": previous_items[i].additional_for_stone,
 						"suggested_appraisal_value": previous_items[i].suggested_appraisal_value,
-						"desired_principal": previous_items[i].desired_principal,
 						"comments": previous_items[i].comments
 					})
 				new_ats.total_value = previous_ats.total_value
@@ -157,7 +156,7 @@ class JewelryItems(Document):
 				new_items = new_ats.jewelry_items
 				total_amount = 0
 				for items in new_items:
-					total_amount = total_amount + items.desired_principal
+					total_amount = total_amount + items.suggested_appraisal_value
 				new_ats.total_value = total_amount
 				new_ats.submit()
 
