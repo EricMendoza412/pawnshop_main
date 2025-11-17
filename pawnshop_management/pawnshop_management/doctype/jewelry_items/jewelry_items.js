@@ -150,6 +150,17 @@ frappe.ui.form.on('Jewelry Items', {
 				}
 			};
 		});
+
+
+		if(frm.doc.workflow_state == "Unprocessed" && frappe.user_roles.includes('Subastado member')){
+			//make comments, subastado_comment and subastado category fields editable and make it appear
+			frm.set_df_property('sizelength', 'read_only', 0);
+			frm.set_df_property('sizelength', 'hidden', 0);
+			frm.set_df_property('selling_price_per_gram', 'read_only', 0);
+			frm.set_df_property('selling_price_per_gram', 'hidden', 0);
+			frm.set_df_property('selling_price', 'read_only', 0);
+			frm.set_df_property('selling_price', 'hidden', 0);
+		}
 	},
 
 	//assistant_appraiser: function(frm){

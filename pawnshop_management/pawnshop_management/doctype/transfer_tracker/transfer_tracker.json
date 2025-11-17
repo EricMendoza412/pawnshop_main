@@ -19,7 +19,23 @@
   "date_received",
   "received_by",
   "nj_items",
+  "j_items",
   "total_cost",
+  "jewelry_counts_section",
+  "earrings_count",
+  "bracelet_count",
+  "jewelry_counts_column_break",
+  "necklace_count",
+  "ring_count",
+  "column_break_lmn0z",
+  "bangles_count",
+  "pendant_count",
+  "column_break_0osou",
+  "set_count",
+  "earcuff_count",
+  "column_break_nlhq5",
+  "gold_coin_count",
+  "total_items",
   "amended_from"
  ],
  "fields": [
@@ -96,9 +112,9 @@
   {
    "fieldname": "nj_items",
    "fieldtype": "Table",
+   "hidden": 1,
    "label": "NJ items",
-   "options": "Transfer Items",
-   "reqd": 1
+   "options": "Transfer Items"
   },
   {
    "fieldname": "amended_from",
@@ -110,12 +126,11 @@
    "read_only": 1
   },
   {
-   "default": "Non Jewelry Items",
    "fieldname": "item_type",
    "fieldtype": "Select",
    "label": "Item type",
-   "options": "Non Jewelry Items\nJewelry Items",
-   "read_only": 1
+   "options": "\nNon Jewelry Items\nJewelry Items",
+   "reqd": 1
   },
   {
    "fieldname": "transfer_type",
@@ -123,12 +138,120 @@
    "label": "Transfer Type",
    "options": "\nPull out of Expired Sangla\nTransfer of Display Items",
    "reqd": 1
+  },
+  {
+   "fieldname": "j_items",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "J items",
+   "options": "Transfer Items J"
+  },
+  {
+   "fieldname": "jewelry_counts_section",
+   "fieldtype": "Section Break",
+   "label": "Jewelry Item Counts"
+  },
+  {
+   "default": "0",
+   "fieldname": "earrings_count",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Earrings",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "bracelet_count",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Bracelet",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "necklace_count",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Necklace",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "ring_count",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Ring",
+   "read_only": 1
+  },
+  {
+   "fieldname": "jewelry_counts_column_break",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "bangles_count",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Bangles",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "pendant_count",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Pendant",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "set_count",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Set",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "earcuff_count",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Earcuff",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "gold_coin_count",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Gold Coin",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_lmn0z",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_0osou",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_nlhq5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "total_items",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Total Items",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-09-07 13:12:49.009034",
+ "modified": "2025-11-17 13:58:31.578316",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Transfer Tracker",

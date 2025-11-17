@@ -1,0 +1,93 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-10-24 17:41:28.750605",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "last_pawn_ticket",
+  "item_no",
+  "type",
+  "weight",
+  "karat",
+  "color",
+  "densi",
+  "principal"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_no",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item No",
+   "options": "Jewelry Items",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_no.type",
+   "fieldname": "type",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Type",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_no.total_weight",
+   "fieldname": "weight",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Weight",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_no.karat",
+   "fieldname": "karat",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Karat",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_no.color",
+   "fieldname": "color",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Color",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_no.densi",
+   "fieldname": "densi",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Densi",
+   "read_only": 1
+  },
+  {
+   "fieldname": "principal",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Principal",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_pawn_ticket",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Last Pawn Ticket",
+   "options": "Pawn Ticket Jewelry"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-11-07 16:26:22.406207",
+ "modified_by": "Administrator",
+ "module": "Pawnshop Management",
+ "name": "Transfer Items J",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

@@ -21,12 +21,23 @@ class TransferTracker(Document):
 		if self.workflow_state == "For Receiving":
 			#change workflow state of all items in the child table to In Transit
 			for item in self.nj_items:
-				item_doc = frappe.get_doc('Non Jewelry Items', item.item_no)
-				item_doc.workflow_state = "In Transit"
-				item_doc.save(ignore_permissions=True)
+				# item_doc = frappe.get_doc('Non Jewelry Items', item.item_no)
+				# item_doc.workflow_state = "In Transit"
+				# item_doc.save(ignore_permissions=True)
+				frappe.db.set_value('Non Jewelry Items', item.item_no, 'workflow_state', 'In Transit')
 				#change workflow state of all pawn tickets in the child table to Pulled Out if the transfer type is Pull out of Expired Sangla
 				if self.transfer_type == "Pull out of Expired Sangla":
 					item_pawnticket = frappe.get_doc('Pawn Ticket Non Jewelry', item.last_pawn_ticket)
+					item_pawnticket.db_set('workflow_state', 'Pulled Out', update_modified=True)
+					item_pawnticket.db_set('change_status_date', now_datetime(), update_modified=True)
+			for item in self.j_items:
+				# item_doc = frappe.get_doc('Jewelry Items', item.item_no)
+				# item_doc.workflow_state = "In Transit"
+				# item_doc.save(ignore_permissions=True)
+				frappe.db.set_value('Jewelry Items', item.item_no, 'workflow_state', 'In Transit')
+
+				if self.transfer_type == "Pull out of Expired Sangla":
+					item_pawnticket = frappe.get_doc('Pawn Ticket Jewelry', item.last_pawn_ticket)
 					item_pawnticket.db_set('workflow_state', 'Pulled Out', update_modified=True)
 					item_pawnticket.db_set('change_status_date', now_datetime(), update_modified=True)
 			
@@ -43,6 +54,13 @@ class TransferTracker(Document):
 					item_doc.workflow_state = "Unprocessed"
 					item_doc.date_received = now_datetime()
 					item_doc.save(ignore_permissions=True)
+
+				for item in self.j_items:
+					frappe.db.set_value('Jewelry Items', item.item_no, 'workflow_state', 'Unprocessed')
+					frappe.db.set_value('Jewelry Items', item.item_no, 'pt_principal', item.principal)
+					frappe.db.set_value('Jewelry Items', item.item_no, 'current_location', self.destination)
+					frappe.db.set_value('Jewelry Items', item.item_no, 'date_received', now_datetime())
+
 					
 			elif self.transfer_type == "Transfer of Display Items":
 				#change current_location of all items in the child table to destination

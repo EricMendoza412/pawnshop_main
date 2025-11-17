@@ -14,9 +14,6 @@
   "colors_if_multi",
   "densi",
   "additional_for_stone",
-  "sizelength",
-  "selling_price",
-  "selling_price_per_gram",
   "column_break_11",
   "item_no",
   "branch",
@@ -35,6 +32,12 @@
   "assistant_appraiser_acct",
   "assistant_appraiser",
   "section_break_18",
+  "current_location",
+  "pt_principal",
+  "date_received",
+  "sizelength",
+  "selling_price_per_gram",
+  "selling_price",
   "amended_from"
  ],
  "fields": [
@@ -136,7 +139,8 @@
   },
   {
    "fieldname": "section_break_18",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Subastado"
   },
   {
    "fieldname": "amended_from",
@@ -221,11 +225,27 @@
    "label": "Assistant Appraiser Name",
    "read_only": 1,
    "reqd": 1
+  },
+  {
+   "fieldname": "current_location",
+   "fieldtype": "Link",
+   "label": "Current Location",
+   "options": "Branch"
+  },
+  {
+   "fieldname": "pt_principal",
+   "fieldtype": "Currency",
+   "label": "Principal upon Pull out"
+  },
+  {
+   "fieldname": "date_received",
+   "fieldtype": "Date",
+   "label": "Date Received by Subastado"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-07 14:57:00.405625",
+ "modified": "2025-11-13 17:27:53.249738",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Jewelry Items",
