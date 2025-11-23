@@ -7,7 +7,8 @@ from frappe.model.document import Document
 
 class NonJewelryItems(Document):
 	def before_save(self):
-		if frappe.db.exists('Pawn Ticket Non Jewelry', self.name) == None:
+		# if the status is Pawned and the document is new, increment the item count in the naming series	
+		if frappe.db.exists('Pawn Ticket Non Jewelry', self.name) == None and self.status == 'Pawned':
 			if frappe.db.exists('Pawnshop Naming Series', self.branch):
 				settings = frappe.get_doc('Pawnshop Naming Series', self.branch)
 				# if branch is Subastado NJ, increment the inventory count and not the item count
