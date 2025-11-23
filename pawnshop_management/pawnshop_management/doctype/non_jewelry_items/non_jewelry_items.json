@@ -75,7 +75,6 @@
    "label": "Item No",
    "read_only": 1,
    "reqd": 1,
-   "set_only_once": 1,
    "unique": 1
   },
   {
@@ -440,7 +439,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-18 09:56:59.476912",
+ "modified": "2025-11-23 18:22:09.337327",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",

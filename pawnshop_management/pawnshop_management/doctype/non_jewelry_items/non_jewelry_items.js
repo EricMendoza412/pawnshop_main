@@ -38,7 +38,10 @@ frappe.ui.form.on('Non Jewelry Items', {
 		let is_allowed = frappe.user_roles.includes('Administrator');
 		frm.toggle_enable(
 			[
-				"branch"
+				"branch",
+				"current_location",
+				"pt_principal",
+				"date_received"
 			],
 			 is_allowed);
 		if (frm.is_new()) {
