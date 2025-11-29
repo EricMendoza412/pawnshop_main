@@ -84,14 +84,17 @@ class JewelryItems(Document):
 				#has amort or Rn w/ amort, do not recompute principal based on items' desired principal
 				total_principal = previous_pawn_ticket.desired_principal
 			else:
-				for items in new_items:
-					total_principal = total_principal + items.suggested_appraisal_value
+				#since desired principal was removed inside Jewelry items, do don recompute even if there was no amortization
+				# for items in new_items:
+				# 	total_principal = total_principal + items.suggested_appraisal_value
+				total_principal = previous_pawn_ticket.desired_principal
 
 			new_pawn_ticket.desired_principal = total_principal
 			interest_rate = previous_pawn_ticket.interest / previous_pawn_ticket.desired_principal
 			new_interest = (total_principal * interest_rate)
 			new_pawn_ticket.interest = new_interest
 			new_pawn_ticket.net_proceeds = total_principal - new_interest
+			new_pawn_ticket.original_principal = previous_pawn_ticket.original_principal
 			new_pawn_ticket.submit()
 		
 		else:
