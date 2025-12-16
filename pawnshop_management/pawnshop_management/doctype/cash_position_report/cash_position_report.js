@@ -631,7 +631,7 @@ function total_cash_breakdown(frm) {
 
 
 function select_naming_series(frm) { //Select naming series with regards to the branch
-	if (frm.doc.branch == "Garcia's Pawnshop - ALP") {
+	if (frm.doc.branch == "Garcia's Pawnshop - BUC") {
 		frm.set_value('naming_series', "No.7-.######")
 	} else if (frm.doc.branch == "Garcia's Pawnshop - CC") {
 		frm.set_value('naming_series', "No.1-.######")

@@ -156,7 +156,7 @@ frappe.ui.form.on('Installment Agreement Form', {
 				frm.set_value('naming_series', "3-NJIS.######")
 			} else if (frm.doc.branch == "Garcia's Pawnshop - TNZ") {
 				frm.set_value('naming_series', "5-NJIS.######")
-			} else if (frm.doc.branch == "Garcia's Pawnshop - ALP") {
+			} else if (frm.doc.branch == "Garcia's Pawnshop - BUC") {
 				frm.set_value('naming_series', "7-NJIS.######")
 			} else if (frm.doc.branch == "Garcia's Pawnshop - NOV") {
 				frm.set_value('naming_series', "8-NJIS.######")

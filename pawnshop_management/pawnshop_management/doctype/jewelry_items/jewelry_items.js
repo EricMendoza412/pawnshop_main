@@ -152,7 +152,7 @@ frappe.ui.form.on('Jewelry Items', {
 		});
 
 
-		if(frm.doc.workflow_state == "Unprocessed" && frappe.user_roles.includes('Subastado member')){
+		if(frm.doc.workflow_state == "Unprocessed" && frappe.user_roles.includes('Subastado member J')){
 			//make comments, subastado_comment and subastado category fields editable and make it appear
 			frm.set_df_property('sizelength', 'read_only', 0);
 			frm.set_df_property('sizelength', 'hidden', 0);

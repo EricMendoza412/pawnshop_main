@@ -28,7 +28,7 @@ def execute(filters=None):
 	elif str(current_ip) == str(branch_ip['tanza']):
 		branch_fr_ip = "Garcia's Pawnshop - TNZ"
 	elif str(current_ip) == str(branch_ip['alapan']):
-		branch_fr_ip = "Garcia's Pawnshop - ALP"
+		branch_fr_ip = "Garcia's Pawnshop - BUC"
 	elif str(current_ip) == str(branch_ip['noveleta']):
 		branch_fr_ip = "Garcia's Pawnshop - NOV"
 	elif str(current_ip) == str(branch_ip['pascam']):

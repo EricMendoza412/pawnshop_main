@@ -16,7 +16,7 @@ def get_ip_from_settings():
     molino = frappe.get_doc('Branch IP Addressing', "Garcia's Pawnshop - MOL")
     gtc = frappe.get_doc('Branch IP Addressing', "Garcia's Pawnshop - GTC")
     tanza = frappe.get_doc('Branch IP Addressing', "Garcia's Pawnshop - TNZ")
-    alapan = frappe.get_doc('Branch IP Addressing', "Garcia's Pawnshop - ALP")
+    alapan = frappe.get_doc('Branch IP Addressing', "Garcia's Pawnshop - BUC")
     noveleta = frappe.get_doc('Branch IP Addressing', "Garcia's Pawnshop - NOV")
     pascam = frappe.get_doc('Branch IP Addressing', "Garcia's Pawnshop - PSC")
     test = frappe.get_doc('Branch IP Addressing', "TEST")
