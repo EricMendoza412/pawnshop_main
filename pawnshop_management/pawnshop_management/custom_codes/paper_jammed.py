@@ -45,6 +45,10 @@ def transfer_to_next_pt_j(pawn_ticket, nxt_pt):
 	new_pawn_ticket.desired_principal = previous_pawn_ticket.desired_principal
 	new_pawn_ticket.interest = previous_pawn_ticket.interest
 	new_pawn_ticket.net_proceeds = previous_pawn_ticket.net_proceeds
+	new_pawn_ticket.last_j_sangla_date_in_branch = previous_pawn_ticket.last_j_sangla_date_in_branch
+	new_pawn_ticket.last_j_sangla_date_in_gp = previous_pawn_ticket.last_j_sangla_date_in_gp
+	new_pawn_ticket.last_nj_sangla_date_in_branch = previous_pawn_ticket.last_nj_sangla_date_in_branch
+	new_pawn_ticket.last_nj_sangla_date_in_gp = previous_pawn_ticket.last_nj_sangla_date_in_gp
 	new_pawn_ticket.save(ignore_permissions=True)
 	new_pawn_ticket.submit()
 	
@@ -94,6 +98,10 @@ def transfer_to_next_pt_nj(pawn_ticket, nxt_pt):
 	new_pawn_ticket.desired_principal = previous_pawn_ticket.desired_principal
 	new_pawn_ticket.interest = previous_pawn_ticket.interest
 	new_pawn_ticket.net_proceeds = previous_pawn_ticket.net_proceeds
+	new_pawn_ticket.last_j_sangla_date_in_branch = previous_pawn_ticket.last_j_sangla_date_in_branch
+	new_pawn_ticket.last_j_sangla_date_in_gp = previous_pawn_ticket.last_j_sangla_date_in_gp
+	new_pawn_ticket.last_nj_sangla_date_in_branch = previous_pawn_ticket.last_nj_sangla_date_in_branch
+	new_pawn_ticket.last_nj_sangla_date_in_gp = previous_pawn_ticket.last_nj_sangla_date_in_gp
 	new_pawn_ticket.save(ignore_permissions=True)
 	new_pawn_ticket.submit()
 
