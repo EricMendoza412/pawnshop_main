@@ -70,6 +70,7 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 		if(!frm.is_new() && frm.doc.docstatus == 0){
 			frm.set_df_property('customers_tracking_no', 'read_only', 1);
 			frm.set_df_property('jewelry_items', 'read_only', 1);
+			frm.set_df_property('desired_principal', 'read_only', 1);
 		}
 		
 		let dlg_workf_good = false
@@ -357,7 +358,8 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 
 				const baseFilters = {
 					customers_tracking_no: customer,
-					old_pawn_ticket: ''
+					old_pawn_ticket: '',
+					workflow_state: ['!=', 'Rejected']
 				};
 
 				const branchFilters = frm.doc.branch
