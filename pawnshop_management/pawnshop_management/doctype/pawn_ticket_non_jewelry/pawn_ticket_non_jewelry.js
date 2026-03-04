@@ -61,12 +61,19 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 
 	refresh: function(frm){
 
+		//make customers_tracking_no and jewelry_items read only after saving
+		if(!frm.is_new() && frm.doc.docstatus == 0){
+			frm.set_df_property('customers_tracking_no', 'read_only', 1);
+			frm.set_df_property('non_jewelry_items', 'read_only', 1);
+			frm.set_df_property('desired_principal', 'read_only', 1);
+		}
+
 		let dlg_workf_good = false
 		if((frm.doc.date_loan_granted == frappe.datetime.get_today()) && (frm.doc.workflow_state == 'Active')){
 			dlg_workf_good = true
 		} 
 		let role_good = false
-		if(frappe.user_roles.includes('Operations Manager') || frappe.user_roles.includes('Administrator')){
+		if(frappe.user_roles.includes('Operations Manager') || frappe.user_roles.includes('Administrator') || frappe.user_roles.includes('Support Team')){
 			role_good = true
 		}
 
@@ -330,7 +337,8 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 
 				const baseFilters = {
 					customers_tracking_no: customer,
-					old_pawn_ticket: ''
+					old_pawn_ticket: '',
+					workflow_state: ['!=', 'Rejected']
 				};
 
 				const branchFilters = frm.doc.branch
