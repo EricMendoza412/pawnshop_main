@@ -662,21 +662,21 @@ frappe.ui.form.on('Provisional Receipt', {
 	},
 
 	cash: function(frm){
-		if (frm.doc.transaction_type == "Amortization" || frm.doc.transaction_type == "Renewal w/ Amortization") {
+		if (frm.doc.transaction_type == "Amortization") {
 			frm.set_value('additional_amortization', parseFloat(frm.doc.cash) + parseFloat(frm.doc.gcash_amount_payment) + parseFloat(frm.doc.bank_payment))
 			frm.refresh_field('additional_amortization')
 		}
 	},
 
 	gcash_amount_payment: function(frm){
-		if (frm.doc.transaction_type == "Amortization" || frm.doc.transaction_type == "Renewal w/ Amortization") {
+		if (frm.doc.transaction_type == "Amortization") {
 			frm.set_value('additional_amortization', parseFloat(frm.doc.cash) + parseFloat(frm.doc.gcash_amount_payment) + parseFloat(frm.doc.bank_payment))
 			frm.refresh_field('additional_amortization')
 		}
 	},
 
 	bank_payment: function(frm){
-		if (frm.doc.transaction_type == "Amortization" || frm.doc.transaction_type == "Renewal w/ Amortization") {
+		if (frm.doc.transaction_type == "Amortization") {
 			frm.set_value('additional_amortization', parseFloat(frm.doc.cash) + parseFloat(frm.doc.gcash_amount_payment) + parseFloat(frm.doc.bank_payment))
 			frm.refresh_field('additional_amortization')
 		} 
