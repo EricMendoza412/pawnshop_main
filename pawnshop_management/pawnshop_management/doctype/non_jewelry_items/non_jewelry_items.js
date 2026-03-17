@@ -75,7 +75,6 @@ frappe.ui.form.on('Non Jewelry Items', {
 			//frm.disable_save();
 		}else{
 
-			//if(!frappe.user_roles.includes('Administrator') && (frm.doc.workflow_state != "Unprocessed" && !frappe.user_roles.includes('Subastado member'))){
 			if(!frappe.user_roles.includes('Administrator')){	
 				frm.set_df_property('type', 'read_only', 1);
 				frm.set_df_property('brand', 'read_only', 1);
@@ -122,7 +121,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 			if (frm.doc.workflow_state == "In Transit" || frm.doc.workflow_state == "For Sale") {
 				//programmatically hide the Menu items
 				frm.page.clear_menu();
-				frm.page.hide_icon_group('print');
+				//frm.page.hide_icon_group('print');
 
 				 // hide/clear the Actions dropdown
 				if (frm.page.clear_actions_menu) {
@@ -157,14 +156,14 @@ frappe.ui.form.on('Non Jewelry Items', {
 		// 	})
 		// });
 
-		if(frm.doc.workflow_state == "Unprocessed" && frappe.user_roles.includes('Subastado member')){
+		if(frm.doc.workflow_state == "Unprocessed" && frappe.user_roles.includes('Subastado member NJ')){
 			//make comments, subastado_comment and subastado category fields editable and make it appear
 			frm.set_df_property('subastado_category', 'read_only', 0);
 			frm.set_df_property('subastado_category', 'hidden', 0);
 			frm.set_df_property('subastado_comment', 'read_only', 0);
 			frm.set_df_property('subastado_comment', 'hidden', 0);
 		}
-		if(frm.doc.workflow_state == "For Sale" && frappe.user_roles.includes('Subastado member')){
+		if(frm.doc.workflow_state == "For Sale" && frappe.user_roles.includes('Subastado member NJ')){
 			frm.set_df_property('live_selling', 'read_only', 0);
 		}
 		
