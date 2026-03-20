@@ -22,6 +22,9 @@ passlibctx = CryptContext(
 def check_password(user, pwd, doctype="User", fieldname="password", delete_tracker_cache=True):
 	"""Checks if user and password are correct, else raises frappe.AuthenticationError"""
 
+	if doctype == "User" and not frappe.db.exists("User", user):
+		return "User not found"
+
 	result = (
 		frappe.qb.from_(Auth)
 		.select(Auth.name, Auth.password)

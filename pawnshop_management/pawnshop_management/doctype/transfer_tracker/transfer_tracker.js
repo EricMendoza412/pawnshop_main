@@ -470,57 +470,50 @@ frappe.ui.form.on('Transfer Tracker', {
 
 		frm._witnessPromptOpen = true;
 
-		frappe.db.exists('User', userId).then(exists => {
-			if (!exists) {
-				frm._witnessPromptOpen = false;
-				return;
-			}
-
-			let promptSubmitted = false;
-			const dialog = frappe.prompt({
-				label: 'Password',
-				fieldname: 'password',
-				fieldtype: 'Password'
-			}, (password) => {
-				promptSubmitted = true;
-				frappe.call({
-					method: 'pawnshop_management.pawnshop_management.custom_codes.passwords.check_password',
-					args: {
-						user: String(frm.doc.witnessed_by),
-						pwd: password.password
-					},
-					callback: function(usr){
-						if (frm.doc.witnessed_by == usr.message) {
-							frappe.msgprint({
-								title: __('Approved!'),
-								indicator: 'green',
-								message: __('Witness Approved')
-							});
-							//check if both witnessed_by and rover is filled out before enabling save
-							if (frm.doc.rover != null) {
-								frm.enable_save();
-							}
-
-						} else {
-							frm.set_value('witnessed_by', null);
-							frm.refresh_field('witnessed_by');
-							frappe.msgprint({
-								title: __('Password Invalid'),
-								indicator: 'red',
-								message: __(usr.message)
-							});
+		let promptSubmitted = false;
+		const dialog = frappe.prompt({
+			label: 'Password',
+			fieldname: 'password',
+			fieldtype: 'Password'
+		}, (password) => {
+			promptSubmitted = true;
+			frappe.call({
+				method: 'pawnshop_management.pawnshop_management.custom_codes.passwords.check_password',
+				args: {
+					user: String(frm.doc.witnessed_by),
+					pwd: password.password
+				},
+				callback: function(usr){
+					if (frm.doc.witnessed_by == usr.message) {
+						frappe.msgprint({
+							title: __('Approved!'),
+							indicator: 'green',
+							message: __('Witness Approved')
+						});
+						//check if both witnessed_by and rover is filled out before enabling save
+						if (frm.doc.rover != null) {
+							frm.enable_save();
 						}
-					}
-				})
-			});
 
-			dialog.$wrapper.on('hidden.bs.modal', () => {
-				if (!promptSubmitted) {
-					frm.set_value('witnessed_by', null);
-					frm.refresh_field('witnessed_by');
+					} else {
+						frm.set_value('witnessed_by', null);
+						frm.refresh_field('witnessed_by');
+						frappe.msgprint({
+							title: __('Password Invalid'),
+							indicator: 'red',
+							message: __(usr.message)
+						});
+					}
 				}
-				frm._witnessPromptOpen = false;
-			});
+			})
+		});
+
+		dialog.$wrapper.on('hidden.bs.modal', () => {
+			if (!promptSubmitted) {
+				frm.set_value('witnessed_by', null);
+				frm.refresh_field('witnessed_by');
+			}
+			frm._witnessPromptOpen = false;
 		});
 	},
 	rover: function(frm){
@@ -529,55 +522,48 @@ frappe.ui.form.on('Transfer Tracker', {
 
 		frm._roverPromptOpen = true;
 
-		frappe.db.exists('User', userId).then(exists => {
-			if (!exists) {
-				frm._roverPromptOpen = false;
-				return;
-			}
-
-			let promptSubmitted = false;
-			const dialog = frappe.prompt({
-				label: 'Password',
-				fieldname: 'password',
-				fieldtype: 'Password'
-			}, (password) => {
-				promptSubmitted = true;
-				frappe.call({
-					method: 'pawnshop_management.pawnshop_management.custom_codes.passwords.check_password',
-					args: {
-						user: String(frm.doc.rover),
-						pwd: password.password
-					},
-					callback: function(usr){
-						if (frm.doc.rover == usr.message) {
-							frappe.msgprint({
-								title: __('Approved!'),
-								indicator: 'green',
-								message: __('Rover Approved')
-							});
-							//check if both witnessed_by and rover is filled out before enabling save
-							if (frm.doc.witnessed_by != null) {
-								frm.enable_save();
-							}
-						} else {
-							frm.set_value('rover', null);
-							frm.refresh_field('rover');
-							frappe.msgprint({
-								title: __('Password Invalid'),
-								indicator: 'red',
-								message: __(usr.message)
-							});
+		let promptSubmitted = false;
+		const dialog = frappe.prompt({
+			label: 'Password',
+			fieldname: 'password',
+			fieldtype: 'Password'
+		}, (password) => {
+			promptSubmitted = true;
+			frappe.call({
+				method: 'pawnshop_management.pawnshop_management.custom_codes.passwords.check_password',
+				args: {
+					user: String(frm.doc.rover),
+					pwd: password.password
+				},
+				callback: function(usr){
+					if (frm.doc.rover == usr.message) {
+						frappe.msgprint({
+							title: __('Approved!'),
+							indicator: 'green',
+							message: __('Rover Approved')
+						});
+						//check if both witnessed_by and rover is filled out before enabling save
+						if (frm.doc.witnessed_by != null) {
+							frm.enable_save();
 						}
+					} else {
+						frm.set_value('rover', null);
+						frm.refresh_field('rover');
+						frappe.msgprint({
+							title: __('Password Invalid'),
+							indicator: 'red',
+							message: __(usr.message)
+						});
 					}
-				})
-			})
-			dialog.$wrapper.on('hidden.bs.modal', () => {
-				if (!promptSubmitted) {
-					frm.set_value('rover', null);
-					frm.refresh_field('rover');
 				}
-				frm._roverPromptOpen = false;
-			});
+			})
+		})
+		dialog.$wrapper.on('hidden.bs.modal', () => {
+			if (!promptSubmitted) {
+				frm.set_value('rover', null);
+				frm.refresh_field('rover');
+			}
+			frm._roverPromptOpen = false;
 		});
 	},
 
