@@ -12,14 +12,16 @@
   "case",
   "box",
   "bag",
+  "last_pawn_ticket",
   "pt_principal",
-  "last_pawn_ticket"
+  "selling_price"
  ],
  "fields": [
   {
    "fetch_from": "item_no.type",
    "fieldname": "type",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Type",
    "length": 200,
    "read_only": 1
@@ -29,6 +31,7 @@
    "fetch_from": "item_no.charger",
    "fieldname": "charger",
    "fieldtype": "Check",
+   "in_list_view": 1,
    "label": "Charger",
    "read_only": 1
   },
@@ -37,6 +40,7 @@
    "fetch_from": "item_no.case",
    "fieldname": "case",
    "fieldtype": "Check",
+   "in_list_view": 1,
    "label": "Case",
    "read_only": 1
   },
@@ -45,6 +49,7 @@
    "fetch_from": "item_no.box",
    "fieldname": "box",
    "fieldtype": "Check",
+   "in_list_view": 1,
    "label": "Box",
    "read_only": 1
   },
@@ -59,26 +64,37 @@
   {
    "fieldname": "pt_principal",
    "fieldtype": "Currency",
+   "in_list_view": 1,
    "label": "Principal",
    "read_only": 1
   },
   {
    "fieldname": "item_no",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Item No",
    "options": "Non Jewelry Items"
   },
   {
    "fieldname": "last_pawn_ticket",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Last Pawn Ticket",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_no.selling_price",
+   "fieldname": "selling_price",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Selling Price",
    "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-09-07 14:59:14.530905",
+ "modified": "2025-11-20 22:44:10.119371",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Transfer Items",

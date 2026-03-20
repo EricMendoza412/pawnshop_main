@@ -13,13 +13,18 @@
   "item_type",
   "transfer_type",
   "destination",
+  "person_responsible",
   "released_by",
   "witnessed_by",
   "rover",
   "date_received",
   "received_by",
+  "from_date",
+  "to_date",
   "nj_items",
   "j_items",
+  "sb_items",
+  "total_price",
   "total_cost",
   "jewelry_counts_section",
   "earrings_count",
@@ -36,6 +41,11 @@
   "column_break_nlhq5",
   "gold_coin_count",
   "total_items",
+  "envelope_count_section",
+  "pawn_ticket_a_cb",
+  "pawn_ticket_b_ncb",
+  "column_break_hkwnp",
+  "total_envelopes",
   "amended_from"
  ],
  "fields": [
@@ -103,7 +113,6 @@
    "read_only": 1
   },
   {
-   "default": "0",
    "fieldname": "total_cost",
    "fieldtype": "Currency",
    "label": "Total Cost",
@@ -112,7 +121,6 @@
   {
    "fieldname": "nj_items",
    "fieldtype": "Table",
-   "hidden": 1,
    "label": "NJ items",
    "options": "Transfer Items"
   },
@@ -129,20 +137,19 @@
    "fieldname": "item_type",
    "fieldtype": "Select",
    "label": "Item type",
-   "options": "\nNon Jewelry Items\nJewelry Items",
+   "options": "\nNon Jewelry Items\nJewelry Items\nSB Jewelry Items",
    "reqd": 1
   },
   {
    "fieldname": "transfer_type",
    "fieldtype": "Select",
    "label": "Transfer Type",
-   "options": "\nPull out of Expired Sangla\nTransfer of Display Items",
+   "options": "\nPull out of Expired Sangla\nTransfer of Display Items\nIssue as company used item",
    "reqd": 1
   },
   {
    "fieldname": "j_items",
    "fieldtype": "Table",
-   "hidden": 1,
    "label": "J items",
    "options": "Transfer Items J"
   },
@@ -246,12 +253,68 @@
    "hidden": 1,
    "label": "Total Items",
    "read_only": 1
+  },
+  {
+   "fieldname": "total_price",
+   "fieldtype": "Currency",
+   "label": "Total Price",
+   "read_only": 1
+  },
+  {
+   "fieldname": "envelope_count_section",
+   "fieldtype": "Section Break",
+   "label": "Envelope Count"
+  },
+  {
+   "fieldname": "pawn_ticket_a_cb",
+   "fieldtype": "Int",
+   "label": "Pawn ticket A (CB)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "pawn_ticket_b_ncb",
+   "fieldtype": "Int",
+   "label": "Pawn ticket B (NCB)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_hkwnp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_envelopes",
+   "fieldtype": "Int",
+   "label": "Total Envelopes",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_items",
+   "fieldtype": "Table",
+   "label": "SB items",
+   "options": "Transfer Items SB"
+  },
+  {
+   "fieldname": "person_responsible",
+   "fieldtype": "Link",
+   "label": "Person Responsible",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "From Date"
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "To Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-17 13:58:31.578316",
+ "modified": "2026-03-19 14:38:28.734857",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Transfer Tracker",
