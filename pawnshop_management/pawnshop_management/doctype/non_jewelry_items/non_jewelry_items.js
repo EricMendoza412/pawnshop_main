@@ -15,6 +15,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 	},
 	onload: function(frm) {
 		frm.message_shown = false; // Initialize message_shown
+		update_battery_health_fields(frm);
 		if (frm.is_new()) {
 			//frm.set_value('main_appraiser', frappe.user_info().fullname);
 			//frm.disable_save();
@@ -35,6 +36,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 	},
 
 	refresh: function(frm){
+		update_battery_health_fields(frm);
 		let is_allowed = frappe.user_roles.includes('Administrator');
 		frm.toggle_enable(
 			[
@@ -359,7 +361,9 @@ frappe.ui.form.on('Non Jewelry Items', {
 		if (frm.doc.type == "Cellphone" || frm.doc.type == "Tablet") {
 			frm.set_value('charger', 1)
 			frm.refresh_field('charger')
-		} 
+		}
+
+		update_battery_health_fields(frm);
 	},
 
 	brand: function(frm){
@@ -377,6 +381,16 @@ frappe.ui.form.on('Non Jewelry Items', {
 				frm.refresh_field('disk_type');
 			}
 		}
+
+		update_battery_health_fields(frm);
+	},
+
+	bh_tools: function(frm) {
+		check_battery_health_discrepancy(frm);
+	},
+
+	bh_dev_settings: function(frm) {
+		check_battery_health_discrepancy(frm);
 	},
 
 	model:function(frm){
@@ -509,5 +523,32 @@ function unhide_hidden_fields(frm) {
 
 	if (cur_frm.get_docfield('extra_lens').hidden) {
 		cur_frm.set_df_property('extra_lens', 'hidden', 0);
+	}
+}
+
+function update_battery_health_fields(frm) {
+	const battery_health_allowed =
+		(frm.doc.type === "Cellphone" || frm.doc.type === "Tablet") &&
+		frm.doc.brand === "Apple";
+
+	frm.set_df_property('bh_tools', 'read_only', battery_health_allowed ? 0 : 1);
+	frm.set_df_property('bh_dev_settings', 'read_only', battery_health_allowed ? 0 : 1);
+	frm.refresh_field('bh_tools');
+	frm.refresh_field('bh_dev_settings');
+}
+
+function check_battery_health_discrepancy(frm) {
+	const bhTools = flt(frm.doc.bh_tools);
+	const bhDeviceSettings = flt(frm.doc.bh_dev_settings);
+
+	if (
+		frm.doc.bh_tools === null || frm.doc.bh_tools === undefined || frm.doc.bh_tools === "" ||
+		frm.doc.bh_dev_settings === null || frm.doc.bh_dev_settings === undefined || frm.doc.bh_dev_settings === ""
+	) {
+		return;
+	}
+
+	if (Math.abs(bhTools - bhDeviceSettings) >= 5) {
+		frappe.msgprint(__('Battery health discrepancy reached 5%, item must be rejected'));
 	}
 }

@@ -13,6 +13,8 @@
   "model",
   "model_number",
   "color",
+  "bh_dev_settings",
+  "bh_tools",
   "column_break_4",
   "item_no",
   "branch",
@@ -435,11 +437,24 @@
    "fieldname": "subastado_comment",
    "fieldtype": "Small Text",
    "label": "Subastado Comment"
+  },
+  {
+   "description": "BATTERY HEALTH (Use 3utools BH)<br>\n75%-79% Defective<br>\n80%-89% Minimum<br>\n90%-100% Maximum\n\n",
+   "fieldname": "bh_tools",
+   "fieldtype": "Percent",
+   "label": "BH% in 3utools",
+   "precision": "0"
+  },
+  {
+   "fieldname": "bh_dev_settings",
+   "fieldtype": "Percent",
+   "label": "BH% in Device Settings",
+   "precision": "0"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-23 18:22:09.337327",
+ "modified": "2026-03-20 11:46:36.027795",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",
