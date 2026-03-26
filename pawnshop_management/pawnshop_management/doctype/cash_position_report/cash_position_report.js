@@ -498,41 +498,41 @@ function get_subastado_sales(frm, date_today=null) {
 
 			//Do not include Subastado Sales with comments "Subasta"
 			if(records[index].mop_1 == "Cash" && records[index].comments != "Subasta"){
-				cash += parseInt(records[index].payment_1);	
+				cash += parseFloat(records[index].payment_1) || 0;	
 			}
 			if(records[index].mop_2 == "Cash" && records[index].comments != "Subasta"){
-				cash += parseInt(records[index].payment_2);	
+				cash += parseFloat(records[index].payment_2) || 0;	
 			}
 			if(records[index].mop_1 == "Gcash" && records[index].comments != "Subasta"){
 				if(records[index].payment_1 > 0){
-					gcash += parseInt(records[index].payment_1);		
+					gcash += parseFloat(records[index].payment_1) || 0;		
 				}else{
-					gcashRet += parseInt((records[index].payment_1 * -1));
-					cash += parseInt(records[index].payment_1);
+					gcashRet += parseFloat(records[index].payment_1 * -1) || 0;
+					cash += parseFloat(records[index].payment_1) || 0;
 				}
 			}
 			if(records[index].mop_2 == "Gcash" && records[index].comments != "Subasta"){
 				if(records[index].payment_2 > 0){
-					gcash += parseInt(records[index].payment_2);		
+					gcash += parseFloat(records[index].payment_2) || 0;		
 				}else{
-					gcashRet += parseInt((records[index].payment_2 * -1));
-					cash += parseInt(records[index].payment_2);
+					gcashRet += parseFloat(records[index].payment_2 * -1) || 0;
+					cash += parseFloat(records[index].payment_2) || 0;
 				}
 			}
 			if((records[index].mop_1 == "BPI" || records[index].mop_1 == "BDO" || records[index].mop_1 == "EASTWEST") && records[index].comments != "Subasta"){
 				if(records[index].payment_1 > 0){
-					bankTrans += parseInt(records[index].payment_1);
+					bankTrans += parseFloat(records[index].payment_1) || 0;
 				}else{
-					bankTransRet += parseInt((records[index].payment_1 * -1));
-					cash += parseInt(records[index].payment_1);
+					bankTransRet += parseFloat(records[index].payment_1 * -1) || 0;
+					cash += parseFloat(records[index].payment_1) || 0;
 				}
 			}
 			if((records[index].mop_2 == "BPI" || records[index].mop_2 == "BDO" || records[index].mop_2 == "EASTWEST") && records[index].comments != "Subasta"){
 				if(records[index].payment_2 > 0){
-					bankTrans += parseInt(records[index].payment_2);
+					bankTrans += parseFloat(records[index].payment_2) || 0;
 				}else{
-					bankTransRet += parseInt((records[index].payment_2 * -1));
-					cash += parseInt(records[index].payment_2);
+					bankTransRet += parseFloat(records[index].payment_2 * -1) || 0;
+					cash += parseFloat(records[index].payment_2) || 0;
 				}
 			}
 		}
@@ -566,8 +566,8 @@ function get_pr_mops(frm, date_today=null){
 		let gcash2 = 0;
 		let bankTrans2 = 0;
 		for (let index = 0; index < records.length; index++) {
-				gcash2 += parseInt(records[index].gcash_amount_payment);	
-				bankTrans2 += parseInt(records[index].bank_payment);
+				gcash2 += parseFloat(records[index].gcash_amount_payment) || 0;	
+				bankTrans2 += parseFloat(records[index].bank_payment) || 0;
 				
 				if(records[index].mode_of_payment == "GCash"){
 					gcash2 += records[index].total
@@ -578,8 +578,8 @@ function get_pr_mops(frm, date_today=null){
 
 		}
 		
-		gcash2 += parseInt(frm.doc.gcash);
-		bankTrans2 += parseInt(frm.doc.bank_transfer);
+		gcash2 += parseFloat(frm.doc.gcash) || 0;
+		bankTrans2 += parseFloat(frm.doc.bank_transfer) || 0;
 		console.log(gcash2)
 
 		frm.set_value('gcash', gcash2);
