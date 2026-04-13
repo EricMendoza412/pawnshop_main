@@ -9,7 +9,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 		}
 		if (frm.doc.type == "Laptop" && frm.doc.brand != "Apple") {
 			if (frm.doc.ram == "Not Shown" || frm.doc.internal_memory == "Not Shown" || frm.doc.disk_type == "Not Shown" || frm.doc.disk_type == "") {
-				frappe.throw('Please input RAM and Internal Memory for Windows Laptops/Chromebooks before saving.<br><br> Reminder: <br>Ram is in System Information <br>Internal Memory is in This PC <br>Disk Type is in Optimize Drives')
+				frappe.throw('Please input RAM and Internal Memory for Windows Laptops before saving.<br><br> Reminder: <br>Ram is in System Information <br>Internal Memory is in This PC <br>Disk Type is in Optimize Drives')
 			}
 		}
 	},
@@ -32,6 +32,12 @@ frappe.ui.form.on('Non Jewelry Items', {
 		frm.set_df_property('date_sold', 'read_only', 1);
 		frm.set_df_property('reference_document', 'read_only', 1);
 		frm.set_df_property('document_number', 'read_only', 1);
+		}else{
+			//check if brand is apple and type is cellphone or tablet, if false, hide battery health fields"
+			if (!((frm.doc.type == "Cellphone" || frm.doc.type == "Tablet") && frm.doc.brand == "Apple")) {
+				frm.set_df_property('bh_tools', 'hidden', 1);
+				frm.set_df_property('bh_dev_settings', 'hidden', 1);
+			}
 		}
 	},
 
@@ -77,7 +83,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 			//frm.disable_save();
 		}else{
 
-			if(!frappe.user_roles.includes('Administrator')){	
+			if(!(frappe.user_roles.includes('Administrator') || frappe.user_roles.includes('Support Team') || frappe.user_roles.includes('Operations Manager'))){	
 				frm.set_df_property('type', 'read_only', 1);
 				frm.set_df_property('brand', 'read_only', 1);
 				frm.set_df_property('model', 'read_only', 1);

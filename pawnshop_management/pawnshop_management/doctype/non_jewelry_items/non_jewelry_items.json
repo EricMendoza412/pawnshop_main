@@ -204,21 +204,18 @@
    "default": "0",
    "fieldname": "box",
    "fieldtype": "Check",
-   "label": "Box",
-   "set_only_once": 1
+   "label": "Box"
   },
   {
    "default": "0",
    "fieldname": "earphones",
    "fieldtype": "Check",
-   "label": "Earphones",
-   "set_only_once": 1
+   "label": "Earphones"
   },
   {
    "fieldname": "others",
    "fieldtype": "Data",
-   "label": "Others",
-   "set_only_once": 1
+   "label": "Others"
   },
   {
    "fieldname": "column_break_20",
@@ -228,29 +225,25 @@
    "default": "0",
    "fieldname": "pin",
    "fieldtype": "Check",
-   "label": "Pin",
-   "set_only_once": 1
+   "label": "Pin"
   },
   {
    "default": "0",
    "fieldname": "manual",
    "fieldtype": "Check",
-   "label": "Manual",
-   "set_only_once": 1
+   "label": "Manual"
   },
   {
    "default": "0",
    "fieldname": "sim_card",
    "fieldtype": "Check",
-   "label": "Sim Card",
-   "set_only_once": 1
+   "label": "Sim Card"
   },
   {
    "default": "0",
    "fieldname": "sd_card",
    "fieldtype": "Check",
-   "label": "SD Card",
-   "set_only_once": 1
+   "label": "SD Card"
   },
   {
    "fieldname": "column_break_25",
@@ -260,22 +253,19 @@
    "default": "0",
    "fieldname": "bag",
    "fieldtype": "Check",
-   "label": "Bag",
-   "set_only_once": 1
+   "label": "Bag"
   },
   {
    "default": "0",
    "fieldname": "extra_battery",
    "fieldtype": "Check",
-   "label": "Extra Battery",
-   "set_only_once": 1
+   "label": "Extra Battery"
   },
   {
    "default": "0",
    "fieldname": "extra_lens",
    "fieldtype": "Check",
-   "label": "Extra Lens",
-   "set_only_once": 1
+   "label": "Extra Lens"
   },
   {
    "fieldname": "batch_number",
@@ -454,7 +444,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-03-20 11:46:36.027795",
+ "modified": "2026-04-13 16:49:14.273802",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",
