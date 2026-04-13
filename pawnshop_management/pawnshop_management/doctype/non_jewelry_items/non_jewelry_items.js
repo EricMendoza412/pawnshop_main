@@ -1,6 +1,33 @@
 // Copyright (c) 2021, Rabie Moses Santillan and contributors
 // For license information, please see license.txt
 
+const SUBASTADO_FIELDS = [
+	'current_location',
+	'person_accountable',
+	'w_audit_finding',
+	'column_break_ouqef',
+	'date_reappraised',
+	'selling_price',
+	'pt_principal',
+	'date_when_audit_was_reflected',
+	'sold_for',
+	'date_sold',
+	'live_selling',
+	'reference_document',
+	'document_number',
+	'ptn_number',
+	'date_received',
+	'subastado_category',
+	'subastado_comment'
+];
+
+function toggle_subastado_fields(frm) {
+	const should_hide = ['Pawned', 'Collected'].includes(frm.doc.workflow_state);
+	SUBASTADO_FIELDS.forEach(fieldname => {
+		frm.set_df_property(fieldname, 'hidden', should_hide ? 1 : 0);
+	});
+}
+
 frappe.ui.form.on('Non Jewelry Items', {
 
 	validate: function(frm){
@@ -16,6 +43,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 	onload: function(frm) {
 		frm.message_shown = false; // Initialize message_shown
 		update_battery_health_fields(frm);
+		toggle_subastado_fields(frm);
 		if (frm.is_new()) {
 			//frm.set_value('main_appraiser', frappe.user_info().fullname);
 			//frm.disable_save();
@@ -43,6 +71,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 
 	refresh: function(frm){
 		update_battery_health_fields(frm);
+		toggle_subastado_fields(frm);
 		let is_allowed = frappe.user_roles.includes('Administrator');
 		frm.toggle_enable(
 			[
