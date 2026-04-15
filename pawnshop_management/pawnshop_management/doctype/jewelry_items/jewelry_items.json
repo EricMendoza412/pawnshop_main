@@ -33,6 +33,7 @@
   "assistant_appraiser",
   "section_break_18",
   "current_location",
+  "person_responsible",
   "pt_principal",
   "date_received",
   "sizelength",
@@ -241,11 +242,18 @@
    "fieldname": "date_received",
    "fieldtype": "Date",
    "label": "Date Received by Subastado"
+  },
+  {
+   "fieldname": "person_responsible",
+   "fieldtype": "Link",
+   "label": "Person Responsible (Head Office)",
+   "options": "User",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-13 17:27:53.249738",
+ "modified": "2025-12-26 14:56:48.252047",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Jewelry Items",

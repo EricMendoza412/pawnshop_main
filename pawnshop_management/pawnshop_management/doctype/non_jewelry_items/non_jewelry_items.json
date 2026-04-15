@@ -421,7 +421,7 @@
    "fieldname": "subastado_category",
    "fieldtype": "Select",
    "label": "Subastado Category",
-   "options": "Defective\nMinimum\nMaximum"
+   "options": "\nDefective\nMinimum\nMaximum"
   },
   {
    "fieldname": "subastado_comment",
@@ -444,7 +444,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-04-13 16:49:14.273802",
+ "modified": "2026-04-13 17:59:13.736519",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",

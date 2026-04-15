@@ -34,6 +34,12 @@ class NonJewelryItems(Document):
 			return
 
 		parent_pt_name = parent_doc_name[0][0]
+		previous_workflow_state = frappe.db.get_value(
+			"Pawn Ticket Non Jewelry", parent_pt_name, "workflow_state"
+		)
+		if previous_workflow_state not in ("Active", "Expired"):
+			return
+
 		frappe.db.set_value('Pawn Ticket Non Jewelry', parent_pt_name, 'workflow_state', 'Rejected')
 		frappe.db.set_value('Pawn Ticket Non Jewelry', parent_pt_name, 'change_status_date', today())
 		frappe.db.set_value('Pawn Ticket Non Jewelry', parent_pt_name, 'docstatus', 2)
