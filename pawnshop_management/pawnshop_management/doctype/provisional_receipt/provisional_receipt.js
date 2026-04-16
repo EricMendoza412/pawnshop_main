@@ -369,11 +369,11 @@ frappe.ui.form.on('Provisional Receipt', {
 
 	maturity_date: function(frm){
 
-		if (frm.doc.date_issued >= frm.doc.maturity_date) {
+		if (frm.doc.date_issued > frm.doc.maturity_date) {
 			if(frm.doc.transaction_type == "Amortization"){
 					let dialog = new frappe.msgprint({
 						title: 'Amortization not allowed',
-						message: 'Date today is already AFTER Pawn Ticket maturity date.',
+						message: 'Amortization is not allowed on or after the pawn ticket\'s maturity date.',
 						indicator: 'red'
 						});
 					dialog.show();
@@ -385,7 +385,7 @@ frappe.ui.form.on('Provisional Receipt', {
 		   if (frm.doc.transaction_type == "Interest Payment") {
 					let dialog = new frappe.msgprint({
 						title: 'Interest Payment not allowed',
-						message: 'Date today is still BEFORE Pawn Ticket maturity date.',
+						message: 'Interest Payment is not allowed before the pawn ticket\'s maturity date.',
 						indicator: 'red'
 						});
 					dialog.show();

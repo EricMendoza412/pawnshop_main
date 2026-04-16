@@ -123,7 +123,7 @@ frappe.ui.form.on('Jewelry Items', {
 						"in", 
 						[
 							"Appraiser",
-							"Supervisor",
+							"Operations Supervisor",
 							"Appraiser/Cashier",
 							"Vault Custodian",
 							"Operations Manager",
@@ -140,7 +140,7 @@ frappe.ui.form.on('Jewelry Items', {
 						"in", 
 						[
 							"Appraiser",
-							"Supervisor",
+							"Operations Supervisor",
 							"Appraiser/Cashier",
 							"Vault Custodian",
 							"Operations Manager",

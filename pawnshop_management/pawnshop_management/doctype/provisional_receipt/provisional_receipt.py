@@ -3,7 +3,7 @@
 
 from datetime import datetime
 from pydoc import Doc, doc
-from frappe.utils import add_to_date, today
+from frappe.utils import add_to_date, today, cstr
 import frappe
 from frappe.model.document import Document
 from frappe.utils import flt
@@ -201,13 +201,36 @@ class ProvisionalReceipt(Document):
 			# Duplicate check before saving
 			if frappe.db.exists(self.pawn_ticket_type, {"pawn_ticket": self.new_pawn_ticket_no}):
 				frappe.throw(
-					msg=f"Pawn Ticket {self.new_pawn_ticket_no} already exists. Please refresh this page and try again.",
+					msg=f"Pawn Ticket {self.new_pawn_ticket_no} already exists. Please refresh this page and try again. If in Draft, request cancellation.",
 					title="Duplicate Pawn Ticket"
 				)
 
 		
 
 	def on_submit(self):
+
+		# if an error occurs such as "The document has been modified. Please refresh" or something like that, do not continue submission
+		current_modified = frappe.db.get_value(self.doctype, self.name, "modified")
+		current_modified_str = cstr(current_modified) if current_modified else None
+		self_modified_str = cstr(self.modified) if self.modified else None
+		# Bail out early if another user/session has updated the doc after it was loaded
+		if current_modified_str and self_modified_str and current_modified_str != self_modified_str:
+			latest_doc = frappe.get_doc(self.doctype, self.name)
+			changed_fields = []
+			for field in self.meta.get_valid_columns():
+				latest_val = latest_doc.get(field)
+				self_val = self.get(field)
+				if cstr(self_val) != cstr(latest_val):
+					changed_fields.append(f"{field}: now '{latest_val}' (yours '{self_val}')")
+					if len(changed_fields) >= 5:  # cap to avoid overly long error
+						changed_fields.append("...more differences omitted")
+						break
+			diff_note = "\n".join(changed_fields) if changed_fields else "Fields changed but differences could not be listed."
+			frappe.throw(
+				msg=f"The document has been modified. Please refresh and resubmit.\n\nRecent changes:\n{diff_note}",  # safety check to avoid continuing with stale data
+				title="Document Modified"
+			)
+		
 		
 		if self.transaction_type == "Redemption":				# Change status of the current PT
 			frappe.db.set_value(self.pawn_ticket_type, self.pawn_ticket_no, 'workflow_state', 'Redeemed')

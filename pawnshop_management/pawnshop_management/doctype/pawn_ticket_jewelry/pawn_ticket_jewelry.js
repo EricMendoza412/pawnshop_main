@@ -78,7 +78,7 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 			dlg_workf_good = true
 		} 
 		let role_good = false
-		if(frappe.user_roles.includes('Operations Manager') || frappe.user_roles.includes('Administrator') || frappe.user_roles.includes('Support Team')){
+		if(frappe.user_roles.includes('Operations Manager') || frappe.user_roles.includes('Administrator') || frappe.user_roles.includes('Support Team') || frappe.user_roles.includes('Operations Supervisor')){
 			role_good = true
 		}
 
