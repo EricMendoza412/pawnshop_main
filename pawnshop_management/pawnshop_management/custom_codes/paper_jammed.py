@@ -43,6 +43,7 @@ def transfer_to_next_pt_j(pawn_ticket, nxt_pt):
 		    "comments": previous_items[i].comments
 		})
 	new_pawn_ticket.desired_principal = previous_pawn_ticket.desired_principal
+	new_pawn_ticket.original_principal = previous_pawn_ticket.original_principal
 	new_pawn_ticket.interest = previous_pawn_ticket.interest
 	new_pawn_ticket.net_proceeds = previous_pawn_ticket.net_proceeds
 	new_pawn_ticket.last_j_sangla_date_in_branch = previous_pawn_ticket.last_j_sangla_date_in_branch
@@ -96,6 +97,7 @@ def transfer_to_next_pt_nj(pawn_ticket, nxt_pt):
 			"suggested_appraisal_value": previous_items[i].suggested_appraisal_value
 		})
 	new_pawn_ticket.desired_principal = previous_pawn_ticket.desired_principal
+	new_pawn_ticket.original_principal = previous_pawn_ticket.original_principal
 	new_pawn_ticket.interest = previous_pawn_ticket.interest
 	new_pawn_ticket.net_proceeds = previous_pawn_ticket.net_proceeds
 	new_pawn_ticket.last_j_sangla_date_in_branch = previous_pawn_ticket.last_j_sangla_date_in_branch

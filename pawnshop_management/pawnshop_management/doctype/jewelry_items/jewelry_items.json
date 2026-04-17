@@ -231,17 +231,20 @@
    "fieldname": "current_location",
    "fieldtype": "Link",
    "label": "Current Location",
-   "options": "Branch"
+   "options": "Branch",
+   "read_only": 1
   },
   {
    "fieldname": "pt_principal",
    "fieldtype": "Currency",
-   "label": "Principal upon Pull out"
+   "label": "Principal upon Pull out",
+   "read_only": 1
   },
   {
    "fieldname": "date_received",
    "fieldtype": "Date",
-   "label": "Date Received by Subastado"
+   "label": "Date Received by Subastado",
+   "read_only": 1
   },
   {
    "fieldname": "person_responsible",
@@ -253,7 +256,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-26 14:56:48.252047",
+ "modified": "2026-04-17 13:03:00.142101",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Jewelry Items",

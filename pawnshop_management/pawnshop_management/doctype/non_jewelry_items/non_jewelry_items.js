@@ -31,6 +31,12 @@ function toggle_subastado_fields(frm) {
 frappe.ui.form.on('Non Jewelry Items', {
 
 	validate: function(frm){
+		if (
+			frm.doc.workflow_state == "Unprocessed" &&
+			(!frm.doc.subastado_category || frm.doc.subastado_category == "-Select-")
+		) {
+			frappe.throw('Put the correct Subastado Category');
+		}
 		if (!frm.doc.assistant_appraiser){
 			frappe.throw('Please input assistant appraiser before saving.')
 		}
