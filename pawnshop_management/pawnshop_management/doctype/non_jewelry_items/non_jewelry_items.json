@@ -152,10 +152,9 @@
   {
    "fieldname": "disk_type",
    "fieldtype": "Select",
-   "label": "Disk Type",
+   "label": "Disk Type (Laptops Only)",
    "mandatory_depends_on": "eval:(doc.type||\"\")===\"Laptop\"",
-   "options": "\nNot Shown\nHDD\nSSD\nHDD & SSD",
-   "set_only_once": 1
+   "options": "\nNot Shown\nHDD\nSSD\nHDD & SSD"
   },
   {
    "fieldname": "color",
@@ -184,7 +183,7 @@
   {
    "fieldname": "internet_connection_capability",
    "fieldtype": "Select",
-   "label": "Internet Connection Capability",
+   "label": "Internet Connection Capability (Tablets Only)",
    "mandatory_depends_on": "eval:(doc.type||\"\")===\"Tablet\"",
    "options": "\nWifi Only\nWifi with Cellular Data"
   },
@@ -297,7 +296,8 @@
    "fieldname": "assistant_appraiser",
    "fieldtype": "Link",
    "label": "Assistant Appraiser",
-   "options": "User"
+   "options": "User",
+   "set_only_once": 1
   },
   {
    "fieldname": "branch",
@@ -444,7 +444,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-04-17 10:51:45.665639",
+ "modified": "2026-04-17 15:59:26.401695",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Non Jewelry Items",

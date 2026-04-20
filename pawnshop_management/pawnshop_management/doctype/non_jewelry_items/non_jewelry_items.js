@@ -131,7 +131,6 @@ frappe.ui.form.on('Non Jewelry Items', {
 				frm.set_df_property('charger', 'read_only', 1);
 				frm.set_df_property('case_box_or_bag', 'read_only', 1);
 				frm.set_df_property('appraisal_value', 'read_only', 1);
-				frm.set_df_property('assistant_appraiser', 'read_only', 1);
 				frm.set_df_property('comments', 'read_only', 1);
 				frm.set_df_property('charger', 'read_only', 1);
 				frm.set_df_property('case', 'read_only', 1);
