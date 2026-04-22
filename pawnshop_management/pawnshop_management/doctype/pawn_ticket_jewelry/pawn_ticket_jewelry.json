@@ -34,7 +34,6 @@
   "net_proceeds",
   "column_break_yrmww",
   "original_principal",
-  "comments",
   "section_break_ziypr",
   "last_j_sangla_date_in_branch",
   "last_nj_sangla_date_in_branch",
@@ -184,11 +183,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "comments",
-   "fieldtype": "Small Text",
-   "label": "Comments"
-  },
-  {
    "fetch_from": "customers_tracking_no.customer_primary_contact",
    "fieldname": "customers_name",
    "fieldtype": "Link",
@@ -282,7 +276,7 @@
    "link_fieldname": "inventory_tracking_no"
   }
  ],
- "modified": "2025-11-12 16:15:11.974176",
+ "modified": "2026-04-22 14:12:59.485711",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Pawn Ticket Jewelry",
