@@ -102,6 +102,102 @@ class TransferTracker(Document):
 
 
 @frappe.whitelist()
+def get_pawn_ticket_series(doctype, tickets):
+	if doctype not in ("Pawn Ticket Jewelry", "Pawn Ticket Non Jewelry"):
+		frappe.throw("Invalid pawn ticket doctype")
+
+	if isinstance(tickets, str):
+		tickets = frappe.parse_json(tickets)
+
+	ticket_names = sorted({ticket for ticket in (tickets or []) if ticket})
+	if not ticket_names:
+		return []
+
+	return frappe.get_all(
+		doctype,
+		fields=["name", "item_series"],
+		filters={"name": ["in", ticket_names]},
+		limit_page_length=0,
+	)
+
+
+@frappe.whitelist()
+def get_non_jewelry_pullout_items(origin, from_date, to_date):
+	if not origin or not from_date or not to_date:
+		return []
+
+	pawn_tickets = frappe.get_all(
+		"Pawn Ticket Non Jewelry",
+		fields=["name", "desired_principal", "date_loan_granted"],
+		filters={
+			"branch": origin,
+			"date_loan_granted": ["between", [from_date, to_date]],
+			"workflow_state": ["in", ["Active", "Expired"]],
+			"docstatus": 1,
+		},
+		order_by="date_loan_granted asc, name asc",
+		limit_page_length=0,
+	)
+
+	if not pawn_tickets:
+		return []
+
+	ticket_names = [ticket.name for ticket in pawn_tickets]
+	ticket_map = {ticket.name: ticket for ticket in pawn_tickets}
+
+	non_jewelry_rows = frappe.get_all(
+		"Non Jewelry List",
+		fields=["parent", "item_no", "type"],
+		filters={
+			"parent": ["in", ticket_names],
+			"parenttype": "Pawn Ticket Non Jewelry",
+		},
+		order_by="parent asc, idx asc",
+		limit_page_length=0,
+	)
+
+	if not non_jewelry_rows:
+		return []
+
+	item_names = sorted({row.item_no for row in non_jewelry_rows if row.item_no})
+	item_info_map = {}
+	if item_names:
+		item_info_map = {
+			row.name: row
+			for row in frappe.get_all(
+				"Non Jewelry Items",
+				fields=["name", "selling_price", "charger", "case", "box", "bag", "type"],
+				filters={"name": ["in", item_names]},
+				limit_page_length=0,
+			)
+		}
+
+	result = []
+	for row in non_jewelry_rows:
+		ticket = ticket_map.get(row.parent)
+		item_info = item_info_map.get(row.item_no)
+		if not ticket or not item_info:
+			continue
+
+		result.append(
+			{
+				"last_pawn_ticket": row.parent,
+				"item_no": row.item_no,
+				"type": row.type or item_info.type,
+				"charger": item_info.charger or 0,
+				"case": item_info.case or 0,
+				"box": item_info.box or 0,
+				"bag": item_info.bag or 0,
+				"pt_principal": ticket.desired_principal or 0,
+				"selling_price": item_info.selling_price or 0,
+				"date_loan_granted": ticket.date_loan_granted,
+			}
+		)
+
+	return result
+
+
+@frappe.whitelist()
 def get_jewelry_pullout_items(origin, from_date, to_date):
 	if not origin or not from_date or not to_date:
 		return []
@@ -196,5 +292,78 @@ def get_jewelry_pullout_items(origin, from_date, to_date):
 					"date_loan_granted": ticket.date_loan_granted,
 				}
 			)
+
+	return result
+
+
+@frappe.whitelist()
+def get_sb_jewelry_pullout_items(origin, from_date, to_date):
+	if not origin or not from_date or not to_date:
+		return []
+
+	agreement_docs = frappe.get_all(
+		"Agreement to Sell",
+		fields=["name", "date_of_sale"],
+		filters={
+			"branch": origin,
+			"date_of_sale": ["between", [from_date, to_date]],
+			"workflow_state": "Active",
+			"docstatus": 1,
+		},
+		order_by="date_of_sale asc, name asc",
+		limit_page_length=0,
+	)
+
+	if not agreement_docs:
+		return []
+
+	agreement_names = [doc.name for doc in agreement_docs]
+
+	jewelry_rows = frappe.get_all(
+		"Jewelry List",
+		fields=["parent", "item_no", "type", "karat", "weight", "densi", "color"],
+		filters={
+			"parent": ["in", agreement_names],
+			"parenttype": "Agreement to Sell",
+		},
+		order_by="parent asc, idx asc",
+		limit_page_length=0,
+	)
+
+	if not jewelry_rows:
+		return []
+
+	item_names = sorted({row.item_no for row in jewelry_rows if row.item_no})
+	item_info_map = {}
+	if item_names:
+		item_info_map = {
+			row.name: row
+			for row in frappe.get_all(
+				"Jewelry Items",
+				fields=["name", "appraisal_value", "selling_price", "total_weight", "karat", "color", "densi", "type"],
+				filters={"name": ["in", item_names]},
+				limit_page_length=0,
+			)
+		}
+
+	result = []
+	for row in jewelry_rows:
+		item_info = item_info_map.get(row.item_no)
+		if not item_info:
+			continue
+
+		result.append(
+			{
+				"last_pawn_ticket": row.parent,
+				"item_no": row.item_no,
+				"type": row.type or item_info.type,
+				"weight": row.weight or item_info.total_weight,
+				"karat": row.karat or item_info.karat,
+				"color": row.color or item_info.color,
+				"densi": row.densi or item_info.densi,
+				"principal": item_info.appraisal_value or 0,
+				"selling_price": item_info.selling_price or 0,
+			}
+		)
 
 	return result

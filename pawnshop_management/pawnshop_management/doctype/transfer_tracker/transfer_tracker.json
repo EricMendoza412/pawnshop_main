@@ -14,18 +14,20 @@
   "transfer_type",
   "destination",
   "person_responsible",
+  "from_date",
+  "to_date",
+  "total_price",
+  "total_cost",
+  "persons_responsible_section",
   "released_by",
   "witnessed_by",
   "rover",
+  "signatures_column",
+  "sign_released_by",
+  "sign_witnessed_by",
+  "signature_rover",
   "date_received",
   "received_by",
-  "from_date",
-  "to_date",
-  "nj_items",
-  "j_items",
-  "sb_items",
-  "total_price",
-  "total_cost",
   "jewelry_counts_section",
   "earrings_count",
   "bracelet_count",
@@ -46,6 +48,10 @@
   "pawn_ticket_b_ncb",
   "column_break_hkwnp",
   "total_envelopes",
+  "list_of_items_section",
+  "nj_items",
+  "j_items",
+  "sb_items",
   "amended_from"
  ],
  "fields": [
@@ -303,18 +309,54 @@
   {
    "fieldname": "from_date",
    "fieldtype": "Date",
-   "label": "From Date"
+   "label": "From Date Loan Granted"
   },
   {
    "fieldname": "to_date",
    "fieldtype": "Date",
-   "label": "To Date"
+   "label": "To Date Loan Granted"
+  },
+  {
+   "fieldname": "list_of_items_section",
+   "fieldtype": "Section Break",
+   "label": "List of items"
+  },
+  {
+   "fieldname": "persons_responsible_section",
+   "fieldtype": "Section Break",
+   "label": "Persons responsible"
+  },
+  {
+   "fieldname": "signatures_column",
+   "fieldtype": "Column Break",
+   "label": "Signatures"
+  },
+  {
+   "default": "______________________________",
+   "fieldname": "sign_released_by",
+   "fieldtype": "Data",
+   "label": "Signature (V.C.)",
+   "read_only": 1
+  },
+  {
+   "default": "______________________________",
+   "fieldname": "sign_witnessed_by",
+   "fieldtype": "Data",
+   "label": "Signature (Witness)",
+   "read_only": 1
+  },
+  {
+   "default": "______________________________",
+   "fieldname": "signature_rover",
+   "fieldtype": "Data",
+   "label": "Signature (Rover)",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-03-19 14:38:28.734857",
+ "modified": "2026-05-04 19:31:11.181249",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Transfer Tracker",

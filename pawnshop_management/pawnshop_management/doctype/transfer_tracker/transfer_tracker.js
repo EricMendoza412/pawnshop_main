@@ -41,6 +41,11 @@ const COMPANY_USED_TRANSFER_TYPE = 'Issue as company used item';
 
 const isDisplayTransferType = transferType => DISPLAY_TRANSFER_TYPES.includes(transferType);
 const PULLOUT_TRANSFER_TYPE = 'Pull out of Expired Sangla';
+const isSbJewelryPulloutTransfer = frm =>
+	!!frm &&
+	!!frm.doc &&
+	isPulloutTransferType(frm.doc.transfer_type) &&
+	frm.doc.item_type === 'SB Jewelry Items';
 
 const syncTransferTypeOptions = frm => {
 	if (!frm) return;
@@ -122,6 +127,57 @@ const setJItemsFromRows = (frm, rows) => {
 	updatePawnTicketEnvelopeCounts(frm);
 };
 
+const setSbItemsFromRows = (frm, rows) => {
+	frm.clear_table('sb_items');
+
+	(rows || []).forEach(row => {
+		const child = frm.add_child('sb_items');
+		child.last_pawn_ticket = row.last_pawn_ticket || '';
+		child.item_no = row.item_no || '';
+		child.type = row.type || '';
+		child.weight = row.weight || 0;
+		child.karat = row.karat || '';
+		child.color = row.color || '';
+		child.densi = row.densi || '';
+		child.principal = toNumberSafe(row.principal);
+		child.selling_price = toNumberSafe(row.selling_price);
+	});
+
+	frm.refresh_field('sb_items');
+	const totalJewelryPrincipal = (frm.doc.sb_items || []).reduce(
+		(sum, child) => sum + toNumberSafe(child.principal),
+		0
+	);
+	frm.set_value('total_cost', totalJewelryPrincipal);
+	updateJewelryCounts(frm);
+	updatePawnTicketEnvelopeCounts(frm);
+};
+
+const setNjItemsFromRows = (frm, rows) => {
+	frm.clear_table('nj_items');
+
+	(rows || []).forEach(row => {
+		const child = frm.add_child('nj_items');
+		child.item_no = row.item_no || '';
+		child.type = row.type || '';
+		child.charger = row.charger ? 1 : 0;
+		child.case = row.case ? 1 : 0;
+		child.box = row.box ? 1 : 0;
+		child.bag = row.bag ? 1 : 0;
+		child.last_pawn_ticket = row.last_pawn_ticket || '';
+		child.pt_principal = toNumberSafe(row.pt_principal);
+		child.selling_price = toNumberSafe(row.selling_price);
+	});
+
+	frm.refresh_field('nj_items');
+	const totalPrincipal = (frm.doc.nj_items || []).reduce(
+		(sum, child) => sum + toNumberSafe(child.pt_principal),
+		0
+	);
+	frm.set_value('total_cost', totalPrincipal);
+	updatePawnTicketEnvelopeCounts(frm);
+};
+
 const populatePulloutJewelryItemsByDateRange = async frm => {
 	if (!frm || !frm.doc) return;
 	if (!isPulloutTransferType(frm.doc.transfer_type) || frm.doc.item_type !== 'Jewelry Items') return;
@@ -151,6 +207,70 @@ const populatePulloutJewelryItemsByDateRange = async frm => {
 		}
 	} catch (error) {
 		console.warn('Unable to populate jewelry items from date range', error);
+	}
+};
+
+const populatePulloutSbJewelryItemsByDateRange = async frm => {
+	if (!frm || !frm.doc) return;
+	if (!isPulloutTransferType(frm.doc.transfer_type) || frm.doc.item_type !== 'SB Jewelry Items') return;
+
+	const { origin, from_date: fromDate, to_date: toDate } = frm.doc;
+	if (!fromDate || !toDate) return;
+
+	if (fromDate > toDate) {
+		frappe.msgprint(__('From Date cannot be later than To Date.'));
+		return;
+	}
+
+	try {
+		const { message } = await frappe.call({
+			method: 'pawnshop_management.pawnshop_management.doctype.transfer_tracker.transfer_tracker.get_sb_jewelry_pullout_items',
+			args: {
+				origin,
+				from_date: fromDate,
+				to_date: toDate
+			}
+		});
+
+		const rows = message || [];
+		setSbItemsFromRows(frm, rows);
+		if (!rows.length) {
+			frappe.msgprint(__('No SB jewelry items found from {0} to {1}.', [fromDate, toDate]));
+		}
+	} catch (error) {
+		console.warn('Unable to populate SB jewelry items from date range', error);
+	}
+};
+
+const populatePulloutNonJewelryItemsByDateRange = async frm => {
+	if (!frm || !frm.doc) return;
+	if (!isPulloutTransferType(frm.doc.transfer_type) || frm.doc.item_type !== 'Non Jewelry Items') return;
+
+	const { origin, from_date: fromDate, to_date: toDate } = frm.doc;
+	if (!fromDate || !toDate) return;
+
+	if (fromDate > toDate) {
+		frappe.msgprint(__('From Date cannot be later than To Date.'));
+		return;
+	}
+
+	try {
+		const { message } = await frappe.call({
+			method: 'pawnshop_management.pawnshop_management.doctype.transfer_tracker.transfer_tracker.get_non_jewelry_pullout_items',
+			args: {
+				origin,
+				from_date: fromDate,
+				to_date: toDate
+			}
+		});
+
+		const rows = message || [];
+		setNjItemsFromRows(frm, rows);
+		if (!rows.length) {
+			frappe.msgprint(__('No non-jewelry items found from {0} to {1}.', [fromDate, toDate]));
+		}
+	} catch (error) {
+		console.warn('Unable to populate non-jewelry items from date range', error);
 	}
 };
 
@@ -203,6 +323,25 @@ const setJItemItemNoEditable = frm => {
 const updatePawnTicketEnvelopeCounts = async frm => {
 	// count unique pawn tickets by series (A/B) and update envelope totals
 	if (!frm || !frm.doc) return;
+	if (isSbJewelryPulloutTransfer(frm)) {
+		const uniqueForms = Array.from(
+			new Set(
+				(frm.doc.sb_items || [])
+					.map(row => (row.last_pawn_ticket || '').trim())
+					.filter(formNumber => formNumber)
+			)
+		);
+		const updates = {};
+		if (Number(frm.doc.pawn_ticket_a_cb || 0) !== 0) updates.pawn_ticket_a_cb = 0;
+		if (Number(frm.doc.pawn_ticket_b_ncb || 0) !== 0) updates.pawn_ticket_b_ncb = 0;
+		if (Number(frm.doc.total_envelopes || 0) !== uniqueForms.length) {
+			updates.total_envelopes = uniqueForms.length;
+		}
+		if (Object.keys(updates).length) {
+			frm.set_value(updates);
+		}
+		return;
+	}
 
 	const extractTickets = rows =>
 		(rows || [])
@@ -211,13 +350,15 @@ const updatePawnTicketEnvelopeCounts = async frm => {
 
 	const fetchTicketSeries = async (doctype, tickets) => {
 		if (!tickets.length) return new Map();
-		const rows = await frappe.db.get_list(doctype, {
-			fields: ['name', 'item_series'],
-			filters: { name: ['in', tickets] },
-			limit: tickets.length
+		const { message } = await frappe.call({
+			method: 'pawnshop_management.pawnshop_management.doctype.transfer_tracker.transfer_tracker.get_pawn_ticket_series',
+			args: {
+				doctype,
+				tickets
+			}
 		});
 		const map = new Map();
-		rows.forEach(row => {
+		(message || []).forEach(row => {
 			const ticket = (row.name || '').trim();
 			if (!ticket) return;
 			map.set(ticket, (row.item_series || '').trim().toUpperCase());
@@ -657,16 +798,24 @@ frappe.ui.form.on('Transfer Tracker', {
 			setJItemItemNoEditable(frm);
 			if (isPulloutTransferType(frm.doc.transfer_type) && frm.doc.item_type === 'Jewelry Items') {
 				populatePulloutJewelryItemsByDateRange(frm);
+			} else if (isPulloutTransferType(frm.doc.transfer_type) && frm.doc.item_type === 'Non Jewelry Items') {
+				populatePulloutNonJewelryItemsByDateRange(frm);
+			} else if (isSbJewelryPulloutTransfer(frm)) {
+				populatePulloutSbJewelryItemsByDateRange(frm);
 			}
 		
 	},
 
 	from_date(frm) {
+		populatePulloutNonJewelryItemsByDateRange(frm);
 		populatePulloutJewelryItemsByDateRange(frm);
+		populatePulloutSbJewelryItemsByDateRange(frm);
 	},
 
 	to_date(frm) {
+		populatePulloutNonJewelryItemsByDateRange(frm);
 		populatePulloutJewelryItemsByDateRange(frm);
+		populatePulloutSbJewelryItemsByDateRange(frm);
 	},
 
 	j_items_add(frm) {
@@ -858,6 +1007,7 @@ frappe.ui.form.on('Transfer Items SB', {
 			frm.set_value('total_cost', totalJewelryPrincipal);
 			frm.refresh_field('total_cost');
 			updateJewelryCounts(frm);
+			updatePawnTicketEnvelopeCounts(frm);
 
 			
 		}).catch(error => {
@@ -869,6 +1019,7 @@ frappe.ui.form.on('Transfer Items SB', {
 
 	sb_items_add(frm) {
 		updateJewelryCounts(frm);
+		updatePawnTicketEnvelopeCounts(frm);
 	},
 
 	before_sb_items_remove(frm, cdt, cdn) {
@@ -904,6 +1055,7 @@ frappe.ui.form.on('Transfer Items SB', {
 		frm.set_value('total_cost', totalSbPrincipal);
 		frm.refresh_field('total_cost');
 		updateJewelryCounts(frm);
+		updatePawnTicketEnvelopeCounts(frm);
 	}
 
 });
