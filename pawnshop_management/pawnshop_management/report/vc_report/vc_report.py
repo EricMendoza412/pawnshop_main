@@ -11,29 +11,29 @@ def execute(filters=None):
 	status_value = getattr(filters, 'branch')
 	columns, data = [], []
 	branch = ""
-	branch_fr_ip = ""
-	current_ip = frappe.local.request_ip
-	branch_ip = get_ip_from_settings()
-	if str(current_ip) == str(branch_ip['cavite_city']):
-		branch_fr_ip = "Garcia\\'s Pawnshop - CC"
-	elif str(current_ip) == str(branch_ip['poblacion']):
-		branch_fr_ip = "Garcia\\'s Pawnshop - POB"
-	elif str(current_ip) == str(branch_ip['molino']):
-		branch_fr_ip = "Garcia\\'s Pawnshop - MOL"
-	elif str(current_ip) == str(branch_ip['gtc']):
-		branch_fr_ip = "Garcia\\'s Pawnshop - GTC"
-	elif str(current_ip) == str(branch_ip['tanza']):
-		branch_fr_ip = "Garcia\\'s Pawnshop - TNZ"
-	elif str(current_ip) == str(branch_ip['alapan']):
-		branch_fr_ip = "Garcia\\'s Pawnshop - BUC"
-	elif str(current_ip) == str(branch_ip['noveleta']):
-		branch_fr_ip = "Garcia\\'s Pawnshop - NOV"
-	elif str(current_ip) == str(branch_ip['pascam']):
-		branch_fr_ip = "Garcia\\'s Pawnshop - PSC"
-	elif str(current_ip) == str(branch_ip['test']):
-		branch_fr_ip = "TEST"
 
 	if status_value == None:
+		branch_fr_ip = ""
+		current_ip = getattr(frappe.local, "request_ip", None)
+		branch_ip = get_ip_from_settings()
+		if str(current_ip) == str(branch_ip['cavite_city']):
+			branch_fr_ip = "Garcia\\'s Pawnshop - CC"
+		elif str(current_ip) == str(branch_ip['poblacion']):
+			branch_fr_ip = "Garcia\\'s Pawnshop - POB"
+		elif str(current_ip) == str(branch_ip['molino']):
+			branch_fr_ip = "Garcia\\'s Pawnshop - MOL"
+		elif str(current_ip) == str(branch_ip['gtc']):
+			branch_fr_ip = "Garcia\\'s Pawnshop - GTC"
+		elif str(current_ip) == str(branch_ip['tanza']):
+			branch_fr_ip = "Garcia\\'s Pawnshop - TNZ"
+		elif str(current_ip) == str(branch_ip['alapan']):
+			branch_fr_ip = "Garcia\\'s Pawnshop - BUC"
+		elif str(current_ip) == str(branch_ip['noveleta']):
+			branch_fr_ip = "Garcia\\'s Pawnshop - NOV"
+		elif str(current_ip) == str(branch_ip['pascam']):
+			branch_fr_ip = "Garcia\\'s Pawnshop - PSC"
+		elif str(current_ip) == str(branch_ip['test']):
+			branch_fr_ip = "TEST"
 		branch = branch_fr_ip
 	else:
 		branch = status_value

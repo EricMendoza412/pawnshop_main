@@ -1,0 +1,21 @@
+{
+ "actions": [],
+ "creation": "2026-05-12 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": ["description", "total"],
+ "fields": [
+  {"fieldname": "description", "fieldtype": "Data", "in_list_view": 1, "label": "Description", "read_only": 1},
+  {"fieldname": "total", "fieldtype": "Currency", "in_list_view": 1, "label": "Total", "read_only": 1}
+ ],
+ "istable": 1,
+ "modified": "2026-05-12 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Pawnshop Management",
+ "name": "Transaction Log Summary Row",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
