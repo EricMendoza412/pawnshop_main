@@ -25,7 +25,10 @@
   "column_break_13",
   "cashier_name_and_signature",
   "column_break_17",
-  "appraiser_name_and_signature"
+  "appraiser_name_and_signature",
+  "customer_retention_information_section",
+  "last_sb_date_in_branch",
+  "last_sb_date_in_gp"
  ],
  "fields": [
   {
@@ -39,7 +42,8 @@
    "fetch_from": "customer_tracker.customer_name",
    "fieldname": "customer_name",
    "fieldtype": "Data",
-   "label": "Customer Name",
+   "in_standard_filter": 1,
+   "label": "Customer's Full Name",
    "read_only": 1,
    "reqd": 1
   },
@@ -158,6 +162,25 @@
    "fieldtype": "Data",
    "hidden": 1,
    "label": "Appraiser name and signature",
+   "read_only": 1
+  },
+  {
+   "fieldname": "customer_retention_information_section",
+   "fieldtype": "Section Break",
+   "label": "Customer Retention Information"
+  },
+  {
+   "fieldname": "last_sb_date_in_branch",
+   "fieldtype": "Date",
+   "label": "Last SB date in branch",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_sb_date_in_gp",
+   "fieldtype": "Date",
+   "label": "Last SB date in GP",
+   "print_hide": 1,
    "read_only": 1
   }
  ],

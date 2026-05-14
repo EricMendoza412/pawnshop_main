@@ -215,6 +215,8 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 			frm.set_df_property('branch', 'read_only', 0);
 		}
 
+		set_appraiser_queries(frm);
+
 		if (frm.is_new()) {
 
 			frm.set_value('date_loan_granted', frappe.datetime.nowdate())
@@ -392,6 +394,20 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 		if (frm.is_new()){
 			show_tracking_no(frm);
 		}		
+	},
+
+	assistant_appraiser_acct: function(frm){
+		if (frm.doc.assistant_appraiser_acct == frm.doc.main_appraiser_acct) {
+			frappe.msgprint({
+				title: __('Error'),
+				indicator: 'red',
+				message: __('Assistant Appraiser cannot be the same as Main Appraiser')
+			});
+			frm.set_value('assistant_appraiser_acct', null);
+			frm.refresh_field('assistant_appraiser_acct');
+			frm.set_value('assistant_appraiser', null);
+			frm.refresh_field('assistant_appraiser');
+		}
 	}
 });
 
@@ -444,6 +460,33 @@ function set_series(frm) { //Set the pawn ticket series
 		}
 		frm.refresh_field('item_series');
 	}	
+}
+
+function set_appraiser_queries(frm) {
+	const appraiser_roles = [
+		"Appraiser",
+		"Operations Supervisor",
+		"Appraiser/Cashier",
+		"Vault Custodian",
+		"Operations Manager",
+		"Area Manager"
+	];
+
+	frm.set_query('assistant_appraiser_acct', function() {
+		return {
+			"filters": {
+				"role_profile_name": ["in", appraiser_roles]
+			}
+		};
+	});
+
+	frm.set_query('main_appraiser_acct', function() {
+		return {
+			"filters": {
+				"role_profile_name": ["in", appraiser_roles]
+			}
+		};
+	});
 }
 
 function show_tracking_no(frm){ //Sets inventory tracking number

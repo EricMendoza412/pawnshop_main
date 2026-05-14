@@ -57,6 +57,7 @@ frappe.ui.form.on('Agreement to Sell', {
 	branch: function(frm){
 	   show_form_no(frm);
 	   show_tracking_no(frm);
+	   update_last_sb_dates(frm);
 
 		//Filter of Jewelry items table
 		frappe.db.get_value('Pawnshop Naming Series', frm.doc.branch, 'jewelry_inventory_count')
@@ -72,9 +73,56 @@ frappe.ui.form.on('Agreement to Sell', {
 			})
 		})
 
+	},
+
+	customer_tracker: function(frm){
+		update_last_sb_dates(frm);
 	}
 
 });
+
+async function update_last_sb_dates(frm) {
+	try {
+		const customer = frm.doc.customer_tracker;
+		if (!customer) {
+			frm.set_value('last_sb_date_in_gp', null);
+			frm.set_value('last_sb_date_in_branch', null);
+			return;
+		}
+
+		const getLastSBDate = (filters) =>
+			frappe.db.get_list('Agreement to Sell', {
+				fields: ['date_of_sale'],
+				filters,
+				order_by: 'date_of_sale desc',
+				limit: 1
+			}).then(res => (res?.length ? res[0].date_of_sale : null));
+
+		const baseFilters = {
+			customer_tracker: customer,
+			workflow_state: ['!=', 'Rejected'],
+			docstatus: ['!=', 2]
+		};
+
+		if (!frm.is_new() && frm.doc.name) {
+			baseFilters.name = ['!=', frm.doc.name];
+		}
+
+		const branchFilters = frm.doc.branch
+			? { ...baseFilters, branch: frm.doc.branch }
+			: null;
+
+		const [lastSBGeneral, lastSBBranch] = await Promise.all([
+			getLastSBDate(baseFilters),
+			branchFilters ? getLastSBDate(branchFilters) : Promise.resolve(null)
+		]);
+
+		frm.set_value('last_sb_date_in_gp', lastSBGeneral);
+		frm.set_value('last_sb_date_in_branch', branchFilters ? lastSBBranch : null);
+	} catch (error) {
+		console.error('Unable to fetch latest Agreement to Sell dates', error);
+	}
+}
 
 function show_tracking_no(frm){ //Sets inventory tracking number
 	let branch_code = 0;
@@ -174,4 +222,3 @@ frappe.ui.form.on('Jewelry List', {
 	}
 	}	
 )
-

@@ -40,6 +40,12 @@
   "column_break_ehdjy",
   "last_j_sangla_date_in_gp",
   "last_nj_sangla_date_in_gp",
+  "appraisers_section",
+  "main_appraiser_acct",
+  "main_appraiser",
+  "column_break_kiaka",
+  "assistant_appraiser_acct",
+  "assistant_appraiser",
   "amended_from"
  ],
  "fields": [
@@ -266,6 +272,43 @@
   {
    "fieldname": "column_break_ehdjy",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "appraisers_section",
+   "fieldtype": "Section Break",
+   "label": "Appraisers"
+  },
+  {
+   "fieldname": "main_appraiser_acct",
+   "fieldtype": "Link",
+   "label": "Main appraiser account",
+   "options": "User"
+  },
+  {
+   "fetch_from": "main_appraiser_acct.first_name",
+   "fieldname": "main_appraiser",
+   "fieldtype": "Data",
+   "label": "Main Appraiser Name",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_kiaka",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "assistant_appraiser_acct",
+   "fieldtype": "Link",
+   "label": "Assistant Appraiser",
+   "options": "User"
+  },
+  {
+   "fetch_from": "assistant_appraiser_acct.first_name",
+   "fieldname": "assistant_appraiser",
+   "fieldtype": "Data",
+   "label": "Assistant Appraiser Name",
+   "read_only": 1,
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,

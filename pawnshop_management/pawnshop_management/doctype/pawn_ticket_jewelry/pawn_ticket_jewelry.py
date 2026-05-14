@@ -15,6 +15,21 @@ from pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket imp
 )
 
 class PawnTicketJewelry(Document):
+	def update_jewelry_item_appraisers(self):
+		for item in self.jewelry_items:
+			if not item.item_no:
+				continue
+			frappe.db.set_value(
+				'Jewelry Items',
+				item.item_no,
+				{
+					'main_appraiser_acct': self.main_appraiser_acct,
+					'main_appraiser': self.main_appraiser,
+					'assistant_appraiser_acct': self.assistant_appraiser_acct,
+					'assistant_appraiser': self.assistant_appraiser
+				}
+			)
+
 	def update_pawn_ticket_jewelry_statuses(self):
 		if self.workflow_state == "Expired":
 			update_fields_after_status_change_collect_pawn_ticket("Pawn Ticket Jewelry", self.inventory_tracking_no, self.pawn_ticket)
@@ -55,6 +70,8 @@ class PawnTicketJewelry(Document):
 
 
 	def on_submit(self):
+		self.update_jewelry_item_appraisers()
+
 		if frappe.db.exists('Jewelry Batch', self.inventory_tracking_no) == None:#Copies Items table from pawnt ticket to non jewelry batch doctype
 			new_jewelry_batch = frappe.new_doc('Jewelry Batch')
 			new_jewelry_batch.inventory_tracking_no = self.inventory_tracking_no
@@ -179,4 +196,3 @@ class PawnTicketJewelry(Document):
 	# 	name = frappe.db.get_value('Journal Entry', {'reference_document': self.name, "document_status": "Active"}, 'name')
 	# 	frappe.db.set_value('Journal Entry', name, 'docstatus', 2)
 	# 	frappe.db.commit()
-
