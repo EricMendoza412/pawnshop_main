@@ -14,6 +14,17 @@ from pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket imp
 	update_fields_after_status_change_reject_pawn_ticket
 )
 
+def get_user_from_appraiser_value(value):
+	if not value:
+		return None
+
+	value = value.strip()
+	return (
+		frappe.db.get_value("User", value, "name")
+		or frappe.db.get_value("User", {"full_name": value}, "name")
+		or frappe.db.get_value("User", {"first_name": value}, "name")
+	)
+
 class PawnTicketJewelry(Document):
 	def before_validate(self):
 		if not self.main_appraiser_acct or not self.assistant_appraiser_acct:
@@ -26,6 +37,9 @@ class PawnTicketJewelry(Document):
 				self.assistant_appraiser_acct = self.assistant_appraiser_acct or first_jewelry_item.assistant_appraiser_acct
 				self.assistant_appraiser = self.assistant_appraiser or first_jewelry_item.assistant_appraiser
 				break
+
+		self.main_appraiser_acct = self.main_appraiser_acct or get_user_from_appraiser_value(self.main_appraiser)
+		self.assistant_appraiser_acct = self.assistant_appraiser_acct or get_user_from_appraiser_value(self.assistant_appraiser)
 
 		if self.main_appraiser_acct:
 			self.main_appraiser = frappe.db.get_value("User", self.main_appraiser_acct, "first_name")
