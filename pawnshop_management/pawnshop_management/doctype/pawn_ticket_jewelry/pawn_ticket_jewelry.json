@@ -289,8 +289,7 @@
    "fieldname": "main_appraiser",
    "fieldtype": "Data",
    "label": "Main Appraiser Name",
-   "read_only": 1,
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "column_break_kiaka",
@@ -307,8 +306,7 @@
    "fieldname": "assistant_appraiser",
    "fieldtype": "Data",
    "label": "Assistant Appraiser Name",
-   "read_only": 1,
-   "reqd": 1
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -319,7 +317,7 @@
    "link_fieldname": "inventory_tracking_no"
   }
  ],
- "modified": "2026-04-22 14:12:59.485711",
+ "modified": "2026-05-15 09:36:04.569271",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Pawn Ticket Jewelry",

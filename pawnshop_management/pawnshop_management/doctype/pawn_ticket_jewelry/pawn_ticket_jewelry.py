@@ -15,6 +15,24 @@ from pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket imp
 )
 
 class PawnTicketJewelry(Document):
+	def before_validate(self):
+		if self.main_appraiser_acct:
+			self.main_appraiser = frappe.db.get_value("User", self.main_appraiser_acct, "first_name")
+
+		if self.assistant_appraiser_acct:
+			self.assistant_appraiser = frappe.db.get_value("User", self.assistant_appraiser_acct, "first_name")
+
+	def validate(self):
+		if self.is_new():
+			if not self.main_appraiser_acct:
+				frappe.throw("Main appraiser account is required.")
+
+			if not self.assistant_appraiser_acct:
+				frappe.throw("Assistant appraiser account is required.")
+
+		if self.main_appraiser_acct and self.main_appraiser_acct == self.assistant_appraiser_acct:
+			frappe.throw("Assistant Appraiser cannot be the same as Main Appraiser.")
+
 	def update_jewelry_item_appraisers(self):
 		for item in self.jewelry_items:
 			if not item.item_no:

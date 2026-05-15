@@ -27,6 +27,10 @@ def transfer_to_next_pt_j(pawn_ticket, nxt_pt):
 	new_pawn_ticket.customers_full_name = previous_pawn_ticket.customers_full_name
 	new_pawn_ticket.inventory_tracking_no = previous_pawn_ticket.inventory_tracking_no
 	new_pawn_ticket.created_by_pr = previous_pawn_ticket.created_by_pr
+	new_pawn_ticket.main_appraiser_acct = previous_pawn_ticket.main_appraiser_acct
+	new_pawn_ticket.main_appraiser = previous_pawn_ticket.main_appraiser
+	new_pawn_ticket.assistant_appraiser_acct = previous_pawn_ticket.assistant_appraiser_acct
+	new_pawn_ticket.assistant_appraiser = previous_pawn_ticket.assistant_appraiser
 	previous_items = previous_pawn_ticket.jewelry_items
 	for i in range(len(previous_items)):
 		new_pawn_ticket.append("jewelry_items", {
