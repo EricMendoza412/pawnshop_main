@@ -280,6 +280,16 @@ class ProvisionalReceipt(Document):
 			elif self.pawn_ticket_type == "Pawn Ticket Jewelry":
 				previous_items = previous_pawn_ticket.jewelry_items
 				new_pawn_ticket.expiry_date = add_to_date(self.date_issued, days=120)
+				new_pawn_ticket.main_appraiser_acct = previous_pawn_ticket.main_appraiser_acct
+				new_pawn_ticket.main_appraiser = previous_pawn_ticket.main_appraiser
+				new_pawn_ticket.assistant_appraiser_acct = previous_pawn_ticket.assistant_appraiser_acct
+				new_pawn_ticket.assistant_appraiser = previous_pawn_ticket.assistant_appraiser
+				if previous_items and (not new_pawn_ticket.main_appraiser_acct or not new_pawn_ticket.assistant_appraiser_acct):
+					first_jewelry_item = frappe.get_doc("Jewelry Items", previous_items[0].item_no)
+					new_pawn_ticket.main_appraiser_acct = new_pawn_ticket.main_appraiser_acct or first_jewelry_item.main_appraiser_acct
+					new_pawn_ticket.main_appraiser = new_pawn_ticket.main_appraiser or first_jewelry_item.main_appraiser
+					new_pawn_ticket.assistant_appraiser_acct = new_pawn_ticket.assistant_appraiser_acct or first_jewelry_item.assistant_appraiser_acct
+					new_pawn_ticket.assistant_appraiser = new_pawn_ticket.assistant_appraiser or first_jewelry_item.assistant_appraiser
 				for i in range(len(previous_items)):
 					new_pawn_ticket.append("jewelry_items", {
 						"item_no": previous_items[i].item_no,
