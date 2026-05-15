@@ -16,6 +16,17 @@ from pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket imp
 
 class PawnTicketJewelry(Document):
 	def before_validate(self):
+		if not self.main_appraiser_acct or not self.assistant_appraiser_acct:
+			for item in self.jewelry_items or []:
+				if not item.item_no:
+					continue
+				first_jewelry_item = frappe.get_doc("Jewelry Items", item.item_no)
+				self.main_appraiser_acct = self.main_appraiser_acct or first_jewelry_item.main_appraiser_acct
+				self.main_appraiser = self.main_appraiser or first_jewelry_item.main_appraiser
+				self.assistant_appraiser_acct = self.assistant_appraiser_acct or first_jewelry_item.assistant_appraiser_acct
+				self.assistant_appraiser = self.assistant_appraiser or first_jewelry_item.assistant_appraiser
+				break
+
 		if self.main_appraiser_acct:
 			self.main_appraiser = frappe.db.get_value("User", self.main_appraiser_acct, "first_name")
 

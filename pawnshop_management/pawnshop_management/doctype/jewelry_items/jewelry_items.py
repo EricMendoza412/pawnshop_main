@@ -146,6 +146,10 @@ class JewelryItems(Document):
 			new_ats.customer_name = previous_ats.customer_name
 			new_ats.ats_tracking_no = previous_ats.ats_tracking_no
 			new_ats.agreement = previous_ats.agreement
+			new_ats.main_appraiser_acct = previous_ats.main_appraiser_acct
+			new_ats.main_appraiser = previous_ats.main_appraiser
+			new_ats.assistant_appraiser_acct = previous_ats.assistant_appraiser_acct
+			new_ats.assistant_appraiser = previous_ats.assistant_appraiser
 			previous_items = previous_ats.jewelry_items
 			
 			for i in range(len(previous_items)):
@@ -174,4 +178,3 @@ class JewelryItems(Document):
 				total_amount = total_amount + items.suggested_appraisal_value
 			new_ats.total_value = total_amount
 			new_ats.submit()
-

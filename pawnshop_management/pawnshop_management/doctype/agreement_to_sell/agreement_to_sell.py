@@ -6,6 +6,53 @@ from frappe.model.document import Document
 from frappe.utils import today
 
 class AgreementtoSell(Document):
+	def before_validate(self):
+		if not self.main_appraiser_acct or not self.assistant_appraiser_acct:
+			for item in self.jewelry_items or []:
+				if not item.item_no:
+					continue
+				first_jewelry_item = frappe.get_doc("Jewelry Items", item.item_no)
+				self.main_appraiser_acct = self.main_appraiser_acct or first_jewelry_item.main_appraiser_acct
+				self.main_appraiser = self.main_appraiser or first_jewelry_item.main_appraiser
+				self.assistant_appraiser_acct = self.assistant_appraiser_acct or first_jewelry_item.assistant_appraiser_acct
+				self.assistant_appraiser = self.assistant_appraiser or first_jewelry_item.assistant_appraiser
+				break
+
+		if self.main_appraiser_acct:
+			self.main_appraiser = frappe.db.get_value("User", self.main_appraiser_acct, "first_name")
+
+		if self.assistant_appraiser_acct:
+			self.assistant_appraiser = frappe.db.get_value("User", self.assistant_appraiser_acct, "first_name")
+
+	def validate(self):
+		if self.main_appraiser_acct and self.main_appraiser_acct == self.assistant_appraiser_acct:
+			frappe.throw("Assistant Appraiser cannot be the same as Main Appraiser.")
+
+	def validate_appraisers_for_submit(self):
+		self.before_validate()
+		self.validate()
+
+		if not self.main_appraiser_acct:
+			frappe.throw("Main appraiser account is required.")
+
+		if not self.assistant_appraiser_acct:
+			frappe.throw("Assistant appraiser account is required.")
+
+	def update_jewelry_item_appraisers(self):
+		for item in self.jewelry_items:
+			if not item.item_no:
+				continue
+			frappe.db.set_value(
+				'Jewelry Items',
+				item.item_no,
+				{
+					'main_appraiser_acct': self.main_appraiser_acct,
+					'main_appraiser': self.main_appraiser,
+					'assistant_appraiser_acct': self.assistant_appraiser_acct,
+					'assistant_appraiser': self.assistant_appraiser
+				}
+			)
+
 	def before_save(self):
 		if frappe.db.exists('Agreement to Sell', self.name) == None:
 			if self.amended_from == None:
@@ -14,7 +61,12 @@ class AgreementtoSell(Document):
 				settings.save(ignore_permissions=True)
 				settings.save(ignore_permissions=True)
 
+	def before_submit(self):
+		self.validate_appraisers_for_submit()
+
 	def on_submit(self):
+		self.update_jewelry_item_appraisers()
+
 		if frappe.db.exists('Jewelry Batch', self.ats_tracking_no) == None:#Copies Items table from pawnt ticket to non jewelry batch doctype
 			new_jewelry_batch = frappe.new_doc('Jewelry Batch')
 			new_jewelry_batch.inventory_tracking_no = self.ats_tracking_no
