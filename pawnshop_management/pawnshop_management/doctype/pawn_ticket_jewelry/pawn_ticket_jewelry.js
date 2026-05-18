@@ -65,6 +65,28 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 	},
 
 	refresh: function(frm){
+		if (frappe.session.user === 'Administrator') {
+			frm.add_custom_button(__('Test SMART SMS'), function() {
+				frappe.call({
+					method: 'pawnshop_management.pawnshop_management.smart_a2p.send_administrator_test_sms',
+					args: {
+						reference_doctype: frm.doc.doctype,
+						reference_name: frm.doc.name
+					},
+					freeze: true,
+					freeze_message: __('Sending SMART SMS...'),
+					callback: function(r) {
+						if (!r.exc) {
+							frappe.msgprint({
+								title: __('SMART SMS Sent'),
+								indicator: 'green',
+								message: __('Sent "Hello There" to 639178400153. SMART SMS Log: {0}', [r.message.log])
+							});
+						}
+					}
+				});
+			});
+		}
 
 		//make customers_tracking_no and jewelry_items read only after saving
 		if(!frm.is_new() && frm.doc.docstatus == 0){
@@ -414,6 +436,10 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 frappe.ui.form.on('Jewelry List', {
 
 	item_no: function(frm, cdt, cdn){
+		if (frm.doctype !== 'Pawn Ticket Jewelry') {
+			return;
+		}
+
 		let table_length = parseInt(frm.doc.jewelry_items.length)
 		if (frm.doc.jewelry_items.length > 1) {
 			for (let index = 0; index < table_length - 1; index++) {
@@ -433,6 +459,10 @@ frappe.ui.form.on('Jewelry List', {
 		
 	},
 	jewelry_items_add: function(frm, cdt, cdn){
+		if (frm.doctype !== 'Pawn Ticket Jewelry') {
+			return;
+		}
+
 		let table_length = parseInt(frm.doc.jewelry_items.length)
 		if (table_length > 4) {
 			frm.fields_dict["jewelry_items"].grid.grid_buttons.find(".grid-add-row")[0].style.visibility = "hidden";
@@ -440,6 +470,10 @@ frappe.ui.form.on('Jewelry List', {
 	},
 
 	jewelry_items_remove: function(frm, cdt, cdn){ //calculate appraisal value when removing items
+		if (frm.doctype !== 'Pawn Ticket Jewelry') {
+			return;
+		}
+
 		let table_length = parseInt(frm.doc.jewelry_items.length)
 		set_total_appraised_amount(frm, cdt, cdn);
 		if (table_length <= 4) {

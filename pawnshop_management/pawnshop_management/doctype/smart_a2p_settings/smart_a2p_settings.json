@@ -1,0 +1,136 @@
+{
+ "actions": [],
+ "creation": "2026-05-19 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "base_url",
+  "credentials_section",
+  "api_id",
+  "api_key",
+  "defaults_section",
+  "default_source",
+  "column_break_8",
+  "default_cost_centre",
+  "registered",
+  "callback_section",
+  "enable_delivery_callback",
+  "callback_url",
+  "request_section",
+  "request_timeout"
+ ],
+ "fields": [
+  {
+   "default": "0",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "default": "https://enterprise.messagingsuite.smart.com.ph/cgpapi/",
+   "fieldname": "base_url",
+   "fieldtype": "Data",
+   "label": "Base URL",
+   "reqd": 1
+  },
+  {
+   "fieldname": "credentials_section",
+   "fieldtype": "Section Break",
+   "label": "Credentials"
+  },
+  {
+   "fieldname": "api_id",
+   "fieldtype": "Data",
+   "label": "API ID"
+  },
+  {
+   "fieldname": "api_key",
+   "fieldtype": "Password",
+   "label": "API Key"
+  },
+  {
+   "fieldname": "defaults_section",
+   "fieldtype": "Section Break",
+   "label": "Defaults"
+  },
+  {
+   "fieldname": "default_source",
+   "fieldtype": "Data",
+   "label": "Default Source",
+   "length": 50
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_cost_centre",
+   "fieldtype": "Data",
+   "label": "Default Cost Centre",
+   "length": 100
+  },
+  {
+   "default": "1",
+   "description": "SMS delivery receipt behavior. SMART guide values: 0 off, 1 registered, 2 error DRs, 3 intermediary DR only, 4 intermediary and network DRs, 5 reserved for error-only DRs.",
+   "fieldname": "registered",
+   "fieldtype": "Select",
+   "label": "Registered",
+   "options": "0\n1\n2\n3\n4\n5"
+  },
+  {
+   "fieldname": "callback_section",
+   "fieldtype": "Section Break",
+   "label": "Callback"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_delivery_callback",
+   "fieldtype": "Check",
+   "label": "Enable Delivery Callback"
+  },
+  {
+   "description": "Use /api/method/pawnshop_management.pawnshop_management.smart_a2p.smart_a2p_callback on your public site URL.",
+   "fieldname": "callback_url",
+   "fieldtype": "Data",
+   "label": "Callback URL"
+  },
+  {
+   "fieldname": "request_section",
+   "fieldtype": "Section Break",
+   "label": "Request"
+  },
+  {
+   "default": "30",
+   "fieldname": "request_timeout",
+   "fieldtype": "Int",
+   "label": "Request Timeout Seconds"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-05-19 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Pawnshop Management",
+ "name": "SMART A2P Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

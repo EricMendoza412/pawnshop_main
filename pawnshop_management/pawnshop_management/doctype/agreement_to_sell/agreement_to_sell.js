@@ -236,6 +236,10 @@ function set_total_appraised_amount(frm) { // Calculate Total Amount
 frappe.ui.form.on('Jewelry List', {
 
 	item_no: function(frm){
+		if (frm.doctype !== 'Agreement to Sell') {
+			return;
+		}
+
 		let table_length = parseInt(frm.doc.jewelry_items.length)
 		if (frm.doc.jewelry_items.length > 1) {
 			for (let index = 0; index < table_length - 1; index++) {
@@ -253,9 +257,17 @@ frappe.ui.form.on('Jewelry List', {
 		}
 	},
 	suggested_appraisal_value: function(frm){
+		if (frm.doctype !== 'Agreement to Sell') {
+			return;
+		}
+
 		set_total_appraised_amount(frm);
 	},
 	jewelry_items_remove: function(frm){ //calculate appraisal value when removing items
+		if (frm.doctype !== 'Agreement to Sell') {
+			return;
+		}
+
 		let table_length = parseInt(frm.doc.jewelry_items.length)
 		set_total_appraised_amount(frm);
 		if (table_length <= 4) {

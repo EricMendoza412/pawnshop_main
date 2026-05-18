@@ -93,13 +93,15 @@
    "fieldname": "main_appraiser_acct",
    "fieldtype": "Link",
    "label": "Main appraiser account",
-   "options": "User"
+   "options": "User",
+   "print_hide": 1
   },
   {
    "fetch_from": "main_appraiser_acct.first_name",
    "fieldname": "main_appraiser",
    "fieldtype": "Data",
    "label": "Main Appraiser Name",
+   "print_hide": 1,
    "read_only": 1
   },
   {
@@ -110,13 +112,15 @@
    "fieldname": "assistant_appraiser_acct",
    "fieldtype": "Link",
    "label": "Assistant Appraiser",
-   "options": "User"
+   "options": "User",
+   "print_hide": 1
   },
   {
    "fetch_from": "assistant_appraiser_acct.first_name",
    "fieldname": "assistant_appraiser",
    "fieldtype": "Data",
    "label": "Assistant Appraiser Name",
+   "print_hide": 1,
    "read_only": 1
   },
   {
@@ -228,7 +232,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-31 18:38:08.764740",
+ "modified": "2026-05-15 14:58:48.608317",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Agreement to Sell",
