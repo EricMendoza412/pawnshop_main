@@ -2,6 +2,39 @@ import frappe
 from frappe.utils import today
 # from flask import jsonify
 
+RENEWAL_TRANSACTION_TYPES = ("Renewal", "Renewal w/ Amortization")
+
+
+def update_connected_provisional_receipt(previous_pawn_ticket, pawn_ticket_type, old_pawn_ticket_no, new_pawn_ticket_no):
+	"""Keep a renewal PR pointed at the replacement pawn ticket."""
+	pr_name = previous_pawn_ticket.created_by_pr
+
+	if pr_name and frappe.db.exists("Provisional Receipt", pr_name):
+		pr = frappe.db.get_value(
+			"Provisional Receipt",
+			pr_name,
+			["transaction_type", "new_pawn_ticket_no"],
+			as_dict=True,
+		)
+		if pr and pr.transaction_type in RENEWAL_TRANSACTION_TYPES and pr.new_pawn_ticket_no == old_pawn_ticket_no:
+			frappe.db.set_value("Provisional Receipt", pr_name, "new_pawn_ticket_no", new_pawn_ticket_no)
+		return
+
+	pr_renewal_check = frappe.get_all(
+		"Provisional Receipt",
+		filters={
+			"pawn_ticket_type": pawn_ticket_type,
+			"new_pawn_ticket_no": old_pawn_ticket_no,
+			"transaction_type": ["in", RENEWAL_TRANSACTION_TYPES],
+		},
+		fields=["name"],
+		order_by="creation desc",
+		limit=1,
+	)
+	if pr_renewal_check:
+		frappe.db.set_value("Provisional Receipt", pr_renewal_check[0].name, "new_pawn_ticket_no", new_pawn_ticket_no)
+
+
 @frappe.whitelist()
 def transfer_to_next_pt_j(pawn_ticket, nxt_pt):
 	
@@ -57,10 +90,7 @@ def transfer_to_next_pt_j(pawn_ticket, nxt_pt):
 	new_pawn_ticket.save(ignore_permissions=True)
 	new_pawn_ticket.submit()
 	
-	# check if from Renewal, replace the New Pawn ticket field with the correct PT
-	pr_renewal_check = frappe.get_all("Provisional Receipt", filters={"new_pawn_ticket_no": pawn_ticket, "date_issued": today()}, fields=["name"])
-	if pr_renewal_check:
-		frappe.db.set_value('Provisional Receipt',pr_renewal_check[0].name, 'new_pawn_ticket_no',nxt_pt)
+	update_connected_provisional_receipt(previous_pawn_ticket, "Pawn Ticket Jewelry", pawn_ticket, nxt_pt)
 	# Return something the client can use
 	return {"status": "ok", "old_pt": pawn_ticket, "new_pt_docname": new_pawn_ticket.name, "new_pt": nxt_pt}
 
@@ -111,9 +141,6 @@ def transfer_to_next_pt_nj(pawn_ticket, nxt_pt):
 	new_pawn_ticket.save(ignore_permissions=True)
 	new_pawn_ticket.submit()
 
-	# check if from Renewal, replace the New Pawn ticket field with the correct PT
-	pr_renewal_check = frappe.get_all("Provisional Receipt", filters={"new_pawn_ticket_no": pawn_ticket, "date_issued": today()}, fields=["name"])
-	if pr_renewal_check:
-		frappe.db.set_value('Provisional Receipt',pr_renewal_check[0].name, 'new_pawn_ticket_no',nxt_pt)
+	update_connected_provisional_receipt(previous_pawn_ticket, "Pawn Ticket Non Jewelry", pawn_ticket, nxt_pt)
 	# Return something the client can use
 	return {"status": "ok", "old_pt": pawn_ticket, "new_pt_docname": new_pawn_ticket.name, "new_pt": nxt_pt}

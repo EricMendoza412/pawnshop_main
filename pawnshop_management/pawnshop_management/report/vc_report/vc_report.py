@@ -72,11 +72,10 @@ def execute(filters=None):
         {conditions}
     """, as_dict=True)
 
-	for pt in data_rejected_J:
-		pt_match = frappe.db.get_value('Pawn Ticket Jewelry',{'amended_from':pt.pawn_ticket},'name')
-		if pt_match:
-			#delete pt from data_rejected_J
-			data_rejected_J.remove(pt)
+	data_rejected_J = [
+		pt for pt in data_rejected_J
+		if not frappe.db.get_value('Pawn Ticket Jewelry', {'amended_from': pt.pawn_ticket}, 'name')
+	]
 
 	data_rejected_NJ = frappe.db.sql(f"""
         SELECT branch, change_status_date, '' as old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, '' as inventory_tracking_no, desired_principal, net_proceeds, '' as item_series, 'NJ' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking, '' as previous_interest_payment
@@ -86,11 +85,10 @@ def execute(filters=None):
         {conditions3}
     """, as_dict=True)
 
-	for ptNJ in data_rejected_NJ:
-		pt_match_NJ = frappe.db.get_value('Pawn Ticket Non Jewelry',{'amended_from':ptNJ.pawn_ticket},'name')
-		if pt_match_NJ:
-			#delete pt from data_rejected_J
-			data_rejected_NJ.remove(ptNJ)
+	data_rejected_NJ = [
+		ptNJ for ptNJ in data_rejected_NJ
+		if not frappe.db.get_value('Pawn Ticket Non Jewelry', {'amended_from': ptNJ.pawn_ticket}, 'name')
+	]
 
 	data_redeemed_J = frappe.db.sql(f"""
         SELECT branch, change_status_date, old_pawn_ticket, workflow_state, pawn_ticket, date_loan_granted, inventory_tracking_no, desired_principal, '' as net_proceeds, item_series, 'J' as pt_type, '' as interest, '' as interest_payment, '' as discount, '' as other_discount_tawad, '' as inventory_tracking, '' as previous_interest_payment
@@ -141,8 +139,36 @@ def execute(filters=None):
 	""", as_dict=True)
 
 	data_pr = frappe.db.sql(f"""
-		SELECT branch, principal_amount as change_status_date, new_pawn_ticket_no as old_pawn_ticket, transaction_type as workflow_state, pawn_ticket_no as pawn_ticket, date_issued as date_loan_granted, pawn_ticket_type as inventory_tracking_no, additional_amortization as desired_principal, total as net_proceeds, series as item_series, '' as pt_type, interest, interest_payment, discount, other_discount_tawad, inventory_tracking, previous_interest_payment, date_loan_granted as dummy_date
+		SELECT
+			`tabProvisional Receipt`.branch,
+			`tabProvisional Receipt`.principal_amount,
+			`tabProvisional Receipt`.principal_amount as change_status_date,
+			`tabProvisional Receipt`.new_pawn_ticket_no as old_pawn_ticket,
+			`tabProvisional Receipt`.transaction_type as workflow_state,
+			`tabProvisional Receipt`.pawn_ticket_no as pawn_ticket,
+			`tabProvisional Receipt`.date_issued as date_loan_granted,
+			`tabProvisional Receipt`.pawn_ticket_type as inventory_tracking_no,
+			`tabProvisional Receipt`.additional_amortization as desired_principal,
+			`tabProvisional Receipt`.total as net_proceeds,
+			COALESCE(`new_jewelry_pawn_ticket`.net_proceeds, `new_non_jewelry_pawn_ticket`.net_proceeds) as new_net_proceeds,
+			`tabProvisional Receipt`.series as item_series,
+			'' as pt_type,
+			`tabProvisional Receipt`.interest,
+			`tabProvisional Receipt`.interest_payment,
+			`tabProvisional Receipt`.discount,
+			`tabProvisional Receipt`.other_discount_tawad,
+			`tabProvisional Receipt`.inventory_tracking,
+			`tabProvisional Receipt`.previous_interest_payment,
+			`tabProvisional Receipt`.date_loan_granted as dummy_date
 		FROM `tabProvisional Receipt`
+		LEFT JOIN `tabPawn Ticket Jewelry` `new_jewelry_pawn_ticket`
+			ON `tabProvisional Receipt`.pawn_ticket_type = 'Pawn Ticket Jewelry'
+			AND `new_jewelry_pawn_ticket`.pawn_ticket = `tabProvisional Receipt`.new_pawn_ticket_no
+			AND `new_jewelry_pawn_ticket`.docstatus = 1
+		LEFT JOIN `tabPawn Ticket Non Jewelry` `new_non_jewelry_pawn_ticket`
+			ON `tabProvisional Receipt`.pawn_ticket_type = 'Pawn Ticket Non Jewelry'
+			AND `new_non_jewelry_pawn_ticket`.pawn_ticket = `tabProvisional Receipt`.new_pawn_ticket_no
+			AND `new_non_jewelry_pawn_ticket`.docstatus = 1
 		WHERE `tabProvisional Receipt`.docstatus=1
 		{conditions5}
 	""", as_dict=True)

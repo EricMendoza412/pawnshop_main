@@ -25,6 +25,22 @@ def _amount(value):
 	return flt(value or 0)
 
 
+def _principal_amount(row):
+	principal = row.get("principal_amount")
+	if principal is not None:
+		return _amount(principal)
+
+	return _amount(row.get("change_status_date"))
+
+
+def _new_net_proceeds(row, fallback):
+	new_net_proceeds = row.get("new_net_proceeds")
+	if new_net_proceeds is not None:
+		return _amount(new_net_proceeds)
+
+	return fallback
+
+
 def _append_log_row(doc, table, source, section, **values):
 	row = doc.append(table, {})
 	row.section = section
@@ -88,7 +104,7 @@ def create_transaction_log_for_cash_position_report(cash_position_report):
 		item_series = row.get("item_series")
 		pt_type = row.get("pt_type")
 		pawn_ticket_type = row.get("inventory_tracking_no")
-		principal = _amount(row.get("change_status_date"))
+		principal = _principal_amount(row)
 		interest = _amount(row.get("interest"))
 		net_proceeds = _amount(row.get("net_proceeds"))
 		desired_principal = _amount(row.get("desired_principal"))
@@ -166,24 +182,25 @@ def create_transaction_log_for_cash_position_report(cash_position_report):
 
 		if workflow_state == "Renewal w/ Amortization":
 			new_principal = principal - desired_principal
+			new_net_proceeds = _new_net_proceeds(row, net_from_principal)
 			if item_series == "A":
-				_append_log_row(log, "renewed_with_amortization", row, "Renewed Pawn Tickets with Amortization", series="A", inventory_no=row.get("inventory_tracking"), old_pawn_ticket=row.get("pawn_ticket"), new_pawn_ticket=row.get("old_pawn_ticket"), old_principal=principal, old_net_proceeds=net_from_principal, new_principal=new_principal)
+				_append_log_row(log, "renewed_with_amortization", row, "Renewed Pawn Tickets with Amortization", series="A", inventory_no=row.get("inventory_tracking"), old_pawn_ticket=row.get("pawn_ticket"), new_pawn_ticket=row.get("old_pawn_ticket"), old_principal=principal, amortization_amount=desired_principal, old_net_proceeds=new_net_proceeds, new_principal=new_principal)
 				totals.sumwRN += principal
-				totals.sumwNPA += net_from_principal
+				totals.sumwNPA += new_net_proceeds
 				totals.sumwNPRA += new_principal
 				totals.sumwAI += _amount(row.get("interest_payment"))
 				totals.sumwD += _amount(row.get("other_discount_tawad"))
 			elif item_series == "B" and pawn_ticket_type == "Pawn Ticket Jewelry":
-				_append_log_row(log, "renewed_with_amortization", row, "Renewed Pawn Tickets with Amortization", series="B", inventory_no=row.get("inventory_tracking"), old_pawn_ticket=row.get("pawn_ticket"), new_pawn_ticket=row.get("old_pawn_ticket"), old_principal=principal, old_net_proceeds=net_from_principal, new_principal=new_principal)
+				_append_log_row(log, "renewed_with_amortization", row, "Renewed Pawn Tickets with Amortization", series="B", inventory_no=row.get("inventory_tracking"), old_pawn_ticket=row.get("pawn_ticket"), new_pawn_ticket=row.get("old_pawn_ticket"), old_principal=principal, amortization_amount=desired_principal, old_net_proceeds=new_net_proceeds, new_principal=new_principal)
 				totals.sumwRNB += principal
-				totals.sumwNPB += net_from_principal
+				totals.sumwNPB += new_net_proceeds
 				totals.sumwNPRB += new_principal
 				totals.sumwAIB += _amount(row.get("interest_payment"))
 				totals.sumwDB += _amount(row.get("other_discount_tawad"))
 			elif item_series == "B" and pawn_ticket_type == "Pawn Ticket Non Jewelry":
-				_append_log_row(log, "renewed_with_amortization", row, "Renewed Pawn Tickets with Amortization", series="NJ", inventory_no=row.get("inventory_tracking"), old_pawn_ticket=row.get("pawn_ticket"), new_pawn_ticket=row.get("old_pawn_ticket"), old_principal=principal, old_net_proceeds=net_from_principal, new_principal=new_principal)
+				_append_log_row(log, "renewed_with_amortization", row, "Renewed Pawn Tickets with Amortization", series="NJ", inventory_no=row.get("inventory_tracking"), old_pawn_ticket=row.get("pawn_ticket"), new_pawn_ticket=row.get("old_pawn_ticket"), old_principal=principal, amortization_amount=desired_principal, old_net_proceeds=new_net_proceeds, new_principal=new_principal)
 				totals.sumwRNNJ += principal
-				totals.sumwNPNJ += net_from_principal
+				totals.sumwNPNJ += new_net_proceeds
 				totals.sumwNPRNJ += new_principal
 				totals.sumwAINJ += _amount(row.get("interest_payment"))
 				totals.sumwDNJ += _amount(row.get("other_discount_tawad"))

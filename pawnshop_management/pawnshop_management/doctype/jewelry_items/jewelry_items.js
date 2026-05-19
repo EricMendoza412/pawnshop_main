@@ -17,13 +17,13 @@ frappe.ui.form.on('Jewelry Items', {
 		if(frm.doc.karat == "-Select-"){
 			frappe.throw(__('Please input item karat'));
 		}
-		if(frm.doc.total_weight == 0){
+		if(flt(frm.doc.total_weight) <= 0){
 			frappe.throw(__('Please input weight(grams)'));
 		}
 		// if(frm.doc.karat_category == "-Select-"){
 		// 	frappe.throw(__('Please choose karat category'));
 		// }
-		if(parseFloat(frm.doc.total_weight) > 500){
+		if(flt(frm.doc.total_weight) > 500){
 			frappe.throw(__('Inputted grams exceeds limit'));
 		}
 	},
@@ -243,7 +243,7 @@ frappe.ui.form.on('Jewelry Karat List', {
 function set_total_weight(frm, cdt, cdn) {
 	let total_weight = 0.00;
 	$.each(frm.doc.karats, function(index, item){
-		total_weight += parseFloat(item.weight);
+		total_weight += flt(item.weight);
 	});
 	frm.set_value('total_weight', total_weight)
 	frm.refresh_field('total_weight')

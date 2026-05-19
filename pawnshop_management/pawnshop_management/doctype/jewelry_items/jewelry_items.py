@@ -3,9 +3,19 @@
 
 import frappe
 from frappe.model.document import Document
-from frappe.utils import today
+from frappe.utils import flt, today
 
-class JewelryItems(Document):		
+class JewelryItems(Document):
+	def validate(self):
+		if self.karats:
+			self.total_weight = sum(flt(row.weight) for row in self.karats)
+
+		if flt(self.total_weight) <= 0:
+			frappe.throw("Please input weight(grams)")
+
+		if flt(self.total_weight) > 500:
+			frappe.throw("Inputted grams exceeds limit")
+
 	def before_save(self):
 		if frappe.db.exists('Pawn Ticket Jewelry', self.name) == None:
 			settings = frappe.get_doc('Pawnshop Naming Series', self.branch)
