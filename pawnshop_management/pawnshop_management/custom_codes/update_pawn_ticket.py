@@ -1,5 +1,5 @@
 import frappe
-from frappe.utils import today
+from frappe.utils import add_to_date, get_datetime, now_datetime, today
 
 
 
@@ -45,6 +45,41 @@ def change_pawn_ticket_j_status_to_expire():
         frappe.db.set_value('Pawn Ticket Jewelry', expired_pt[i].name, 'workflow_state', 'Expired')
         frappe.db.commit()
         change_pt_inventory_batch_and_items('Pawn Ticket Jewelry', expired_pt[i].name)
+
+
+@frappe.whitelist()
+def change_reserved_non_jewelry_items_status_to_for_sale():
+    cutoff_datetime = add_to_date(now_datetime(), hours=-48)
+    updated_items = []
+    reserved_items = frappe.db.get_all(
+        'Non Jewelry Items',
+        filters={'workflow_state': 'Reserved'},
+        pluck='name'
+    )
+
+    for item_name in reserved_items:
+        reserved_buyer_rows = frappe.db.get_all(
+            'Reserved Buyer Row',
+            filters={
+                'parent': item_name,
+                'parenttype': 'Non Jewelry Items',
+                'parentfield': 'reserved_buyers',
+            },
+            fields=['reservation_datetime'],
+            order_by='idx desc',
+            limit=1
+        )
+
+        if not reserved_buyer_rows or not reserved_buyer_rows[0].reservation_datetime:
+            continue
+
+        reservation_datetime = get_datetime(reserved_buyer_rows[0].reservation_datetime)
+        if reservation_datetime <= cutoff_datetime:
+            frappe.db.set_value('Non Jewelry Items', item_name, 'workflow_state', 'For Sale')
+            updated_items.append(item_name)
+
+    frappe.db.commit()
+    return updated_items
         
 
 def change_pt_inventory_batch_and_items(pawn_ticket_type, pawn_ticket):

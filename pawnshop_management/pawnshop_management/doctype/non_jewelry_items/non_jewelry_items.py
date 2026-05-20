@@ -8,6 +8,8 @@ from frappe.utils import today
 
 class NonJewelryItems(Document):
 	def before_save(self):
+		self.remove_empty_reserved_buyers()
+
 		# if the status is Pawned and the document is new, increment the item count in the naming series	
 		if frappe.db.exists('Pawn Ticket Non Jewelry', self.name) == None and self.workflow_state == 'Pawned':
 			if frappe.db.exists('Pawnshop Naming Series', self.branch):
@@ -18,6 +20,12 @@ class NonJewelryItems(Document):
 				else:			
 					settings.item_count += 1
 				settings.save(ignore_permissions=True)
+
+	def remove_empty_reserved_buyers(self):
+		self.reserved_buyers = [
+			row for row in self.get("reserved_buyers", [])
+			if row.customer_name or row.reservation_datetime or row.comments or row.reserved_by
+		]
 
 	def on_update(self):
 		query = """

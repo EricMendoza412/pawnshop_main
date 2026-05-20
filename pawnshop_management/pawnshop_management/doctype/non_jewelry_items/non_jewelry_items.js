@@ -28,9 +28,103 @@ function toggle_subastado_fields(frm) {
 	});
 }
 
+function highlight_appraisal_value(frm) {
+	const field = frm.get_field('appraisal_value');
+	if (!field || !field.$wrapper) return;
+
+	field.$wrapper.find('.control-input input, .control-value').css({
+		'font-size': '18px',
+		'font-weight': '700'
+	});
+}
+
+function get_reserved_buyer_row_name() {
+	return `reserved-buyer-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function get_reserve_details(frm) {
+	return new Promise((resolve, reject) => {
+		let submitted = false;
+		const dialog = new frappe.ui.Dialog({
+			title: __('Reserve Buyer'),
+			fields: [
+				{
+					fieldname: 'customer_name',
+					fieldtype: 'Data',
+					label: __('Name of Customer'),
+					reqd: 1
+				},
+				{
+					fieldname: 'comments',
+					fieldtype: 'Small Text',
+					label: __('Initial Comment')
+				}
+			],
+			primary_action_label: __('Reserve'),
+			primary_action(values) {
+				submitted = true;
+				dialog.hide();
+				resolve(values);
+			}
+		});
+
+		dialog.onhide = () => {
+			if (!submitted) reject();
+		};
+		dialog.show();
+	});
+}
+
+function cleanup_reserved_buyers(frm) {
+	if (!frm.doc.reserved_buyers) return;
+
+	frm.doc.reserved_buyers = frm.doc.reserved_buyers.filter(row => {
+		return row.customer_name || row.reservation_datetime || row.comments || row.reserved_by;
+	});
+
+	frm.doc.reserved_buyers.forEach((row, index) => {
+		row.idx = index + 1;
+	});
+}
+
 frappe.ui.form.on('Non Jewelry Items', {
 
+	before_workflow_action: function(frm) {
+		if (frm.selected_workflow_action === 'Reserve') {
+			return get_reserve_details(frm).then(values => {
+				frm._pending_reservation = values;
+				frm._pending_reservation_action = 'Reserve';
+			});
+		}
+	},
+
+	after_workflow_action: function(frm) {
+		if (frm._pending_reservation_action === 'Reserve' && frm._pending_reservation) {
+			const values = frm._pending_reservation;
+			frm._pending_reservation = null;
+			frm._pending_reservation_action = null;
+
+			return frm.reload_doc().then(() => {
+				cleanup_reserved_buyers(frm);
+				const row = frm.add_child('reserved_buyers');
+				row.name = get_reserved_buyer_row_name();
+				row.customer_name = values.customer_name;
+				row.reservation_datetime = frappe.datetime.now_datetime();
+				row.comments = values.comments;
+				row.reserved_by = frappe.session.user;
+
+				frm.refresh_field('reserved_buyers');
+				return frm.save();
+			}).then(() => frm.reload_doc()).catch(error => {
+				frappe.msgprint(__('Reservation was not added. Please try again.'));
+				throw error;
+			});
+		}
+	},
+
 	validate: function(frm){
+		cleanup_reserved_buyers(frm);
+
 		if (
 			frm.doc.workflow_state == "Unprocessed" &&
 			(!frm.doc.subastado_category || frm.doc.subastado_category == "-Select-")
@@ -78,6 +172,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 	refresh: function(frm){
 		update_battery_health_fields(frm);
 		toggle_subastado_fields(frm);
+		highlight_appraisal_value(frm);
 		let is_allowed = frappe.user_roles.includes('Administrator');
 		frm.toggle_enable(
 			[
@@ -479,6 +574,7 @@ function compute_nj_av(frm) {
 		}
 		frm.set_value('appraisal_value', initial_price)
 		frm.refresh_field('appraisal_value')
+		highlight_appraisal_value(frm);
 	});
 }
 

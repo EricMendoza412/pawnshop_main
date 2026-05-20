@@ -234,6 +234,16 @@ def send_administrator_test_sms(reference_doctype=None, reference_name=None):
 	)
 
 
+def send_daily_administrator_test_sms():
+	return send_sms(
+		destination=TEST_DESTINATION,
+		text=TEST_MESSAGE,
+		client_message_id="SMART-A2P-DAILY-TEST-{0}".format(frappe.generate_hash(length=16)),
+		reference_doctype="Scheduled Job",
+		reference_name="Daily SMART A2P Test SMS",
+	)
+
+
 def _find_log(params):
 	client_message_id = params.get("clientMessageId")
 	if client_message_id:

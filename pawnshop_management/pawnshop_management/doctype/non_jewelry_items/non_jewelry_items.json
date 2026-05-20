@@ -29,27 +29,29 @@
   "charger",
   "case",
   "box",
-  "earphones",
-  "others",
   "column_break_20",
   "pin",
   "manual",
   "sim_card",
-  "sd_card",
   "column_break_25",
+  "earphones",
+  "sd_card",
+  "others",
   "bag",
   "extra_battery",
   "extra_lens",
   "section_break_6",
-  "appraisal_value",
-  "section_break_11",
   "comments",
+  "section_break_11",
+  "appraisal_value",
   "appraisers_section",
   "main_appraiser",
   "main_appraiser_name",
   "column_break_36",
   "assistant_appraiser",
   "assistant_appraiser_name",
+  "reserved_buyers_section",
+  "reserved_buyers",
   "subastado_section",
   "current_location",
   "person_accountable",
@@ -120,7 +122,7 @@
   },
   {
    "fieldname": "section_break_11",
-   "fieldtype": "Section Break"
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "section_break_6",
@@ -318,6 +320,18 @@
    "fieldtype": "Data",
    "label": "Main Appraiser Name",
    "read_only": 1
+  },
+  {
+   "fieldname": "reserved_buyers_section",
+   "fieldtype": "Section Break",
+   "label": "Reserved Buyers List"
+  },
+  {
+   "cannot_add_rows": 1,
+   "fieldname": "reserved_buyers",
+   "fieldtype": "Table",
+   "label": "Reserved Buyers",
+   "options": "Reserved Buyer Row"
   },
   {
    "fieldname": "subastado_section",
