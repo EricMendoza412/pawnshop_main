@@ -12,7 +12,7 @@ SMS_MESSAGE_TYPE = "sms"
 E164_RE = re.compile(r"^\d{1,15}$")
 TEST_DESTINATION = "639178400153"
 TEST_MESSAGE = "Hello There"
-NOON_TEST_CLIENT_MESSAGE_ID_PREFIX = "SMART-A2P-DAILY-TEST-1210"
+NOON_TEST_CLIENT_MESSAGE_ID_PREFIX = "SMART-A2P-DAILY-TEST-1230"
 
 
 class SmartA2PError(frappe.ValidationError):
@@ -250,32 +250,30 @@ def _send_administrator_test_sms(
 def send_daily_administrator_test_sms():
 	return _send_administrator_test_sms(
 		client_message_id_prefix="SMART-A2P-DAILY-TEST",
-		reference_doctype="Scheduled Job Type",
-		reference_name="smart_a2p.send_daily_administrator_test_sms",
 	)
 
 
 def send_daily_administrator_test_sms_at_1145():
 	return _send_administrator_test_sms(
 		client_message_id_prefix="SMART-A2P-DAILY-TEST-1145",
-		reference_doctype="Scheduled Job Type",
-		reference_name="smart_a2p.send_daily_administrator_test_sms_at_1145",
 	)
 
 
 def send_daily_administrator_test_sms_at_1200():
 	return _send_administrator_test_sms(
 		client_message_id_prefix="SMART-A2P-DAILY-TEST-1200",
-		reference_doctype="Scheduled Job Type",
-		reference_name="smart_a2p.send_daily_administrator_test_sms_at_1200",
 	)
 
 
 def send_daily_administrator_test_sms_at_1210():
 	return _send_administrator_test_sms(
+		client_message_id_prefix="SMART-A2P-DAILY-TEST-1210",
+	)
+
+
+def send_daily_administrator_test_sms_at_1230():
+	return _send_administrator_test_sms(
 		client_message_id_prefix=NOON_TEST_CLIENT_MESSAGE_ID_PREFIX,
-		reference_doctype="Scheduled Job Type",
-		reference_name="smart_a2p.send_daily_administrator_test_sms_at_1210",
 	)
 
 
@@ -294,13 +292,13 @@ def _has_noon_test_sms_log_for_today():
 
 def send_daily_administrator_test_sms_after_noon_once():
 	current_datetime = now_datetime()
-	if current_datetime.hour < 12 or (current_datetime.hour == 12 and current_datetime.minute < 10):
+	if current_datetime.hour < 12 or (current_datetime.hour == 12 and current_datetime.minute < 30):
 		return
 
 	if _has_noon_test_sms_log_for_today():
 		return
 
-	return send_daily_administrator_test_sms_at_1210()
+	return send_daily_administrator_test_sms_at_1230()
 
 
 def _find_log(params):

@@ -147,8 +147,8 @@ scheduler_events = {
 			"pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.change_pawn_ticket_j_status_to_expire",
 			"pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.change_reserved_non_jewelry_items_status_to_for_sale"
 		],
-		"10 12 * * *":[
-			"pawnshop_management.pawnshop_management.smart_a2p.send_daily_administrator_test_sms_at_1210"
+		"30 12 * * *":[
+			"pawnshop_management.pawnshop_management.smart_a2p.send_daily_administrator_test_sms_at_1230"
 		]
 	}	
 }
