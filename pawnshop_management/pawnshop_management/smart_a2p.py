@@ -277,30 +277,6 @@ def send_daily_administrator_test_sms_at_1230():
 	)
 
 
-def _has_noon_test_sms_log_for_today():
-	current_datetime = now_datetime()
-	today = current_datetime.strftime("%Y-%m-%d")
-
-	return frappe.db.exists(
-		"SMART SMS Log",
-		{
-			"client_message_id": ["like", "{0}%".format(NOON_TEST_CLIENT_MESSAGE_ID_PREFIX)],
-			"creation": ["between", ["{0} 00:00:00".format(today), "{0} 23:59:59".format(today)]],
-		},
-	)
-
-
-def send_daily_administrator_test_sms_after_noon_once():
-	current_datetime = now_datetime()
-	if current_datetime.hour < 12 or (current_datetime.hour == 12 and current_datetime.minute < 30):
-		return
-
-	if _has_noon_test_sms_log_for_today():
-		return
-
-	return send_daily_administrator_test_sms_at_1230()
-
-
 def _find_log(params):
 	client_message_id = params.get("clientMessageId")
 	if client_message_id:

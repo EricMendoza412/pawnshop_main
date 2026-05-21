@@ -138,9 +138,6 @@ doc_events = {
 
 
 scheduler_events = {
-	"all": [
-		"pawnshop_management.pawnshop_management.smart_a2p.send_daily_administrator_test_sms_after_noon_once"
-	],
 	"cron": {
 		"0 3 * * *":[
 			"pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.change_pawn_ticket_nj_status_to_expire",
