@@ -12,6 +12,7 @@ SMS_MESSAGE_TYPE = "sms"
 E164_RE = re.compile(r"^\d{1,15}$")
 TEST_DESTINATION = "639178400153"
 TEST_MESSAGE = "Hello There"
+NOON_TEST_CLIENT_MESSAGE_ID_PREFIX = "SMART-A2P-DAILY-TEST-1210"
 
 
 class SmartA2PError(frappe.ValidationError):
@@ -268,6 +269,38 @@ def send_daily_administrator_test_sms_at_1200():
 		reference_doctype="Scheduled Job Type",
 		reference_name="smart_a2p.send_daily_administrator_test_sms_at_1200",
 	)
+
+
+def send_daily_administrator_test_sms_at_1210():
+	return _send_administrator_test_sms(
+		client_message_id_prefix=NOON_TEST_CLIENT_MESSAGE_ID_PREFIX,
+		reference_doctype="Scheduled Job Type",
+		reference_name="smart_a2p.send_daily_administrator_test_sms_at_1210",
+	)
+
+
+def _has_noon_test_sms_log_for_today():
+	current_datetime = now_datetime()
+	today = current_datetime.strftime("%Y-%m-%d")
+
+	return frappe.db.exists(
+		"SMART SMS Log",
+		{
+			"client_message_id": ["like", "{0}%".format(NOON_TEST_CLIENT_MESSAGE_ID_PREFIX)],
+			"creation": ["between", ["{0} 00:00:00".format(today), "{0} 23:59:59".format(today)]],
+		},
+	)
+
+
+def send_daily_administrator_test_sms_after_noon_once():
+	current_datetime = now_datetime()
+	if current_datetime.hour < 12 or (current_datetime.hour == 12 and current_datetime.minute < 10):
+		return
+
+	if _has_noon_test_sms_log_for_today():
+		return
+
+	return send_daily_administrator_test_sms_at_1210()
 
 
 def _find_log(params):
