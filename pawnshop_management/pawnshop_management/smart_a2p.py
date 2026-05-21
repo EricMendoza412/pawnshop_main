@@ -249,16 +249,16 @@ def _send_administrator_test_sms(
 def send_daily_administrator_test_sms():
 	return _send_administrator_test_sms(
 		client_message_id_prefix="SMART-A2P-DAILY-TEST",
-		reference_doctype="Scheduled Job",
-		reference_name="Daily SMART A2P Test SMS",
+		reference_doctype="Scheduled Job Type",
+		reference_name="smart_a2p.send_daily_administrator_test_sms",
 	)
 
 
 def send_daily_administrator_test_sms_at_1145():
 	return _send_administrator_test_sms(
 		client_message_id_prefix="SMART-A2P-DAILY-TEST-1145",
-		reference_doctype="Scheduled Job",
-		reference_name="Daily SMART A2P Test SMS at 11:45 AM",
+		reference_doctype="Scheduled Job Type",
+		reference_name="smart_a2p.send_daily_administrator_test_sms_at_1145",
 	)
 
 
