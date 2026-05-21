@@ -48,10 +48,10 @@ def get_transaction_log_name_from_cpr(cash_position_report):
 	return f"TL{branch_code}-{series_number}"
 
 
-class TransactionLog(Document):
+class PawnshopTransactionLog(Document):
 	def autoname(self):
 		name_from_cpr = get_transaction_log_name_from_cpr(self.cash_position_report)
-		if name_from_cpr and not frappe.db.exists("Transaction Log", name_from_cpr):
+		if name_from_cpr and not frappe.db.exists("Pawnshop Transaction Log", name_from_cpr):
 			self.name = name_from_cpr
 			return
 

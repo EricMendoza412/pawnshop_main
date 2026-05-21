@@ -217,7 +217,7 @@
   },
   {
    "doc_view": "Report Builder",
-   "label": "Transaction Log",
+   "label": "Pawnshop Transaction Log",
    "link_to": "VC Report",
    "type": "Report"
   },

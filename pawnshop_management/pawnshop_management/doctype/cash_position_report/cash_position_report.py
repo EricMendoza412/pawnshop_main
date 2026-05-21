@@ -66,11 +66,11 @@ def _append_log_row(doc, table, source, section, **values):
 
 
 def create_transaction_log_for_cash_position_report(cash_position_report):
-	if frappe.db.exists("Transaction Log", {"cash_position_report": cash_position_report.name}):
+	if frappe.db.exists("Pawnshop Transaction Log", {"cash_position_report": cash_position_report.name}):
 		return
 
 	data = _report_rows(cash_position_report.date, cash_position_report.branch)
-	log = frappe.new_doc("Transaction Log")
+	log = frappe.new_doc("Pawnshop Transaction Log")
 	log.date = cash_position_report.date
 	log.branch = cash_position_report.branch
 	log.cash_position_report = cash_position_report.name

@@ -148,7 +148,7 @@ frappe.ui.form.on('Cash Position Report', {
 	after_save: function(frm) {
 		if (frm.doc.docstatus === 1) { // Check if the document is submitted
 			frappe.msgprint({
-				message: __('Please do not forget to refresh and print the Transaction Log. <br><br> Thank you'),
+				message: __('Please do not forget to refresh and print the Pawnshop Transaction Log. <br><br> Thank you'),
 				indicator: 'green',
 				title: __('CPR Saved!'),
 				primary_action: {
