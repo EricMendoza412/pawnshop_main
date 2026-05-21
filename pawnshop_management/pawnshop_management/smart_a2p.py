@@ -225,22 +225,40 @@ def send_administrator_test_sms(reference_doctype=None, reference_name=None):
 	if frappe.session.user != "Administrator":
 		frappe.throw("Only Administrator can send the SMART A2P test SMS.", frappe.PermissionError)
 
+	return _send_administrator_test_sms(
+		client_message_id_prefix="SMART-A2P-TEST",
+		reference_doctype=reference_doctype,
+		reference_name=reference_name,
+	)
+
+
+def _send_administrator_test_sms(
+	client_message_id_prefix,
+	reference_doctype=None,
+	reference_name=None,
+):
 	return send_sms(
 		destination=TEST_DESTINATION,
 		text=TEST_MESSAGE,
-		client_message_id="SMART-A2P-TEST-{0}".format(frappe.generate_hash(length=16)),
+		client_message_id="{0}-{1}".format(client_message_id_prefix, frappe.generate_hash(length=16)),
 		reference_doctype=reference_doctype,
 		reference_name=reference_name,
 	)
 
 
 def send_daily_administrator_test_sms():
-	return send_sms(
-		destination=TEST_DESTINATION,
-		text=TEST_MESSAGE,
-		client_message_id="SMART-A2P-DAILY-TEST-{0}".format(frappe.generate_hash(length=16)),
+	return _send_administrator_test_sms(
+		client_message_id_prefix="SMART-A2P-DAILY-TEST",
 		reference_doctype="Scheduled Job",
 		reference_name="Daily SMART A2P Test SMS",
+	)
+
+
+def send_daily_administrator_test_sms_at_1145():
+	return _send_administrator_test_sms(
+		client_message_id_prefix="SMART-A2P-DAILY-TEST-1145",
+		reference_doctype="Scheduled Job",
+		reference_name="Daily SMART A2P Test SMS at 11:45 AM",
 	)
 
 
