@@ -262,6 +262,14 @@ def send_daily_administrator_test_sms_at_1145():
 	)
 
 
+def send_daily_administrator_test_sms_at_1200():
+	return _send_administrator_test_sms(
+		client_message_id_prefix="SMART-A2P-DAILY-TEST-1200",
+		reference_doctype="Scheduled Job Type",
+		reference_name="smart_a2p.send_daily_administrator_test_sms_at_1200",
+	)
+
+
 def _find_log(params):
 	client_message_id = params.get("clientMessageId")
 	if client_message_id:
