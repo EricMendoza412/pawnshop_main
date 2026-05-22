@@ -8,6 +8,10 @@ from frappe.utils import now_datetime
 
 
 class TransferTracker(Document):
+	def before_submit(self):
+		if not self.witnessed_by or not self.rover:
+			frappe.throw("Witnessed By and Rover are required before submitting Transfer Tracker.")
+
 	def before_save(self):
 		if frappe.db.exists('Transfer Tracker', self.name) == None:
 			if self.amended_from == None:
@@ -204,14 +208,14 @@ def get_jewelry_pullout_items(origin, from_date, to_date):
 
 	pawn_tickets = frappe.get_all(
 		"Pawn Ticket Jewelry",
-		fields=["name", "desired_principal", "date_loan_granted"],
+		fields=["name", "item_series", "desired_principal", "date_loan_granted"],
 		filters={
 			"branch": origin,
 			"date_loan_granted": ["between", [from_date, to_date]],
 			"workflow_state": ["in", ["Active", "Expired"]],
 			"docstatus": 1,
 		},
-		order_by="date_loan_granted asc, name asc",
+		order_by="item_series asc, date_loan_granted asc, name asc",
 		limit_page_length=0,
 	)
 

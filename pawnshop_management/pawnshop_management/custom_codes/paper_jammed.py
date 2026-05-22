@@ -5,9 +5,41 @@ from frappe.utils import today
 RENEWAL_TRANSACTION_TYPES = ("Renewal", "Renewal w/ Amortization")
 
 
+def get_pawn_ticket_identity_values(pawn_ticket_type, pawn_ticket_doc, old_pawn_ticket_no=None):
+	"""Return all document and pawn ticket values that identify this amended PT line."""
+	identity_values = {
+		old_pawn_ticket_no,
+		pawn_ticket_doc.name,
+		pawn_ticket_doc.pawn_ticket,
+	}
+
+	amended_from = pawn_ticket_doc.amended_from
+	while amended_from:
+		identity_values.add(amended_from)
+
+		parent = frappe.db.get_value(
+			pawn_ticket_type,
+			amended_from,
+			["pawn_ticket", "amended_from"],
+			as_dict=True,
+		)
+		if not parent:
+			break
+
+		identity_values.add(parent.pawn_ticket)
+		amended_from = parent.amended_from
+
+	return {value for value in identity_values if value}
+
+
 def update_connected_provisional_receipt(previous_pawn_ticket, pawn_ticket_type, old_pawn_ticket_no, new_pawn_ticket_no):
 	"""Keep a renewal PR pointed at the replacement pawn ticket."""
 	pr_name = previous_pawn_ticket.created_by_pr
+	old_pawn_ticket_values = get_pawn_ticket_identity_values(
+		pawn_ticket_type,
+		previous_pawn_ticket,
+		old_pawn_ticket_no,
+	)
 
 	if pr_name and frappe.db.exists("Provisional Receipt", pr_name):
 		pr = frappe.db.get_value(
@@ -16,7 +48,7 @@ def update_connected_provisional_receipt(previous_pawn_ticket, pawn_ticket_type,
 			["transaction_type", "new_pawn_ticket_no"],
 			as_dict=True,
 		)
-		if pr and pr.transaction_type in RENEWAL_TRANSACTION_TYPES and pr.new_pawn_ticket_no == old_pawn_ticket_no:
+		if pr and pr.transaction_type in RENEWAL_TRANSACTION_TYPES and pr.new_pawn_ticket_no in old_pawn_ticket_values:
 			frappe.db.set_value("Provisional Receipt", pr_name, "new_pawn_ticket_no", new_pawn_ticket_no)
 		return
 
@@ -24,7 +56,7 @@ def update_connected_provisional_receipt(previous_pawn_ticket, pawn_ticket_type,
 		"Provisional Receipt",
 		filters={
 			"pawn_ticket_type": pawn_ticket_type,
-			"new_pawn_ticket_no": old_pawn_ticket_no,
+			"new_pawn_ticket_no": ["in", list(old_pawn_ticket_values)],
 			"transaction_type": ["in", RENEWAL_TRANSACTION_TYPES],
 		},
 		fields=["name"],

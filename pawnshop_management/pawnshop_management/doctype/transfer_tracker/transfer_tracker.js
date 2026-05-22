@@ -75,6 +75,30 @@ const syncTransferTypeOptions = frm => {
 
 const isPulloutTransferType = transferType => transferType === PULLOUT_TRANSFER_TYPE;
 
+const addDraftPrintButton = frm => {
+	if (!frm || frm.is_new() || frm.doc.docstatus !== 0) return;
+
+	frm.add_custom_button(__('Print'), () => {
+		const settings = encodeURIComponent(JSON.stringify({
+			allow_print_for_draft: 1,
+			add_draft_heading: 0
+		}));
+		const url = frappe.urllib.get_full_url(
+			`/printview?doctype=${encodeURIComponent(frm.doc.doctype)}` +
+			`&name=${encodeURIComponent(frm.doc.name)}` +
+			'&trigger_print=1' +
+			'&format=Transfer%20Tracker%20Items%20Only' +
+			'&no_letterhead=1' +
+			`&settings=${settings}`
+		);
+		const printWindow = window.open(url);
+
+		if (!printWindow) {
+			frappe.msgprint(__('Please enable pop-ups'));
+		}
+	});
+};
+
 const syncPulloutDateFieldState = frm => {
 	if (!frm) return;
 
@@ -427,6 +451,7 @@ frappe.ui.form.on('Transfer Tracker', {
 
 		syncTransferTypeOptions(frm);
 		syncPulloutDateFieldState(frm);
+		addDraftPrintButton(frm);
 
 		updateJewelryCounts(frm);
 		updatePawnTicketEnvelopeCounts(frm);
@@ -505,8 +530,6 @@ frappe.ui.form.on('Transfer Tracker', {
 		//Put name of current user in the field released_by
 		frm.set_value('released_by', frappe.session.user);
 		frm.refresh_field('released_by');
-		//Disable save button until witnessed_by and rover is filled out
-		frm.disable_save();
 		//Hide nj_items table until transfer_type is filled out
 		frm.set_df_property('nj_items', 'hidden', 1);
 		frm.refresh_field('nj_items');
@@ -631,10 +654,6 @@ frappe.ui.form.on('Transfer Tracker', {
 							indicator: 'green',
 							message: __('Witness Approved')
 						});
-						//check if both witnessed_by and rover is filled out before enabling save
-						if (frm.doc.rover != null) {
-							frm.enable_save();
-						}
 
 					} else {
 						frm.set_value('witnessed_by', null);
@@ -683,10 +702,6 @@ frappe.ui.form.on('Transfer Tracker', {
 							indicator: 'green',
 							message: __('Rover Approved')
 						});
-						//check if both witnessed_by and rover is filled out before enabling save
-						if (frm.doc.witnessed_by != null) {
-							frm.enable_save();
-						}
 					} else {
 						frm.set_value('rover', null);
 						frm.refresh_field('rover');

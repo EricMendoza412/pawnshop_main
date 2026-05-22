@@ -93,16 +93,14 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Witnessed By",
-   "options": "User",
-   "reqd": 1
+   "options": "User"
   },
   {
    "fieldname": "rover",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Rover",
-   "options": "User",
-   "reqd": 1
+   "options": "User"
   },
   {
    "allow_on_submit": 1,

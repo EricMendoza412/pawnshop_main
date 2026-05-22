@@ -1,0 +1,184 @@
+<style>
+	.gfs-page {
+		min-height: 10.2in;
+		padding: 0.36in 0.34in 0.46in;
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 9px;
+		color: #182832;
+	}
+
+	.gfs-header {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		margin-bottom: 12px;
+		min-height: 0.85in;
+	}
+
+	.gfs-brand {
+		display: flex;
+		align-items: center;
+		margin-left: 0.32in;
+		color: #000000;
+	}
+
+	.gfs-brand-name {
+		font-size: 15px;
+		font-weight: 700;
+		line-height: 0.92;
+	}
+
+	.gfs-tagline {
+		margin: 0 0 5px;
+		color: #2b8e85;
+		font-size: 7px;
+		font-weight: 700;
+		letter-spacing: 0;
+		text-transform: uppercase;
+		white-space: nowrap;
+	}
+
+	.gfs-table {
+		width: 100%;
+		border-collapse: collapse;
+		table-layout: fixed;
+		background: #ffffff;
+	}
+
+	.gfs-table th,
+	.gfs-table td {
+		border: 1px solid #78acd9;
+		padding: 5px 4px;
+		text-align: center;
+		vertical-align: middle;
+		word-wrap: break-word;
+		overflow-wrap: anywhere;
+		line-height: 1.15;
+	}
+
+	.gfs-table th {
+		background: #d9d9d9;
+		color: #101820;
+		font-size: 8px;
+		font-weight: 700;
+	}
+
+	.gfs-table td {
+		font-size: 8px;
+	}
+
+	.gfs-table .model {
+		text-transform: uppercase;
+	}
+
+	.gfs-table .price {
+		font-weight: 700;
+	}
+
+	.gfs-table .code,
+	.gfs-table .branch {
+		white-space: nowrap;
+	}
+
+	.gfs-empty {
+		padding: 16px;
+		font-weight: 700;
+	}
+
+	@media print {
+		.gfs-table {
+			page-break-inside: auto;
+		}
+
+		.gfs-table tr {
+			page-break-inside: avoid;
+			page-break-after: auto;
+		}
+	}
+</style>
+
+<div class="gfs-page">
+	<div class="gfs-content">
+		{% var yes_no = function(value) {
+			return cint(value) ? "YES" : "NO";
+		}; %}
+		{% var case_box = function(row) {
+			var items = [];
+			if (cint(row.case)) { items.push("CASE"); }
+			if (cint(row.box)) { items.push("BOX"); }
+			if (cint(row.bag)) { items.push("BAG"); }
+			return items.length ? "YES" : "NO";
+		}; %}
+		{% var brand_model = function(row) {
+			var parts = [];
+			if (row.brand) { parts.push(row.brand); }
+			if (row.model) { parts.push(row.model); }
+			if (row.model_number) { parts.push(row.model_number); }
+			return parts.join(" ");
+		}; %}
+		{% var branch_code = function(location) {
+			var value = (location || "").trim();
+			var marker = "Garcia's Pawnshop -";
+			if (value.indexOf(marker) !== -1) {
+				return value.split(marker).pop().trim();
+			}
+			if (value.indexOf("-") !== -1) {
+				return value.split("-").pop().trim();
+			}
+			return value;
+		}; %}
+		{% var price = function(value) {
+			var amount = flt(value || 0);
+			if (amount.toLocaleString) {
+				return amount.toLocaleString(undefined, { maximumFractionDigits: 0 });
+			}
+			return String(Math.round(amount));
+		}; %}
+
+		<div class="gfs-header">
+			<div class="gfs-brand">
+				<div class="gfs-brand-name">Garcia's<br>Pawnshop</div>
+			</div>
+			<p class="gfs-tagline">Pawnshop&nbsp;&nbsp;|&nbsp;&nbsp;Money Changer&nbsp;&nbsp;|&nbsp;&nbsp;Jewelry and Gadget Sale&nbsp;&nbsp;|&nbsp;&nbsp;Remittance</p>
+		</div>
+
+		<table class="gfs-table">
+			<thead>
+				<tr>
+					<th style="width: 13%">{%= __("Kind") %}</th>
+					<th style="width: 26%">{%= __("Brand and Model") %}</th>
+					<th style="width: 7%">{%= __("Ram") %}</th>
+					<th style="width: 9%">{%= __("Internal Memory") %}</th>
+					<th style="width: 10%">{%= __("W/ Charger") %}</th>
+					<th style="width: 11%">{%= __("W / Case, Box, Bag") %}</th>
+					<th style="width: 9%">{%= __("Color") %}</th>
+					<th style="width: 10%">{%= __("Price") %}</th>
+					<th style="width: 9%">{%= __("Code") %}</th>
+					<th style="width: 7%">{%= __("Branch") %}</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for (var i = 0, l = data.length; i < l; i++) { %}
+					{% var item = data[i] || {}; %}
+					<tr>
+						<td>{%= item.type || "" %}</td>
+						<td class="model">{%= brand_model(item) %}</td>
+						<td>{%= item.ram || "" %}</td>
+						<td>{%= item.internal_memory || "" %}</td>
+						<td>{%= yes_no(item.charger) %}</td>
+						<td>{%= case_box(item) %}</td>
+						<td>{%= item.color || "" %}</td>
+						<td class="price">{%= price(item.selling_price) %}</td>
+						<td class="code">{%= item.item_no || "" %}</td>
+						<td class="branch">{%= branch_code(item.current_location) %}</td>
+					</tr>
+				{% } %}
+				{% if (!data.length) { %}
+					<tr>
+						<td colspan="10" class="gfs-empty">{%= __("No records found") %}</td>
+					</tr>
+				{% } %}
+			</tbody>
+		</table>
+	</div>
+</div>
