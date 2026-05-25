@@ -298,11 +298,8 @@ def _get_pawn_ticket_jewelry_customer_sms_details(pawn_ticket_name):
 def _build_pawn_ticket_jewelry_maturity_message(pawn_ticket):
 	maturity_date = formatdate(pawn_ticket.maturity_date) if pawn_ticket.maturity_date else ""
 	return (
-		"Good Day Ma'am/Sir {0}!\n"
-		"Ito po ang {1} branch, ipinapaalam po namin na ang inyong Pawn Ticket: {2} "
-		"ay matured na sa {3}. Mainam po na ito ay matubuan/renew upang maging updated "
-		"ang inyong sangla. Puwede po kayong magreply, tumawag o kaya magchat sa aming "
-		"FB page kung may katanungan. Maraming salamat po."
+		"Good day {0}. {1}: Pawn Ticket {2} matured on {3}. "
+		"Please renew/tubuan to keep your sangla updated. Salamat po."
 	).format(
 		pawn_ticket.customers_full_name or "",
 		pawn_ticket.branch or "",
