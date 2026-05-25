@@ -80,7 +80,7 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 							frappe.msgprint({
 								title: __('SMART SMS Sent'),
 								indicator: 'green',
-								message: __('Sent "Hello There" to {0}. SMART SMS Log: {1}', [r.message.destination, r.message.log])
+								message: __('Sent SMART SMS to {0}. SMART SMS Log: {1}', [r.message.destination, r.message.log])
 							});
 						}
 					}

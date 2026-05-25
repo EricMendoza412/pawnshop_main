@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 
 import frappe
 import requests
-from frappe.utils import now_datetime
+from frappe.utils import formatdate, now_datetime
 
 
 DEFAULT_BASE_URL = "https://enterprise.messagingsuite.smart.com.ph/cgpapi/"
@@ -208,6 +208,7 @@ def send_sms(
 			"log": log.name,
 			"status": log.status,
 			"destination": log.destination,
+			"text": log.text,
 			"provider_message_id": log.provider_message_id,
 			"client_message_id": log.client_message_id,
 			"http_status_code": response.status_code,
@@ -228,14 +229,16 @@ def send_administrator_test_sms(reference_doctype=None, reference_name=None):
 		frappe.throw("Only Administrator can send the SMART A2P test SMS.", frappe.PermissionError)
 
 	destination = TEST_DESTINATION
+	text = TEST_MESSAGE
 	if reference_doctype == "Pawn Ticket Jewelry" and reference_name:
-		destination = _get_pawn_ticket_jewelry_customer_mobile_no(reference_name)
+		destination, text = _get_pawn_ticket_jewelry_customer_sms_details(reference_name)
 
 	return _send_administrator_test_sms(
 		client_message_id_prefix="SMART-A2P-TEST",
 		reference_doctype=reference_doctype,
 		reference_name=reference_name,
 		destination=destination,
+		text=text,
 	)
 
 
@@ -244,18 +247,28 @@ def _send_administrator_test_sms(
 	reference_doctype=None,
 	reference_name=None,
 	destination=TEST_DESTINATION,
+	text=TEST_MESSAGE,
 ):
 	return send_sms(
 		destination=destination,
-		text=TEST_MESSAGE,
+		text=text,
 		client_message_id="{0}-{1}".format(client_message_id_prefix, frappe.generate_hash(length=16)),
 		reference_doctype=reference_doctype,
 		reference_name=reference_name,
 	)
 
 
-def _get_pawn_ticket_jewelry_customer_mobile_no(pawn_ticket_name):
-	customer = frappe.db.get_value("Pawn Ticket Jewelry", pawn_ticket_name, "customers_tracking_no")
+def _get_pawn_ticket_jewelry_customer_sms_details(pawn_ticket_name):
+	pawn_ticket = frappe.db.get_value(
+		"Pawn Ticket Jewelry",
+		pawn_ticket_name,
+		["name", "customers_tracking_no", "customers_full_name", "branch", "pawn_ticket", "maturity_date"],
+		as_dict=True,
+	)
+	if not pawn_ticket:
+		frappe.throw("Pawn Ticket Jewelry {0} was not found.".format(pawn_ticket_name), SmartA2PError)
+
+	customer = pawn_ticket.customers_tracking_no
 	if not customer:
 		frappe.throw("Pawn Ticket Jewelry has no customer tracking number.", SmartA2PError)
 
@@ -278,7 +291,23 @@ def _get_pawn_ticket_jewelry_customer_mobile_no(pawn_ticket_name):
 	if not mobile_no:
 		frappe.throw("Contact {0} has no mobile number.".format(contact), SmartA2PError)
 
-	return mobile_no
+	return mobile_no, _build_pawn_ticket_jewelry_maturity_message(pawn_ticket)
+
+
+def _build_pawn_ticket_jewelry_maturity_message(pawn_ticket):
+	maturity_date = formatdate(pawn_ticket.maturity_date) if pawn_ticket.maturity_date else ""
+	return (
+		"Good Day Ma'am/Sir {0}!\n"
+		"Ito po ang {1} branch, ipinapaalam po namin na ang inyong Pawn Ticket: {2} "
+		"ay matured na sa {3}. Mainam po na ito ay matubuan/renew upang maging updated "
+		"ang inyong sangla. Puwede po kayong magreply, tumawag o kaya magchat sa aming "
+		"FB page kung may katanungan. Maraming salamat po."
+	).format(
+		pawn_ticket.customers_full_name or "",
+		pawn_ticket.branch or "",
+		pawn_ticket.pawn_ticket or pawn_ticket.name,
+		maturity_date,
+	)
 
 
 def send_daily_administrator_test_sms():
