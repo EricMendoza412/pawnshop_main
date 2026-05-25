@@ -296,7 +296,19 @@ def _get_pawn_ticket_jewelry_customer_sms_details(pawn_ticket_name):
 
 
 def _build_pawn_ticket_jewelry_maturity_message(pawn_ticket):
-	return TEST_MESSAGE
+	maturity_date = formatdate(pawn_ticket.maturity_date) if pawn_ticket.maturity_date else ""
+	return (
+		"Good Day Ma'am/Sir {0}!\n"
+		"Ito po ang {1} branch, ipinapaalam po namin na ang inyong Pawn Ticket: {2} "
+		"ay matured na sa {3}. Mainam po na ito ay matubuan/renew upang maging updated "
+		"ang inyong sangla. Puwede po kayong magreply, tumawag o kaya magchat sa aming "
+		"FB page kung may katanungan. Maraming salamat po."
+	).format(
+		pawn_ticket.customers_full_name or "",
+		pawn_ticket.branch or "",
+		pawn_ticket.pawn_ticket or pawn_ticket.name,
+		maturity_date,
+	)
 
 
 def send_daily_administrator_test_sms():
@@ -369,6 +381,22 @@ def _find_log(params):
 	return None
 
 
+def _mark_maturity_texted_if_delivered(log):
+	if log.reference_doctype != "Pawn Ticket Jewelry" or not log.reference_name:
+		return
+
+	if not frappe.db.exists("Pawn Ticket Jewelry", log.reference_name):
+		return
+
+	frappe.db.set_value(
+		"Pawn Ticket Jewelry",
+		log.reference_name,
+		"texted_upon_maturity",
+		1,
+		update_modified=False,
+	)
+
+
 @frappe.whitelist(allow_guest=True)
 def smart_a2p_callback(**kwargs):
 	"""Receive SMART Connect API GET callbacks for replies and delivery reports."""
@@ -384,6 +412,7 @@ def smart_a2p_callback(**kwargs):
 			if normalized_status in DELIVERED_PROVIDER_STATUSES:
 				log.status = "Delivered"
 				log.delivered_at = now_datetime()
+				_mark_maturity_texted_if_delivered(log)
 			else:
 				log.status = "Callback Received"
 
