@@ -13,6 +13,7 @@ E164_RE = re.compile(r"^\d{1,15}$")
 TEST_DESTINATION = "639178400153"
 TEST_MESSAGE = "Hello There"
 NOON_TEST_CLIENT_MESSAGE_ID_PREFIX = "SMART-A2P-DAILY-TEST-1230"
+DELIVERED_PROVIDER_STATUSES = {"DELIVERED", "DELIVRD"}
 
 
 class SmartA2PError(frappe.ValidationError):
@@ -340,16 +341,40 @@ def send_daily_administrator_test_sms_at_1230():
 	)
 
 
+def _first_param(params, keys):
+	for key in keys:
+		value = params.get(key)
+		if value:
+			return str(value).strip()
+	return None
+
+
+def _delivery_receipt_value(text, key):
+	match = re.search(r"(?:^|\s){0}:([^\s]+)".format(re.escape(key)), str(text or ""), re.IGNORECASE)
+	return match.group(1).strip() if match else None
+
+
+def _delivery_receipt_status(params):
+	status = _first_param(params, ("mtStatus", "status", "stat"))
+	if status:
+		return status
+
+	return _delivery_receipt_value(params.get("text"), "stat")
+
+
 def _find_log(params):
-	client_message_id = params.get("clientMessageId")
+	client_message_id = _first_param(params, ("clientMessageId", "client_message_id"))
 	if client_message_id:
 		name = frappe.db.get_value("SMART SMS Log", {"client_message_id": client_message_id})
 		if name:
 			return frappe.get_doc("SMART SMS Log", name)
 
-	mt_message_id = params.get("mtMessageId")
-	if mt_message_id:
-		name = frappe.db.get_value("SMART SMS Log", {"provider_message_id": mt_message_id})
+	message_ids = [
+		_first_param(params, ("mtMessageId", "messageId", "message_id")),
+		_delivery_receipt_value(params.get("text"), "id"),
+	]
+	for message_id in filter(None, message_ids):
+		name = frappe.db.get_value("SMART SMS Log", {"provider_message_id": message_id})
 		if name:
 			return frappe.get_doc("SMART SMS Log", name)
 
@@ -364,11 +389,15 @@ def smart_a2p_callback(**kwargs):
 
 	log = _find_log(params)
 	if log:
-		status = params.get("mtStatus")
+		status = _delivery_receipt_status(params)
 		if status:
+			normalized_status = status.upper()
 			log.provider_status = status
-			log.status = "Delivered" if status == "DELIVERED" else "Callback Received"
-			log.delivered_at = params.get("mtDoneDate") if status == "DELIVERED" else log.delivered_at
+			if normalized_status in DELIVERED_PROVIDER_STATUSES:
+				log.status = "Delivered"
+				log.delivered_at = now_datetime()
+			else:
+				log.status = "Callback Received"
 
 		if params.get("messageId"):
 			log.last_callback_message_id = params.get("messageId")
