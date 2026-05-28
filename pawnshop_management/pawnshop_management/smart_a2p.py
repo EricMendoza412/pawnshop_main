@@ -297,18 +297,43 @@ def _get_pawn_ticket_jewelry_customer_sms_details(pawn_ticket_name):
 
 def _build_pawn_ticket_jewelry_maturity_message(pawn_ticket):
 	maturity_date = formatdate(pawn_ticket.maturity_date) if pawn_ticket.maturity_date else ""
+	branch_contact = _get_branch_sms_contact_details(pawn_ticket.branch)
 	return (
 		"Good Day Ma'am/Sir {0}!\n"
 		"Ito po ang {1} branch, ipinapaalam po namin na ang inyong Pawn Ticket: {2} "
 		"ay matured na sa {3}. Mainam po na ito ay matubuan/renew upang maging updated "
-		"ang inyong sangla. Puwede po kayong magreply, tumawag o kaya magchat sa aming "
-		"FB page kung may katanungan. Maraming salamat po."
+		"ang inyong sangla. Puwede niyo po kami macontact sa FB: {4} at sa phone: {5}. "
+		"Maraming salamat po."
 	).format(
 		pawn_ticket.customers_full_name or "",
 		pawn_ticket.branch or "",
 		pawn_ticket.pawn_ticket or pawn_ticket.name,
 		maturity_date,
+		branch_contact.facebook_account,
+		branch_contact.contact_number,
 	)
+
+
+def _get_branch_sms_contact_details(branch):
+	if not branch:
+		frappe.throw("Pawn Ticket Jewelry has no branch.", SmartA2PError)
+
+	branch_contact = frappe.db.get_value(
+		"Branch",
+		branch,
+		["facebook_account", "contact_number"],
+		as_dict=True,
+	)
+	if not branch_contact:
+		frappe.throw("Branch {0} was not found.".format(branch), SmartA2PError)
+
+	if not branch_contact.facebook_account:
+		frappe.throw("Branch {0} has no Facebook Account.".format(branch), SmartA2PError)
+
+	if not branch_contact.contact_number:
+		frappe.throw("Branch {0} has no Contact Number.".format(branch), SmartA2PError)
+
+	return branch_contact
 
 
 def send_daily_administrator_test_sms():

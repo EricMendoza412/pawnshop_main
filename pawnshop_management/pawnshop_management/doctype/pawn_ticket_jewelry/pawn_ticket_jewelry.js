@@ -65,7 +65,11 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 	},
 
 	refresh: function(frm){
-		if (frappe.session.user === 'Administrator') {
+		if (
+			(frappe.session.user === 'Administrator' || frappe.user_roles.includes('Vault Custodian'))
+			&& frm.doc.maturity_date === frappe.datetime.get_today()
+			&& !frm.doc.texted_upon_maturity
+		) {
 			frm.add_custom_button(__('Maturity Date SMS'), function() {
 				frappe.call({
 					method: 'pawnshop_management.pawnshop_management.smart_a2p.send_administrator_test_sms',
