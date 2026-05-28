@@ -1,0 +1,1 @@
+pawnshop_management.pawnshop_management.patches.v1_0.ensure_branch_contact_fields
