@@ -226,8 +226,11 @@ def send_sms(
 
 @frappe.whitelist()
 def send_administrator_test_sms(reference_doctype=None, reference_name=None):
-	if frappe.session.user != "Administrator":
-		frappe.throw("Only Administrator can send the SMART A2P test SMS.", frappe.PermissionError)
+	if frappe.session.user != "Administrator" and "Vault Custodian" not in frappe.get_roles():
+		frappe.throw(
+			"Only Administrator or Vault Custodian can send the SMART A2P maturity SMS.",
+			frappe.PermissionError,
+		)
 
 	destination = TEST_DESTINATION
 	text = TEST_MESSAGE
