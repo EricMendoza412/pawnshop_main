@@ -14,6 +14,8 @@
   "branch",
   "customer_tracker",
   "customer_name",
+  "default_image",
+  "customer_id_picture",
   "section_break_6",
   "ats_tracking_no",
   "agreement",
@@ -58,6 +60,17 @@
    "fieldtype": "Link",
    "label": "Customer Tracker",
    "options": "Customer",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "default_image",
+   "fieldtype": "HTML",
+   "label": "Default Image"
+  },
+  {
+   "fieldname": "customer_id_picture",
+   "fieldtype": "Select",
+   "label": "Customer ID Picture",
    "print_hide": 1
   },
   {
@@ -187,6 +200,7 @@
    "fieldname": "change_status_date",
    "fieldtype": "Date",
    "label": "Change Status Date",
+   "print_hide": 1,
    "read_only": 1
   },
   {
@@ -232,7 +246,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-05-15 14:58:48.608317",
+ "modified": "2026-05-30 11:09:33.991508",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Agreement to Sell",

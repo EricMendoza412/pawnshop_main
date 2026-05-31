@@ -15,6 +15,7 @@
   "client_message_id",
   "provider_message_id",
   "reference_section",
+  "branch",
   "reference_doctype",
   "reference_name",
   "message_section",
@@ -47,7 +48,7 @@
    "fieldname": "provider_status",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "in_standard_filter": 1,
+   "in_standard_filter": 0,
    "label": "Provider Status",
    "read_only": 1
   },
@@ -63,7 +64,7 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Destination",
+   "label": "Contact No",
    "read_only": 1
   },
   {
@@ -75,8 +76,8 @@
   {
    "fieldname": "client_message_id",
    "fieldtype": "Data",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
+   "in_list_view": 0,
+   "in_standard_filter": 0,
    "label": "Client Message ID",
    "read_only": 1,
    "unique": 1
@@ -84,8 +85,8 @@
   {
    "fieldname": "provider_message_id",
    "fieldtype": "Data",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
+   "in_list_view": 0,
+   "in_standard_filter": 0,
    "label": "Provider Message ID",
    "read_only": 1
   },
@@ -93,6 +94,15 @@
    "fieldname": "reference_section",
    "fieldtype": "Section Break",
    "label": "Reference"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Branch",
+   "options": "Branch",
+   "read_only": 1
   },
   {
    "fieldname": "reference_doctype",

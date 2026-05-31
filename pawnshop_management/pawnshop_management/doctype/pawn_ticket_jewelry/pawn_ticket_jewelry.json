@@ -24,6 +24,7 @@
   "customers_full_name",
   "customer_birthday",
   "default_image",
+  "customer_id_picture",
   "created_by_pr",
   "section_break_9",
   "inventory_tracking_no",
@@ -207,6 +208,11 @@
    "fieldname": "default_image",
    "fieldtype": "HTML",
    "label": "Default Image"
+  },
+  {
+   "fieldname": "customer_id_picture",
+   "fieldtype": "Select",
+   "label": "Customer ID Picture"
   },
   {
    "fieldname": "transfer_pt",

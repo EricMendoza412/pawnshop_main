@@ -10,6 +10,7 @@ frappe.ui.form.on('Agreement to Sell', {
 		let is_allowed = frappe.user_roles.includes('Administrator') || frappe.user_roles.includes('Support Team');
 		frm.toggle_enable(['date_of_sale', 'branch'], is_allowed);
 		set_appraiser_queries(frm);
+		load_customer_id_pictures(frm);
 
 	   if (frm.is_new()) {
 		   frm.set_value('date_of_sale', frappe.datetime.nowdate())
@@ -78,6 +79,11 @@ frappe.ui.form.on('Agreement to Sell', {
 
 	customer_tracker: function(frm){
 		update_last_sb_dates(frm);
+		load_customer_id_pictures(frm);
+	},
+
+	customer_id_picture: function(frm) {
+		show_selected_customer_id_picture(frm);
 	},
 
 	assistant_appraiser_acct: function(frm){
@@ -164,6 +170,130 @@ async function update_last_sb_dates(frm) {
 	} catch (error) {
 		console.error('Unable to fetch latest Agreement to Sell dates', error);
 	}
+}
+
+function load_customer_id_pictures(frm) {
+	if (!frm.doc.customer_tracker) {
+		frm._customer_id_picture_options = [];
+		frm.set_df_property('customer_id_picture', 'options', []);
+		frm.doc.customer_id_picture = null;
+		frm.refresh_field('customer_id_picture');
+		frm._all_customer_ids_expired = false;
+		$(frm.fields_dict['default_image'].wrapper).html('');
+		return;
+	}
+
+	frappe.call({
+		method: "pawnshop_management.pawnshop_management.utils.get_contact_id_pictures_by_customer",
+		args: {
+			customer: frm.doc.customer_tracker,
+		},
+		callback: function(r) {
+			const data = r.message || {};
+			const options = data.options || [];
+			frm._customer_id_picture_options = options;
+			frm._all_customer_ids_expired = Boolean(data.all_customer_ids_expired);
+
+			frm.set_df_property(
+				'customer_id_picture',
+				'options',
+				options.map(option => option.label).join('\n')
+			);
+
+			frm.toggle_display('customer_id_picture', options.length > 1);
+
+			if (data.selected) {
+				const selected_option = options.find(option => option.value === data.selected);
+				frm.doc.customer_id_picture = selected_option ? selected_option.label : null;
+				frm.refresh_field('customer_id_picture');
+			}
+
+			if (data.html) {
+				const selected_option = options.find(option => option.label === frm.doc.customer_id_picture);
+				render_customer_id_picture(frm, data.html, selected_option);
+			}
+		}
+	});
+}
+
+function show_selected_customer_id_picture(frm) {
+	const selected = frm.doc.customer_id_picture;
+	const options = frm._customer_id_picture_options || [];
+	const selected_option = options.find(option => option.label === selected);
+
+	if (!selected_option) {
+		return;
+	}
+
+	if (selected_option.id_pic_name) {
+		const image_url = `https://storage.cloud.google.com/gpcustomersids.appspot.com/customerPictures/${encodeURIComponent(selected_option.id_pic_name)}.jpg`;
+		render_customer_id_picture(
+			frm,
+			`<img src="${escape_html(image_url)}" style="max-width: 400px; height: auto;">`,
+			selected_option
+		);
+		return;
+	}
+
+	render_customer_id_picture(
+		frm,
+		`<div class="alert alert-warning">${__('No ID picture set for selected ID')}</div>`,
+		selected_option
+	);
+}
+
+function render_customer_id_picture(frm, image_html, selected_option) {
+	const indicator = get_customer_id_expiry_indicator(frm, selected_option);
+	$(frm.fields_dict['default_image'].wrapper).html(`${image_html}${indicator}`);
+	make_customer_id_picture_zoomable(frm);
+}
+
+function get_customer_id_expiry_indicator(frm, selected_option) {
+	let message = null;
+
+	if (frm._all_customer_ids_expired) {
+		message = __('All customer IDs have expired');
+	} else if (selected_option && selected_option.is_expired) {
+		message = __('Selected customer ID has expired');
+	}
+
+	if (!message) {
+		return '';
+	}
+
+	return `<div style="color: #b42318; font-weight: 700; font-size: 14px; margin-top: 8px;">${message}</div>`;
+}
+
+function make_customer_id_picture_zoomable(frm) {
+	const $wrapper = $(frm.fields_dict['default_image'].wrapper);
+	const $image = $wrapper.find('img');
+
+	if (!$image.length) {
+		return;
+	}
+
+	$image
+		.css('cursor', 'zoom-in')
+		.attr('title', __('Click to zoom'))
+		.off('click.customer_id_zoom')
+		.on('click.customer_id_zoom', function() {
+			const image_url = $(this).attr('src');
+			const dialog = new frappe.ui.Dialog({
+				title: __('Customer ID Picture'),
+				size: 'large'
+			});
+
+			dialog.$body.html(
+				`<div style="text-align: center;">
+					<img src="${escape_html(image_url)}" style="max-width: 100%; max-height: 75vh; height: auto;">
+				</div>`
+			);
+			dialog.show();
+		});
+}
+
+function escape_html(value) {
+	return $('<div>').text(value || '').html();
 }
 
 function show_tracking_no(frm){ //Sets inventory tracking number

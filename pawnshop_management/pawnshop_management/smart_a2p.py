@@ -6,6 +6,8 @@ import frappe
 import requests
 from frappe.utils import formatdate, now_datetime
 
+from pawnshop_management.pawnshop_management.doctype.smart_sms_log.smart_sms_log import get_reference_branch
+
 
 DEFAULT_BASE_URL = "https://enterprise.messagingsuite.smart.com.ph/cgpapi/"
 SMS_MESSAGE_TYPE = "sms"
@@ -126,6 +128,7 @@ def _new_log(payload, reference_doctype=None, reference_name=None):
 	log.client_message_id = payload.get("clientMessageId")
 	log.reference_doctype = reference_doctype
 	log.reference_name = reference_name
+	log.branch = get_reference_branch(reference_doctype, reference_name)
 	log.text = payload.get("text")
 	log.template_name = payload.get("templateName")
 	log.request_payload = json.dumps(payload, indent=2, sort_keys=True)
