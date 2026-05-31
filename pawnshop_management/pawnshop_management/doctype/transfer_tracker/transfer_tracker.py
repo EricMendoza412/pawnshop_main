@@ -12,6 +12,14 @@ class TransferTracker(Document):
 		if not self.witnessed_by or not self.rover:
 			frappe.throw("Witnessed By and Rover are required before submitting Transfer Tracker.")
 
+		for item in self.nj_items:
+			if item.item_no:
+				item.previous_workflow_state = frappe.db.get_value(
+					'Non Jewelry Items',
+					item.item_no,
+					'workflow_state'
+				)
+
 	def before_save(self):
 		if frappe.db.exists('Transfer Tracker', self.name) == None:
 			if self.amended_from == None:
@@ -80,7 +88,7 @@ class TransferTracker(Document):
 				for item in self.nj_items:
 					item_doc = frappe.get_doc('Non Jewelry Items', item.item_no)
 					item_doc.current_location = self.destination
-					item_doc.workflow_state = "For Sale"
+					item_doc.workflow_state = "Reserved" if item.previous_workflow_state == "Reserved" else "For Sale"
 					item_doc.save(ignore_permissions=True)
 				for item in self.j_items:
 					frappe.db.set_value('Jewelry Items', item.item_no, 'workflow_state', 'For Sale')

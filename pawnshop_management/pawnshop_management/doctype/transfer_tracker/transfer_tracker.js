@@ -183,6 +183,7 @@ const setNjItemsFromRows = (frm, rows) => {
 	(rows || []).forEach(row => {
 		const child = frm.add_child('nj_items');
 		child.item_no = row.item_no || '';
+		child.previous_workflow_state = row.workflow_state || '';
 		child.type = row.type || '';
 		child.charger = row.charger ? 1 : 0;
 		child.case = row.case ? 1 : 0;
@@ -906,14 +907,11 @@ frappe.ui.form.on('Transfer Tracker', {
 			//set total_cost to total
 				frm.set_value('total_cost', total);
 				frm.refresh_field('total_cost');
-	
-			
-
-
 		}else if(isDisplayTransferType(frm.doc.transfer_type)){
-			//get the pt_principal from the Non Jewelry Items doctype
-			let pt_principal = await frappe.db.get_value('Non Jewelry Items', row.item_no, 'pt_principal');
-			frappe.model.set_value(cdt, cdn, 'pt_principal', pt_principal.message.pt_principal);
+			//get the pt_principal and current status from the Non Jewelry Items doctype
+			let item_details = await frappe.db.get_value('Non Jewelry Items', row.item_no, ['pt_principal', 'workflow_state']);
+			frappe.model.set_value(cdt, cdn, 'pt_principal', item_details.message.pt_principal);
+			frappe.model.set_value(cdt, cdn, 'previous_workflow_state', item_details.message.workflow_state);
 			frappe.model.set_value(cdt, cdn, 'last_pawn_ticket', 'Unnecessary');
 			frm.refresh_field('nj_items');
 
