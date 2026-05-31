@@ -786,7 +786,7 @@ frappe.ui.form.on('Transfer Tracker', {
 						frm.set_query('item_no', 'nj_items', function(){
 							return {
 								filters: {
-									workflow_State: 'For Sale',
+									workflow_State: ['in', ['For Sale', 'Reserved']],
 									current_location: frm.doc.origin
 								}
 							}
