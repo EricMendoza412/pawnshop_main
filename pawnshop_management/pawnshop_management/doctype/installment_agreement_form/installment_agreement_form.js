@@ -65,11 +65,11 @@ frappe.ui.form.on('Installment Agreement Form', {
 						frm.set_value('branch', records[0].name);
 						frm.refresh_field('branch');
 
-						// only allow Non Jewelry items with status "For Sale" to be selected in field "item_no"
+						// only allow available Non Jewelry items to be selected in field "item_no"
 						frm.set_query('item_no', function() {
 							return {
 								filters: {
-									workflow_state: 'For Sale',
+									workflow_state: ['in', ['For Sale', 'Reserved']],
 									current_location: records[0].name
 								}
 							};
