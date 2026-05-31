@@ -254,8 +254,8 @@ frappe.ui.form.on('Non Jewelry Items', {
 				frm.set_df_property('internet_connection_capability', 'read_only', 1);
 
 
-			//if workflow_state is "In Transit" or "For Sale" disable Actions. The Transfer Tracker doctype controls the workflow state
-			if (frm.doc.workflow_state == "In Transit" || frm.doc.workflow_state == "For Sale") {
+				// Disable Actions while the Transfer Tracker controls the workflow state.
+				if (frm.doc.workflow_state == "In Transit") {
 				//programmatically hide the Menu items
 				frm.page.clear_menu();
 				//frm.page.hide_icon_group('print');
