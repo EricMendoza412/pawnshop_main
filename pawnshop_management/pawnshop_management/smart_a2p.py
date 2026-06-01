@@ -120,7 +120,7 @@ def _build_payload(
 	return payload
 
 
-def _new_log(payload, reference_doctype=None, reference_name=None):
+def _new_log(payload, reference_doctype=None, reference_name=None, sms_purpose=None):
 	log = frappe.new_doc("SMART SMS Log")
 	log.destination = payload.get("destination")
 	log.message_type = SMS_MESSAGE_TYPE
@@ -129,6 +129,7 @@ def _new_log(payload, reference_doctype=None, reference_name=None):
 	log.reference_doctype = reference_doctype
 	log.reference_name = reference_name
 	log.branch = get_reference_branch(reference_doctype, reference_name)
+	log.sms_purpose = sms_purpose
 	log.text = payload.get("text")
 	log.template_name = payload.get("templateName")
 	log.request_payload = json.dumps(payload, indent=2, sort_keys=True)
@@ -160,6 +161,7 @@ def send_sms(
 	cost_centre=None,
 	reference_doctype=None,
 	reference_name=None,
+	sms_purpose=None,
 	key_values=None,
 	extra=None,
 ):
@@ -184,7 +186,12 @@ def send_sms(
 		extra=extra,
 	)
 
-	log = _new_log(payload, reference_doctype=reference_doctype, reference_name=reference_name)
+	log = _new_log(
+		payload,
+		reference_doctype=reference_doctype,
+		reference_name=reference_name,
+		sms_purpose=sms_purpose,
+	)
 	url = urljoin(_get_base_url(settings), "messages/sms")
 
 	try:
@@ -238,7 +245,7 @@ def send_administrator_test_sms(reference_doctype=None, reference_name=None):
 	destination = TEST_DESTINATION
 	text = TEST_MESSAGE
 	if reference_doctype == "Pawn Ticket Jewelry" and reference_name:
-		destination, text = _get_pawn_ticket_jewelry_customer_sms_details(reference_name)
+		destination, text = _get_pawn_ticket_jewelry_customer_sms_details(reference_name, "Maturity")
 
 	return _send_administrator_test_sms(
 		client_message_id_prefix="SMART-A2P-TEST",
@@ -246,6 +253,30 @@ def send_administrator_test_sms(reference_doctype=None, reference_name=None):
 		reference_name=reference_name,
 		destination=destination,
 		text=text,
+		sms_purpose="Maturity" if reference_doctype == "Pawn Ticket Jewelry" else None,
+	)
+
+
+@frappe.whitelist()
+def send_expiry_date_sms(reference_doctype=None, reference_name=None):
+	if frappe.session.user != "Administrator" and "Vault Custodian" not in frappe.get_roles():
+		frappe.throw(
+			"Only Administrator or Vault Custodian can send the SMART A2P expiry SMS.",
+			frappe.PermissionError,
+		)
+
+	if reference_doctype != "Pawn Ticket Jewelry" or not reference_name:
+		frappe.throw("Expiry Date SMS requires a Pawn Ticket Jewelry reference.", SmartA2PError)
+
+	destination, text = _get_pawn_ticket_jewelry_customer_sms_details(reference_name, "Expiry")
+
+	return _send_administrator_test_sms(
+		client_message_id_prefix="SMART-A2P-EXPIRY",
+		reference_doctype=reference_doctype,
+		reference_name=reference_name,
+		destination=destination,
+		text=text,
+		sms_purpose="Expiry",
 	)
 
 
@@ -255,6 +286,7 @@ def _send_administrator_test_sms(
 	reference_name=None,
 	destination=TEST_DESTINATION,
 	text=TEST_MESSAGE,
+	sms_purpose=None,
 ):
 	return send_sms(
 		destination=destination,
@@ -262,14 +294,23 @@ def _send_administrator_test_sms(
 		client_message_id="{0}-{1}".format(client_message_id_prefix, frappe.generate_hash(length=16)),
 		reference_doctype=reference_doctype,
 		reference_name=reference_name,
+		sms_purpose=sms_purpose,
 	)
 
 
-def _get_pawn_ticket_jewelry_customer_sms_details(pawn_ticket_name):
+def _get_pawn_ticket_jewelry_customer_sms_details(pawn_ticket_name, sms_purpose):
 	pawn_ticket = frappe.db.get_value(
 		"Pawn Ticket Jewelry",
 		pawn_ticket_name,
-		["name", "customers_tracking_no", "customers_full_name", "branch", "pawn_ticket", "maturity_date"],
+		[
+			"name",
+			"customers_tracking_no",
+			"customers_full_name",
+			"branch",
+			"pawn_ticket",
+			"maturity_date",
+			"expiry_date",
+		],
 		as_dict=True,
 	)
 	if not pawn_ticket:
@@ -298,23 +339,34 @@ def _get_pawn_ticket_jewelry_customer_sms_details(pawn_ticket_name):
 	if not mobile_no:
 		frappe.throw("Contact {0} has no mobile number.".format(contact), SmartA2PError)
 
-	return mobile_no, _build_pawn_ticket_jewelry_maturity_message(pawn_ticket)
+	return mobile_no, _build_pawn_ticket_jewelry_message(pawn_ticket, sms_purpose)
 
 
 def _build_pawn_ticket_jewelry_maturity_message(pawn_ticket):
-	maturity_date = formatdate(pawn_ticket.maturity_date) if pawn_ticket.maturity_date else ""
+	return _build_pawn_ticket_jewelry_message(pawn_ticket, "Maturity")
+
+
+def _build_pawn_ticket_jewelry_message(pawn_ticket, sms_purpose):
+	if sms_purpose == "Expiry":
+		status_phrase = "expired"
+		status_date = formatdate(pawn_ticket.expiry_date) if pawn_ticket.expiry_date else ""
+	else:
+		status_phrase = "matured"
+		status_date = formatdate(pawn_ticket.maturity_date) if pawn_ticket.maturity_date else ""
+
 	branch_contact = _get_branch_sms_contact_details(pawn_ticket.branch)
 	return (
 		"Good Day Ma'am/Sir {0}!\n"
 		"Ito po ang {1} branch, ipinapaalam po namin na ang inyong Pawn Ticket: {2} "
-		"ay matured na sa {3}. Mainam po na ito ay matubuan/renew upang maging updated "
-		"ang inyong sangla. Puwede niyo po kami macontact sa FB: {4} at sa phone: {5}. "
+		"ay {3} na sa {4}. Mainam po na ito ay matubuan/renew upang maging updated "
+		"ang inyong sangla. Puwede niyo po kami macontact sa FB: {5} at sa phone: {6}. "
 		"Maraming salamat po."
 	).format(
 		pawn_ticket.customers_full_name or "",
 		pawn_ticket.branch or "",
 		pawn_ticket.pawn_ticket or pawn_ticket.name,
-		maturity_date,
+		status_phrase,
+		status_date,
 		branch_contact.facebook_account,
 		branch_contact.contact_number,
 	)
@@ -412,17 +464,18 @@ def _find_log(params):
 	return None
 
 
-def _mark_maturity_texted_if_delivered(log):
+def _mark_pawn_ticket_texted_if_delivered(log):
 	if log.reference_doctype != "Pawn Ticket Jewelry" or not log.reference_name:
 		return
 
 	if not frappe.db.exists("Pawn Ticket Jewelry", log.reference_name):
 		return
 
+	fieldname = "texted_upon_expiry" if log.get("sms_purpose") == "Expiry" else "texted_upon_maturity"
 	frappe.db.set_value(
 		"Pawn Ticket Jewelry",
 		log.reference_name,
-		"texted_upon_maturity",
+		fieldname,
 		1,
 		update_modified=False,
 	)
@@ -443,7 +496,7 @@ def smart_a2p_callback(**kwargs):
 			if normalized_status in DELIVERED_PROVIDER_STATUSES:
 				log.status = "Delivered"
 				log.delivered_at = now_datetime()
-				_mark_maturity_texted_if_delivered(log)
+				_mark_pawn_ticket_texted_if_delivered(log)
 			else:
 				log.status = "Callback Received"
 

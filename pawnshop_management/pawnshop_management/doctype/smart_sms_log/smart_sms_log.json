@@ -18,6 +18,7 @@
   "branch",
   "reference_doctype",
   "reference_name",
+  "sms_purpose",
   "message_section",
   "text",
   "template_name",
@@ -115,6 +116,13 @@
    "fieldtype": "Dynamic Link",
    "label": "Reference Name",
    "options": "reference_doctype",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sms_purpose",
+   "fieldtype": "Select",
+   "label": "SMS Purpose",
+   "options": "\nMaturity\nExpiry",
    "read_only": 1
   },
   {

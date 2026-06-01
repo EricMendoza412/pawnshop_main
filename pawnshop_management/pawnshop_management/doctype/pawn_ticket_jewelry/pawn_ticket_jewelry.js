@@ -65,14 +65,20 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 	},
 
 	refresh: function(frm){
-		if (
-			(frappe.session.user === 'Administrator' || frappe.user_roles.includes('Vault Custodian'))
-			&& frm.doc.maturity_date === frappe.datetime.get_today()
-			&& !frm.doc.texted_upon_maturity
-		) {
-			frm.add_custom_button(__('Maturity Date SMS'), function() {
+		const can_send_smart_sms = frappe.session.user === 'Administrator' || frappe.user_roles.includes('Vault Custodian');
+		const today = frappe.datetime.get_today();
+		const is_today_or_within_previous_5_days = function(date) {
+			if (!date) {
+				return false;
+			}
+
+			const days_from_today = frappe.datetime.get_day_diff(today, date);
+			return days_from_today >= 0 && days_from_today <= 5;
+		};
+		const add_smart_sms_button = function(label, method) {
+			frm.add_custom_button(__(label), function() {
 				frappe.call({
-					method: 'pawnshop_management.pawnshop_management.smart_a2p.send_administrator_test_sms',
+					method: method,
 					args: {
 						reference_doctype: frm.doc.doctype,
 						reference_name: frm.doc.name
@@ -90,6 +96,20 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 					}
 				});
 			});
+		};
+
+		if (can_send_smart_sms && is_today_or_within_previous_5_days(frm.doc.maturity_date) && !frm.doc.texted_upon_maturity) {
+			add_smart_sms_button(
+				'Maturity Date SMS',
+				'pawnshop_management.pawnshop_management.smart_a2p.send_administrator_test_sms'
+			);
+		}
+
+		if (can_send_smart_sms && is_today_or_within_previous_5_days(frm.doc.expiry_date) && !frm.doc.texted_upon_expiry) {
+			add_smart_sms_button(
+				'Expiry Date SMS',
+				'pawnshop_management.pawnshop_management.smart_a2p.send_expiry_date_sms'
+			);
 		}
 
 		//make customers_tracking_no and jewelry_items read only after saving
