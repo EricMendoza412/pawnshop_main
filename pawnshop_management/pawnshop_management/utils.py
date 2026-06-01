@@ -8,15 +8,18 @@ from frappe.integrations.utils import (
 )
 
 
-ID_PICTURE_BASE_URL = "https://storage.cloud.google.com/gpcustomersids.appspot.com/customerPictures/{0}.jpg"
+ID_PICTURE_BASE_URL = "https://firebasestorage.googleapis.com/v0/b/gpcustomersids.appspot.com/o/customerPictures%2F{0}.jpg?alt=media"
+ID_PICTURE_FALLBACK_BASE_URL = "https://storage.cloud.google.com/gpcustomersids.appspot.com/customerPictures/{0}.jpg"
 
 
 def get_id_picture_html(id_pic_name=None, empty_message=None):
     if id_pic_name:
-        image_url = ID_PICTURE_BASE_URL.format(quote(str(id_pic_name).strip()))
+        quoted_id_pic_name = quote(str(id_pic_name).strip())
+        image_url = ID_PICTURE_BASE_URL.format(quoted_id_pic_name)
+        fallback_image_url = ID_PICTURE_FALLBACK_BASE_URL.format(quoted_id_pic_name)
         return """
-            <img src="{0}" style="max-width: 400px; height: auto;">
-        """.format(escape_html(image_url))
+            <img src="{0}" data-fallback-src="{1}" onerror="if (this.dataset.fallbackSrc && this.src !== this.dataset.fallbackSrc) {{ this.src = this.dataset.fallbackSrc; this.removeAttribute('data-fallback-src'); }}" style="max-width: 400px; height: auto;">
+        """.format(escape_html(image_url), escape_html(fallback_image_url))
 
     return """
         <div class="alert alert-warning">

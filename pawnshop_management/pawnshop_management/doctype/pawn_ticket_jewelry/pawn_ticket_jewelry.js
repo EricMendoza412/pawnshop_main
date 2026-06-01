@@ -558,10 +558,11 @@ function show_selected_customer_id_picture(frm) {
 	}
 
 	if (selected_option.id_pic_name) {
-		const image_url = `https://storage.cloud.google.com/gpcustomersids.appspot.com/customerPictures/${encodeURIComponent(selected_option.id_pic_name)}.jpg`;
+		const image_url = get_customer_id_picture_url(selected_option.id_pic_name);
+		const fallback_image_url = get_customer_id_picture_fallback_url(selected_option.id_pic_name);
 		render_customer_id_picture(
 			frm,
-			`<img src="${escape_html(image_url)}" style="max-width: 400px; height: auto;">`,
+			`<img src="${escape_html(image_url)}" data-fallback-src="${escape_html(fallback_image_url)}" onerror="handle_customer_id_picture_error(this)" style="max-width: 400px; height: auto;">`,
 			selected_option
 		);
 		return;
@@ -626,6 +627,21 @@ function make_customer_id_picture_zoomable(frm) {
 
 function escape_html(value) {
 	return $('<div>').text(value || '').html();
+}
+
+function get_customer_id_picture_url(id_pic_name) {
+	return `https://firebasestorage.googleapis.com/v0/b/gpcustomersids.appspot.com/o/customerPictures%2F${encodeURIComponent(id_pic_name)}.jpg?alt=media`;
+}
+
+function get_customer_id_picture_fallback_url(id_pic_name) {
+	return `https://storage.cloud.google.com/gpcustomersids.appspot.com/customerPictures/${encodeURIComponent(id_pic_name)}.jpg`;
+}
+
+function handle_customer_id_picture_error(image) {
+	if (image.dataset.fallbackSrc && image.src !== image.dataset.fallbackSrc) {
+		image.src = image.dataset.fallbackSrc;
+		image.removeAttribute('data-fallback-src');
+	}
 }
 
 function show_tracking_no(frm){ //Sets inventory tracking number
