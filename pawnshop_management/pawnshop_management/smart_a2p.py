@@ -16,6 +16,7 @@ TEST_DESTINATION = "639178400153"
 TEST_MESSAGE = "Hello There"
 NOON_TEST_CLIENT_MESSAGE_ID_PREFIX = "SMART-A2P-DAILY-TEST-1230"
 DELIVERED_PROVIDER_STATUSES = {"DELIVERED", "DELIVRD"}
+PAWN_TICKET_DOCTYPES = {"Pawn Ticket Jewelry", "Pawn Ticket Non Jewelry"}
 
 
 class SmartA2PError(frappe.ValidationError):
@@ -245,7 +246,7 @@ def send_administrator_test_sms(reference_doctype=None, reference_name=None):
 	destination = TEST_DESTINATION
 	text = TEST_MESSAGE
 	if reference_doctype == "Pawn Ticket Jewelry" and reference_name:
-		destination, text = _get_pawn_ticket_jewelry_customer_sms_details(reference_name, "Maturity")
+		destination, text = _get_pawn_ticket_customer_sms_details(reference_doctype, reference_name, "Maturity")
 
 	return _send_administrator_test_sms(
 		client_message_id_prefix="SMART-A2P-TEST",
@@ -265,10 +266,10 @@ def send_expiry_date_sms(reference_doctype=None, reference_name=None):
 			frappe.PermissionError,
 		)
 
-	if reference_doctype != "Pawn Ticket Jewelry" or not reference_name:
-		frappe.throw("Expiry Date SMS requires a Pawn Ticket Jewelry reference.", SmartA2PError)
+	if reference_doctype not in PAWN_TICKET_DOCTYPES or not reference_name:
+		frappe.throw("Expiry Date SMS requires a Pawn Ticket reference.", SmartA2PError)
 
-	destination, text = _get_pawn_ticket_jewelry_customer_sms_details(reference_name, "Expiry")
+	destination, text = _get_pawn_ticket_customer_sms_details(reference_doctype, reference_name, "Expiry")
 
 	return _send_administrator_test_sms(
 		client_message_id_prefix="SMART-A2P-EXPIRY",
@@ -298,9 +299,9 @@ def _send_administrator_test_sms(
 	)
 
 
-def _get_pawn_ticket_jewelry_customer_sms_details(pawn_ticket_name, sms_purpose):
+def _get_pawn_ticket_customer_sms_details(pawn_ticket_doctype, pawn_ticket_name, sms_purpose):
 	pawn_ticket = frappe.db.get_value(
-		"Pawn Ticket Jewelry",
+		pawn_ticket_doctype,
 		pawn_ticket_name,
 		[
 			"name",
@@ -314,11 +315,11 @@ def _get_pawn_ticket_jewelry_customer_sms_details(pawn_ticket_name, sms_purpose)
 		as_dict=True,
 	)
 	if not pawn_ticket:
-		frappe.throw("Pawn Ticket Jewelry {0} was not found.".format(pawn_ticket_name), SmartA2PError)
+		frappe.throw("{0} {1} was not found.".format(pawn_ticket_doctype, pawn_ticket_name), SmartA2PError)
 
 	customer = pawn_ticket.customers_tracking_no
 	if not customer:
-		frappe.throw("Pawn Ticket Jewelry has no customer tracking number.", SmartA2PError)
+		frappe.throw("{0} has no customer tracking number.".format(pawn_ticket_doctype), SmartA2PError)
 
 	contact = frappe.db.get_value("Customer", customer, "customer_primary_contact")
 	if not contact:
@@ -339,14 +340,14 @@ def _get_pawn_ticket_jewelry_customer_sms_details(pawn_ticket_name, sms_purpose)
 	if not mobile_no:
 		frappe.throw("Contact {0} has no mobile number.".format(contact), SmartA2PError)
 
-	return mobile_no, _build_pawn_ticket_jewelry_message(pawn_ticket, sms_purpose)
+	return mobile_no, _build_pawn_ticket_message(pawn_ticket, sms_purpose)
 
 
 def _build_pawn_ticket_jewelry_maturity_message(pawn_ticket):
-	return _build_pawn_ticket_jewelry_message(pawn_ticket, "Maturity")
+	return _build_pawn_ticket_message(pawn_ticket, "Maturity")
 
 
-def _build_pawn_ticket_jewelry_message(pawn_ticket, sms_purpose):
+def _build_pawn_ticket_message(pawn_ticket, sms_purpose):
 	if sms_purpose == "Expiry":
 		status_phrase = "expired"
 		status_date = formatdate(pawn_ticket.expiry_date) if pawn_ticket.expiry_date else ""
@@ -374,7 +375,7 @@ def _build_pawn_ticket_jewelry_message(pawn_ticket, sms_purpose):
 
 def _get_branch_sms_contact_details(branch):
 	if not branch:
-		frappe.throw("Pawn Ticket Jewelry has no branch.", SmartA2PError)
+		frappe.throw("Pawn Ticket has no branch.", SmartA2PError)
 
 	branch_contact = frappe.db.get_value(
 		"Branch",
@@ -465,15 +466,15 @@ def _find_log(params):
 
 
 def _mark_pawn_ticket_texted_if_delivered(log):
-	if log.reference_doctype != "Pawn Ticket Jewelry" or not log.reference_name:
+	if log.reference_doctype not in PAWN_TICKET_DOCTYPES or not log.reference_name:
 		return
 
-	if not frappe.db.exists("Pawn Ticket Jewelry", log.reference_name):
+	if not frappe.db.exists(log.reference_doctype, log.reference_name):
 		return
 
 	fieldname = "texted_upon_expiry" if log.get("sms_purpose") == "Expiry" else "texted_upon_maturity"
 	frappe.db.set_value(
-		"Pawn Ticket Jewelry",
+		log.reference_doctype,
 		log.reference_name,
 		fieldname,
 		1,

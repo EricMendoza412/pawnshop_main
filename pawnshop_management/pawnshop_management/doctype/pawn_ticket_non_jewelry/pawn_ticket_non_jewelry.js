@@ -60,6 +60,39 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 	},
 
 	refresh: function(frm){
+		const can_send_smart_sms = frappe.session.user === 'Administrator' || frappe.user_roles.includes('Vault Custodian');
+		const today = frappe.datetime.get_today();
+		const is_today_or_within_previous_5_days = function(date) {
+			if (!date) {
+				return false;
+			}
+
+			const days_from_today = frappe.datetime.get_day_diff(today, date);
+			return days_from_today >= 0 && days_from_today <= 5;
+		};
+
+		if (can_send_smart_sms && is_today_or_within_previous_5_days(frm.doc.expiry_date) && !frm.doc.texted_upon_expiry) {
+			frm.add_custom_button(__('Expiry Date SMS'), function() {
+				frappe.call({
+					method: 'pawnshop_management.pawnshop_management.smart_a2p.send_expiry_date_sms',
+					args: {
+						reference_doctype: frm.doc.doctype,
+						reference_name: frm.doc.name
+					},
+					freeze: true,
+					freeze_message: __('Sending SMART SMS...'),
+					callback: function(r) {
+						if (!r.exc) {
+							frappe.msgprint({
+								title: __('SMART SMS Sent'),
+								indicator: 'green',
+								message: __('Sent SMART SMS to {0}. SMART SMS Log: {1}', [r.message.destination, r.message.log])
+							});
+						}
+					}
+				});
+			});
+		}
 
 		//make customers_tracking_no and jewelry_items read only after saving
 		if(!frm.is_new() && frm.doc.docstatus == 0){
