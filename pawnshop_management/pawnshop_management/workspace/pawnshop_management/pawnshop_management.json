@@ -217,6 +217,12 @@
   },
   {
    "doc_view": "Report Builder",
+   "label": "VC Count Consolidated",
+   "link_to": "VC Count Consolidated",
+   "type": "Report"
+  },
+  {
+   "doc_view": "Report Builder",
    "label": "Pawnshop Transaction Log",
    "link_to": "VC Report",
    "type": "Report"

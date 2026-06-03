@@ -295,7 +295,16 @@ def check_new_submissions(loaded_at: str, branch: str = None):
 
 class CashPositionReport(Document):
 	def on_submit(self):
+		self.validate_no_existing_inventory_count()
 		create_transaction_log_for_cash_position_report(self)
+		self.create_inventory_count_document()
+
+	def validate_no_existing_inventory_count(self):
+		if frappe.db.exists("Inventory Count", {"date": self.date, "branch": self.branch}):
+			frappe.throw(
+				title="CPR submission restricted",
+				msg="A VC inventory report already exists for today, please contact IT to resolve duplicate document",
+			)
 
 	def create_inventory_count_document(self):
 #A IN count
@@ -469,6 +478,27 @@ class CashPositionReport(Document):
 		for record2 in bnj_principal_total_exp:
 			bnj_principal_total += record2
 
+#SB IN count
+		sb_in_count = frappe.db.count('Agreement to Sell', {'date_of_sale': self.date, 'branch': self.branch, 'workflow_state': 'Active'})
+		sb_in_principal = frappe.db.get_all('Agreement to Sell', filters={'date_of_sale': self.date, 'branch': self.branch, 'workflow_state': 'Active'}, fields=['total_value'], pluck='total_value')
+		sb_principal_in = 0
+		for record in sb_in_principal:
+			sb_principal_in += flt(record)
+
+#SB PO count
+		sb_pulled_out = frappe.db.count('Agreement to Sell', {'change_status_date': self.date, 'branch': self.branch, 'workflow_state': 'Pulled Out'})
+		sb_po_principal = frappe.db.get_all('Agreement to Sell', filters={'change_status_date': self.date, 'branch': self.branch, 'workflow_state': 'Pulled Out'}, fields=['total_value'], pluck='total_value')
+		sb_principal_po = 0
+		for record in sb_po_principal:
+			sb_principal_po += flt(record)
+
+#SB Total
+		sb_total = frappe.db.count('Agreement to Sell', {'date_of_sale': ['<=', self.date], 'branch': self.branch, 'workflow_state': 'Active'})
+		sb_total_principal = frappe.db.get_all('Agreement to Sell', filters={'date_of_sale': ['<=', self.date], 'branch': self.branch, 'workflow_state': 'Active'}, fields=['total_value'], pluck='total_value')
+		sb_principal_total = 0
+		for record in sb_total_principal:
+			sb_principal_total += flt(record)
+
 #assign to document fields
 		invetory_count_doc = frappe.new_doc('Inventory Count')
 		invetory_count_doc.date = self.date
@@ -496,6 +526,12 @@ class CashPositionReport(Document):
 		invetory_count_doc.principal_totalb = b_principal_total
 		
 		invetory_count_doc.in_count_nj = nj_in_count
+		invetory_count_doc.in_count_sb = sb_in_count
+		invetory_count_doc.principal_in_sb = sb_principal_in
+		invetory_count_doc.pulled_out_sb = sb_pulled_out
+		invetory_count_doc.principal_po_sb = sb_principal_po
+		invetory_count_doc.total_sb = sb_total
+		invetory_count_doc.principal_totalsb = sb_principal_total
 		invetory_count_doc.principal_in_nj = bnj_in_principal
 		invetory_count_doc.out_count_nj = nj_out_count
 		invetory_count_doc.principal_out_nj = bnj_out_principal
@@ -509,6 +545,7 @@ class CashPositionReport(Document):
 
 # Added Comment
 	def before_save(self):
+		pass
 		# if self.shortage_overage > 0:
 		# 	doc1 = frappe.new_doc('Journal Entry')
 		# 	doc1.voucher_type = 'Journal Entry'
@@ -601,6 +638,5 @@ class CashPositionReport(Document):
 
 		# 	doc1.save(ignore_permissions=True)
 		# 	doc1.submit()
-		self.create_inventory_count_document()
 
 			

@@ -42,7 +42,14 @@
   "pulled_out_nj",
   "principal_po_nj",
   "total_nj",
-  "principal_totalnj"
+  "principal_totalnj",
+  "column_break_sb",
+  "in_count_sb",
+  "principal_in_sb",
+  "pulled_out_sb",
+  "principal_po_sb",
+  "total_sb",
+  "principal_totalsb"
  ],
  "fields": [
   {
@@ -166,6 +173,16 @@
    "label": "IN(NJ)"
   },
   {
+   "default": "0",
+   "fieldname": "in_count_sb",
+   "fieldtype": "Int",
+   "label": "IN(SB)"
+  },
+  {
+   "fieldname": "column_break_sb",
+   "fieldtype": "Column Break"
+  },
+  {
    "fieldname": "column_break_2",
    "fieldtype": "Column Break"
   },
@@ -258,6 +275,36 @@
    "fieldname": "principal_totalnj",
    "fieldtype": "Currency",
    "label": "Principal Total(NJ)"
+  },
+  {
+   "default": "0",
+   "fieldname": "principal_in_sb",
+   "fieldtype": "Currency",
+   "label": "Principal In(SB)"
+  },
+  {
+   "default": "0",
+   "fieldname": "pulled_out_sb",
+   "fieldtype": "Int",
+   "label": "Pulled Out(SB)"
+  },
+  {
+   "default": "0",
+   "fieldname": "principal_po_sb",
+   "fieldtype": "Currency",
+   "label": "Principal PO(SB)"
+  },
+  {
+   "default": "0",
+   "fieldname": "total_sb",
+   "fieldtype": "Int",
+   "label": "Total(SB)"
+  },
+  {
+   "default": "0",
+   "fieldname": "principal_totalsb",
+   "fieldtype": "Currency",
+   "label": "Principal Total(SB)"
   }
  ],
  "index_web_pages_for_search": 1,

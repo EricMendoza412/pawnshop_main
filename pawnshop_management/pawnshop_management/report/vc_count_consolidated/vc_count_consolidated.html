@@ -1,0 +1,139 @@
+<style>
+	.vc-count-print {
+		border: 2px solid #222;
+		font-family: Arial, sans-serif;
+		font-size: 12px;
+		color: #222;
+		width: 100%;
+	}
+	.vc-count-title {
+		border-bottom: 1px solid #222;
+		font-size: 22px;
+		font-weight: 700;
+		text-align: center;
+		padding: 4px;
+	}
+	.vc-section-title {
+		border-bottom: 1px solid #222;
+		font-size: 14px;
+		font-weight: 700;
+		text-align: center;
+		padding: 3px;
+	}
+	.vc-count-table {
+		width: 100%;
+		border-collapse: collapse;
+		table-layout: fixed;
+	}
+	.vc-count-table th,
+	.vc-count-table td {
+		border: 1px solid #222;
+		padding: 4px 3px;
+		text-align: center;
+		vertical-align: middle;
+	}
+	.vc-count-table th {
+		background: #e7f0e3;
+		font-weight: 700;
+	}
+	.vc-count-table .currency {
+		text-align: right;
+		white-space: nowrap;
+	}
+	.vc-signature {
+		width: 32%;
+		margin-left: auto;
+		padding-top: 38px;
+		text-align: center;
+	}
+	.vc-signature-line {
+		border-top: 1px solid #222;
+		font-weight: 700;
+		padding-top: 3px;
+	}
+	@media print {
+		.print-format {
+			padding: 0.2in;
+		}
+		.vc-count-print {
+			page-break-inside: avoid;
+		}
+	}
+</style>
+
+{% if (data && data.length) { %}
+<div class="vc-count-print">
+	<div class="vc-count-title">{%= data[0].branch_code || "" %} Vault Custodian Report - Inventory Count</div>
+
+	{% for (var i = 0; i < data.length; i++) { %}
+		{% var row = data[i]; %}
+		<div class="vc-section-title">{%= row.section %}</div>
+
+		{% if (row.section === "SANGLANG BENTA") { %}
+			<table class="vc-count-table">
+				<thead>
+					<tr>
+						<th style="width: 14%">{%= __("Date") %}</th>
+						<th style="width: 6%">{%= __("IN") %}</th>
+						<th style="width: 18%">{%= __("Principal") %}</th>
+						<th style="width: 10%">{%= __("Pulled Out") %}</th>
+						<th style="width: 18%">{%= __("Principal") %}</th>
+						<th style="width: 9%">{%= __("Total") %}</th>
+						<th style="width: 20%">{%= __("Principal") %}</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>{%= row.date ? frappe.datetime.str_to_user(row.date) : "" %}</td>
+						<td>{%= row.in_count || 0 %}</td>
+						<td class="currency">{%= frappe.format(row.principal_in || 0, {fieldtype: "Currency"}) %}</td>
+						<td>{%= row.pulled_out || 0 %}</td>
+						<td class="currency">{%= frappe.format(row.principal_po || 0, {fieldtype: "Currency"}) %}</td>
+						<td>{%= row.total || 0 %}</td>
+						<td class="currency">{%= frappe.format(row.principal_total || 0, {fieldtype: "Currency"}) %}</td>
+					</tr>
+				</tbody>
+			</table>
+		{% } else { %}
+			<table class="vc-count-table">
+				<thead>
+					<tr>
+						<th style="width: 13%">{%= __("Date") %}</th>
+						<th style="width: 5%">{%= __("IN") %}</th>
+						<th style="width: 14%">{%= __("Principal") %}</th>
+						<th style="width: 5%">{%= __("OUT") %}</th>
+						<th style="width: 14%">{%= __("Principal") %}</th>
+						<th style="width: 8%">{%= __("Returned") %}</th>
+						<th style="width: 12%">{%= __("Principal") %}</th>
+						<th style="width: 7%">{%= __("Pulled Out") %}</th>
+						<th style="width: 12%">{%= __("Principal") %}</th>
+						<th style="width: 6%">{%= __("Total") %}</th>
+						<th style="width: 14%">{%= __("Principal") %}</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>{%= row.date ? frappe.datetime.str_to_user(row.date) : "" %}</td>
+						<td>{%= row.in_count || 0 %}</td>
+						<td class="currency">{%= frappe.format(row.principal_in || 0, {fieldtype: "Currency"}) %}</td>
+						<td>{%= row.out_count || 0 %}</td>
+						<td class="currency">{%= frappe.format(row.principal_out || 0, {fieldtype: "Currency"}) %}</td>
+						<td>{%= row.returned || 0 %}</td>
+						<td class="currency">{%= frappe.format(row.principal_ret || 0, {fieldtype: "Currency"}) %}</td>
+						<td>{%= row.pulled_out || 0 %}</td>
+						<td class="currency">{%= frappe.format(row.principal_po || 0, {fieldtype: "Currency"}) %}</td>
+						<td>{%= row.total || 0 %}</td>
+						<td class="currency">{%= frappe.format(row.principal_total || 0, {fieldtype: "Currency"}) %}</td>
+					</tr>
+				</tbody>
+			</table>
+		{% } %}
+	{% } %}
+
+	<div class="vc-signature">
+		<div class="vc-signature-line">VC Signature</div>
+	</div>
+</div>
+{% } else { %}
+<p>{%= __("No Inventory Count found for the selected filters.") %}</p>
+{% } %}

@@ -14,7 +14,7 @@ SMS_MESSAGE_TYPE = "sms"
 E164_RE = re.compile(r"^\d{1,15}$")
 TEST_DESTINATION = "639178400153"
 TEST_MESSAGE = "Hello There"
-NOON_TEST_CLIENT_MESSAGE_ID_PREFIX = "SMART-A2P-DAILY-TEST-1230"
+DAILY_0900_TEST_CLIENT_MESSAGE_ID_PREFIX = "SMART-A2P-DAILY-TEST-0900"
 DELIVERED_PROVIDER_STATUSES = {"DELIVERED", "DELIVRD"}
 PAWN_TICKET_DOCTYPES = {"Pawn Ticket Jewelry", "Pawn Ticket Non Jewelry"}
 
@@ -419,9 +419,9 @@ def send_daily_administrator_test_sms_at_1210():
 	)
 
 
-def send_daily_administrator_test_sms_at_1230():
+def send_daily_administrator_test_sms_at_0900():
 	return _send_administrator_test_sms(
-		client_message_id_prefix=NOON_TEST_CLIENT_MESSAGE_ID_PREFIX,
+		client_message_id_prefix=DAILY_0900_TEST_CLIENT_MESSAGE_ID_PREFIX,
 	)
 
 
