@@ -1,6 +1,5 @@
 import frappe
 from frappe import _
-from pawnshop_management.pawnshop_management.custom_codes.get_ip import get_ip_from_settings
 
 
 BRANCH_CODES = {
@@ -16,21 +15,9 @@ BRANCH_CODES = {
 }
 
 
-IP_BRANCHES = {
-	"cavite_city": "Garcia's Pawnshop - CC",
-	"poblacion": "Garcia's Pawnshop - POB",
-	"molino": "Garcia's Pawnshop - MOL",
-	"gtc": "Garcia's Pawnshop - GTC",
-	"tanza": "Garcia's Pawnshop - TNZ",
-	"alapan": "Garcia's Pawnshop - BUC",
-	"noveleta": "Garcia's Pawnshop - NOV",
-	"pascam": "Garcia's Pawnshop - PSC",
-}
-
-
 def execute(filters=None):
 	filters = frappe._dict(filters or {})
-	branch = filters.get("branch") or get_branch_from_ip()
+	branch = normalize_branch(filters.get("branch")) or get_branch_from_ip()
 	report_date = filters.get("date")
 
 	inventory_count = get_inventory_count(branch, report_date)
@@ -39,15 +26,27 @@ def execute(filters=None):
 	return columns, data
 
 
+def normalize_branch(branch):
+	if isinstance(branch, (list, tuple)):
+		return branch[0] if branch else None
+
+	if isinstance(branch, str):
+		return branch.strip() or None
+
+	return branch
+
+
 def get_branch_from_ip():
-	current_ip = frappe.local.request_ip
-	branch_ip = get_ip_from_settings()
+	current_ip = getattr(frappe.local, "request_ip", None)
+	if not current_ip:
+		return None
 
-	for key, branch in IP_BRANCHES.items():
-		if str(current_ip) == str(branch_ip.get(key)):
-			return branch
+	return frappe.db.get_value("Branch IP Addressing", {"ip_address": current_ip}, "name")
 
-	return None
+
+@frappe.whitelist()
+def get_default_branch():
+	return get_branch_from_ip()
 
 
 def get_inventory_count(branch, report_date):

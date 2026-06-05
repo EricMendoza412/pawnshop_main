@@ -1,21 +1,16 @@
 /* eslint-disable */
 
-var default_branch = [];
+var default_branch = "";
 
 frappe.call({
-	method: "pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip",
+	method: "pawnshop_management.pawnshop_management.report.vc_count_consolidated.vc_count_consolidated.get_default_branch",
 	callback: function(data) {
-		let current_ip = data.message;
-		frappe.db.get_list("Branch IP Addressing", {
-			fields: ["name"],
-			filters: {
-				ip_address: current_ip
+		if (data.message) {
+			default_branch = data.message;
+			if (frappe.query_report && frappe.query_report.get_filter_value("branch") !== default_branch) {
+				frappe.query_report.set_filter_value("branch", default_branch);
 			}
-		}).then(records => {
-			if (records.length) {
-				default_branch.push(records[0].name);
-			}
-		});
+		}
 	}
 });
 
