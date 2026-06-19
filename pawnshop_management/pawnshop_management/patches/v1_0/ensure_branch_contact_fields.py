@@ -27,6 +27,7 @@ def execute():
 				"fieldtype": "Link",
 				"options": "User",
 				"insert_after": "pawnshop_details_section",
+				"read_only": 1,
 			},
 			{
 				"fieldname": "fx_cashier",
@@ -34,6 +35,7 @@ def execute():
 				"fieldtype": "Link",
 				"options": "User",
 				"insert_after": "pawnshop_cashier",
+				"read_only": 1,
 			},
 			{
 				"fieldname": "remittance_cashier",
@@ -41,12 +43,21 @@ def execute():
 				"fieldtype": "Link",
 				"options": "User",
 				"insert_after": "fx_cashier",
+				"read_only": 1,
+			},
+			{
+				"fieldname": "vault_custodian",
+				"label": "Vault Custodian",
+				"fieldtype": "Link",
+				"options": "User",
+				"insert_after": "remittance_cashier",
+				"read_only": 1,
 			},
 			{
 				"fieldname": "facebook_account",
 				"label": "Facebook Account",
 				"fieldtype": "Data",
-				"insert_after": "remittance_cashier",
+				"insert_after": "vault_custodian",
 			},
 			{
 				"fieldname": "contact_number",

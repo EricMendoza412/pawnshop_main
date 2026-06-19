@@ -81,13 +81,16 @@ permission_query_conditions = {
 	"Provisional Receipt": "pawnshop_management.pawnshop_management.custom_codes.pr_list_filter.filter_pr_based_on_banch",
 	"Cash Position Report": "pawnshop_management.pawnshop_management.custom_codes.cpr_list_filter.filter_cpr_based_on_banch",
 	"Pawnshop Transaction Log": "pawnshop_management.pawnshop_management.custom_codes.pawnshop_transaction_log_list_filter.filter_transaction_log_based_on_banch",
-    "Agreement to Sell": "pawnshop_management.pawnshop_management.custom_codes.ats_list_filter.filter_ats_based_on_banch",
-	"Acknowledgement Receipt": "pawnshop_management.pawnshop_management.custom_codes.ar_list_filter.filter_ar_based_on_banch"	
+	"Agreement to Sell": "pawnshop_management.pawnshop_management.custom_codes.ats_list_filter.filter_ats_based_on_banch",
+	"Acknowledgement Receipt": "pawnshop_management.pawnshop_management.custom_codes.ar_list_filter.filter_ar_based_on_banch",
+	"Branch Role Assignment": "pawnshop_management.operations_access_control.doctype.branch_role_assignment.branch_role_assignment.get_permission_query_conditions",
+	"VC Turnover Checklist": "pawnshop_management.pawnshop_management.doctype.vc_turnover_checklist.vc_turnover_checklist.get_permission_query_conditions",
 }
 #
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+has_permission = {
+	"Branch Role Assignment": "pawnshop_management.operations_access_control.doctype.branch_role_assignment.branch_role_assignment.has_permission",
+	"VC Turnover Checklist": "pawnshop_management.pawnshop_management.doctype.vc_turnover_checklist.vc_turnover_checklist.has_permission",
+}
 
 # DocType Class
 # ---------------
@@ -143,7 +146,8 @@ scheduler_events = {
 		"0 3 * * *":[
 			"pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.change_pawn_ticket_nj_status_to_expire",
 			"pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.change_pawn_ticket_j_status_to_expire",
-			"pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.change_reserved_non_jewelry_items_status_to_for_sale"
+			"pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket.change_reserved_non_jewelry_items_status_to_for_sale",
+			"pawnshop_management.operations_access_control.doctype.branch_role_assignment.branch_role_assignment.clear_branch_cashier_assignments"
 		],
 		"0 9 * * *":[
 			"pawnshop_management.pawnshop_management.smart_a2p.send_daily_administrator_test_sms_at_0900"

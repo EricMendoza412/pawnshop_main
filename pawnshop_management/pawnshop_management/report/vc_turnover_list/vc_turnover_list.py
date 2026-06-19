@@ -11,7 +11,6 @@ from pawnshop_management.pawnshop_management.custom_codes.get_ip import get_ip_f
 
 def execute(filters=None):
 	columns, data = [], []
-	columns = get_columns()
 	status_value = getattr(filters, 'branch')
 	series = getattr(filters, 'series')
 	branch_fr_ip = ""
@@ -51,7 +50,35 @@ def execute(filters=None):
 	elif series == "B-Non Jewelry":
 		item_series = "B"
 		pt_type = "Pawn Ticket Non Jewelry"
+	elif series == "Agreement to Sell":
+		pt_type = "Agreement to Sell"
 
+	columns = get_columns(pt_type)
+
+	if pt_type == "Agreement to Sell":
+		data_active = frappe.get_all(pt_type, filters={'branch': branch, 'workflow_state': "Active"}, fields=['form_number', 'customer_tracker', 'customer_name', 'ats_tracking_no', 'total_value', 'date_of_sale', 'branch'])
+
+		for i in range(len(data_active)):
+			description = ""
+			detailsL = frappe.db.get_list("Jewelry List", filters={'parent': data_active[i]['form_number']}, fields=['item_no'])
+			for j in range(len(detailsL)):
+				if detailsL[j]['item_no'] != "0-0J-0":
+					details = frappe.db.get_list("Jewelry Items", filters={'item_no': detailsL[j]['item_no']}, fields=['item_no','type', 'karat_category', 'karat', 'total_weight', 'color', 'colors_if_multi', 'additional_for_stone', 'densi','comments'])
+					for doc in details:
+						densi, comments, colorMulti, addForStone  = "", "", "", ""
+						if doc.densi != None:
+							densi = ", " + doc.densi
+						if doc.comments != None:
+							comments = ", " + doc.comments
+						if doc.colors_if_multi != None:
+							colorMulti = ", " + doc.colors_if_multi
+						if doc.additional_for_stone != None:
+							addForStone = ", Stone:" + str(doc.additional_for_stone)
+						description += "One " + doc.type + ", " + doc.karat_category + ", " + doc.karat + ", " + str(doc.total_weight) + ", " + doc.color + colorMulti + densi + comments + colorMulti + addForStone + "; "
+			data_active[i]['description'] = description
+
+		data = data_active
+		return columns, data
 
 	data_act = frappe.get_all(pt_type, filters={'branch': branch, 'workflow_state': "Active", 'item_series': item_series}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'maturity_date', 'expiry_date', 'branch', 'item_series'])
 	data_exp = frappe.get_all(pt_type, filters={'branch': branch, 'workflow_state': "Expired", 'item_series': item_series}, fields=['pawn_ticket', 'customers_tracking_no', 'customers_full_name', 'inventory_tracking_no', 'desired_principal', 'date_loan_granted', 'maturity_date', 'expiry_date', 'branch', 'item_series'])
@@ -113,7 +140,7 @@ def execute(filters=None):
 						if doc.colors_if_multi != None:
 							colorMulti = ", " + doc.colors_if_multi
 						if doc.additional_for_stone != None:
-							addForStone = ", Stone:" + str(doc.additional_for_Stone)
+							addForStone = ", Stone:" + str(doc.additional_for_stone)
 						description += "One " + doc.type + ", " + doc.karat_category + ", " + doc.karat + ", " + str(doc.total_weight) + ", " + doc.color + colorMulti + densi + comments + colorMulti + addForStone + "; "
 		data_active[i]['description'] = description
 
@@ -144,7 +171,54 @@ def nj_numeric_key(val):
         return int(middle) if middle else 0
     return 0
 
-def get_columns():
+def get_columns(pt_type=None):
+	if pt_type == "Agreement to Sell":
+		return [
+			{
+				'fieldname': 'ats_tracking_no',
+				'label': _('Inventory Tracker'),
+				'fieldtype': 'Data',
+				'width': 100
+			},
+
+			{
+				'fieldname': 'customer_name',
+				'label': _('Customer Name'),
+				'fieldtype': 'Data',
+				'width': 200
+			},
+
+			{
+				'fieldname': 'form_number',
+				'label': _('Form number'),
+				'fieldtype': 'Link',
+				'options': 'Agreement to Sell',
+				'width': 100
+			},
+
+			{
+				'fieldname': 'description',
+				'label': _('Item Description'),
+				'fieldtype': 'Small Text',
+				'width': 500
+			},
+
+			{
+				'fieldname': 'total_value',
+				'label': _('Total amount'),
+				'fieldtype': 'Currency',
+				'width': 100,
+				'sum': 1
+			},
+
+			{
+				'fieldname': 'date_of_sale',
+				'label': _('Date of sale'),
+				'fieldtype': 'Date',
+				'width': 150
+			}
+		]
+
 	columns = [
 		{
 			'fieldname': 'inventory_tracking_no',

@@ -6,12 +6,20 @@
   {{ frappe.datetime.str_to_user(frappe.datetime.now_datetime()) }}
 </div>
 
+{% let is_ats = data[0] && data[0].form_number %}
+
 <h1 text-align="center">{%= data[0].branch %}</h1>
 <h2>Vault Inventory Master List</h2>
 <br>
+{% if(is_ats) { %}
+<h5>Sanglang Benta (Agreement to Sell)</h5>
+<h5>Total Count: <b>{{ data.length-1 }}</b></h5>
+<h5>Total Value: <b>{{ data[data.length-1].total_value }}</b> </h5>
+{% } else { %}
 <h5>Series: <b>{{ data[0].item_series }} </b></h5>
 <h5>Total Count: <b>{{ data.length-1 }}</b></h5>
 <h5>Total Principal: <b>{{ data[data.length-1].desired_principal }}</b> </h5>
+{% } %}
 <br>
 <p> Date of turn over:____/____/________ </p>
 <br>
@@ -23,6 +31,15 @@
 
 <table class="table table-bordered">
     <thead>
+        {% if(is_ats) { %}
+        <tr>
+            <th style="width: 9%">{%= __("Inventory Tracker") %}</th>
+            <th style="width: 9%">{%= __("Customer Name") %}</th>
+            <th style="width: 10%">{%= __("Form Name") %}</th>
+            <th style="width: 35%">{%= __("Item Description") %}</th>
+            <th style="width: 7%">{%= __("Total Value") %}</th>
+        </tr>
+        {% } else { %}
         <tr>
             <th style="width: 9%">{%= __("Inventory Tracker") %}</th>
             <th style="width: 9%">{%= __("Customer Name") %}</th>
@@ -33,13 +50,22 @@
             <th style="width: 10%">{%= __("Maturity Date") %}</th>
             <th style="width: 10%">{%= __("Expiry Date") %}</th>
         </tr>
+        {% } %}
     </thead>
     <tbody>
         {% let sumNS = 0 %}
         {% let count = 0 %}
         {% for(var i=0, l=data.length; i<l; i++) { %}
             <tr>
-                {% if(data[i].date_loan_granted != null) { %}
+                {% if(is_ats && data[i].date_of_sale != null) { %}
+                <td>{%= data[i].ats_tracking_no %}</td>
+                <td>{%= data[i].customer_name %}</td>
+                <td>{%= data[i].form_number %}</td>
+                <td>{%= data[i].description %}</td>
+                <td>{%= data[i].total_value %}</td>
+                {% sumNS += data[i].total_value %}
+                {% count += 1 %}
+                {% } else if(!is_ats && data[i].date_loan_granted != null) { %}
                 <td>{%= data[i].inventory_tracking_no %}</td>
                 <td>{%= data[i].customers_full_name %}</td>
                 <td>{%= data[i].pawn_ticket %}</td>
@@ -57,7 +83,11 @@
                 <td></td>
                 <td><b>Total Count: </b></td>
                 <td>{{ count }}</td>
+                {% if(is_ats) { %}
+                <td style="text-align: right"><b>Total Value:</b></td>
+                {% } else { %}
                 <td style="text-align: right"><b>Total Principal:</b></td>
+                {% } %}
                 <td>{{ sumNS }}</td>
             </tr>
     </tbody>

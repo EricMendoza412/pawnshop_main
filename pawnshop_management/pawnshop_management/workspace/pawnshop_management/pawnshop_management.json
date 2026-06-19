@@ -228,6 +228,12 @@
    "type": "Report"
   },
   {
+   "doc_view": "List",
+   "label": "VC Turnover Checklist",
+   "link_to": "VC Turnover Checklist",
+   "type": "DocType"
+  },
+  {
    "doc_view": "Report Builder",
    "label": "VC Turnover List",
    "link_to": "VC Turnover List",

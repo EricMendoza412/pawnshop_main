@@ -1,0 +1,636 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "method",
+ "creation": "2026-06-17 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "branch",
+  "date",
+  "workflow_state",
+  "accepted_by",
+  "accepted_datetime",
+  "endorsed_by",
+  "received_by",
+  "checked_witnessed_by",
+  "safe_items_section",
+  "sangla_envelopes_cb",
+  "sangla_envelopes_ncb",
+  "sangla_non_jewelry",
+  "sanglang_benta",
+  "cash_inside_safe_column",
+  "forex_reserved_php",
+  "forex_reserved_usd",
+  "petty_cash_fund_php",
+  "display_section",
+  "necklace_count",
+  "pendant_count",
+  "earrings_count",
+  "rings_count",
+  "bracelet_count",
+  "bangle_count",
+  "set_count",
+  "jewelry_display_total",
+  "gadgets_display_column",
+  "cellphone_count",
+  "tablet_count",
+  "laptop_count",
+  "dslr_count",
+  "gadgets_display_total",
+  "other_safe_items_section",
+  "fx_remittance_envelope",
+  "jewelry_for_pickup_envelope",
+  "selling_for_deposit_envelope",
+  "gadget_under_installment",
+  "branch_mobile_phones",
+  "guard_firearm",
+  "company_laptop",
+  "denomination_section",
+  "php_1000",
+  "php_500",
+  "php_200",
+  "php_100",
+  "php_50",
+  "php_20",
+  "php_10",
+  "php_5",
+  "php_1",
+  "php_total",
+  "usd_column",
+  "usd_100",
+  "usd_50",
+  "usd_20",
+  "usd_10",
+  "usd_5",
+  "usd_2",
+  "usd_1",
+  "usd_total",
+  "petty_cash_section",
+  "petty_php_1000",
+  "petty_php_500",
+  "petty_php_200",
+  "petty_php_100",
+  "petty_php_50",
+  "petty_php_20",
+  "petty_php_10",
+  "petty_php_5",
+  "petty_php_1",
+  "petty_cash_total",
+  "others_inside_vault_or_safe",
+  "turnover_lists_section",
+  "turnover_items",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "VCT-.YYYY.-.######",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Series",
+   "options": "VCT-.YYYY.-.######",
+   "read_only": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Branch",
+   "options": "Branch",
+   "reqd": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "workflow_state",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nFor Acceptance\nAccepted",
+   "default": "Draft",
+   "read_only": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "accepted_by",
+   "fieldtype": "Link",
+   "label": "Accepted By",
+   "options": "User",
+   "read_only": 1,
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "accepted_datetime",
+   "fieldtype": "Datetime",
+   "label": "Accepted Date and Time",
+   "read_only": 1,
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "endorsed_by",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Endorsed By",
+   "options": "User",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "received_by",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Received By",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "checked_witnessed_by",
+   "fieldtype": "Link",
+   "label": "Checked/Witnessed By",
+   "options": "User"
+  },
+  {
+   "fieldname": "safe_items_section",
+   "fieldtype": "Section Break",
+   "label": "Items Inside the Safe in the Vault"
+  },
+  {
+   "default": "0",
+   "fieldname": "sangla_envelopes_cb",
+   "fieldtype": "Int",
+   "label": "Sangla Envelopes (CB)",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "sangla_envelopes_ncb",
+   "fieldtype": "Int",
+   "label": "Sangla Envelopes (NCB)",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "sangla_non_jewelry",
+   "fieldtype": "Int",
+   "label": "Sangla (Non Jewelry)",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "sanglang_benta",
+   "fieldtype": "Int",
+   "label": "Sanglang Benta",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cash_inside_safe_column",
+   "fieldtype": "Column Break",
+   "label": "Cash Inside the Safe"
+  },
+  {
+   "default": "0",
+   "fieldname": "forex_reserved_php",
+   "fieldtype": "Currency",
+   "label": "Forex Reserved (PHP)"
+  },
+  {
+   "default": "0",
+   "fieldname": "forex_reserved_usd",
+   "fieldtype": "Currency",
+   "label": "Forex Reserved (USD)"
+  },
+  {
+   "default": "0",
+   "fieldname": "petty_cash_fund_php",
+   "fieldtype": "Currency",
+   "label": "Petty Cash Fund (PHP)"
+  },
+  {
+   "fieldname": "display_section",
+   "fieldtype": "Section Break",
+   "label": "Display Items"
+  },
+  {
+   "default": "0",
+   "fieldname": "necklace_count",
+   "fieldtype": "Int",
+   "label": "Necklace"
+  },
+  {
+   "default": "0",
+   "fieldname": "pendant_count",
+   "fieldtype": "Int",
+   "label": "Pendant"
+  },
+  {
+   "default": "0",
+   "fieldname": "earrings_count",
+   "fieldtype": "Int",
+   "label": "Earrings"
+  },
+  {
+   "default": "0",
+   "fieldname": "rings_count",
+   "fieldtype": "Int",
+   "label": "Rings"
+  },
+  {
+   "default": "0",
+   "fieldname": "bracelet_count",
+   "fieldtype": "Int",
+   "label": "Bracelet"
+  },
+  {
+   "default": "0",
+   "fieldname": "bangle_count",
+   "fieldtype": "Int",
+   "label": "Bangle"
+  },
+  {
+   "default": "0",
+   "fieldname": "set_count",
+   "fieldtype": "Int",
+   "label": "Set"
+  },
+  {
+   "default": "0",
+   "fieldname": "jewelry_display_total",
+   "fieldtype": "Int",
+   "label": "Jewelry Display Total",
+   "read_only": 1
+  },
+  {
+   "fieldname": "gadgets_display_column",
+   "fieldtype": "Column Break",
+   "label": "Gadgets on Display"
+  },
+  {
+   "default": "0",
+   "fieldname": "cellphone_count",
+   "fieldtype": "Int",
+   "label": "Cellphone",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "tablet_count",
+   "fieldtype": "Int",
+   "label": "Tablet",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "laptop_count",
+   "fieldtype": "Int",
+   "label": "Laptop",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "dslr_count",
+   "fieldtype": "Int",
+   "label": "DSLR",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "gadgets_display_total",
+   "fieldtype": "Int",
+   "label": "Gadgets Display Total",
+   "read_only": 1
+  },
+  {
+   "fieldname": "other_safe_items_section",
+   "fieldtype": "Section Break",
+   "label": "Other Items Inside the Safe"
+  },
+  {
+   "default": "0",
+   "fieldname": "fx_remittance_envelope",
+   "fieldtype": "Int",
+   "label": "FX Remittance Envelope"
+  },
+  {
+   "default": "0",
+   "fieldname": "jewelry_for_pickup_envelope",
+   "fieldtype": "Int",
+   "label": "Jewelry for Pickup Envelope"
+  },
+  {
+   "default": "0",
+   "fieldname": "selling_for_deposit_envelope",
+   "fieldtype": "Int",
+   "label": "Selling for Deposit Envelope"
+  },
+  {
+   "default": "0",
+   "fieldname": "gadget_under_installment",
+   "fieldtype": "Int",
+   "label": "Gadget Under Installment",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "branch_mobile_phones",
+   "fieldtype": "Int",
+   "label": "Branch Laptops and Phones",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "guard_firearm",
+   "fieldtype": "Int",
+   "label": "Guard Firearm"
+  },
+  {
+   "default": "0",
+   "fieldname": "company_laptop",
+   "fieldtype": "Int",
+   "label": "Company Laptop",
+   "hidden": 1,
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "denomination_section",
+   "fieldtype": "Section Break",
+   "label": "FX Reserved Cash Breakdown"
+  },
+  {
+   "default": "0",
+   "fieldname": "php_1000",
+   "fieldtype": "Currency",
+   "label": "PHP 1000"
+  },
+  {
+   "default": "0",
+   "fieldname": "php_500",
+   "fieldtype": "Currency",
+   "label": "PHP 500"
+  },
+  {
+   "default": "0",
+   "fieldname": "php_200",
+   "fieldtype": "Currency",
+   "label": "PHP 200"
+  },
+  {
+   "default": "0",
+   "fieldname": "php_100",
+   "fieldtype": "Currency",
+   "label": "PHP 100"
+  },
+  {
+   "default": "0",
+   "fieldname": "php_50",
+   "fieldtype": "Currency",
+   "label": "PHP 50"
+  },
+  {
+   "default": "0",
+   "fieldname": "php_20",
+   "fieldtype": "Currency",
+   "label": "PHP 20"
+  },
+  {
+   "default": "0",
+   "fieldname": "php_10",
+   "fieldtype": "Currency",
+   "label": "PHP 10"
+  },
+  {
+   "default": "0",
+   "fieldname": "php_5",
+   "fieldtype": "Currency",
+   "label": "PHP 5"
+  },
+  {
+   "default": "0",
+   "fieldname": "php_1",
+   "fieldtype": "Currency",
+   "label": "PHP 1"
+  },
+  {
+   "default": "0",
+   "fieldname": "php_total",
+   "fieldtype": "Currency",
+   "label": "PHP Total",
+   "read_only": 1
+  },
+  {
+   "fieldname": "usd_column",
+   "fieldtype": "Column Break",
+   "label": "USD"
+  },
+  {
+   "default": "0",
+   "fieldname": "usd_100",
+   "fieldtype": "Currency",
+   "label": "USD 100"
+  },
+  {
+   "default": "0",
+   "fieldname": "usd_50",
+   "fieldtype": "Currency",
+   "label": "USD 50"
+  },
+  {
+   "default": "0",
+   "fieldname": "usd_20",
+   "fieldtype": "Currency",
+   "label": "USD 20"
+  },
+  {
+   "default": "0",
+   "fieldname": "usd_10",
+   "fieldtype": "Currency",
+   "label": "USD 10"
+  },
+  {
+   "default": "0",
+   "fieldname": "usd_5",
+   "fieldtype": "Currency",
+   "label": "USD 5"
+  },
+  {
+   "default": "0",
+   "fieldname": "usd_2",
+   "fieldtype": "Currency",
+   "label": "USD 2"
+  },
+  {
+   "default": "0",
+   "fieldname": "usd_1",
+   "fieldtype": "Currency",
+   "label": "USD 1"
+  },
+  {
+   "default": "0",
+   "fieldname": "usd_total",
+   "fieldtype": "Currency",
+   "label": "USD Total",
+   "read_only": 1
+  },
+  {
+   "fieldname": "petty_cash_section",
+   "fieldtype": "Section Break",
+   "label": "Petty Cash Fund"
+  },
+  {
+   "default": "0",
+   "fieldname": "petty_php_1000",
+   "fieldtype": "Currency",
+   "label": "Petty PHP 1000"
+  },
+  {
+   "default": "0",
+   "fieldname": "petty_php_500",
+   "fieldtype": "Currency",
+   "label": "Petty PHP 500"
+  },
+  {
+   "default": "0",
+   "fieldname": "petty_php_200",
+   "fieldtype": "Currency",
+   "label": "Petty PHP 200"
+  },
+  {
+   "default": "0",
+   "fieldname": "petty_php_100",
+   "fieldtype": "Currency",
+   "label": "Petty PHP 100"
+  },
+  {
+   "default": "0",
+   "fieldname": "petty_php_50",
+   "fieldtype": "Currency",
+   "label": "Petty PHP 50"
+  },
+  {
+   "default": "0",
+   "fieldname": "petty_php_20",
+   "fieldtype": "Currency",
+   "label": "Petty PHP 20"
+  },
+  {
+   "default": "0",
+   "fieldname": "petty_php_10",
+   "fieldtype": "Currency",
+   "label": "Petty PHP 10"
+  },
+  {
+   "default": "0",
+   "fieldname": "petty_php_5",
+   "fieldtype": "Currency",
+   "label": "Petty PHP 5"
+  },
+  {
+   "default": "0",
+   "fieldname": "petty_php_1",
+   "fieldtype": "Currency",
+   "label": "Petty PHP 1"
+  },
+  {
+   "default": "0",
+   "fieldname": "petty_cash_total",
+   "fieldtype": "Currency",
+   "label": "Petty Cash Total",
+   "read_only": 1
+  },
+  {
+   "fieldname": "others_inside_vault_or_safe",
+   "fieldtype": "Text",
+   "label": "Others Inside Vault or Safe"
+  },
+  {
+   "fieldname": "turnover_lists_section",
+   "fieldtype": "Section Break",
+   "label": "Turnover Lists"
+  },
+  {
+   "fieldname": "turnover_items",
+   "fieldtype": "Table",
+   "label": "Turnover Items",
+   "options": "VC Turnover Checklist Item",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "VC Turnover Checklist",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-06-17 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Pawnshop Management",
+ "name": "VC Turnover Checklist",
+ "naming_rule": "By script",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Operations Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Supervisor",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Pawnshop Cashier"
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "default_print_format": "VC Turnover Checklist"
+}

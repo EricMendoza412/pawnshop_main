@@ -58,6 +58,7 @@ if(is_allowed){
                     "A-Jewelry", 
                     "B-Jewelry", 
                     "B-Non Jewelry",
+                    "Agreement to Sell",
                 ],
                 default: "A-Jewelry"
             }
@@ -75,6 +76,7 @@ if(is_allowed){
                     "A-Jewelry", 
                     "B-Jewelry", 
                     "B-Non Jewelry",
+                    "Agreement to Sell",
                 ],
                 default: "A-Jewelry"
             }
