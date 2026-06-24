@@ -3,6 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
+from frappe.utils import flt
 from frappe.utils import today
 
 def get_user_from_appraiser_value(value):
@@ -76,6 +77,9 @@ class AgreementtoSell(Document):
 				settings.save(ignore_permissions=True)
 
 	def before_submit(self):
+		if flt(self.total_value) == 0:
+			frappe.throw("Total Value must not be zero")
+
 		self.validate_appraisers_for_submit()
 
 	def on_submit(self):

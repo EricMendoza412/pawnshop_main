@@ -81,6 +81,8 @@ const refreshSystemFields = frm => {
 		args: {
 			branch: frm.doc.branch,
 		},
+		freeze: true,
+		freeze_message: __("Loading data"),
 		callback(response) {
 			applyAutofillValues(frm, response.message);
 		},
@@ -106,6 +108,8 @@ frappe.ui.form.on("VC Turnover Checklist", {
 		if (frm.is_new() && !frm.doc.branch) {
 			frappe.call({
 				method: "pawnshop_management.pawnshop_management.doctype.vc_turnover_checklist.vc_turnover_checklist.get_default_branch",
+				freeze: true,
+				freeze_message: __("Loading data"),
 				callback(response) {
 					if (response.message && !frm.doc.branch) {
 						frm.set_value("branch", response.message);

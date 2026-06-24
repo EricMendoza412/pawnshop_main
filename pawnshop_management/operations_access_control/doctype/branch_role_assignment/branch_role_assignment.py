@@ -4,7 +4,12 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
+from frappe.model.naming import make_autoname
 from frappe.utils import getdate, now_datetime, today
+
+from pawnshop_management.pawnshop_management.doctype.pawnshop_transaction_log.pawnshop_transaction_log import (
+	get_branch_code,
+)
 
 
 ROLE_TO_BRANCH_FIELD = {
@@ -17,6 +22,14 @@ MANAGER_ROLES = {"Operations Manager", "Supervisor"}
 
 
 class BranchRoleAssignment(Document):
+	def autoname(self):
+		branch_code = get_branch_code(self.branch)
+		if branch_code:
+			self.name = make_autoname(f"BRA{branch_code}-.######")
+			return
+
+		self.name = make_autoname("BRA-.######")
+
 	def before_insert(self):
 		self.validate_create_permission()
 

@@ -197,7 +197,12 @@ class ProvisionalReceipt(Document):
 				msg='Payment does not amount to total fee',
 			)
 		# check if ameneded
-		if not self.amended_from:
+		if self.transaction_type in ("Renewal", "Renewal w/ Amortization") and not self.amended_from:
+			if not self.new_pawn_ticket_no:
+				frappe.throw(
+					msg="New Pawn Ticket No is required before submitting a renewal Provisional Receipt.",
+					title="Missing New Pawn Ticket"
+				)
 			# Duplicate check before saving
 			if frappe.db.exists(self.pawn_ticket_type, {"pawn_ticket": self.new_pawn_ticket_no}):
 				frappe.throw(
@@ -251,70 +256,88 @@ class ProvisionalReceipt(Document):
 			self.amortization += self.additional_amortization
 
 		if (self.transaction_type == "Renewal" or self.transaction_type == "Renewal w/ Amortization") and not self.amended_from: # Create New Pawn Ticket
-			previous_pawn_ticket = frappe.get_doc(self.pawn_ticket_type, self.pawn_ticket_no)
-			new_pawn_ticket = frappe.new_doc(self.pawn_ticket_type)
-			new_pawn_ticket.branch = self.branch
-			new_pawn_ticket.item_series = previous_pawn_ticket.item_series
-			new_pawn_ticket.pawn_ticket = self.new_pawn_ticket_no
-			new_pawn_ticket.date_loan_granted = self.date_issued
-			new_pawn_ticket.old_pawn_ticket = self.pawn_ticket_no
-			new_pawn_ticket.maturity_date = add_to_date(self.date_issued, days=30)
-			new_pawn_ticket.customers_tracking_no = previous_pawn_ticket.customers_tracking_no
-			new_pawn_ticket.customers_full_name = previous_pawn_ticket.customers_full_name
-			new_pawn_ticket.inventory_tracking_no = previous_pawn_ticket.inventory_tracking_no
-			new_pawn_ticket.original_principal = previous_pawn_ticket.original_principal
-			new_pawn_ticket.created_by_pr = self.name
-			if self.pawn_ticket_type == "Pawn Ticket Non Jewelry":
-				new_pawn_ticket.interest_rate = previous_pawn_ticket.interest_rate
-				previous_items = previous_pawn_ticket.non_jewelry_items
-				new_pawn_ticket.expiry_date = add_to_date(self.date_issued, days=30)
-				for i in range(len(previous_items)):
-					new_pawn_ticket.append("non_jewelry_items", {
-						"item_no": previous_items[i].item_no,
-						"type": previous_items[i].type,
-						"brand": previous_items[i].brand,
-						"model": previous_items[i].model,
-						"model_number": previous_items[i].model_number,
-						"suggested_appraisal_value": previous_items[i].suggested_appraisal_value
-					})
-			elif self.pawn_ticket_type == "Pawn Ticket Jewelry":
-				previous_items = previous_pawn_ticket.jewelry_items
-				new_pawn_ticket.expiry_date = add_to_date(self.date_issued, days=120)
-				new_pawn_ticket.main_appraiser_acct = previous_pawn_ticket.main_appraiser_acct
-				new_pawn_ticket.main_appraiser = previous_pawn_ticket.main_appraiser
-				new_pawn_ticket.assistant_appraiser_acct = previous_pawn_ticket.assistant_appraiser_acct
-				new_pawn_ticket.assistant_appraiser = previous_pawn_ticket.assistant_appraiser
-				for i in range(len(previous_items)):
-					new_pawn_ticket.append("jewelry_items", {
-						"item_no": previous_items[i].item_no,
-						"type": previous_items[i].type,
-						"karat_category": previous_items[i].karat_category,
-						"karat": previous_items[i].karat,
-						"weight": previous_items[i].weight,
-						"color": previous_items[i].color,
-						"colors_if_multi": previous_items[i].colors_if_multi,
-						"additional_for_stone": previous_items[i].additional_for_stone,
-						"suggested_appraisal_value": previous_items[i].suggested_appraisal_value,
-						"desired_principal": previous_items[i].desired_principal,
-						"comments": previous_items[i].comments
-					})
+			try:
+				previous_pawn_ticket = frappe.get_doc(self.pawn_ticket_type, self.pawn_ticket_no)
+				new_pawn_ticket = frappe.new_doc(self.pawn_ticket_type)
+				new_pawn_ticket.branch = self.branch
+				new_pawn_ticket.item_series = previous_pawn_ticket.item_series
+				new_pawn_ticket.pawn_ticket = self.new_pawn_ticket_no
+				new_pawn_ticket.date_loan_granted = self.date_issued
+				new_pawn_ticket.old_pawn_ticket = self.pawn_ticket_no
+				new_pawn_ticket.maturity_date = add_to_date(self.date_issued, days=30)
+				new_pawn_ticket.customers_tracking_no = previous_pawn_ticket.customers_tracking_no
+				new_pawn_ticket.customers_full_name = previous_pawn_ticket.customers_full_name
+				new_pawn_ticket.inventory_tracking_no = previous_pawn_ticket.inventory_tracking_no
+				new_pawn_ticket.original_principal = previous_pawn_ticket.original_principal
+				new_pawn_ticket.created_by_pr = self.name
+				if self.pawn_ticket_type == "Pawn Ticket Non Jewelry":
+					new_pawn_ticket.interest_rate = previous_pawn_ticket.interest_rate
+					previous_items = previous_pawn_ticket.non_jewelry_items
+					new_pawn_ticket.expiry_date = add_to_date(self.date_issued, days=30)
+					for i in range(len(previous_items)):
+						new_pawn_ticket.append("non_jewelry_items", {
+							"item_no": previous_items[i].item_no,
+							"type": previous_items[i].type,
+							"brand": previous_items[i].brand,
+							"model": previous_items[i].model,
+							"model_number": previous_items[i].model_number,
+							"suggested_appraisal_value": previous_items[i].suggested_appraisal_value
+						})
+				elif self.pawn_ticket_type == "Pawn Ticket Jewelry":
+					previous_items = previous_pawn_ticket.jewelry_items
+					new_pawn_ticket.expiry_date = add_to_date(self.date_issued, days=120)
+					new_pawn_ticket.main_appraiser_acct = previous_pawn_ticket.main_appraiser_acct
+					new_pawn_ticket.main_appraiser = previous_pawn_ticket.main_appraiser
+					new_pawn_ticket.assistant_appraiser_acct = previous_pawn_ticket.assistant_appraiser_acct
+					new_pawn_ticket.assistant_appraiser = previous_pawn_ticket.assistant_appraiser
+					for i in range(len(previous_items)):
+						new_pawn_ticket.append("jewelry_items", {
+							"item_no": previous_items[i].item_no,
+							"type": previous_items[i].type,
+							"karat_category": previous_items[i].karat_category,
+							"karat": previous_items[i].karat,
+							"weight": previous_items[i].weight,
+							"color": previous_items[i].color,
+							"colors_if_multi": previous_items[i].colors_if_multi,
+							"additional_for_stone": previous_items[i].additional_for_stone,
+							"suggested_appraisal_value": previous_items[i].suggested_appraisal_value,
+							"desired_principal": previous_items[i].desired_principal,
+							"comments": previous_items[i].comments
+						})
 
-			if self.transaction_type == "Renewal w/ Amortization":
-				newPrincipal = previous_pawn_ticket.desired_principal - self.additional_amortization
-				new_pawn_ticket.desired_principal = newPrincipal
-				new_pawn_ticket.interest = self.advance_interest
-				new_pawn_ticket.net_proceeds = newPrincipal - self.advance_interest
-			else:
-				new_pawn_ticket.desired_principal = previous_pawn_ticket.desired_principal
-				new_pawn_ticket.interest = previous_pawn_ticket.interest
-				new_pawn_ticket.net_proceeds = previous_pawn_ticket.net_proceeds
-	
-			if self.pawn_ticket_no != "":
-				frappe.db.set_value(self.pawn_ticket_type, self.pawn_ticket_no, 'workflow_state', 'Renewed')
-				frappe.db.set_value(self.pawn_ticket_type, self.pawn_ticket_no, 'change_status_date', today())
-				frappe.db.commit()
-			new_pawn_ticket.save(ignore_permissions=True)
-			new_pawn_ticket.submit()
+				if self.transaction_type == "Renewal w/ Amortization":
+					newPrincipal = previous_pawn_ticket.desired_principal - self.additional_amortization
+					new_pawn_ticket.desired_principal = newPrincipal
+					new_pawn_ticket.interest = self.advance_interest
+					new_pawn_ticket.net_proceeds = newPrincipal - self.advance_interest
+				else:
+					new_pawn_ticket.desired_principal = previous_pawn_ticket.desired_principal
+					new_pawn_ticket.interest = previous_pawn_ticket.interest
+					new_pawn_ticket.net_proceeds = previous_pawn_ticket.net_proceeds
+		
+				new_pawn_ticket.save(ignore_permissions=True)
+				new_pawn_ticket.submit()
+
+				if new_pawn_ticket.docstatus != 1:
+					frappe.throw(
+						msg=f"New Pawn Ticket {self.new_pawn_ticket_no} was created but was not submitted.",
+						title="Pawn Ticket Submission Failed"
+					)
+
+				if self.pawn_ticket_no != "":
+					frappe.db.set_value(self.pawn_ticket_type, self.pawn_ticket_no, 'workflow_state', 'Renewed')
+					frappe.db.set_value(self.pawn_ticket_type, self.pawn_ticket_no, 'change_status_date', today())
+			except Exception as e:
+				frappe.log_error(frappe.get_traceback(), "Provisional Receipt Renewal Failed")
+				error_message = cstr(e) or e.__class__.__name__
+				frappe.throw(
+					msg=(
+						f"Provisional Receipt was not submitted because the new Pawn Ticket "
+						f"{self.new_pawn_ticket_no or ''} could not be created and submitted.<br><br>"
+						f"<b>Error:</b> {error_message}"
+					),
+					title="Pawn Ticket Creation Failed"
+				)
 
 		elif self.transaction_type == "Amortization" and not self.amended_from:
 			interest_rate = frappe.get_doc('Pawnshop Management Settings')

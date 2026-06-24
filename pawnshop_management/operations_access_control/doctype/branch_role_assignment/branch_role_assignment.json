@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 0,
- "autoname": "naming_series:",
+ "autoname": "method",
  "creation": "2026-06-04 00:00:00.000000",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -108,7 +108,7 @@
  "modified_by": "Administrator",
  "module": "Operations Access Control",
  "name": "Branch Role Assignment",
- "naming_rule": "By \"Naming Series\" field",
+ "naming_rule": "By script",
  "owner": "Administrator",
  "permissions": [
         {
