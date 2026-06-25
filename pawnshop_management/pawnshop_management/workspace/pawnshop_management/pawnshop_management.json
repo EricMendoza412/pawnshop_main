@@ -207,6 +207,15 @@
   {
    "hidden": 0,
    "is_query_report": 0,
+   "label": "VC Turnover Lists (J, NJ, SB)",
+   "link_to": "VC Turnover List",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
    "label": "Transfer Tracker",
    "link_to": "Transfer Tracker",
    "link_type": "DocType",
@@ -232,7 +241,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-06-25 16:20:05.731118",
+ "modified": "2026-06-25 16:26:58.370055",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Pawnshop Management",
