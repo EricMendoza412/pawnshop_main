@@ -5,6 +5,7 @@ from pydoc import doc
 import frappe
 from frappe.model.document import Document
 from frappe.utils import flt
+from pawnshop_management.pawnshop_management.utils import validate_unique_pawn_ticket_name
 from pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket import (
     update_fields_after_status_change_collect_pawn_ticket,
     update_fields_after_status_change_pull_out_pawn_ticket,
@@ -15,6 +16,9 @@ from pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket imp
 )
 
 class PawnTicketNonJewelry(Document):
+	def validate(self):
+		validate_unique_pawn_ticket_name(self.pawn_ticket, self.doctype, self.name)
+
 	def update_pawn_ticket_jewelry_statuses(self):
 		if self.workflow_state == "Expired":
 			update_fields_after_status_change_collect_pawn_ticket("Pawn Ticket Non Jewelry", self.inventory_tracking_no, self.pawn_ticket)

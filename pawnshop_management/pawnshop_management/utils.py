@@ -10,6 +10,23 @@ from frappe.integrations.utils import (
 
 ID_PICTURE_BASE_URL = "https://firebasestorage.googleapis.com/v0/b/gpcustomersids.appspot.com/o/customerPictures%2F{0}.jpg?alt=media"
 ID_PICTURE_FALLBACK_BASE_URL = "https://storage.cloud.google.com/gpcustomersids.appspot.com/customerPictures/{0}.jpg"
+PAWN_TICKET_DOCTYPES = ("Pawn Ticket Jewelry", "Pawn Ticket Non Jewelry")
+
+
+def validate_unique_pawn_ticket_name(pawn_ticket_no, current_doctype=None, current_name=None):
+    if not pawn_ticket_no:
+        return
+
+    for doctype in PAWN_TICKET_DOCTYPES:
+        existing_name = frappe.db.exists(doctype, pawn_ticket_no)
+        if existing_name and not (doctype == current_doctype and existing_name == current_name):
+            frappe.throw(
+                msg=_("Pawn Ticket {0} already exists in {1}. Please refresh this page and try again.").format(
+                    frappe.bold(pawn_ticket_no),
+                    frappe.bold(doctype),
+                ),
+                title=_("Duplicate Pawn Ticket"),
+            )
 
 
 def get_id_picture_html(id_pic_name=None, empty_message=None):

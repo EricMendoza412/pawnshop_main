@@ -7,6 +7,7 @@ from frappe.utils import add_to_date, today, cstr
 import frappe
 from frappe.model.document import Document
 from frappe.utils import flt
+from pawnshop_management.pawnshop_management.utils import validate_unique_pawn_ticket_name
 
 
 @frappe.whitelist()
@@ -203,12 +204,9 @@ class ProvisionalReceipt(Document):
 					msg="New Pawn Ticket No is required before submitting a renewal Provisional Receipt.",
 					title="Missing New Pawn Ticket"
 				)
+
 			# Duplicate check before saving
-			if frappe.db.exists(self.pawn_ticket_type, {"pawn_ticket": self.new_pawn_ticket_no}):
-				frappe.throw(
-					msg=f"Pawn Ticket {self.new_pawn_ticket_no} already exists. Please refresh this page and try again. If in Draft, request cancellation.",
-					title="Duplicate Pawn Ticket"
-				)
+			validate_unique_pawn_ticket_name(self.new_pawn_ticket_no)
 
 		
 

@@ -2,6 +2,7 @@
  "cards_label": "List",
  "category": "Modules",
  "charts": [],
+ "charts_label": "",
  "creation": "2022-04-20 10:15:18.773416",
  "developer_mode_only": 0,
  "disable_user_customization": 1,
@@ -18,7 +19,7 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Documents",
+   "label": "Tickets and Receipts",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
@@ -46,15 +47,6 @@
    "is_query_report": 0,
    "label": "Provisional Receipt",
    "link_to": "Provisional Receipt",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Cash Position Report",
-   "link_to": "Cash Position Report",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -107,7 +99,7 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Gadget Price List",
+   "label": "Gadgets",
    "link_to": "Models",
    "link_type": "DocType",
    "onboard": 0,
@@ -125,11 +117,92 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Subastado",
-   "link_to": "Transfer Tracker",
+   "label": "Installment Agreement Forms",
+   "link_to": "Installment Agreement Form",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Gadgets for Sale",
+   "link_to": "Gadgets For Sale",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "End of Day Reports",
+   "link_to": "Pawnshop Transaction Log",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cash Position Report",
+   "link_to": "Cash Position Report",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Transaction Log Report",
+   "link_to": "Pawnshop Transaction Log",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Transaction Log Preview",
+   "link_to": "VC Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Text Blast",
+   "link_to": "SMART SMS Log",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "SMS Log",
+   "link_to": "SMART SMS Log",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Vault Custodian Reports",
+   "link_to": "Pawnshop Transaction Log",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "VC Count Report",
+   "link_to": "VC Count Consolidated",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
   },
   {
    "hidden": 0,
@@ -139,9 +212,27 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "VC Tracker (Gadget)",
+   "link_to": "NJ End of the Day Repor",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "VC Tracker (Jewelry)",
+   "link_to": "J End of Day Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2025-09-07 16:13:57.144184",
+ "modified": "2026-06-25 16:20:05.731118",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Pawnshop Management",
@@ -186,64 +277,10 @@
    "type": "DocType"
   },
   {
-   "doc_view": "Report Builder",
-   "label": "VC Tracker (Gadget)",
-   "link_to": "NJ End of the Day Repor",
-   "type": "Report"
-  },
-  {
-   "doc_view": "Report Builder",
-   "label": "VC Tracker (Jewelry)",
-   "link_to": "J End of Day Report",
-   "type": "Report"
-  },
-  {
-   "doc_view": "Report Builder",
-   "label": "VC Count - A ",
-   "link_to": "Vault Custodian Jewelry Report A",
-   "type": "Report"
-  },
-  {
-   "doc_view": "Report Builder",
-   "label": "VC Count -B (J)",
-   "link_to": "Vault Custodian Jewelry Report B",
-   "type": "Report"
-  },
-  {
-   "doc_view": "Report Builder",
-   "label": "VC Count - B (NJ)",
-   "link_to": "Vault Custodian Non Jewelry Report",
-   "type": "Report"
-  },
-  {
-   "doc_view": "Report Builder",
-   "label": "VC Count Consolidated",
-   "link_to": "VC Count Consolidated",
-   "type": "Report"
-  },
-  {
-   "doc_view": "Report Builder",
-   "label": "Pawnshop Transaction Log",
-   "link_to": "VC Report",
-   "type": "Report"
-  },
-  {
-   "doc_view": "List",
-   "label": "VC Turnover Checklist",
-   "link_to": "VC Turnover Checklist",
+   "doc_view": "New",
+   "label": "New NJ Installment Form",
+   "link_to": "Installment Agreement Form",
    "type": "DocType"
-  },
-  {
-   "doc_view": "Report Builder",
-   "label": "VC Turnover List",
-   "link_to": "VC Turnover List",
-   "type": "Report"
-  },
-  {
-   "doc_view": "Report Builder",
-   "label": "VC Agreement to Sell List",
-   "link_to": "VC Agreement to Sell List",
-   "type": "Report"
   }
  ],
  "shortcuts_label": "Shortcuts"
