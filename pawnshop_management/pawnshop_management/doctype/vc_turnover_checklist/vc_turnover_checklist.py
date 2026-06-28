@@ -33,6 +33,10 @@ class VCTurnoverChecklist(Document):
 		if self.is_new() and not self.workflow_state:
 			self.workflow_state = "Draft"
 
+		if self.is_new():
+			self.branch = get_branch_from_request_ip()
+			self.date = today()
+
 		if not self.branch:
 			self.branch = get_branch_from_request_ip()
 
@@ -66,6 +70,9 @@ class VCTurnoverChecklist(Document):
 
 	def on_submit(self):
 		pass
+
+	def on_cancel(self):
+		self.db_set("workflow_state", "Rejected", update_modified=False)
 
 	def on_update_after_submit(self):
 		if self.workflow_state == "Accepted":

@@ -2,8 +2,8 @@ import frappe
 
 
 WORKFLOW_NAME = "VC Turnover Checklist Workflow"
-WORKFLOW_STATES = ("Draft", "For Acceptance", "Accepted")
-WORKFLOW_ACTIONS = ("Submit", "Accept Turnover")
+WORKFLOW_STATES = ("Draft", "For Acceptance", "Accepted", "Rejected")
+WORKFLOW_ACTIONS = ("Submit", "Accept Turnover", "Reject")
 
 
 def execute():
@@ -72,6 +72,11 @@ def ensure_workflow():
 				"doc_status": "1",
 				"allow_edit": "System Manager",
 			},
+			{
+				"state": "Rejected",
+				"doc_status": "2",
+				"allow_edit": "System Manager",
+			},
 		],
 	)
 	workflow.set(
@@ -91,6 +96,13 @@ def ensure_workflow():
 				"allowed": "All",
 				"allow_self_approval": 1,
 				"condition": "doc.received_by == frappe.session.user",
+			},
+			{
+				"state": "For Acceptance",
+				"action": "Reject",
+				"next_state": "Rejected",
+				"allowed": "System Manager",
+				"allow_self_approval": 1,
 			},
 		],
 	)
@@ -116,6 +128,14 @@ def backfill_existing_workflow_states():
 			and (workflow_state is null or workflow_state = '')
 		"""
 	)
+	frappe.db.sql(
+		"""
+		update `tabVC Turnover Checklist`
+		set workflow_state = 'Rejected'
+		where docstatus = 2
+			and workflow_state != 'Rejected'
+		"""
+	)
 
 
 def _get_state_style(state):
@@ -123,4 +143,6 @@ def _get_state_style(state):
 		return "Success"
 	if state == "For Acceptance":
 		return "Primary"
+	if state == "Rejected":
+		return "Danger"
 	return "Secondary"
