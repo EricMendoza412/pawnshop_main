@@ -105,6 +105,9 @@ frappe.ui.form.on('Agreement to Sell', {
 function set_appraiser_queries(frm) {
 	const appraiser_roles = [
 		"Appraiser",
+		"Senior Appraiser",
+		"Junior Appraiser",
+		"Cashier",
 		"Operations Supervisor",
 		"Appraiser/Cashier",
 		"Vault Custodian",

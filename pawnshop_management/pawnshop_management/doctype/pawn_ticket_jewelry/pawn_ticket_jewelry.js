@@ -65,7 +65,7 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 	},
 
 	refresh: function(frm){
-		const can_send_smart_sms = frappe.session.user === 'Administrator' || frappe.user_roles.includes('Vault Custodian');
+		const is_administrator = frappe.session.user === 'Administrator';
 		const today = frappe.datetime.get_today();
 		const is_today_or_within_previous_5_days = function(date) {
 			if (!date) {
@@ -98,18 +98,34 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 			});
 		};
 
-		if (can_send_smart_sms && is_today_or_within_previous_5_days(frm.doc.maturity_date) && !frm.doc.texted_upon_maturity) {
-			add_smart_sms_button(
-				'Maturity Date SMS',
-				'pawnshop_management.pawnshop_management.smart_a2p.send_administrator_test_sms'
-			);
-		}
+		const add_smart_sms_buttons = function() {
+			if (is_today_or_within_previous_5_days(frm.doc.maturity_date) && !frm.doc.texted_upon_maturity) {
+				add_smart_sms_button(
+					'Maturity Date SMS',
+					'pawnshop_management.pawnshop_management.smart_a2p.send_administrator_test_sms'
+				);
+			}
 
-		if (can_send_smart_sms && is_today_or_within_previous_5_days(frm.doc.expiry_date) && !frm.doc.texted_upon_expiry) {
-			add_smart_sms_button(
-				'Expiry Date SMS',
-				'pawnshop_management.pawnshop_management.smart_a2p.send_expiry_date_sms'
-			);
+			if (is_today_or_within_previous_5_days(frm.doc.expiry_date) && !frm.doc.texted_upon_expiry) {
+				add_smart_sms_button(
+					'Expiry Date SMS',
+					'pawnshop_management.pawnshop_management.smart_a2p.send_expiry_date_sms'
+				);
+			}
+		};
+
+		if (is_administrator) {
+			add_smart_sms_buttons();
+		} else if (frm.doc.branch) {
+			frappe.call({
+				method: "pawnshop_management.operations_access_control.access_control.get_active_branch_roles",
+				args: { branch: frm.doc.branch },
+				callback(response) {
+					if ((response.message || {})["Vault Custodian"]) {
+						add_smart_sms_buttons();
+					}
+				},
+			});
 		}
 
 		//make customers_tracking_no and jewelry_items read only after saving
@@ -500,6 +516,9 @@ function set_series(frm) { //Set the pawn ticket series
 function set_appraiser_queries(frm) {
 	const appraiser_roles = [
 		"Appraiser",
+		"Senior Appraiser",
+		"Junior Appraiser",
+		"Cashier",
 		"Operations Supervisor",
 		"Appraiser/Cashier",
 		"Vault Custodian",

@@ -6,6 +6,8 @@ ALLOWED_BRANCH_ROLES = {
     "Cashier",
     "Operations Supervisor/Cashier",
     "Appraiser/Cashier",
+    "Senior Appraiser",
+    "Junior Appraiser",
     "Appraiser",
     "Operations Supervisor",
     "Vault Custodian",
