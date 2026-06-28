@@ -518,7 +518,6 @@ function set_appraiser_queries(frm) {
 		"Appraiser",
 		"Senior Appraiser",
 		"Junior Appraiser",
-		"Cashier",
 		"Operations Supervisor",
 		"Appraiser/Cashier",
 		"Vault Custodian",
