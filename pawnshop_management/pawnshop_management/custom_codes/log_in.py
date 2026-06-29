@@ -14,7 +14,16 @@ def login_feed(login_manager):
     user = frappe.get_doc('User', login_manager.user)
     branch_address = frappe.get_all('Branch IP Addressing', filters={'ip_address': ip}, fields=['name', 'ip_address'])
 
-    roles = {"Cashier", "Appraiser", "Vault Custodian", "Operations Supervisor/Cashier", "Appraiser/Cashier", "Operations Supervisor"}
+    roles = {
+        "Cashier",
+        "Appraiser",
+        "Senior Appraiser",
+        "Junior Appraiser",
+        "Vault Custodian",
+        "Operations Supervisor/Cashier",
+        "Appraiser/Cashier",
+        "Operations Supervisor",
+    }
 
     if user.role_profile_name in roles:
         if branch_address:

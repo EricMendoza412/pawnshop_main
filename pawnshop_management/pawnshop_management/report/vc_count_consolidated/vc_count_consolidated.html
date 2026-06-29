@@ -46,6 +46,10 @@
 		padding-top: 38px;
 		text-align: center;
 	}
+	.vc-signature-name {
+		min-height: 18px;
+		font-weight: 700;
+	}
 	.vc-signature-line {
 		border-top: 1px solid #222;
 		font-weight: 700;
@@ -131,6 +135,7 @@
 	{% } %}
 
 	<div class="vc-signature">
+		<div class="vc-signature-name">{%= data[0].vault_custodian_name || "" %}</div>
 		<div class="vc-signature-line">VC Signature</div>
 	</div>
 </div>

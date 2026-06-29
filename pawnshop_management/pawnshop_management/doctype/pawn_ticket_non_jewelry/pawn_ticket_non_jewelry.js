@@ -60,7 +60,7 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 	},
 
 	refresh: function(frm){
-		const can_send_smart_sms = frappe.session.user === 'Administrator' || frappe.user_roles.includes('Vault Custodian');
+		const is_administrator = frappe.session.user === 'Administrator';
 		const today = frappe.datetime.get_today();
 		const is_today_or_within_previous_5_days = function(date) {
 			if (!date) {
@@ -71,7 +71,11 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 			return days_from_today >= 0 && days_from_today <= 5;
 		};
 
-		if (can_send_smart_sms && is_today_or_within_previous_5_days(frm.doc.expiry_date) && !frm.doc.texted_upon_expiry) {
+		const add_expiry_sms_button = function() {
+			if (!is_today_or_within_previous_5_days(frm.doc.expiry_date) || frm.doc.texted_upon_expiry) {
+				return;
+			}
+
 			frm.add_custom_button(__('Expiry Date SMS'), function() {
 				frappe.call({
 					method: 'pawnshop_management.pawnshop_management.smart_a2p.send_expiry_date_sms',
@@ -91,6 +95,20 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 						}
 					}
 				});
+			});
+		};
+
+		if (is_administrator) {
+			add_expiry_sms_button();
+		} else if (frm.doc.branch) {
+			frappe.call({
+				method: "pawnshop_management.operations_access_control.access_control.get_active_branch_roles",
+				args: { branch: frm.doc.branch },
+				callback(response) {
+					if ((response.message || {})["Vault Custodian"]) {
+						add_expiry_sms_button();
+					}
+				},
 			});
 		}
 

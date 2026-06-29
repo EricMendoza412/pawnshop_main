@@ -13,6 +13,11 @@ from pawnshop_management.pawnshop_management.doctype.pawnshop_transaction_log.pa
 from pawnshop_management.pawnshop_management.report.vc_turnover_list.vc_turnover_list import (
 	execute as execute_vc_turnover_list,
 )
+from pawnshop_management.operations_access_control.access_control import (
+	get_active_branch_role_user,
+	has_active_branch_role,
+	require_active_branch_role,
+)
 
 
 TURNOVER_LIST_TYPES = ("A-Jewelry", "B-Jewelry", "B-Non Jewelry", "Agreement to Sell")
@@ -71,6 +76,10 @@ class VCTurnoverChecklist(Document):
 	def on_submit(self):
 		pass
 
+	def before_cancel(self):
+		if self.workflow_state not in {"For Acceptance", "Rejected"}:
+			frappe.throw(_("Only VC Turnover Checklists pending acceptance can be rejected."))
+
 	def on_cancel(self):
 		self.db_set("workflow_state", "Rejected", update_modified=False)
 
@@ -100,7 +109,7 @@ class VCTurnoverChecklist(Document):
 			self.branch = get_branch_from_request_ip()
 
 		if self.branch:
-			self.endorsed_by = frappe.db.get_value("Branch", self.branch, "vault_custodian")
+			self.endorsed_by = get_active_branch_role_user(self.branch, "Vault Custodian")
 
 		self.populate_gadget_counts()
 		self.populate_turnover_items()
@@ -309,12 +318,14 @@ def get_autofill_values(branch):
 	if not branch:
 		return {}
 
+	require_active_branch_role(frappe.session.user, branch, "Vault Custodian")
+
 	rows = get_turnover_rows(branch)
 	gadget_counts = get_gadget_counts(branch)
 
 	return {
 		"branch": branch,
-		"endorsed_by": frappe.db.get_value("Branch", branch, "vault_custodian"),
+		"endorsed_by": get_active_branch_role_user(branch, "Vault Custodian"),
 		"sangla_envelopes_cb": sum(1 for row in rows if row.get("list_type") == "A-Jewelry"),
 		"sangla_envelopes_ncb": sum(1 for row in rows if row.get("list_type") == "B-Jewelry"),
 		"sangla_non_jewelry": sum(1 for row in rows if row.get("list_type") == "B-Non Jewelry"),
@@ -331,12 +342,16 @@ def get_autofill_values(branch):
 def get_permission_query_conditions(user=None):
 	user = user or frappe.session.user
 
-	if _is_system_manager(user) or _user_has_any_role(user, MANAGER_ROLES):
+	if _is_system_manager(user):
 		return None
 
 	escaped_user = frappe.db.escape(user)
 	return (
-		f"(`tabVC Turnover Checklist`.`received_by` = {escaped_user} "
+		"(exists (select `tabBranch`.`name` "
+		"from `tabBranch` "
+		"where `tabBranch`.`name` = `tabVC Turnover Checklist`.`branch` "
+		f"and `tabBranch`.`vault_custodian` = {escaped_user}) "
+		f"or `tabVC Turnover Checklist`.`received_by` = {escaped_user} "
 		f"or `tabVC Turnover Checklist`.`endorsed_by` = {escaped_user} "
 		f"or `tabVC Turnover Checklist`.`owner` = {escaped_user})"
 	)
@@ -348,8 +363,7 @@ def has_permission(doc, ptype=None, user=None):
 
 	if permission_type == "create":
 		return (
-			_user_has_any_role(user, MANAGER_ROLES)
-			or _is_system_manager(user)
+			_is_system_manager(user)
 			or (
 				_user_has_doctype_permission(user, "VC Turnover Checklist", "create")
 				and _is_current_branch_vault_custodian(doc, user)
@@ -358,10 +372,9 @@ def has_permission(doc, ptype=None, user=None):
 
 	if permission_type == "submit":
 		if doc.workflow_state in {"For Acceptance", "Accepted"} and user == doc.received_by:
-			return user == doc.received_by
+			return True
 		return (
-			_user_has_any_role(user, MANAGER_ROLES)
-			or _is_system_manager(user)
+			_is_system_manager(user)
 			or (
 				_user_has_doctype_permission(user, "VC Turnover Checklist", "submit")
 				and _is_current_branch_vault_custodian(doc, user)
@@ -384,7 +397,7 @@ def has_permission(doc, ptype=None, user=None):
 
 		if doc.workflow_state in {"For Acceptance", "Accepted"}:
 			return user == doc.received_by or _is_system_manager(user)
-		return _user_has_any_role(user, MANAGER_ROLES) or _is_system_manager(user)
+		return _is_system_manager(user)
 
 	if permission_type in {"cancel", "delete"}:
 		return _is_system_manager(user)
@@ -393,9 +406,7 @@ def has_permission(doc, ptype=None, user=None):
 		return True
 
 	if permission_type == "read":
-		if _user_has_any_role(user, MANAGER_ROLES):
-			return True
-		return user in {doc.received_by, doc.endorsed_by, doc.owner}
+		return _is_current_branch_vault_custodian(doc, user) or user in {doc.received_by, doc.endorsed_by, doc.owner}
 
 	return None
 
@@ -413,7 +424,7 @@ def _is_current_branch_vault_custodian(doc, user):
 	if not branch:
 		return False
 
-	return frappe.db.get_value("Branch", branch, "vault_custodian") == user
+	return has_active_branch_role(user, branch, "Vault Custodian")
 
 
 def _is_submitting_document(doc):

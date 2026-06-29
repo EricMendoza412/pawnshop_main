@@ -17,11 +17,11 @@
  "name": "Daily New J-Sangla",
  "owner": "Administrator",
  "prepared_report": 0,
- "query": "SELECT old_pawn_ticket as \"Old pawn ticket\"\nFROM `tabPawn Ticket Jewelry`\nWHERE `tabPawn Ticket Jewelry`.docstatus=1\nAND `tabPawn Ticket Jewelry`.old_pawn_ticket IS NOT NULL\nAND `tabPawn Ticket Jewelry`.date_loan_granted = CURDATE()",
+ "query": "",
  "ref_doctype": "Pawn Ticket Jewelry",
  "report_name": "Daily New J-Sangla",
  "report_script": "",
- "report_type": "Query Report",
+ "report_type": "Script Report",
  "roles": [
   {
    "role": "System Manager"

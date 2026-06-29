@@ -1,5 +1,6 @@
 import frappe
 from frappe import _
+from pawnshop_management.operations_access_control.vault_custodian import require_vault_custodian_access
 
 
 BRANCH_CODES = {
@@ -18,6 +19,7 @@ BRANCH_CODES = {
 def execute(filters=None):
 	filters = frappe._dict(filters or {})
 	branch = normalize_branch(filters.get("branch")) or get_branch_from_ip()
+	require_vault_custodian_access(filters, branch)
 	report_date = filters.get("date")
 
 	inventory_count = get_inventory_count(branch, report_date)
@@ -83,16 +85,28 @@ def get_inventory_count(branch, report_date):
 def get_data(doc, branch):
 	branch = doc.get("branch") or branch
 	branch_code = BRANCH_CODES.get(branch, branch or "")
+	vault_custodian_name = get_vault_custodian_name(branch)
 
 	return [
-		get_series_row(doc, branch_code, "JEWELRY - A", "a"),
-		get_series_row(doc, branch_code, "JEWELRY - B", "b"),
-		get_series_row(doc, branch_code, "NON JEWELRY", "nj"),
-		get_sb_row(doc, branch_code),
+		get_series_row(doc, branch_code, vault_custodian_name, "JEWELRY - A", "a"),
+		get_series_row(doc, branch_code, vault_custodian_name, "JEWELRY - B", "b"),
+		get_series_row(doc, branch_code, vault_custodian_name, "NON JEWELRY", "nj"),
+		get_sb_row(doc, branch_code, vault_custodian_name),
 	]
 
 
-def get_series_row(doc, branch_code, section, suffix):
+def get_vault_custodian_name(branch):
+	if not branch:
+		return ""
+
+	vault_custodian = frappe.db.get_value("Branch", branch, "vault_custodian")
+	if not vault_custodian:
+		return ""
+
+	return frappe.db.get_value("User", vault_custodian, "full_name") or vault_custodian
+
+
+def get_series_row(doc, branch_code, vault_custodian_name, section, suffix):
 	total_field = "principal_total" + suffix
 	if suffix == "a":
 		total_field = "principal_totala"
@@ -103,6 +117,7 @@ def get_series_row(doc, branch_code, section, suffix):
 
 	return frappe._dict({
 		"branch_code": branch_code,
+		"vault_custodian_name": vault_custodian_name,
 		"section": section,
 		"date": doc.get("date"),
 		"in_count": doc.get("in_count_" + suffix) or 0,
@@ -118,9 +133,10 @@ def get_series_row(doc, branch_code, section, suffix):
 	})
 
 
-def get_sb_row(doc, branch_code):
+def get_sb_row(doc, branch_code, vault_custodian_name):
 	return frappe._dict({
 		"branch_code": branch_code,
+		"vault_custodian_name": vault_custodian_name,
 		"section": "SANGLANG BENTA",
 		"date": doc.get("date"),
 		"in_count": doc.get("in_count_sb") or 0,

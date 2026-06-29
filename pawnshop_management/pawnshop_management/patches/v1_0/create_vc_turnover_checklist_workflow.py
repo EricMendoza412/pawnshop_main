@@ -133,7 +133,7 @@ def backfill_existing_workflow_states():
 		update `tabVC Turnover Checklist`
 		set workflow_state = 'Rejected'
 		where docstatus = 2
-			and workflow_state != 'Rejected'
+			and (workflow_state is null or workflow_state != 'Rejected')
 		"""
 	)
 

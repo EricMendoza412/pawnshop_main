@@ -6,6 +6,7 @@ import frappe
 import requests
 from frappe.utils import formatdate, now_datetime
 
+from pawnshop_management.operations_access_control.vault_custodian import require_vault_custodian_access
 from pawnshop_management.pawnshop_management.doctype.smart_sms_log.smart_sms_log import get_reference_branch
 
 
@@ -237,11 +238,7 @@ def send_sms(
 
 @frappe.whitelist()
 def send_administrator_test_sms(reference_doctype=None, reference_name=None):
-	if frappe.session.user != "Administrator" and "Vault Custodian" not in frappe.get_roles():
-		frappe.throw(
-			"Only Administrator or Vault Custodian can send the SMART A2P maturity SMS.",
-			frappe.PermissionError,
-		)
+	require_vault_custodian_access(branch=get_reference_branch(reference_doctype, reference_name))
 
 	destination = TEST_DESTINATION
 	text = TEST_MESSAGE
@@ -260,11 +257,7 @@ def send_administrator_test_sms(reference_doctype=None, reference_name=None):
 
 @frappe.whitelist()
 def send_expiry_date_sms(reference_doctype=None, reference_name=None):
-	if frappe.session.user != "Administrator" and "Vault Custodian" not in frappe.get_roles():
-		frappe.throw(
-			"Only Administrator or Vault Custodian can send the SMART A2P expiry SMS.",
-			frappe.PermissionError,
-		)
+	require_vault_custodian_access(branch=get_reference_branch(reference_doctype, reference_name))
 
 	if reference_doctype not in PAWN_TICKET_DOCTYPES or not reference_name:
 		frappe.throw("Expiry Date SMS requires a Pawn Ticket reference.", SmartA2PError)

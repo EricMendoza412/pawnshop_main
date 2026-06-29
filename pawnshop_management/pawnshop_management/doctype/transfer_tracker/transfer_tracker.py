@@ -5,10 +5,22 @@
 import frappe
 from frappe.model.document import Document
 from frappe.utils import now_datetime
+from pawnshop_management.operations_access_control.access_control import (
+	has_active_branch_role,
+	is_system_manager,
+)
+from pawnshop_management.operations_access_control.vault_custodian import require_vault_custodian_access
 
 
 class TransferTracker(Document):
+	def validate(self):
+		if not is_system_manager(frappe.session.user):
+			require_vault_custodian_access(branch=self.origin)
+
 	def before_submit(self):
+		if not is_system_manager(frappe.session.user):
+			require_vault_custodian_access(branch=self.origin)
+
 		if not self.witnessed_by or not self.rover:
 			frappe.throw("Witnessed By and Rover are required before submitting Transfer Tracker.")
 
@@ -135,6 +147,8 @@ def get_pawn_ticket_series(doctype, tickets):
 
 @frappe.whitelist()
 def get_non_jewelry_pullout_items(origin, from_date, to_date):
+	require_vault_custodian_access(branch=origin)
+
 	if not origin or not from_date or not to_date:
 		return []
 
@@ -211,6 +225,8 @@ def get_non_jewelry_pullout_items(origin, from_date, to_date):
 
 @frappe.whitelist()
 def get_jewelry_pullout_items(origin, from_date, to_date):
+	require_vault_custodian_access(branch=origin)
+
 	if not origin or not from_date or not to_date:
 		return []
 
@@ -310,6 +326,8 @@ def get_jewelry_pullout_items(origin, from_date, to_date):
 
 @frappe.whitelist()
 def get_sb_jewelry_pullout_items(origin, from_date, to_date):
+	require_vault_custodian_access(branch=origin)
+
 	if not origin or not from_date or not to_date:
 		return []
 
@@ -379,3 +397,29 @@ def get_sb_jewelry_pullout_items(origin, from_date, to_date):
 		)
 
 	return result
+
+
+def get_permission_query_conditions(user=None):
+	user = user or frappe.session.user
+	if is_system_manager(user):
+		return None
+
+	escaped_user = frappe.db.escape(user)
+	return (
+		"exists (select `tabBranch`.`name` "
+		"from `tabBranch` "
+		"where `tabBranch`.`name` = `tabTransfer Tracker`.`origin` "
+		f"and `tabBranch`.`vault_custodian` = {escaped_user})"
+	)
+
+
+def has_permission(doc, ptype=None, user=None):
+	user = user or frappe.session.user
+	if is_system_manager(user):
+		return True
+
+	branch = getattr(doc, "origin", None)
+	if not branch:
+		return False
+
+	return has_active_branch_role(user, branch, "Vault Custodian")

@@ -7,8 +7,10 @@ from unittest.util import strclass
 import frappe
 from frappe import _ # _ for to set the string into literal string
 from pawnshop_management.pawnshop_management.custom_codes.get_ip import get_ip_from_settings
+from pawnshop_management.operations_access_control.vault_custodian import require_vault_custodian_access
 
 def execute(filters=None):
+	require_vault_custodian_access(filters)
 	columns, data = [], []
 	columns = get_columns()
 	status_value = getattr(filters, 'branch')

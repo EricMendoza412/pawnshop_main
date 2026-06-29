@@ -14,7 +14,7 @@ app_license = "MIT"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/pawnshop_management/css/pawnshop_management.css"
-# app_include_js = "/assets/pawnshop_management/js/pawnshop_management.js"
+app_include_js = "/assets/pawnshop_management/js/branch_role_access.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/pawnshop_management/css/pawnshop_management.css"
@@ -36,7 +36,10 @@ app_license = "MIT"
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
-doctype_js = {"Contact" : "public/js/contact.js"}
+doctype_js = {
+	"Branch": "public/js/branch.js",
+	"Contact": "public/js/contact.js",
+}
 
 # Home Pages
 # ----------
@@ -85,11 +88,13 @@ permission_query_conditions = {
 	"Acknowledgement Receipt": "pawnshop_management.pawnshop_management.custom_codes.ar_list_filter.filter_ar_based_on_banch",
 	"Branch Role Assignment": "pawnshop_management.operations_access_control.doctype.branch_role_assignment.branch_role_assignment.get_permission_query_conditions",
 	"VC Turnover Checklist": "pawnshop_management.pawnshop_management.doctype.vc_turnover_checklist.vc_turnover_checklist.get_permission_query_conditions",
+	"Transfer Tracker": "pawnshop_management.pawnshop_management.doctype.transfer_tracker.transfer_tracker.get_permission_query_conditions",
 }
 #
 has_permission = {
 	"Branch Role Assignment": "pawnshop_management.operations_access_control.doctype.branch_role_assignment.branch_role_assignment.has_permission",
 	"VC Turnover Checklist": "pawnshop_management.pawnshop_management.doctype.vc_turnover_checklist.vc_turnover_checklist.has_permission",
+	"Transfer Tracker": "pawnshop_management.pawnshop_management.doctype.transfer_tracker.transfer_tracker.has_permission",
 }
 
 # DocType Class
