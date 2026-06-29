@@ -12,6 +12,12 @@ from pawnshop_management.operations_access_control.access_control import (
 from pawnshop_management.operations_access_control.vault_custodian import require_vault_custodian_access
 
 
+SUBASTADO_TRANSFER_BRANCH_BY_ROLE = {
+	"Subastado member J": "Subastado J",
+	"Subastado member NJ": "Subastado NJ",
+}
+
+
 class TransferTracker(Document):
 	def validate(self):
 		if not is_system_manager(frappe.session.user):
@@ -405,12 +411,24 @@ def get_permission_query_conditions(user=None):
 		return None
 
 	escaped_user = frappe.db.escape(user)
-	return (
+	conditions = [
 		"exists (select `tabBranch`.`name` "
 		"from `tabBranch` "
-		"where `tabBranch`.`name` = `tabTransfer Tracker`.`origin` "
+		"where `tabBranch`.`name` in (`tabTransfer Tracker`.`origin`, `tabTransfer Tracker`.`destination`) "
 		f"and `tabBranch`.`vault_custodian` = {escaped_user})"
-	)
+	]
+
+	subastado_branches = get_subastado_transfer_branches(user)
+	if subastado_branches:
+		escaped_branches = ", ".join(frappe.db.escape(branch) for branch in subastado_branches)
+		conditions.append(
+			"("
+			f"`tabTransfer Tracker`.`origin` in ({escaped_branches}) "
+			f"or `tabTransfer Tracker`.`destination` in ({escaped_branches})"
+			")"
+		)
+
+	return "(" + " or ".join(conditions) + ")"
 
 
 def has_permission(doc, ptype=None, user=None):
@@ -418,8 +436,33 @@ def has_permission(doc, ptype=None, user=None):
 	if is_system_manager(user):
 		return True
 
-	branch = getattr(doc, "origin", None)
-	if not branch:
+	permission_type = ptype or "read"
+	if permission_type in {"read", "report", "print", "email", "export"} and is_subastado_transfer_tracker(doc, user):
+		return True
+
+	return is_transfer_tracker_branch_vault_custodian(doc, user)
+
+
+def get_subastado_transfer_branches(user):
+	user_roles = set(frappe.get_roles(user))
+	return [
+		branch
+		for role, branch in SUBASTADO_TRANSFER_BRANCH_BY_ROLE.items()
+		if role in user_roles
+	]
+
+
+def is_subastado_transfer_tracker(doc, user):
+	subastado_branches = set(get_subastado_transfer_branches(user))
+	if not subastado_branches:
 		return False
 
-	return has_active_branch_role(user, branch, "Vault Custodian")
+	return getattr(doc, "origin", None) in subastado_branches or getattr(doc, "destination", None) in subastado_branches
+
+
+def is_transfer_tracker_branch_vault_custodian(doc, user):
+	for branch in {getattr(doc, "origin", None), getattr(doc, "destination", None)}:
+		if branch and has_active_branch_role(user, branch, "Vault Custodian"):
+			return True
+
+	return False
