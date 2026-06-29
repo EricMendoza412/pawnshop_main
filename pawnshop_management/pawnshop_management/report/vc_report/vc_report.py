@@ -5,11 +5,9 @@ import frappe
 from frappe import _
 from pawnshop_management.pawnshop_management.custom_codes.get_ip import get_ip_from_settings
 from frappe import get_list
-from pawnshop_management.operations_access_control.vault_custodian import require_vault_custodian_access
 
 
 def execute(filters=None):
-	require_vault_custodian_access(filters)
 	return get_vc_report_data(filters)
 
 
