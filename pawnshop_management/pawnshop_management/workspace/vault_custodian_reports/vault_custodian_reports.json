@@ -1,5 +1,5 @@
 {
- "cards_label": "Vault Custodian",
+ "cards_label": "Vault Custodian Reports",
  "category": "Modules",
  "charts": [],
  "charts_label": "",
@@ -19,19 +19,10 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Operations",
+   "label": "Vault Management",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "VC Turnover Checklist",
-   "link_to": "VC Turnover Checklist",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
   },
   {
    "hidden": 0,
@@ -45,17 +36,26 @@
   {
    "hidden": 0,
    "is_query_report": 1,
-   "label": "Summary Reports",
+   "label": "VC Count Report",
+   "link_to": "VC Count Consolidated",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Vault Turnover Reports",
    "link_type": "Report",
    "onboard": 0,
    "type": "Card Break"
   },
   {
    "hidden": 0,
-   "is_query_report": 1,
-   "label": "VC Count Report",
-   "link_to": "VC Count Consolidated",
-   "link_type": "Report",
+   "is_query_report": 0,
+   "label": "VC Turnover Checklist and Lists",
+   "link_to": "VC Turnover Checklist",
+   "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
   },
@@ -70,17 +70,9 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 1,
-   "label": "VC Agreement to Sell List",
-   "link_to": "VC Agreement to Sell List",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "End of Day Trackers",
+   "is_query_report": 0,
+   "label": "Trackers",
+   "link_to": "J End of Day Report",
    "link_type": "Report",
    "onboard": 0,
    "type": "Card Break"
@@ -102,80 +94,9 @@
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Jewelry Inventory A",
-   "link_to": "Vault Custodian Jewelry Report A",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Jewelry Inventory B",
-   "link_to": "Vault Custodian Jewelry Report B",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Non Jewelry Inventory",
-   "link_to": "Vault Custodian Non Jewelry Report",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Daily Jewelry Reports",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Daily New J-Sangla",
-   "link_to": "Daily New J-Sangla",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "New Sangla Today (J)",
-   "link_to": "New Sangla today (J)",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Renewed PT Today (J)",
-   "link_to": "Renewed PT today (J)",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Redeemed PT Today (J)",
-   "link_to": "Redeemed PT today (J)",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
   }
  ],
- "modified": "2026-06-29 17:29:39.435662",
+ "modified": "2026-06-29 23:41:13.754158",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Vault Custodian Reports",
