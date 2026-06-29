@@ -5,7 +5,7 @@ import frappe
 from frappe.utils import flt
 from frappe.model.document import Document
 from frappe.utils import today
-from pawnshop_management.pawnshop_management.report.vc_report.vc_report import execute as execute_vc_report
+from pawnshop_management.pawnshop_management.report.vc_report.vc_report import get_vc_report_data
 
 
 def _report_rows(report_date, branch):
@@ -13,7 +13,7 @@ def _report_rows(report_date, branch):
 		"change_status_date": report_date,
 		"branch": branch.replace("'", "\\'") if branch else branch,
 	})
-	_columns, data = execute_vc_report(filters)
+	_columns, data = get_vc_report_data(filters)
 	return data
 
 

@@ -18,6 +18,7 @@ MAIN_WORKSPACE_LINKS = [
 	{"type": "Card Break", "label": "End of Day Reports", "link_to": "Pawnshop Transaction Log", "link_type": "DocType"},
 	{"type": "Link", "label": "Cash Position Report", "link_to": "Cash Position Report", "link_type": "DocType"},
 	{"type": "Link", "label": "Transaction Log Report", "link_to": "Pawnshop Transaction Log", "link_type": "DocType"},
+	{"type": "Link", "label": "Transaction Log Preview", "link_to": "VC Report", "link_type": "Report", "is_query_report": 1},
 	{"type": "Card Break", "label": "Text Blast", "link_to": "SMART SMS Log", "link_type": "DocType"},
 	{"type": "Link", "label": "SMS Log", "link_to": "SMART SMS Log", "link_type": "DocType"},
 ]
@@ -29,7 +30,6 @@ VC_WORKSPACE_LINKS = [
 	{"type": "Link", "label": "Transfer Tracker", "link_to": "Transfer Tracker", "link_type": "DocType"},
 	{"type": "Card Break", "label": "Summary Reports", "link_type": "Report", "is_query_report": 1},
 	{"type": "Link", "label": "VC Count Report", "link_to": "VC Count Consolidated", "link_type": "Report", "is_query_report": 1},
-	{"type": "Link", "label": "Transaction Log Preview", "link_to": "VC Report", "link_type": "Report", "is_query_report": 1},
 	{"type": "Link", "label": "VC Turnover Lists (J, NJ, SB)", "link_to": "VC Turnover List", "link_type": "Report", "is_query_report": 1},
 	{"type": "Link", "label": "VC Agreement to Sell List", "link_to": "VC Agreement to Sell List", "link_type": "Report", "is_query_report": 1},
 	{"type": "Card Break", "label": "End of Day Trackers", "link_type": "Report", "is_query_report": 1},

@@ -10,6 +10,10 @@ from pawnshop_management.operations_access_control.vault_custodian import requir
 
 def execute(filters=None):
 	require_vault_custodian_access(filters)
+	return get_vc_report_data(filters)
+
+
+def get_vc_report_data(filters=None):
 	status_value = getattr(filters, 'branch')
 	columns, data = [], []
 	branch = ""
