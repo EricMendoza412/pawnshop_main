@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 
 import frappe
 import requests
-from frappe.utils import formatdate, now_datetime
+from frappe.utils import formatdate, now_datetime, today
 
 from pawnshop_management.operations_access_control.vault_custodian import require_vault_custodian_access
 from pawnshop_management.pawnshop_management.doctype.smart_sms_log.smart_sms_log import get_reference_branch
@@ -16,6 +16,7 @@ E164_RE = re.compile(r"^\d{1,15}$")
 TEST_DESTINATION = "639178400153"
 TEST_MESSAGE = "Hello There"
 DAILY_0900_TEST_CLIENT_MESSAGE_ID_PREFIX = "SMART-A2P-DAILY-TEST-0900"
+DAILY_TEXT_BLAST_STATUS_MESSAGE_TEMPLATE = "ERPNEXT text blast - total SMS requests: {0}"
 DELIVERED_PROVIDER_STATUSES = {"DELIVERED", "DELIVRD"}
 PAWN_TICKET_DOCTYPES = {"Pawn Ticket Jewelry", "Pawn Ticket Non Jewelry"}
 
@@ -416,6 +417,108 @@ def send_daily_administrator_test_sms_at_0900():
 	return _send_administrator_test_sms(
 		client_message_id_prefix=DAILY_0900_TEST_CLIENT_MESSAGE_ID_PREFIX,
 	)
+
+
+def send_daily_pawn_ticket_sms_notifications():
+	current_user = frappe.session.user
+	summary = {
+		"maturity_sent": 0,
+		"expiry_sent": 0,
+		"failed": [],
+		"status_sms_sent": False,
+	}
+
+	frappe.set_user("Administrator")
+	try:
+		for pawn_ticket in _get_pawn_tickets_for_daily_sms(
+			"Pawn Ticket Jewelry",
+			"maturity_date",
+			"texted_upon_maturity",
+		):
+			if _send_daily_pawn_ticket_sms(
+				send_administrator_test_sms,
+				"Pawn Ticket Jewelry",
+				pawn_ticket.name,
+				summary,
+				"Maturity",
+			):
+				summary["maturity_sent"] += 1
+
+		for doctype in PAWN_TICKET_DOCTYPES:
+			for pawn_ticket in _get_pawn_tickets_for_daily_sms(
+				doctype,
+				"expiry_date",
+				"texted_upon_expiry",
+			):
+				if _send_daily_pawn_ticket_sms(
+					send_expiry_date_sms,
+					doctype,
+					pawn_ticket.name,
+					summary,
+					"Expiry",
+				):
+					summary["expiry_sent"] += 1
+
+		summary["status_sms_sent"] = _send_daily_text_blast_status_sms(summary)
+	finally:
+		frappe.set_user(current_user)
+
+	return summary
+
+
+def _get_pawn_tickets_for_daily_sms(doctype, date_field, texted_field):
+	return frappe.get_all(
+		doctype,
+		filters={
+			date_field: today(),
+			texted_field: 0,
+		},
+		fields=["name"],
+		order_by="name asc",
+	)
+
+
+def _send_daily_pawn_ticket_sms(send_method, reference_doctype, reference_name, summary, sms_purpose):
+	try:
+		send_method(reference_doctype=reference_doctype, reference_name=reference_name)
+	except Exception:
+		summary["failed"].append(
+			{
+				"reference_doctype": reference_doctype,
+				"reference_name": reference_name,
+				"sms_purpose": sms_purpose,
+			}
+		)
+		frappe.log_error(
+			frappe.get_traceback(),
+			"Daily {0} SMS failed for {1} {2}".format(
+				sms_purpose,
+				reference_doctype,
+				reference_name,
+			),
+		)
+		return False
+
+	return True
+
+
+def _send_daily_text_blast_status_sms(summary):
+	total_sms_requests = summary["maturity_sent"] + summary["expiry_sent"]
+	text = DAILY_TEXT_BLAST_STATUS_MESSAGE_TEMPLATE.format(total_sms_requests)
+
+	try:
+		_send_administrator_test_sms(
+			client_message_id_prefix=DAILY_0900_TEST_CLIENT_MESSAGE_ID_PREFIX,
+			text=text,
+		)
+	except Exception:
+		frappe.log_error(
+			frappe.get_traceback(),
+			"Daily text blast status SMS failed",
+		)
+		return False
+
+	return True
 
 
 def _first_param(params, keys):

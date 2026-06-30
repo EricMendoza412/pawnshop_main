@@ -155,7 +155,7 @@ scheduler_events = {
 			"pawnshop_management.operations_access_control.doctype.branch_role_assignment.branch_role_assignment.clear_branch_cashier_assignments"
 		],
 		"0 9 * * *":[
-			"pawnshop_management.pawnshop_management.smart_a2p.send_daily_administrator_test_sms_at_0900"
+			"pawnshop_management.pawnshop_management.smart_a2p.send_daily_pawn_ticket_sms_notifications"
 		]
 	}	
 }
