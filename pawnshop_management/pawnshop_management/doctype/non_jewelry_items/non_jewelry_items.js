@@ -173,15 +173,16 @@ frappe.ui.form.on('Non Jewelry Items', {
 		update_battery_health_fields(frm);
 		toggle_subastado_fields(frm);
 		highlight_appraisal_value(frm);
-		let is_allowed = frappe.user_roles.includes('Administrator');
+		let is_admin = frappe.user_roles.includes('Administrator');
+		let is_support_team = frappe.user_roles.some(role => role.toLowerCase() === 'support team');
 		frm.toggle_enable(
 			[
 				"branch",
-				"current_location",
 				"pt_principal",
 				"date_received"
 			],
-			 is_allowed);
+			is_admin);
+		frm.toggle_enable("current_location", is_admin || is_support_team);
 		if (frm.is_new()) {
 			frappe.call({
 				method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip',
