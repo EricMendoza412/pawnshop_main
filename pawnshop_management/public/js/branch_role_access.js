@@ -5,8 +5,6 @@
 		"VC Count Report",
 		"VC Turnover Lists (J, NJ, SB)",
 		"VC Agreement to Sell List",
-		"VC Tracker (Gadget)",
-		"VC Tracker (Jewelry)",
 		"Transfer Tracker",
 		"VC Turnover Checklist",
 		"Daily New J-Sangla",
@@ -30,8 +28,6 @@
 		"Renewed PT today (J)",
 		"Redeemed PT today (J)",
 		"Daily New J-Sangla",
-		"J End of Day Report",
-		"NJ End of the Day Repor",
 		"VC Turnover Checklist",
 		"Transfer Tracker",
 	];

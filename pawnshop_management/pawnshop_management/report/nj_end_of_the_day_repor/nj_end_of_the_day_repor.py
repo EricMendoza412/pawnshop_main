@@ -4,7 +4,6 @@
 import frappe
 from frappe import _ # _ for to set the string into literal string
 from pawnshop_management.pawnshop_management.custom_codes.get_ip import get_ip_from_settings
-from pawnshop_management.operations_access_control.vault_custodian import require_vault_custodian_access
 
 import frappe
 from frappe.model.base_document import BaseDocument
@@ -17,7 +16,6 @@ import json
 
 
 def execute(filters=None):
-	require_vault_custodian_access(filters)
 	current_ip = frappe.local.request_ip
 	branch_ip = get_ip_from_settings()
 	if str(current_ip) == str(branch_ip['cavite_city']):

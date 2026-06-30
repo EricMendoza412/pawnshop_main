@@ -67,33 +67,6 @@
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Trackers",
-   "link_to": "J End of Day Report",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "VC Tracker (Jewelry)",
-   "link_to": "J End of Day Report",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "VC Tracker (Gadget)",
-   "link_to": "NJ End of the Day Repor",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
   }
  ],
  "modified": "2026-06-29 23:41:13.754158",

@@ -19,30 +19,20 @@ MAIN_WORKSPACE_LINKS = [
 	{"type": "Link", "label": "Cash Position Report", "link_to": "Cash Position Report", "link_type": "DocType"},
 	{"type": "Link", "label": "Transaction Log Report", "link_to": "Pawnshop Transaction Log", "link_type": "DocType"},
 	{"type": "Link", "label": "Transaction Log Preview", "link_to": "VC Report", "link_type": "Report", "is_query_report": 1},
+	{"type": "Link", "label": "J End of Day Report", "link_to": "J End of Day Report", "link_type": "Report", "is_query_report": 1},
+	{"type": "Link", "label": "NJ End of the Day Report", "link_to": "NJ End of the Day Repor", "link_type": "Report", "is_query_report": 1},
 	{"type": "Card Break", "label": "Text Blast", "link_to": "SMART SMS Log", "link_type": "DocType"},
 	{"type": "Link", "label": "SMS Log", "link_to": "SMART SMS Log", "link_type": "DocType"},
 ]
 
 
 VC_WORKSPACE_LINKS = [
-	{"type": "Card Break", "label": "Operations", "link_type": "DocType"},
-	{"type": "Link", "label": "VC Turnover Checklist", "link_to": "VC Turnover Checklist", "link_type": "DocType"},
+	{"type": "Card Break", "label": "Vault Management", "link_type": "DocType"},
 	{"type": "Link", "label": "Transfer Tracker", "link_to": "Transfer Tracker", "link_type": "DocType"},
-	{"type": "Card Break", "label": "Summary Reports", "link_type": "Report", "is_query_report": 1},
 	{"type": "Link", "label": "VC Count Report", "link_to": "VC Count Consolidated", "link_type": "Report", "is_query_report": 1},
+	{"type": "Card Break", "label": "Vault Turnover Reports", "link_type": "Report", "is_query_report": 1},
+	{"type": "Link", "label": "VC Turnover Checklist and Lists", "link_to": "VC Turnover Checklist", "link_type": "DocType"},
 	{"type": "Link", "label": "VC Turnover Lists (J, NJ, SB)", "link_to": "VC Turnover List", "link_type": "Report", "is_query_report": 1},
-	{"type": "Link", "label": "VC Agreement to Sell List", "link_to": "VC Agreement to Sell List", "link_type": "Report", "is_query_report": 1},
-	{"type": "Card Break", "label": "End of Day Trackers", "link_type": "Report", "is_query_report": 1},
-	{"type": "Link", "label": "VC Tracker (Jewelry)", "link_to": "J End of Day Report", "link_type": "Report", "is_query_report": 1},
-	{"type": "Link", "label": "VC Tracker (Gadget)", "link_to": "NJ End of the Day Repor", "link_type": "Report", "is_query_report": 1},
-	{"type": "Link", "label": "Jewelry Inventory A", "link_to": "Vault Custodian Jewelry Report A", "link_type": "Report", "is_query_report": 1},
-	{"type": "Link", "label": "Jewelry Inventory B", "link_to": "Vault Custodian Jewelry Report B", "link_type": "Report", "is_query_report": 1},
-	{"type": "Link", "label": "Non Jewelry Inventory", "link_to": "Vault Custodian Non Jewelry Report", "link_type": "Report", "is_query_report": 1},
-	{"type": "Card Break", "label": "Daily Jewelry Reports", "link_type": "Report", "is_query_report": 1},
-	{"type": "Link", "label": "Daily New J-Sangla", "link_to": "Daily New J-Sangla", "link_type": "Report", "is_query_report": 1},
-	{"type": "Link", "label": "New Sangla Today (J)", "link_to": "New Sangla today (J)", "link_type": "Report", "is_query_report": 1},
-	{"type": "Link", "label": "Renewed PT Today (J)", "link_to": "Renewed PT today (J)", "link_type": "Report", "is_query_report": 1},
-	{"type": "Link", "label": "Redeemed PT Today (J)", "link_to": "Redeemed PT today (J)", "link_type": "Report", "is_query_report": 1},
 ]
 
 
@@ -87,7 +77,7 @@ def sync_vc_workspace():
 		workspace = frappe.new_doc("Workspace")
 		workspace.label = "Vault Custodian Reports"
 
-	workspace.cards_label = "Vault Custodian"
+	workspace.cards_label = "Vault Custodian Reports"
 	workspace.category = "Modules"
 	workspace.developer_mode_only = 0
 	workspace.disable_user_customization = 1

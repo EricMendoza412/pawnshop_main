@@ -1,18 +1,25 @@
 /* eslint-disable */
 
 var default_branch = "";
+var get_default_branch_method = "pawnshop_management.pawnshop_management.report.vc_count_consolidated.vc_count_consolidated.get_default_branch";
 
-frappe.call({
-	method: "pawnshop_management.pawnshop_management.report.vc_count_consolidated.vc_count_consolidated.get_default_branch",
-	callback: function(data) {
-		if (data.message) {
+function set_default_branch_from_ip(report) {
+	frappe.call({
+		method: get_default_branch_method,
+		callback: function(data) {
+			if (!data.message) {
+				return;
+			}
+
 			default_branch = data.message;
-			if (frappe.query_report && frappe.query_report.get_filter_value("branch") !== default_branch) {
-				frappe.query_report.set_filter_value("branch", default_branch);
+			report = report || frappe.query_report;
+
+			if (report && report.get_filter_value("branch") !== default_branch) {
+				report.set_filter_value("branch", default_branch);
 			}
 		}
-	}
-});
+	});
+}
 
 const date = new Date();
 let day = String(date.getDate()).padStart(2, "0");
@@ -24,6 +31,7 @@ let is_allowed = frappe.user_roles.includes("Auditor") || frappe.user_roles.incl
 
 if (is_allowed) {
 	frappe.query_reports["VC Count Consolidated"] = {
+		onload: set_default_branch_from_ip,
 		filters: [
 			{
 				fieldname: "date",
@@ -52,6 +60,7 @@ if (is_allowed) {
 	};
 } else {
 	frappe.query_reports["VC Count Consolidated"] = {
+		onload: set_default_branch_from_ip,
 		filters: [
 			{
 				fieldname: "date",
