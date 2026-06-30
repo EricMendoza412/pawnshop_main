@@ -196,6 +196,8 @@ def send_sms(
 		reference_name=reference_name,
 		sms_purpose=sms_purpose,
 	)
+	# SMART can send delivery callbacks immediately, so make the log visible first.
+	frappe.db.commit()
 	url = urljoin(_get_base_url(settings), "messages/sms")
 
 	try:
