@@ -61,6 +61,7 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 
 	refresh: function(frm){
 		const is_administrator = frappe.session.user === 'Administrator';
+		const can_send_smart_sms = ['Active', 'Expired'].includes(frm.doc.workflow_state);
 		const today = frappe.datetime.get_today();
 		const is_today_or_within_previous_5_days = function(date) {
 			if (!date) {
@@ -72,7 +73,7 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 		};
 
 		const add_expiry_sms_button = function() {
-			if (!is_today_or_within_previous_5_days(frm.doc.expiry_date) || frm.doc.texted_upon_expiry) {
+			if (!can_send_smart_sms || !is_today_or_within_previous_5_days(frm.doc.expiry_date) || frm.doc.texted_upon_expiry) {
 				return;
 			}
 

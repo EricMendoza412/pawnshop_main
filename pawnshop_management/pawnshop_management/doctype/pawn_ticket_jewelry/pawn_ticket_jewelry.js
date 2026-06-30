@@ -66,6 +66,7 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 
 	refresh: function(frm){
 		const is_administrator = frappe.session.user === 'Administrator';
+		const can_send_smart_sms = ['Active', 'Expired'].includes(frm.doc.workflow_state);
 		const today = frappe.datetime.get_today();
 		const is_today_or_within_previous_5_days = function(date) {
 			if (!date) {
@@ -99,14 +100,14 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 		};
 
 		const add_smart_sms_buttons = function() {
-			if (is_today_or_within_previous_5_days(frm.doc.maturity_date) && !frm.doc.texted_upon_maturity) {
+			if (can_send_smart_sms && is_today_or_within_previous_5_days(frm.doc.maturity_date) && !frm.doc.texted_upon_maturity) {
 				add_smart_sms_button(
 					'Maturity Date SMS',
 					'pawnshop_management.pawnshop_management.smart_a2p.send_administrator_test_sms'
 				);
 			}
 
-			if (is_today_or_within_previous_5_days(frm.doc.expiry_date) && !frm.doc.texted_upon_expiry) {
+			if (can_send_smart_sms && is_today_or_within_previous_5_days(frm.doc.expiry_date) && !frm.doc.texted_upon_expiry) {
 				add_smart_sms_button(
 					'Expiry Date SMS',
 					'pawnshop_management.pawnshop_management.smart_a2p.send_expiry_date_sms'

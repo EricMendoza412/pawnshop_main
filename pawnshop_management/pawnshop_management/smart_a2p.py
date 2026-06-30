@@ -19,6 +19,7 @@ DAILY_0900_TEST_CLIENT_MESSAGE_ID_PREFIX = "SMART-A2P-DAILY-TEST-0900"
 DAILY_TEXT_BLAST_STATUS_MESSAGE_TEMPLATE = "ERPNEXT text blast - total SMS requests: {0}"
 DELIVERED_PROVIDER_STATUSES = {"DELIVERED", "DELIVRD"}
 PAWN_TICKET_DOCTYPES = {"Pawn Ticket Jewelry", "Pawn Ticket Non Jewelry"}
+PAWN_TICKET_SMS_WORKFLOW_STATES = {"Active", "Expired"}
 
 
 class SmartA2PError(frappe.ValidationError):
@@ -244,6 +245,7 @@ def send_administrator_test_sms(reference_doctype=None, reference_name=None):
 	destination = TEST_DESTINATION
 	text = TEST_MESSAGE
 	if reference_doctype == "Pawn Ticket Jewelry" and reference_name:
+		_validate_pawn_ticket_sms_workflow_state(reference_doctype, reference_name)
 		destination, text = _get_pawn_ticket_customer_sms_details(reference_doctype, reference_name, "Maturity")
 
 	return _send_administrator_test_sms(
@@ -263,6 +265,7 @@ def send_expiry_date_sms(reference_doctype=None, reference_name=None):
 	if reference_doctype not in PAWN_TICKET_DOCTYPES or not reference_name:
 		frappe.throw("Expiry Date SMS requires a Pawn Ticket reference.", SmartA2PError)
 
+	_validate_pawn_ticket_sms_workflow_state(reference_doctype, reference_name)
 	destination, text = _get_pawn_ticket_customer_sms_details(reference_doctype, reference_name, "Expiry")
 
 	return _send_administrator_test_sms(
@@ -335,6 +338,18 @@ def _get_pawn_ticket_customer_sms_details(pawn_ticket_doctype, pawn_ticket_name,
 		frappe.throw("Contact {0} has no mobile number.".format(contact), SmartA2PError)
 
 	return mobile_no, _build_pawn_ticket_message(pawn_ticket, sms_purpose)
+
+
+def _validate_pawn_ticket_sms_workflow_state(pawn_ticket_doctype, pawn_ticket_name):
+	workflow_state = frappe.db.get_value(pawn_ticket_doctype, pawn_ticket_name, "workflow_state")
+	if workflow_state not in PAWN_TICKET_SMS_WORKFLOW_STATES:
+		frappe.throw(
+			"{0} {1} must be Active or Expired before sending SMS.".format(
+				pawn_ticket_doctype,
+				pawn_ticket_name,
+			),
+			SmartA2PError,
+		)
 
 
 def _build_pawn_ticket_jewelry_maturity_message(pawn_ticket):
@@ -472,6 +487,7 @@ def _get_pawn_tickets_for_daily_sms(doctype, date_field, texted_field):
 		filters={
 			date_field: today(),
 			texted_field: 0,
+			"workflow_state": ["in", list(PAWN_TICKET_SMS_WORKFLOW_STATES)],
 		},
 		fields=["name"],
 		order_by="name asc",
