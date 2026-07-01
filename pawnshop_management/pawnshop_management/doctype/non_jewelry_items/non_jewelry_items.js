@@ -182,6 +182,9 @@ frappe.ui.form.on('Non Jewelry Items', {
 				"date_received"
 			],
 			is_admin);
+		if (!frm.is_new()) {
+			frm.set_df_property('assistant_appraiser', 'read_only', is_admin ? 0 : 1);
+		}
 		frm.toggle_enable("current_location", is_admin || is_support_team);
 		if (frm.is_new()) {
 			frappe.call({

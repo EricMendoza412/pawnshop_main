@@ -7,6 +7,22 @@ from frappe.model.document import Document
 from frappe.utils import today
 
 class NonJewelryItems(Document):
+	def validate(self):
+		self.validate_assistant_appraiser_edit()
+
+	def validate_assistant_appraiser_edit(self):
+		if self.is_new():
+			return
+
+		previous_doc = self.get_doc_before_save()
+		if not previous_doc or previous_doc.assistant_appraiser == self.assistant_appraiser:
+			return
+
+		if frappe.session.user == "Administrator" or "Administrator" in frappe.get_roles(frappe.session.user):
+			return
+
+		frappe.throw("Only Administrator can edit Assistant Appraiser.")
+
 	def before_save(self):
 		self.remove_empty_reserved_buyers()
 

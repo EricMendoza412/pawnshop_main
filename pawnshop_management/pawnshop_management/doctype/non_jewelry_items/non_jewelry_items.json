@@ -298,8 +298,7 @@
    "fieldname": "assistant_appraiser",
    "fieldtype": "Link",
    "label": "Assistant Appraiser",
-   "options": "User",
-   "set_only_once": 1
+   "options": "User"
   },
   {
    "fieldname": "branch",
