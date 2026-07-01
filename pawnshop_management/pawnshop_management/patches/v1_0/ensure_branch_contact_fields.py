@@ -54,10 +54,16 @@ def execute():
 				"read_only": 1,
 			},
 			{
+				"fieldname": "contact_information",
+				"label": "Contact Information",
+				"fieldtype": "Section Break",
+				"insert_after": "vault_custodian",
+			},
+			{
 				"fieldname": "facebook_account",
 				"label": "Facebook Account",
 				"fieldtype": "Data",
-				"insert_after": "vault_custodian",
+				"insert_after": "contact_information",
 			},
 			{
 				"fieldname": "contact_number",
