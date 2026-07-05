@@ -10,6 +10,9 @@ from frappe.utils import flt
 from pawnshop_management.pawnshop_management.utils import validate_unique_pawn_ticket_name
 
 
+VAULT_CUSTODIAN_REDEMPTION_MESSAGE = "The Vault Custodian is not allowed to transact a redemption type Provisional Receipt"
+
+
 @frappe.whitelist()
 def calculate_interest(date_issued, date_loan_granted, maturity_date, expiry_date, interest, pawn_ticket_no, pawn_ticket_type,branch):
 	# e-mail: Regarding Accrued interest computation
@@ -192,6 +195,11 @@ def calculate_interest(date_issued, date_loan_granted, maturity_date, expiry_dat
 class ProvisionalReceipt(Document):
 
 	def validate(self):
+		if self.transaction_type == "Redemption" and self.branch:
+			vault_custodian = frappe.db.get_value("Branch", self.branch, "vault_custodian")
+			if vault_custodian == frappe.session.user:
+				frappe.throw(VAULT_CUSTODIAN_REDEMPTION_MESSAGE)
+
 		if self.mode_of_payment == "Cash & GCash" and self.transaction_type == "Renewal" and self.total != self.cash + self.gcash_amount_payment:
 			frappe.throw(
 				title='Insufficient Payment',

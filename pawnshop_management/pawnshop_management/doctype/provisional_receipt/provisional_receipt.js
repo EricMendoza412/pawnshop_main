@@ -8,6 +8,7 @@ var with_other_discount = false;
 var og_total_no_discount;
 let msgDisplayed = false; // Global flag
 let msgDisplayedTwo = false; // Global flag
+const VAULT_CUSTODIAN_REDEMPTION_MESSAGE = "The Vault Custodian is not allowed to transact a redemption type Provisional Receipt";
 
 frappe.ui.form.on('Provisional Receipt', {
 
@@ -365,6 +366,7 @@ frappe.ui.form.on('Provisional Receipt', {
 
 	branch: function(frm){
 		select_naming_series(frm);
+		block_vault_custodian_redemption(frm);
 	},
 
 	maturity_date: function(frm){
@@ -539,6 +541,7 @@ frappe.ui.form.on('Provisional Receipt', {
 	},
 
 	transaction_type: function(frm){
+		block_vault_custodian_redemption(frm);
 		if(frm.doc.transaction_type != "-Select-"){
 		frm.set_df_property('transaction_type', 'read_only', 1)
 		}
@@ -1349,6 +1352,38 @@ function select_naming_series(frm) { //Select naming series with regards to the 
 		frm.set_value('naming_series', "No-20-.######")
 	}
 
+}
+
+function block_vault_custodian_redemption(frm) {
+	if (!frm.is_new() || frm.doc.transaction_type != "Redemption" || !frm.doc.branch || frm.__vc_redemption_checking) {
+		return;
+	}
+
+	frm.__vc_redemption_checking = true;
+	frappe.db.get_value("Branch", frm.doc.branch, "vault_custodian")
+		.then(response => {
+			frm.__vc_redemption_checking = false;
+			let vault_custodian = (response.message || {}).vault_custodian;
+			if (vault_custodian != frappe.session.user || frm.__vc_redemption_blocked) {
+				return;
+			}
+
+			frm.__vc_redemption_blocked = true;
+			frm.disable_save();
+			frm.doc.__unsaved = 0;
+
+			let dialog = frappe.msgprint({
+				message: __(VAULT_CUSTODIAN_REDEMPTION_MESSAGE),
+				indicator: "red"
+			});
+			dialog.onhide = function() {
+				frm.doc.__unsaved = 0;
+				frappe.set_route("List", "Provisional Receipt");
+			};
+		})
+		.catch(() => {
+			frm.__vc_redemption_checking = false;
+		});
 }
 
 function get_new_pawn_ticket_no(frm) {
