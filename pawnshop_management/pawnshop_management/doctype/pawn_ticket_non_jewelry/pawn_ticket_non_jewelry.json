@@ -232,7 +232,7 @@
    "default": "0",
    "fieldname": "texted_upon_maturity",
    "fieldtype": "Check",
-   "label": "Texted upon maturity (GP app)",
+   "label": "Texted upon maturity",
    "read_only": 1
   },
   {
@@ -240,7 +240,7 @@
    "default": "0",
    "fieldname": "texted_upon_expiry",
    "fieldtype": "Check",
-   "label": "Texted upon expiry (GP app)",
+   "label": "Texted upon expiry",
    "read_only": 1
   },
   {
@@ -291,7 +291,7 @@
    "link_fieldname": "inventory_tracking_no"
   }
  ],
- "modified": "2026-04-22 14:15:34.331171",
+ "modified": "2026-07-05 18:00:17.182796",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Pawn Ticket Non Jewelry",
