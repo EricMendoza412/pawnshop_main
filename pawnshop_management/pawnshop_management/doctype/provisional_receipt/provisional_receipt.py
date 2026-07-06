@@ -195,7 +195,7 @@ def calculate_interest(date_issued, date_loan_granted, maturity_date, expiry_dat
 class ProvisionalReceipt(Document):
 
 	def validate(self):
-		if self.transaction_type == "Redemption" and self.branch:
+		if self.is_new() and self.transaction_type == "Redemption" and self.branch:
 			vault_custodian = frappe.db.get_value("Branch", self.branch, "vault_custodian")
 			if vault_custodian == frappe.session.user:
 				frappe.throw(VAULT_CUSTODIAN_REDEMPTION_MESSAGE)

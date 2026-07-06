@@ -541,7 +541,6 @@ frappe.ui.form.on('Provisional Receipt', {
 	},
 
 	transaction_type: function(frm){
-		block_vault_custodian_redemption(frm);
 		if(frm.doc.transaction_type != "-Select-"){
 		frm.set_df_property('transaction_type', 'read_only', 1)
 		}
@@ -590,6 +589,7 @@ frappe.ui.form.on('Provisional Receipt', {
 				return {"filters": {}}
 				})
 		}
+		block_vault_custodian_redemption(frm);
 
 	},
 
