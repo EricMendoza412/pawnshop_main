@@ -1,0 +1,68 @@
+import frappe
+from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
+
+
+def execute():
+	custom_fields = {
+		"Branch": [
+			{
+				"fieldname": "pawnshop_details_section",
+				"label": "Pawnshop Details",
+				"fieldtype": "Section Break",
+				"insert_after": "branch",
+			},
+			{
+				"fieldname": "pawnshop_cashier",
+				"label": "Pawnshop Cashier",
+				"fieldtype": "Link",
+				"options": "User",
+				"insert_after": "pawnshop_details_section",
+				"read_only": 1,
+			},
+			{
+				"fieldname": "fx_cashier",
+				"label": "FX Cashier",
+				"fieldtype": "Link",
+				"options": "User",
+				"insert_after": "pawnshop_cashier",
+				"read_only": 1,
+			},
+			{
+				"fieldname": "remittance_cashier",
+				"label": "Remittance Cashier",
+				"fieldtype": "Link",
+				"options": "User",
+				"insert_after": "fx_cashier",
+				"read_only": 1,
+			},
+			{
+				"fieldname": "vault_custodian",
+				"label": "Vault Custodian",
+				"fieldtype": "Link",
+				"options": "User",
+				"insert_after": "remittance_cashier",
+				"read_only": 1,
+			},
+			{
+				"fieldname": "contact_information",
+				"label": "Contact Information",
+				"fieldtype": "Section Break",
+				"insert_after": "vault_custodian",
+			},
+			{
+				"fieldname": "facebook_account",
+				"label": "Facebook Account",
+				"fieldtype": "Data",
+				"insert_after": "contact_information",
+			},
+			{
+				"fieldname": "contact_number",
+				"label": "Contact Number",
+				"fieldtype": "Data",
+				"insert_after": "facebook_account",
+			},
+		]
+	}
+
+	create_custom_fields(custom_fields, update=True)
+	frappe.clear_cache(doctype="Branch")

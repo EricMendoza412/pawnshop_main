@@ -5,7 +5,10 @@ from pydoc import doc
 import frappe
 from frappe.model.document import Document
 from frappe.utils import flt
-from pawnshop_management.pawnshop_management.utils import validate_unique_pawn_ticket_name
+from pawnshop_management.pawnshop_management.utils import (
+	get_amended_pawn_ticket_name,
+	validate_unique_pawn_ticket_name,
+)
 from pawnshop_management.pawnshop_management.custom_codes.update_pawn_ticket import (
     update_fields_after_status_change_collect_pawn_ticket,
     update_fields_after_status_change_pull_out_pawn_ticket,
@@ -27,7 +30,16 @@ def get_user_from_appraiser_value(value):
 	)
 
 class PawnTicketJewelry(Document):
+	def set_amended_pawn_ticket(self):
+		if self.amended_from:
+			self.pawn_ticket = get_amended_pawn_ticket_name(self.amended_from)
+
+	def before_insert(self):
+		self.set_amended_pawn_ticket()
+
 	def before_validate(self):
+		self.set_amended_pawn_ticket()
+
 		if not self.main_appraiser_acct or not self.assistant_appraiser_acct:
 			for item in self.jewelry_items or []:
 				if not item.item_no:

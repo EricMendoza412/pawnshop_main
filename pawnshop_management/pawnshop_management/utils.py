@@ -13,6 +13,21 @@ ID_PICTURE_FALLBACK_BASE_URL = "https://storage.cloud.google.com/gpcustomersids.
 PAWN_TICKET_DOCTYPES = ("Pawn Ticket Jewelry", "Pawn Ticket Non Jewelry")
 
 
+def get_amended_pawn_ticket_name(amended_from):
+    if not amended_from:
+        return None
+
+    amended_from = str(amended_from)
+    if amended_from.count("-") < 2:
+        return "{0}-1".format(amended_from)
+
+    base_pawn_ticket, separator, amend_count = amended_from.rpartition("-")
+    if separator and amend_count.isdigit():
+        return "{0}-{1}".format(base_pawn_ticket, int(amend_count) + 1)
+
+    return "{0}-1".format(amended_from)
+
+
 def validate_unique_pawn_ticket_name(pawn_ticket_no, current_doctype=None, current_name=None):
     if not pawn_ticket_no:
         return

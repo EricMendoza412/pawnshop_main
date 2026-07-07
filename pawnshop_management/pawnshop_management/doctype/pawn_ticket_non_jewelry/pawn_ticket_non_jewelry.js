@@ -424,8 +424,8 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 
 	amended_from: function(frm){
 		if (frm.is_new()){
-			show_tracking_no(frm);
-		}	
+			set_amended_pawn_ticket(frm);
+		}
 	},
 
 	customer_id_picture: function(frm) {
@@ -490,18 +490,9 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 			})
 		})
 	} else {
-		var previous_pt = frm.doc.amended_from      //Naming for the next document created of amend
-		if (count_dash_characters(previous_pt) < 2) {
-			frm.set_value('pawn_ticket', frm.doc.amended_from + "-1");
-			frm.refresh_field('pawn_ticket');
-		} else {
-			var index_of_last_dash_caharacter = previous_pt.lastIndexOf("-")
-			var current_amend_count = index_of_last_dash_caharacter.slice(index_of_last_dash_caharacter, -1)
-			frm.set_value('pawn_ticket', frm.doc.amended_from + "-" + parseInt(current_amend_count) + 1);
-			frm.refresh_field('pawn_ticket');
-		}
+		set_amended_pawn_ticket(frm);
 	}
-	
+
 
 	// if (frm.doc.branch == "Garcia's Pawnshop - CC") {
 	// 	if (frm.doc.amended_from == null) {
@@ -823,12 +814,27 @@ function null_checker(number) {
 	return parseInt(number)
 }
 
-function count_dash_characters(string) {
-	var dash_character_count = 0
-	for (let index = 0; index < string.length; index++) {
-		if (string[index] == "-") {
-			dash_character_count++
-		}
+function get_amended_pawn_ticket_name(amended_from) {
+	if (!amended_from) {
+		return "";
 	}
-	return dash_character_count
+
+	if ((amended_from.match(/-/g) || []).length < 2) {
+		return amended_from + "-1";
+	}
+
+	const last_dash_index = amended_from.lastIndexOf("-");
+	const base_pawn_ticket = amended_from.slice(0, last_dash_index);
+	const amend_count = amended_from.slice(last_dash_index + 1);
+
+	if (/^\d+$/.test(amend_count)) {
+		return base_pawn_ticket + "-" + (parseInt(amend_count, 10) + 1);
+	}
+
+	return amended_from + "-1";
+}
+
+function set_amended_pawn_ticket(frm) {
+	frm.set_value('pawn_ticket', get_amended_pawn_ticket_name(frm.doc.amended_from));
+	frm.refresh_field('pawn_ticket');
 }
