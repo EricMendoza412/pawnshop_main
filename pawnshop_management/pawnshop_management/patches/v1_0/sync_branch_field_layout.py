@@ -2,6 +2,18 @@ import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 
 
+BRANCH_FIELD_LAYOUT = {
+	"pawnshop_details_section": "branch",
+	"pawnshop_cashier": "pawnshop_details_section",
+	"fx_cashier": "pawnshop_cashier",
+	"remittance_cashier": "fx_cashier",
+	"vault_custodian": "remittance_cashier",
+	"contact_information": "vault_custodian",
+	"facebook_account": "contact_information",
+	"contact_number": "facebook_account",
+}
+
+
 def execute():
 	custom_fields = {
 		"Branch": [
@@ -65,4 +77,15 @@ def execute():
 	}
 
 	create_custom_fields(custom_fields, update=True)
+	for fieldname, insert_after in BRANCH_FIELD_LAYOUT.items():
+		custom_field = frappe.db.exists("Custom Field", "Branch-{0}".format(fieldname))
+		if custom_field:
+			frappe.db.set_value(
+				"Custom Field",
+				custom_field,
+				"insert_after",
+				insert_after,
+				update_modified=False,
+			)
+
 	frappe.clear_cache(doctype="Branch")

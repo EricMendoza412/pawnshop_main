@@ -63,6 +63,7 @@ doctype_js = {
 
 # before_install = "pawnshop_management.install.before_install"
 # after_install = "pawnshop_management.install.after_install"
+after_migrate = "pawnshop_management.pawnshop_management.patches.v1_0.sync_branch_field_layout.execute"
 
 # Desk Notifications
 # ------------------

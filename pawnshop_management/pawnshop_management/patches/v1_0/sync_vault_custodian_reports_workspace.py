@@ -81,7 +81,8 @@ def sync_vc_workspace():
 	workspace.category = "Modules"
 	workspace.developer_mode_only = 0
 	workspace.disable_user_customization = 1
-	workspace.extends_another_page = 0
+	workspace.extends = "Pawnshop Management"
+	workspace.extends_another_page = 1
 	workspace.hide_custom = 0
 	workspace.icon = "folder-normal"
 	workspace.is_default = 0
