@@ -180,6 +180,15 @@
   {
    "hidden": 0,
    "is_query_report": 0,
+   "label": "Text Blast",
+   "link_to": "Text Blast",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
    "label": "SMS Log",
    "link_to": "SMART SMS Log",
    "link_type": "DocType",
@@ -214,7 +223,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-06-30 14:31:31.148421",
+ "modified": "2026-07-21 15:22:48.928357",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Pawnshop Management",

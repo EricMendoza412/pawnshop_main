@@ -7,6 +7,10 @@ from frappe.model.naming import make_autoname
 
 class SMARTSMSLog(Document):
 	def autoname(self):
+		if self.sms_purpose == "Text Blast":
+			self.name = make_autoname("TXTBLAST-SMS-.#####")
+			return
+
 		branch_code = get_branch_code(self.branch) if self.branch else "SMART"
 		self.name = make_autoname("{0}-SMS-.#####".format(branch_code))
 
@@ -16,6 +20,9 @@ def get_reference_branch(reference_doctype, reference_name):
 		return None
 
 	meta = frappe.get_meta(reference_doctype)
+	if reference_doctype == "Text Blast" and meta.has_field("recipient_options"):
+		return frappe.db.get_value(reference_doctype, reference_name, "recipient_options")
+
 	if not meta.has_field("branch"):
 		return None
 

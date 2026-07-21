@@ -8,6 +8,7 @@
  "engine": "InnoDB",
  "field_order": [
   "branch",
+  "branch_code",
   "date_bought_or_returned",
   "receipt_number",
   "customer_tracker",
@@ -19,12 +20,14 @@
   "mode_of_delivery",
   "gcash_reference_no",
   "items",
+  "items_list",
   "total_amount",
   "commision",
   "distributed_amount",
   "credited_to",
   "paid_or_cop",
   "seller",
+  "sellers_list",
   "reason_for_return",
   "comments"
  ],
@@ -34,6 +37,11 @@
    "fieldtype": "Link",
    "label": "Branch",
    "options": "Branch"
+  },
+  {
+   "fieldname": "branch_code",
+   "fieldtype": "Data",
+   "label": "Branch Code"
   },
   {
    "fieldname": "date_bought_or_returned",
@@ -107,6 +115,12 @@
    "label": "Items"
   },
   {
+   "fieldname": "items_list",
+   "fieldtype": "Table",
+   "label": "Items List",
+   "options": "Subastado Sales Item"
+  },
+  {
    "fieldname": "gcash_reference_no",
    "fieldtype": "Data",
    "label": "Gcash reference no"
@@ -130,6 +144,12 @@
    "fieldname": "total_amount",
    "fieldtype": "Currency",
    "label": "Total amount"
+  },
+  {
+   "fieldname": "sellers_list",
+   "fieldtype": "Table",
+   "label": "Sellers List",
+   "options": "Subastado Commission Entry"
   }
  ],
  "index_web_pages_for_search": 1,

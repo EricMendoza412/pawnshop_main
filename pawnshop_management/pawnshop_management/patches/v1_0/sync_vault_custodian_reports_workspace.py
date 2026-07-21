@@ -19,10 +19,12 @@ MAIN_WORKSPACE_LINKS = [
 	{"type": "Link", "label": "Cash Position Report", "link_to": "Cash Position Report", "link_type": "DocType"},
 	{"type": "Link", "label": "Transaction Log Report", "link_to": "Pawnshop Transaction Log", "link_type": "DocType"},
 	{"type": "Link", "label": "Transaction Log Preview", "link_to": "VC Report", "link_type": "Report", "is_query_report": 1},
-	{"type": "Link", "label": "J End of Day Report", "link_to": "J End of Day Report", "link_type": "Report", "is_query_report": 1},
-	{"type": "Link", "label": "NJ End of the Day Report", "link_to": "NJ End of the Day Repor", "link_type": "Report", "is_query_report": 1},
 	{"type": "Card Break", "label": "Text Blast", "link_to": "SMART SMS Log", "link_type": "DocType"},
+	{"type": "Link", "label": "Text Blast", "link_to": "Text Blast", "link_type": "DocType"},
 	{"type": "Link", "label": "SMS Log", "link_to": "SMART SMS Log", "link_type": "DocType"},
+	{"type": "Card Break", "label": "Sangla Tracker lists", "link_to": "Pawn Ticket Jewelry", "link_type": "DocType"},
+	{"type": "Link", "label": "Jewelry Tracker", "link_to": "J End of Day Report", "link_type": "Report", "is_query_report": 1},
+	{"type": "Link", "label": "Gadget Tracker", "link_to": "NJ End of the Day Repor", "link_type": "Report", "is_query_report": 1},
 ]
 
 
@@ -33,6 +35,9 @@ VC_WORKSPACE_LINKS = [
 	{"type": "Card Break", "label": "Vault Turnover Reports", "link_type": "Report", "is_query_report": 1},
 	{"type": "Link", "label": "VC Turnover Checklist and Lists", "link_to": "VC Turnover Checklist", "link_type": "DocType"},
 	{"type": "Link", "label": "VC Turnover Lists (J, NJ, SB)", "link_to": "VC Turnover List", "link_type": "Report", "is_query_report": 1},
+	{"type": "Card Break", "label": "Trackers", "link_to": "J End of Day Report", "link_type": "Report"},
+	{"type": "Link", "label": "VC Tracker (Jewelry)", "link_to": "J End of Day Report", "link_type": "Report", "is_query_report": 1},
+	{"type": "Link", "label": "VC Tracker (Gadget)", "link_to": "NJ End of the Day Repor", "link_type": "Report", "is_query_report": 1},
 ]
 
 
@@ -81,8 +86,8 @@ def sync_vc_workspace():
 	workspace.category = "Modules"
 	workspace.developer_mode_only = 0
 	workspace.disable_user_customization = 1
-	workspace.extends = "Pawnshop Management"
-	workspace.extends_another_page = 1
+	workspace.extends = None
+	workspace.extends_another_page = 0
 	workspace.hide_custom = 0
 	workspace.icon = "folder-normal"
 	workspace.is_default = 0

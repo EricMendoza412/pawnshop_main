@@ -142,6 +142,37 @@ def _new_log(payload, reference_doctype=None, reference_name=None, sms_purpose=N
 	return log
 
 
+def log_failed_sms_attempt(
+	destination,
+	text,
+	client_message_id,
+	error_message,
+	reference_doctype=None,
+	reference_name=None,
+	sms_purpose=None,
+):
+	"""Persist failures that occur before send_sms can create its normal queued log."""
+	existing = frappe.db.get_value("SMART SMS Log", {"client_message_id": client_message_id})
+	if existing:
+		return frappe.get_doc("SMART SMS Log", existing)
+
+	payload = _build_payload(
+		destination=destination,
+		text=text,
+		client_message_id=client_message_id,
+	)
+	log = _new_log(
+		payload,
+		reference_doctype=reference_doctype,
+		reference_name=reference_name,
+		sms_purpose=sms_purpose,
+	)
+	log.status = "Failed"
+	log.error_message = str(error_message)
+	log.save(ignore_permissions=True)
+	return log
+
+
 def _response_body(response):
 	try:
 		return json.dumps(response.json(), indent=2, sort_keys=True)

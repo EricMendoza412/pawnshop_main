@@ -122,7 +122,7 @@
    "fieldname": "sms_purpose",
    "fieldtype": "Select",
    "label": "SMS Purpose",
-   "options": "\nMaturity\nExpiry",
+   "options": "\nMaturity\nExpiry\nText Blast",
    "read_only": 1
   },
   {
