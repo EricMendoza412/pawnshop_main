@@ -12,13 +12,17 @@ frappe.ui.form.on('Text Blast', {
 
 	refresh(frm) {
 		update_message_length(frm);
+		show_processing_progress(frm);
 		if (!frm.is_new() && frm.doc.workflow_state === 'Sent') {
-			frm.add_custom_button(__('Retry Failed SMS'), () => {
+			frm.add_custom_button(__('View Batches'), () => {
+				frappe.set_route('List', 'Text Blast Batch', { text_blast: frm.doc.name });
+			}, __('Actions'));
+			frm.add_custom_button(__('Retry Failed / Unsent SMS'), () => {
 				frappe.call({
 					method: 'pawnshop_management.pawnshop_management.doctype.text_blast.text_blast.retry_text_blast',
 					args: { text_blast_name: frm.doc.name },
 					freeze: true,
-					freeze_message: __('Queueing failed SMS recipients...'),
+					freeze_message: __('Queueing failed and unsent SMS recipients...'),
 					callback(r) {
 						const result = r.message || {};
 						if (result.queued) {
@@ -30,7 +34,7 @@ frappe.ui.form.on('Text Blast', {
 							frappe.msgprint({
 								title: __('Nothing to Retry'),
 								indicator: 'blue',
-								message: __('All {0} recipient(s) already have successful SMS Log entries.', [result.successful || 0])
+								message: __('No recipients are eligible. Successful: {0}; maximum attempts reached: {1}.', [result.successful || 0, result.exhausted || 0])
 							});
 						}
 					}
@@ -73,4 +77,24 @@ function update_message_length(frm) {
 	const segments = Math.max(1, Math.ceil(characters / 160));
 	const capacity = segments * 160;
 	frm.set_value('message_length', __('Characters: {0} / {1}\nSMS Segments: {2}', [characters, capacity, segments]));
+}
+
+function show_processing_progress(frm) {
+	if (frm.is_new() || frm.doc.workflow_state !== 'Sent') return;
+	const progress = frm.doc.processing_progress || 0;
+	frm.dashboard.add_progress(
+		__('Text Blast Processing'),
+		progress,
+		__('Accepted: {0}; Failed: {1}; Unsent: {2}; Batches: {3}/{4}', [
+			frm.doc.accepted_recipients || 0,
+			frm.doc.failed_recipients || 0,
+			frm.doc.unsent_recipients || 0,
+			frm.doc.completed_batches || 0,
+			frm.doc.total_batches || 0
+		])
+	);
+	if (['Queued', 'Processing'].includes(frm.doc.processing_status)) {
+		clearTimeout(frm.text_blast_refresh_timer);
+		frm.text_blast_refresh_timer = setTimeout(() => frm.reload_doc(), 10000);
+	}
 }

@@ -7,6 +7,7 @@ WORKFLOW_NAME = "Text Blast Workflow"
 def execute():
 	frappe.reload_doc("pawnshop_management", "doctype", "recipient_list")
 	frappe.reload_doc("pawnshop_management", "doctype", "text_blast")
+	frappe.reload_doc("pawnshop_management", "doctype", "text_blast_batch")
 	ensure_master("Workflow State", "workflow_state_name", "Draft", "Inverse")
 	ensure_master("Workflow State", "workflow_state_name", "For Approval", "Primary")
 	ensure_master("Workflow State", "workflow_state_name", "Sent", "Success")

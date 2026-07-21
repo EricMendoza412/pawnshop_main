@@ -8,12 +8,18 @@ from frappe.utils import now_datetime
 from pawnshop_management.pawnshop_management.doctype.smart_sms_log.smart_sms_log import get_branch_code
 from pawnshop_management.pawnshop_management.smart_a2p import (
 	SmartA2PError,
+	is_smart_a2p_configuration_error,
 	log_failed_sms_attempt,
 	send_sms,
+	validate_smart_a2p_configuration,
 )
 
 
 TRACKER_BRANCH_RE_TEMPLATE = r"(?:^|-){0}\.[1-3]-"
+DEFAULT_BATCH_SIZE = 250
+DEFAULT_MAX_ATTEMPTS = 3
+BATCH_JOB_TIMEOUT = 900
+SUCCESSFUL_LOG_STATUSES = {"Queued", "Accepted", "Callback Received", "Delivered"}
 
 
 class TextBlast(Document):
@@ -28,18 +34,15 @@ class TextBlast(Document):
 		previous = self.get_doc_before_save()
 		if self.workflow_state == "Sent" and previous and previous.workflow_state != "Sent":
 			frappe.enqueue(
-				"pawnshop_management.pawnshop_management.doctype.text_blast.text_blast.send_text_blast",
+				"pawnshop_management.pawnshop_management.doctype.text_blast.text_blast.initialize_text_blast_processing",
 				queue="long",
+				timeout=BATCH_JOB_TIMEOUT,
 				enqueue_after_commit=True,
 				text_blast_name=self.name,
 			)
 
 	def _set_message_length(self):
-		characters = len(self.message or "")
-		segments = max(1, int(math.ceil(characters / 160.0)))
-		self.message_length = "Characters: {0} / {1}\nSMS Segments: {2}".format(
-			characters, segments * 160, segments
-		)
+		self.message_length = _get_message_length_display(self.message)
 
 	def _validate_recipient_source(self):
 		if self.recipient_options and not frappe.db.exists("Branch", self.recipient_options):
@@ -113,6 +116,12 @@ def is_authorized_text_blast_approver(user):
 	)
 
 
+def _get_message_length_display(message):
+	characters = len(message or "")
+	segments = max(1, int(math.ceil(characters / 160.0)))
+	return "Characters: {0} / {1}\nSMS Segments: {2}".format(characters, segments * 160, segments)
+
+
 @frappe.whitelist()
 def get_recipient_options():
 	return frappe.get_all("Branch", pluck="name", order_by="name asc")
@@ -178,17 +187,30 @@ def retry_text_blast(text_blast_name):
 		frappe.throw("Only an approved Text Blast can be retried.")
 	if not is_authorized_text_blast_approver(frappe.session.user):
 		frappe.throw("Only an authorized Text Blast approver can retry failed SMS messages.", frappe.PermissionError)
+	if doc.processing_status in ("Queued", "Processing"):
+		frappe.throw("Text Blast processing is already active.")
 	retry_status = get_text_blast_retry_status(doc)
 	eligible = retry_status["failed"] + retry_status["unsent"]
 	if not eligible:
 		return {"queued": False, "eligible": 0, **retry_status}
 
-	frappe.enqueue(
-		"pawnshop_management.pawnshop_management.doctype.text_blast.text_blast.send_text_blast",
-		queue="long",
-		timeout=3600,
-		text_blast_name=doc.name,
+	if not frappe.db.exists("Text Blast Batch", {"text_blast": doc.name}):
+		batch_size = doc.batch_size or DEFAULT_BATCH_SIZE
+		_create_batches(doc.name, len(doc.recipient_list), batch_size)
+	_reset_retryable_batches(doc)
+	frappe.db.set_value(
+		"Text Blast",
+		doc.name,
+		{
+			"processing_status": "Queued",
+			"processing_completed_at": None,
+			"last_processing_error": None,
+			"retry_count": (doc.retry_count or 0) + 1,
+		},
+		update_modified=False,
 	)
+	frappe.db.commit()
+	enqueue_next_text_blast_batch(doc.name)
 	return {"queued": True, "eligible": eligible, **retry_status}
 
 
@@ -196,51 +218,175 @@ def get_text_blast_retry_status(doc):
 	if isinstance(doc, str):
 		doc = frappe.get_doc("Text Blast", doc)
 
-	logs = frappe.get_all(
-		"SMART SMS Log",
-		filters={"reference_doctype": "Text Blast", "reference_name": doc.name},
-		fields=["client_message_id", "status"],
-	)
-	status = {"successful": 0, "failed": 0, "unsent": 0}
+	logs_by_row = _get_logs_by_recipient(doc.name)
+	status = {"successful": 0, "failed": 0, "exhausted": 0, "unsent": 0}
+	max_attempts = doc.max_attempts or DEFAULT_MAX_ATTEMPTS
 	for row in doc.recipient_list:
-		prefix = "TEXT-BLAST-{0}-{1}".format(doc.name, row.idx)
-		row_statuses = [
-			log.status
-			for log in logs
-			if log.client_message_id == prefix or (log.client_message_id or "").startswith(prefix + "-R")
-		]
-		if any(log_status != "Failed" for log_status in row_statuses):
+		row_logs = logs_by_row.get(row.idx, [])
+		if _has_successful_attempt(row_logs):
 			status["successful"] += 1
-		elif row_statuses:
+		elif row_logs and len(row_logs) < max_attempts:
 			status["failed"] += 1
+		elif row_logs:
+			status["exhausted"] += 1
 		else:
 			status["unsent"] += 1
 	return status
 
 
-def send_text_blast(text_blast_name):
+def initialize_text_blast_processing(text_blast_name):
 	doc = frappe.get_doc("Text Blast", text_blast_name)
 	if doc.workflow_state != "Sent" or not doc.approved_by:
 		raise SmartA2PError("Only an approved Text Blast can send SMS messages.")
 
-	results = {"accepted": 0, "failed": 0, "skipped": 0}
-	for row in doc.recipient_list:
-		base_client_message_id = "TEXT-BLAST-{0}-{1}".format(doc.name, row.idx)[:128]
-		client_message_id = base_client_message_id
-		existing_status = frappe.db.get_value(
-			"SMART SMS Log", {"client_message_id": client_message_id}, "status"
+	batch_size = doc.batch_size or DEFAULT_BATCH_SIZE
+	total_recipients = frappe.db.count("Recipient List", {"parent": doc.name, "parenttype": "Text Blast"})
+	if not total_recipients:
+		_set_campaign_failure(doc.name, "Text Blast has no recipients.")
+		return
+
+	_create_batches(doc.name, total_recipients, batch_size)
+	frappe.db.set_value(
+		"Text Blast",
+		doc.name,
+		{
+			"processing_status": "Queued",
+			"batch_size": batch_size,
+			"max_attempts": doc.max_attempts or DEFAULT_MAX_ATTEMPTS,
+			"total_recipients": total_recipients,
+			"total_batches": int(math.ceil(total_recipients / float(batch_size))),
+			"completed_batches": 0,
+			"accepted_recipients": 0,
+			"failed_recipients": 0,
+			"skipped_recipients": 0,
+			"unsent_recipients": total_recipients,
+			"processing_progress": 0,
+			"processing_started_at": now_datetime(),
+			"processing_completed_at": None,
+			"last_processing_error": None,
+		},
+		update_modified=False,
+	)
+	frappe.db.commit()
+
+	try:
+		validate_smart_a2p_configuration()
+	except Exception as exc:
+		_pause_campaign(doc.name, None, exc)
+		return
+
+	enqueue_next_text_blast_batch(doc.name)
+
+
+def _create_batches(text_blast_name, total_recipients, batch_size):
+	if frappe.db.exists("Text Blast Batch", {"text_blast": text_blast_name}):
+		return
+
+	for batch_number, start_index, end_index in _get_batch_ranges(total_recipients, batch_size):
+		frappe.get_doc(
+			{
+				"doctype": "Text Blast Batch",
+				"batch_key": "{0}-BATCH-{1:04d}".format(text_blast_name, batch_number),
+				"text_blast": text_blast_name,
+				"batch_number": batch_number,
+				"status": "Pending",
+				"start_index": start_index,
+				"end_index": end_index,
+				"recipient_count": end_index - start_index + 1,
+			}
+		).insert(ignore_permissions=True)
+
+
+def _get_batch_ranges(total_recipients, batch_size):
+	total_batches = int(math.ceil(total_recipients / float(batch_size)))
+	return [
+		(
+			batch_number,
+			((batch_number - 1) * batch_size) + 1,
+			min(batch_number * batch_size, total_recipients),
 		)
-		if existing_status and existing_status != "Failed":
+		for batch_number in range(1, total_batches + 1)
+	]
+
+
+def enqueue_next_text_blast_batch(text_blast_name):
+	batch_name = frappe.db.get_value(
+		"Text Blast Batch",
+		{"text_blast": text_blast_name, "status": "Pending"},
+		"name",
+		order_by="batch_number asc",
+	)
+	if not batch_name:
+		_update_campaign_progress(text_blast_name, finalize=True)
+		return
+
+	frappe.db.set_value(
+		"Text Blast Batch",
+		batch_name,
+		{"status": "Queued", "queued_at": now_datetime()},
+		update_modified=False,
+	)
+	frappe.db.set_value("Text Blast", text_blast_name, "processing_status", "Processing", update_modified=False)
+	frappe.db.commit()
+	frappe.enqueue(
+		"pawnshop_management.pawnshop_management.doctype.text_blast.text_blast.process_text_blast_batch",
+		queue="long",
+		timeout=BATCH_JOB_TIMEOUT,
+		job_name="text-blast:{0}:batch:{1}".format(text_blast_name, batch_name),
+		batch_name=batch_name,
+	)
+
+
+def process_text_blast_batch(batch_name):
+	batch = frappe.get_doc("Text Blast Batch", batch_name)
+	if batch.status in ("Completed", "Partially Failed"):
+		return
+
+	doc = frappe.get_doc("Text Blast", batch.text_blast)
+	if doc.workflow_state != "Sent" or not doc.approved_by:
+		_set_campaign_failure(doc.name, "Only an approved Text Blast can send SMS messages.", batch.name)
+		return
+
+	try:
+		validate_smart_a2p_configuration()
+	except Exception as exc:
+		_pause_campaign(doc.name, batch.name, exc)
+		return
+
+	frappe.db.set_value(
+		"Text Blast Batch",
+		batch.name,
+		{
+			"status": "Processing",
+			"started_at": now_datetime(),
+			"attempt_count": (batch.attempt_count or 0) + 1,
+			"last_error": None,
+		},
+		update_modified=False,
+	)
+	frappe.db.commit()
+
+	rows = frappe.get_all(
+		"Recipient List",
+		filters={
+			"parent": doc.name,
+			"parenttype": "Text Blast",
+			"idx": ("between", [batch.start_index, batch.end_index]),
+		},
+		fields=["idx", "contact_name", "mobile_number"],
+		order_by="idx asc",
+	)
+	logs_by_row = _get_logs_by_recipient(doc.name)
+	results = {"accepted": 0, "failed": 0, "skipped": 0}
+	max_attempts = doc.max_attempts or DEFAULT_MAX_ATTEMPTS
+
+	for row in rows:
+		row_logs = logs_by_row.get(row.idx, [])
+		if _has_successful_attempt(row_logs) or len(row_logs) >= max_attempts:
 			results["skipped"] += 1
 			continue
-		if existing_status == "Failed":
-			retry_number = 2
-			while frappe.db.exists(
-				"SMART SMS Log", {"client_message_id": "{0}-R{1}".format(base_client_message_id, retry_number)[:128]}
-			):
-				retry_number += 1
-			client_message_id = "{0}-R{1}".format(base_client_message_id, retry_number)[:128]
 
+		client_message_id = _get_next_client_message_id(doc.name, row.idx, len(row_logs) + 1)
 		try:
 			send_sms(
 				destination=row.mobile_number,
@@ -252,6 +398,9 @@ def send_text_blast(text_blast_name):
 			)
 			results["accepted"] += 1
 		except Exception as exc:
+			if is_smart_a2p_configuration_error(exc):
+				_pause_campaign(doc.name, batch.name, exc)
+				return
 			results["failed"] += 1
 			if not frappe.db.exists("SMART SMS Log", {"client_message_id": client_message_id}):
 				log_failed_sms_attempt(
@@ -265,4 +414,153 @@ def send_text_blast(text_blast_name):
 				)
 			frappe.log_error(frappe.get_traceback(), "Text Blast SMS failed: {0} row {1}".format(doc.name, row.idx))
 		frappe.db.commit()
-	return results
+
+	batch_status = "Partially Failed" if results["failed"] else "Completed"
+	frappe.db.set_value(
+		"Text Blast Batch",
+		batch.name,
+		{
+			"status": batch_status,
+			"accepted_count": results["accepted"],
+			"failed_count": results["failed"],
+			"skipped_count": results["skipped"],
+			"completed_at": now_datetime(),
+		},
+		update_modified=False,
+	)
+	frappe.db.commit()
+	_update_campaign_progress(doc.name)
+	enqueue_next_text_blast_batch(doc.name)
+
+
+def _get_logs_by_recipient(text_blast_name):
+	logs = frappe.get_all(
+		"SMART SMS Log",
+		filters={"reference_doctype": "Text Blast", "reference_name": text_blast_name},
+		fields=["client_message_id", "status"],
+		order_by="creation asc",
+	)
+	pattern = re.compile(r"^TEXT-BLAST-{0}-(\d+)(?:-R\d+)?$".format(re.escape(text_blast_name)))
+	by_row = {}
+	for log in logs:
+		match = pattern.match(log.client_message_id or "")
+		if match:
+			by_row.setdefault(int(match.group(1)), []).append(log)
+	return by_row
+
+
+def _has_successful_attempt(logs):
+	return any(log.status in SUCCESSFUL_LOG_STATUSES for log in logs)
+
+
+def _get_next_client_message_id(text_blast_name, row_index, attempt_number):
+	base = "TEXT-BLAST-{0}-{1}".format(text_blast_name, row_index)
+	return base[:128] if attempt_number == 1 else "{0}-R{1}".format(base, attempt_number)[:128]
+
+
+def _reset_retryable_batches(doc):
+	logs_by_row = _get_logs_by_recipient(doc.name)
+	max_attempts = doc.max_attempts or DEFAULT_MAX_ATTEMPTS
+	batch_size = doc.batch_size or DEFAULT_BATCH_SIZE
+	batch_numbers = set()
+	for row in doc.recipient_list:
+		row_logs = logs_by_row.get(row.idx, [])
+		if not _has_successful_attempt(row_logs) and len(row_logs) < max_attempts:
+			batch_numbers.add(int(math.ceil(row.idx / float(batch_size))))
+	for batch_number in batch_numbers:
+		frappe.db.set_value(
+			"Text Blast Batch",
+			{"text_blast": doc.name, "batch_number": batch_number},
+			{
+				"status": "Pending",
+				"accepted_count": 0,
+				"failed_count": 0,
+				"skipped_count": 0,
+				"completed_at": None,
+				"last_error": None,
+			},
+			update_modified=False,
+		)
+
+
+def _update_campaign_progress(text_blast_name, finalize=False):
+	doc = frappe.get_doc("Text Blast", text_blast_name)
+	logs_by_row = _get_logs_by_recipient(doc.name)
+	max_attempts = doc.max_attempts or DEFAULT_MAX_ATTEMPTS
+	accepted = failed = unsent = 0
+	for row in doc.recipient_list:
+		row_logs = logs_by_row.get(row.idx, [])
+		if _has_successful_attempt(row_logs):
+			accepted += 1
+		elif row_logs:
+			failed += 1
+		else:
+			unsent += 1
+
+	total = len(doc.recipient_list)
+	completed_batches = frappe.db.count(
+		"Text Blast Batch",
+		{"text_blast": doc.name, "status": ("in", ["Completed", "Partially Failed", "Failed"])},
+	)
+	total_batches = frappe.db.count("Text Blast Batch", {"text_blast": doc.name})
+	skipped = sum(
+		row.skipped_count or 0
+		for row in frappe.get_all(
+			"Text Blast Batch", filters={"text_blast": doc.name}, fields=["skipped_count"]
+		)
+	)
+	values = {
+		"total_recipients": total,
+		"total_batches": total_batches,
+		"completed_batches": completed_batches,
+		"accepted_recipients": accepted,
+		"failed_recipients": failed,
+		"skipped_recipients": skipped,
+		"unsent_recipients": unsent,
+		"processing_progress": ((accepted + failed) * 100.0 / total) if total else 0,
+	}
+	if finalize or (total_batches and completed_batches == total_batches):
+		values["processing_status"] = "Completed" if not failed and not unsent else "Partially Failed"
+		values["processing_completed_at"] = now_datetime()
+	frappe.db.set_value("Text Blast", doc.name, values, update_modified=False)
+	frappe.db.commit()
+
+
+def _pause_campaign(text_blast_name, batch_name, exc):
+	error = str(exc)
+	frappe.db.set_value(
+		"Text Blast",
+		text_blast_name,
+		{"processing_status": "Paused", "last_processing_error": error},
+		update_modified=False,
+	)
+	if batch_name:
+		frappe.db.set_value(
+			"Text Blast Batch",
+			batch_name,
+			{"status": "Paused", "last_error": error},
+			update_modified=False,
+		)
+	frappe.log_error(frappe.get_traceback(), "Text Blast paused: {0}".format(text_blast_name))
+	frappe.db.commit()
+
+
+def _set_campaign_failure(text_blast_name, error, batch_name=None):
+	frappe.db.set_value(
+		"Text Blast",
+		text_blast_name,
+		{
+			"processing_status": "Failed",
+			"last_processing_error": str(error),
+			"processing_completed_at": now_datetime(),
+		},
+		update_modified=False,
+	)
+	if batch_name:
+		frappe.db.set_value(
+			"Text Blast Batch",
+			batch_name,
+			{"status": "Failed", "last_error": str(error), "completed_at": now_datetime()},
+			update_modified=False,
+		)
+	frappe.db.commit()

@@ -9,7 +9,12 @@
  "field_order": [
   "workflow_state", "date_created", "requested_by", "approved_by",
   "message_section", "message", "message_length", "recipient_section",
-  "recipient_options", "recipient_list"
+  "recipient_options", "recipient_list", "processing_section", "processing_status",
+  "processing_progress", "processing_column", "batch_size", "max_attempts",
+  "totals_section", "total_recipients", "total_batches", "completed_batches",
+  "accepted_recipients", "failed_recipients", "skipped_recipients", "unsent_recipients",
+  "timing_section", "processing_started_at", "processing_completed_at", "retry_count",
+  "last_processing_error"
  ],
  "fields": [
   {
@@ -76,11 +81,32 @@
    "label": "Recipient List",
    "options": "Recipient List",
    "reqd": 1
-  }
+  },
+  {"fieldname":"processing_section","fieldtype":"Section Break","label":"Batch Processing"},
+  {"default":"Not Started","fieldname":"processing_status","fieldtype":"Select","in_list_view":1,"in_standard_filter":1,"label":"Processing Status","options":"Not Started\nQueued\nProcessing\nCompleted\nPartially Failed\nFailed\nPaused","read_only":1},
+  {"fieldname":"processing_progress","fieldtype":"Percent","label":"Processing Progress","read_only":1},
+  {"fieldname":"processing_column","fieldtype":"Column Break"},
+  {"default":"250","fieldname":"batch_size","fieldtype":"Int","label":"Batch Size","read_only":1},
+  {"default":"3","fieldname":"max_attempts","fieldtype":"Int","label":"Maximum Attempts per Recipient","read_only":1},
+  {"fieldname":"totals_section","fieldtype":"Section Break","label":"Processing Totals"},
+  {"fieldname":"total_recipients","fieldtype":"Int","label":"Total Recipients","read_only":1},
+  {"fieldname":"total_batches","fieldtype":"Int","label":"Total Batches","read_only":1},
+  {"fieldname":"completed_batches","fieldtype":"Int","label":"Completed Batches","read_only":1},
+  {"fieldname":"accepted_recipients","fieldtype":"Int","label":"Accepted Recipients","read_only":1},
+  {"fieldname":"failed_recipients","fieldtype":"Int","label":"Failed Recipients","read_only":1},
+  {"fieldname":"skipped_recipients","fieldtype":"Int","label":"Skipped Recipients","read_only":1},
+  {"fieldname":"unsent_recipients","fieldtype":"Int","label":"Unsent Recipients","read_only":1},
+  {"fieldname":"timing_section","fieldtype":"Section Break","label":"Processing Timing and Error"},
+  {"fieldname":"processing_started_at","fieldtype":"Datetime","label":"Processing Started At","read_only":1},
+  {"fieldname":"processing_completed_at","fieldtype":"Datetime","label":"Processing Completed At","read_only":1},
+  {"fieldname":"retry_count","fieldtype":"Int","label":"Retry Count","read_only":1},
+  {"fieldname":"last_processing_error","fieldtype":"Long Text","label":"Last Processing Error","read_only":1}
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
- "links": [],
+ "links": [
+  {"link_doctype":"Text Blast Batch","link_fieldname":"text_blast"}
+ ],
  "modified": "2026-07-21 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",

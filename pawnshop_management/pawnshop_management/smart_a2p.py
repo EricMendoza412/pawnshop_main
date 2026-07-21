@@ -41,6 +41,25 @@ def _get_settings():
 	return settings, api_key
 
 
+def validate_smart_a2p_configuration():
+	"""Validate campaign-blocking SMART settings before starting a batch."""
+	_get_settings()
+	return True
+
+
+def is_smart_a2p_configuration_error(exc):
+	message = str(exc or "")
+	return any(
+		marker in message
+		for marker in (
+			"SMART A2P SMS sending is disabled",
+			"SMART A2P API ID is required",
+			"SMART A2P API Key is required",
+			"Encryption key is invalid",
+		)
+	)
+
+
 def _get_base_url(settings):
 	base_url = (settings.base_url or DEFAULT_BASE_URL).strip()
 	if not base_url.endswith("/"):

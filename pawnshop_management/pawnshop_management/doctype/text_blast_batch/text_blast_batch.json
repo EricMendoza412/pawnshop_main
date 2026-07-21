@@ -1,0 +1,48 @@
+{
+ "actions": [],
+ "autoname": "field:batch_key",
+ "creation": "2026-07-21 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "batch_key", "text_blast", "batch_number", "status", "range_section",
+  "start_index", "end_index", "recipient_count", "result_section",
+  "accepted_count", "failed_count", "skipped_count", "attempt_count",
+  "timing_section", "queued_at", "started_at", "completed_at", "last_error"
+ ],
+ "fields": [
+  {"fieldname":"batch_key","fieldtype":"Data","hidden":1,"label":"Batch Key","unique":1},
+  {"fieldname":"text_blast","fieldtype":"Link","in_list_view":1,"in_standard_filter":1,"label":"Text Blast","options":"Text Blast","reqd":1},
+  {"fieldname":"batch_number","fieldtype":"Int","in_list_view":1,"label":"Batch Number","read_only":1,"reqd":1},
+  {"default":"Pending","fieldname":"status","fieldtype":"Select","in_list_view":1,"in_standard_filter":1,"label":"Status","options":"Pending\nQueued\nProcessing\nCompleted\nPartially Failed\nFailed\nPaused","read_only":1},
+  {"fieldname":"range_section","fieldtype":"Section Break","label":"Recipient Range"},
+  {"fieldname":"start_index","fieldtype":"Int","label":"Start Index","read_only":1},
+  {"fieldname":"end_index","fieldtype":"Int","label":"End Index","read_only":1},
+  {"fieldname":"recipient_count","fieldtype":"Int","label":"Recipient Count","read_only":1},
+  {"fieldname":"result_section","fieldtype":"Section Break","label":"Results"},
+  {"fieldname":"accepted_count","fieldtype":"Int","label":"Accepted Count","read_only":1},
+  {"fieldname":"failed_count","fieldtype":"Int","label":"Failed Count","read_only":1},
+  {"fieldname":"skipped_count","fieldtype":"Int","label":"Skipped Count","read_only":1},
+  {"fieldname":"attempt_count","fieldtype":"Int","label":"Batch Attempts","read_only":1},
+  {"fieldname":"timing_section","fieldtype":"Section Break","label":"Timing and Errors"},
+  {"fieldname":"queued_at","fieldtype":"Datetime","label":"Queued At","read_only":1},
+  {"fieldname":"started_at","fieldtype":"Datetime","label":"Started At","read_only":1},
+  {"fieldname":"completed_at","fieldtype":"Datetime","label":"Completed At","read_only":1},
+  {"fieldname":"last_error","fieldtype":"Long Text","label":"Last Error","read_only":1}
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-07-21 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Pawnshop Management",
+ "name": "Text Blast Batch",
+ "owner": "Administrator",
+ "permissions": [
+  {"export":1,"read":1,"report":1,"role":"Operations Manager"},
+  {"export":1,"read":1,"report":1,"role":"System Manager"}
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
