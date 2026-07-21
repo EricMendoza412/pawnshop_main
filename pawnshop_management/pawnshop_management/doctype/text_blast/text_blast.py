@@ -178,14 +178,44 @@ def retry_text_blast(text_blast_name):
 		frappe.throw("Only an approved Text Blast can be retried.")
 	if not is_authorized_text_blast_approver(frappe.session.user):
 		frappe.throw("Only an authorized Text Blast approver can retry failed SMS messages.", frappe.PermissionError)
+	retry_status = get_text_blast_retry_status(doc)
+	eligible = retry_status["failed"] + retry_status["unsent"]
+	if not eligible:
+		return {"queued": False, "eligible": 0, **retry_status}
 
 	frappe.enqueue(
 		"pawnshop_management.pawnshop_management.doctype.text_blast.text_blast.send_text_blast",
 		queue="long",
-		enqueue_after_commit=True,
+		timeout=3600,
 		text_blast_name=doc.name,
 	)
-	return {"queued": True}
+	return {"queued": True, "eligible": eligible, **retry_status}
+
+
+def get_text_blast_retry_status(doc):
+	if isinstance(doc, str):
+		doc = frappe.get_doc("Text Blast", doc)
+
+	logs = frappe.get_all(
+		"SMART SMS Log",
+		filters={"reference_doctype": "Text Blast", "reference_name": doc.name},
+		fields=["client_message_id", "status"],
+	)
+	status = {"successful": 0, "failed": 0, "unsent": 0}
+	for row in doc.recipient_list:
+		prefix = "TEXT-BLAST-{0}-{1}".format(doc.name, row.idx)
+		row_statuses = [
+			log.status
+			for log in logs
+			if log.client_message_id == prefix or (log.client_message_id or "").startswith(prefix + "-R")
+		]
+		if any(log_status != "Failed" for log_status in row_statuses):
+			status["successful"] += 1
+		elif row_statuses:
+			status["failed"] += 1
+		else:
+			status["unsent"] += 1
+	return status
 
 
 def send_text_blast(text_blast_name):

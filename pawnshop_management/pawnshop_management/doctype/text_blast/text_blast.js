@@ -19,8 +19,20 @@ frappe.ui.form.on('Text Blast', {
 					args: { text_blast_name: frm.doc.name },
 					freeze: true,
 					freeze_message: __('Queueing failed SMS recipients...'),
-					callback() {
-						frappe.show_alert({ message: __('Text Blast retry queued.'), indicator: 'green' });
+					callback(r) {
+						const result = r.message || {};
+						if (result.queued) {
+							frappe.show_alert({
+								message: __('Text Blast retry queued for {0} recipient(s).', [result.eligible]),
+								indicator: 'green'
+							});
+						} else {
+							frappe.msgprint({
+								title: __('Nothing to Retry'),
+								indicator: 'blue',
+								message: __('All {0} recipient(s) already have successful SMS Log entries.', [result.successful || 0])
+							});
+						}
 					}
 				});
 			}, __('Actions'));
