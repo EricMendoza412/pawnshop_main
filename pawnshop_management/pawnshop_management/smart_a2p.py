@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 
 import frappe
 import requests
-from frappe.utils import formatdate, now_datetime, today
+from frappe.utils import add_days, formatdate, now_datetime, today
 
 from pawnshop_management.operations_access_control.vault_custodian import require_vault_custodian_access
 from pawnshop_management.pawnshop_management.doctype.smart_sms_log.smart_sms_log import get_reference_branch
@@ -534,10 +534,13 @@ def send_daily_pawn_ticket_sms_notifications():
 
 
 def _get_pawn_tickets_for_daily_sms(doctype, date_field, texted_field):
+	current_date = today()
+	reminder_window_end = add_days(current_date, 2)
+
 	return frappe.get_all(
 		doctype,
 		filters={
-			date_field: today(),
+			date_field: ["between", [current_date, reminder_window_end]],
 			texted_field: 0,
 			"workflow_state": ["in", list(PAWN_TICKET_SMS_WORKFLOW_STATES)],
 		},
