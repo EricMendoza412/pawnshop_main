@@ -338,6 +338,16 @@ def enqueue_next_text_blast_batch(text_blast_name):
 
 
 def process_text_blast_batch(batch_name):
+	try:
+		return _process_text_blast_batch(batch_name)
+	except Exception as exc:
+		batch = frappe.get_doc("Text Blast Batch", batch_name)
+		_set_campaign_failure(batch.text_blast, exc, batch.name)
+		frappe.log_error(frappe.get_traceback(), "Text Blast batch failed: {0}".format(batch.name))
+		raise
+
+
+def _process_text_blast_batch(batch_name):
 	batch = frappe.get_doc("Text Blast Batch", batch_name)
 	if batch.status in ("Completed", "Partially Failed"):
 		return
@@ -368,11 +378,12 @@ def process_text_blast_batch(batch_name):
 
 	rows = frappe.get_all(
 		"Recipient List",
-		filters={
-			"parent": doc.name,
-			"parenttype": "Text Blast",
-			"idx": ("between", [batch.start_index, batch.end_index]),
-		},
+		filters=[
+			["parent", "=", doc.name],
+			["parenttype", "=", "Text Blast"],
+			["idx", ">=", batch.start_index],
+			["idx", "<=", batch.end_index],
+		],
 		fields=["idx", "contact_name", "mobile_number"],
 		order_by="idx asc",
 	)
