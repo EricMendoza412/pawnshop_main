@@ -338,6 +338,9 @@ def _send_administrator_test_sms(
 	text=TEST_MESSAGE,
 	sms_purpose=None,
 ):
+	if _normalize_destination(destination) == TEST_DESTINATION and text == TEST_MESSAGE:
+		return {"disabled": True}
+
 	return send_sms(
 		destination=destination,
 		text=text,
