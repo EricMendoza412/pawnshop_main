@@ -19,6 +19,7 @@ ROLE_TO_BRANCH_FIELD = {
 }
 
 MANAGER_ROLES = {"Operations Manager", "Supervisor"}
+READ_ALL_ROLES = MANAGER_ROLES | {"Auditor"}
 
 
 class BranchRoleAssignment(Document):
@@ -168,7 +169,7 @@ def clear_branch_cashier_assignments():
 def get_permission_query_conditions(user=None):
 	user = user or frappe.session.user
 
-	if _is_system_manager(user) or _user_has_any_role(user, MANAGER_ROLES):
+	if _is_system_manager(user) or _user_has_any_role(user, READ_ALL_ROLES):
 		return None
 
 	escaped_user = frappe.db.escape(user)
@@ -205,7 +206,7 @@ def has_permission(doc, ptype=None, user=None):
 		return True
 
 	if permission_type == "read":
-		if _user_has_any_role(user, MANAGER_ROLES):
+		if _user_has_any_role(user, READ_ALL_ROLES):
 			return True
 		return user in {doc.assigned_user, doc.assigned_by, doc.owner}
 
