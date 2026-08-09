@@ -241,7 +241,19 @@ def _build_uat_row(doc):
 	row[balance_column] = flt(doc.civ_balance)
 	row[given_column] = doc.given_by or ""
 	row[received_column] = doc.received_by or ""
-	row[comments_column] = doc.comments or ""
+	comments = doc.comments or ""
+	if doc.transfer_type in {
+		"Vault to Cash Manager",
+		"Cash Manager to Vault",
+	}:
+		transfer_note = "By {0}-Rover transfer".format(doc.initiated_by)
+	elif doc.transfer_type == "Armored Van to Vault":
+		transfer_note = "By {0}-Armored Van transfer".format(doc.initiated_by)
+	else:
+		transfer_note = None
+	if transfer_note:
+		comments = "{0}\n{1}".format(comments, transfer_note).strip() if comments else transfer_note
+	row[comments_column] = comments
 	row[month_column] = getdate(doc.business_date).strftime("%B %Y")
 	return row
 

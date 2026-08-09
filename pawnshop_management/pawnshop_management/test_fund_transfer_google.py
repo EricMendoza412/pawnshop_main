@@ -35,6 +35,77 @@ class TestFundTransferGoogle(unittest.TestCase):
 		self.assertEqual(row[5], "")
 		self.assertEqual(row[15], 1500)
 
+	def test_cash_manager_rows_include_vault_custodian_rover_note(self):
+		for currency in ("PHP", "USD"):
+			for transfer_type in ("Vault to Cash Manager", "Cash Manager to Vault"):
+				with self.subTest(currency=currency, transfer_type=transfer_type):
+					doc = frappe._dict(
+						currency=currency,
+						branch="TEST",
+						date_of_transfer="2026-08-07 10:25:54",
+						name="3.1-5707",
+						transfer_type=transfer_type,
+						amount=5000,
+						civ_balance=5000,
+						given_by="giver@example.com",
+						received_by="receiver@example.com",
+						initiated_by="gpemmacostibolo@gmail.com",
+						comments="",
+						business_date="2026-08-07",
+					)
+
+					row = _build_uat_row(doc)
+					comments_column = 18 if currency == "PHP" else 13
+
+					self.assertEqual(
+						row[comments_column], "By gpemmacostibolo@gmail.com-Rover transfer"
+					)
+
+	def test_armored_van_rows_include_vault_custodian_note(self):
+		for currency in ("PHP", "USD"):
+			with self.subTest(currency=currency):
+				doc = frappe._dict(
+					currency=currency,
+					branch="TEST",
+					date_of_transfer="2026-08-07 10:25:54",
+					name="3.1-5707",
+					transfer_type="Armored Van to Vault",
+					amount=5000,
+					civ_balance=5000,
+					given_by="Armored Van",
+					received_by="gpjacklyndiaz@gmail.com",
+					initiated_by="gpjacklyndiaz@gmail.com",
+					comments="",
+					business_date="2026-08-07",
+				)
+
+				row = _build_uat_row(doc)
+				comments_column = 18 if currency == "PHP" else 13
+
+				self.assertEqual(
+					row[comments_column], "By gpjacklyndiaz@gmail.com-Armored Van transfer"
+				)
+
+	def test_usd_cash_manager_rover_note_preserves_existing_comments(self):
+		doc = frappe._dict(
+			currency="USD",
+			branch="TEST",
+			date_of_transfer="2026-08-07 10:25:54",
+			name="3.1-5707",
+			transfer_type="Vault to Cash Manager",
+			amount=5000,
+			civ_balance=5000,
+			given_by="giver@example.com",
+			received_by="receiver@example.com",
+			initiated_by="vc@example.com",
+			comments="Existing comment",
+			business_date="2026-08-07",
+		)
+
+		row = _build_uat_row(doc)
+
+		self.assertEqual(row[13], "Existing comment\nBy vc@example.com-Rover transfer")
+
 	@patch("pawnshop_management.pawnshop_management.fund_transfer_google.frappe.get_all")
 	@patch("pawnshop_management.pawnshop_management.fund_transfer_google._get_sheets_service")
 	@patch("pawnshop_management.pawnshop_management.fund_transfer_google.frappe.get_single")
