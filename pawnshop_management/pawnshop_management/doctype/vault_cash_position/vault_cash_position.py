@@ -83,7 +83,8 @@ class VaultCashPosition(Document):
 			self.db_set("reconciliation_status", "Pending Accounting Review", update_modified=False)
 
 	def before_cancel(self):
-		frappe.throw(_("Submitted Vault Cash Positions cannot be cancelled."))
+		if not is_system_manager(frappe.session.user):
+			frappe.throw(_("Submitted Vault Cash Positions cannot be cancelled."))
 
 	def _ensure_denomination_rows(self):
 		_ensure_table(self, "php_denominations", PHP_DENOMINATIONS, "PHP")

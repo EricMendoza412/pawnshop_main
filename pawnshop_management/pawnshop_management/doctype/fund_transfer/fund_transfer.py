@@ -235,10 +235,11 @@ class FundTransfer(Document):
 		queue_google_uat_sync(self.name)
 
 	def before_cancel(self):
-		frappe.throw(_("Submitted Fund Transfers cannot be cancelled or reversed."))
+		if not is_system_manager(frappe.session.user):
+			frappe.throw(_("Submitted Fund Transfers cannot be cancelled or reversed."))
 
 	def on_trash(self):
-		if self.docstatus == 1 or self.status == "Submitted":
+		if (self.docstatus == 1 or self.status == "Submitted") and not is_system_manager(frappe.session.user):
 			frappe.throw(_("Submitted Fund Transfers cannot be deleted."))
 
 	def _validate_rule(self, rule):
