@@ -19,12 +19,10 @@
   "payment_2",
   "mode_of_delivery",
   "gcash_reference_no",
-  "items",
   "items_list",
   "total_amount",
   "commision",
   "distributed_amount",
-  "credited_to",
   "paid_or_cop",
   "seller",
   "sellers_list",
@@ -110,11 +108,6 @@
    "label": "Comments"
   },
   {
-   "fieldname": "items",
-   "fieldtype": "Data",
-   "label": "Items"
-  },
-  {
    "fieldname": "items_list",
    "fieldtype": "Table",
    "label": "Items List",
@@ -136,11 +129,6 @@
    "label": "Distributed amount"
   },
   {
-   "fieldname": "credited_to",
-   "fieldtype": "Data",
-   "label": "Credited to"
-  },
-  {
    "fieldname": "total_amount",
    "fieldtype": "Currency",
    "label": "Total amount"
@@ -154,7 +142,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-06-29 22:42:09.706127",
+ "modified": "2026-08-09 16:56:33.286179",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Subastado Sales Commissions",
