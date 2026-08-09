@@ -8,6 +8,7 @@ MAIN_WORKSPACE_LINKS = [
 	{"type": "Link", "label": "Provisional Receipt", "link_to": "Provisional Receipt", "link_type": "DocType"},
 	{"type": "Link", "label": "Agreement to Sell", "link_to": "Agreement to Sell", "link_type": "DocType"},
 	{"type": "Link", "label": "Acknowledgement Receipt", "link_to": "Acknowledgement Receipt", "link_type": "DocType"},
+	{"type": "Link", "label": "Fund Transfer", "link_to": "Fund Transfer", "link_type": "DocType"},
 	{"type": "Card Break", "label": "Envelope Items", "link_to": "Models", "link_type": "DocType"},
 	{"type": "Link", "label": "Jewelry Items", "link_to": "Jewelry Items", "link_type": "DocType"},
 	{"type": "Link", "label": "Non Jewelry Items", "link_to": "Non Jewelry Items", "link_type": "DocType"},
@@ -31,6 +32,8 @@ MAIN_WORKSPACE_LINKS = [
 VC_WORKSPACE_LINKS = [
 	{"type": "Card Break", "label": "Vault Management", "link_type": "DocType"},
 	{"type": "Link", "label": "Transfer Tracker", "link_to": "Transfer Tracker", "link_type": "DocType"},
+	{"type": "Link", "label": "Fund Transfer", "link_to": "Fund Transfer", "link_type": "DocType"},
+	{"type": "Link", "label": "Vault Cash Position", "link_to": "Vault Cash Position", "link_type": "DocType"},
 	{"type": "Link", "label": "VC Count Report", "link_to": "VC Count Consolidated", "link_type": "Report", "is_query_report": 1},
 	{"type": "Card Break", "label": "Vault Turnover Reports", "link_type": "Report", "is_query_report": 1},
 	{"type": "Link", "label": "VC Turnover Checklist and Lists", "link_to": "VC Turnover Checklist", "link_type": "DocType"},
@@ -42,6 +45,8 @@ VC_WORKSPACE_LINKS = [
 
 
 VC_SHORTCUTS = [
+	{"type": "DocType", "label": "New Fund Transfer", "link_to": "Fund Transfer", "doc_view": "New"},
+	{"type": "DocType", "label": "New Vault Cash Position", "link_to": "Vault Cash Position", "doc_view": "New"},
 	{"type": "DocType", "label": "New VC Turnover Checklist", "link_to": "VC Turnover Checklist", "doc_view": "New"},
 	{"type": "DocType", "label": "New Transfer Tracker", "link_to": "Transfer Tracker", "doc_view": "New"},
 ]

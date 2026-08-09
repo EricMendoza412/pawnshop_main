@@ -1,0 +1,293 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "method",
+ "creation": "2026-07-30 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "details_section",
+  "branch",
+  "business_date",
+  "count_datetime",
+  "column_break_details",
+  "vault_custodian",
+  "reconciliation_status",
+  "is_opening_position",
+  "php_section",
+  "php_denominations",
+  "php_summary_section",
+  "php_latest_fund_transfer",
+  "php_system_civ_balance",
+  "php_actual_cash",
+  "php_variance",
+  "php_reconciled_ending_balance",
+  "php_adjustment_fund_transfer",
+  "usd_section",
+  "usd_denominations",
+  "usd_summary_section",
+  "usd_latest_fund_transfer",
+  "usd_system_civ_balance",
+  "usd_actual_cash",
+  "usd_variance",
+  "usd_reconciled_ending_balance",
+  "usd_adjustment_fund_transfer",
+  "reconciliation_section",
+  "reconciled_by",
+  "reconciliation_datetime",
+  "reconciliation_comments"
+ ],
+ "fields": [
+  {
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "label": "Daily Cash Position"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Branch",
+   "options": "Branch",
+   "reqd": 1,
+   "set_only_once": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "business_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Business Date",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "count_datetime",
+   "fieldtype": "Datetime",
+   "label": "Count Date and Time",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_details",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "vault_custodian",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Vault Custodian",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "default": "Draft",
+   "fieldname": "reconciliation_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Reconciliation Status",
+   "options": "Draft\nBalanced\nPending Accounting Review\nReconciled",
+   "read_only": 1,
+   "allow_on_submit": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_opening_position",
+   "fieldtype": "Check",
+   "label": "Cutover Opening Position",
+   "read_only": 1
+  },
+  {
+   "fieldname": "php_section",
+   "fieldtype": "Section Break",
+   "label": "PHP Denomination Count"
+  },
+  {
+   "fieldname": "php_denominations",
+   "fieldtype": "Table",
+   "cannot_add_rows": 1,
+   "cannot_delete_rows": 1,
+   "label": "PHP Denominations",
+   "options": "Vault Cash Denomination",
+   "reqd": 1
+  },
+  {
+   "fieldname": "php_summary_section",
+   "fieldtype": "Section Break",
+   "label": "PHP Summary"
+  },
+  {
+   "fieldname": "php_latest_fund_transfer",
+   "fieldtype": "Link",
+   "label": "Latest PHP Fund Transfer",
+   "options": "Fund Transfer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "php_system_civ_balance",
+   "fieldtype": "Currency",
+   "label": "PHP System CIV",
+   "read_only": 1
+  },
+  {
+   "fieldname": "php_actual_cash",
+   "fieldtype": "Currency",
+   "label": "PHP Actual Cash",
+   "read_only": 1
+  },
+  {
+   "fieldname": "php_variance",
+   "fieldtype": "Currency",
+   "label": "PHP Shortage / Overage",
+   "read_only": 1
+  },
+  {
+   "fieldname": "php_reconciled_ending_balance",
+   "fieldtype": "Currency",
+   "label": "PHP Reconciled Ending CIV",
+   "read_only": 1,
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "php_adjustment_fund_transfer",
+   "fieldtype": "Link",
+   "label": "PHP Adjustment Fund Transfer",
+   "options": "Fund Transfer",
+   "read_only": 1,
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "usd_section",
+   "fieldtype": "Section Break",
+   "label": "USD Denomination Count"
+  },
+  {
+   "fieldname": "usd_denominations",
+   "fieldtype": "Table",
+   "cannot_add_rows": 1,
+   "cannot_delete_rows": 1,
+   "label": "USD Denominations",
+   "options": "Vault Cash Denomination",
+   "reqd": 1
+  },
+  {
+   "fieldname": "usd_summary_section",
+   "fieldtype": "Section Break",
+   "label": "USD Summary"
+  },
+  {
+   "fieldname": "usd_latest_fund_transfer",
+   "fieldtype": "Link",
+   "label": "Latest USD Fund Transfer",
+   "options": "Fund Transfer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "usd_system_civ_balance",
+   "fieldtype": "Currency",
+   "label": "USD System CIV",
+   "read_only": 1
+  },
+  {
+   "fieldname": "usd_actual_cash",
+   "fieldtype": "Currency",
+   "label": "USD Actual Cash",
+   "read_only": 1
+  },
+  {
+   "fieldname": "usd_variance",
+   "fieldtype": "Currency",
+   "label": "USD Shortage / Overage",
+   "read_only": 1
+  },
+  {
+   "fieldname": "usd_reconciled_ending_balance",
+   "fieldtype": "Currency",
+   "label": "USD Reconciled Ending CIV",
+   "read_only": 1,
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "usd_adjustment_fund_transfer",
+   "fieldtype": "Link",
+   "label": "USD Adjustment Fund Transfer",
+   "options": "Fund Transfer",
+   "read_only": 1,
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "reconciliation_section",
+   "fieldtype": "Section Break",
+   "label": "Accounting Reconciliation"
+  },
+  {
+   "fieldname": "reconciled_by",
+   "fieldtype": "Link",
+   "label": "Reconciled By",
+   "options": "User",
+   "read_only": 1,
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "reconciliation_datetime",
+   "fieldtype": "Datetime",
+   "label": "Reconciliation Date and Time",
+   "read_only": 1,
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "reconciliation_comments",
+   "fieldtype": "Small Text",
+   "label": "Reconciliation Comments",
+   "read_only_depends_on": "eval:doc.docstatus==1",
+   "allow_on_submit": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-07-30 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Pawnshop Management",
+ "name": "Vault Cash Position",
+ "naming_rule": "By script",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounting Analyst"
+  }
+ ],
+ "sort_field": "business_date",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

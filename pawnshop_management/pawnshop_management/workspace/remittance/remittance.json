@@ -1,0 +1,44 @@
+{
+ "cards_label": "Remittance",
+ "category": "Modules",
+ "charts": [],
+ "creation": "2026-07-30 00:00:00.000000",
+ "developer_mode_only": 0,
+ "disable_user_customization": 1,
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "extends_another_page": 0,
+ "hide_custom": 0,
+ "icon": "star",
+ "is_default": 0,
+ "is_standard": 1,
+ "label": "Remittance",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Fund Transfers",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Fund Transfer",
+   "link_to": "Fund Transfer",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-07-30 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Pawnshop Management",
+ "name": "Remittance",
+ "owner": "Administrator",
+ "pin_to_bottom": 0,
+ "pin_to_top": 0,
+ "shortcuts": [],
+ "shortcuts_label": "Shortcuts"
+}

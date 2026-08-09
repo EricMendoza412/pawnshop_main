@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe import _
 from frappe.utils import flt
 from frappe.model.document import Document
 from frappe.utils import today
@@ -293,7 +294,79 @@ def check_new_submissions(loaded_at: str, branch: str = None):
 
 	return {"has_new": len(details) > 0, "details": details}
 
+
+def _get_pawnshop_fund_transfer_totals(branch, report_date):
+	if not branch or not report_date:
+		return frappe._dict(cash_from_vault=0, cash_to_vault=0)
+
+	rows = frappe.db.sql(
+		"""
+			select
+				coalesce(sum(case
+					when transfer_type = 'Vault to Pawnshop (-NCB)' then amount
+					when coalesce(transfer_type, '') = '' then vc_to_ps_cashier
+					else 0
+				end), 0) as cash_from_vault,
+				coalesce(sum(case
+					when transfer_type = 'Pawnshop (-NCB) to Vault' then amount
+					when coalesce(transfer_type, '') = '' then ps_cashier_to_vc
+					else 0
+				end), 0) as cash_to_vault
+			from `tabFund Transfer`
+			where branch = %(branch)s
+				and docstatus = 1
+				and (
+					(
+						transfer_type in ('Vault to Pawnshop (-NCB)', 'Pawnshop (-NCB) to Vault')
+						and business_date = %(report_date)s
+						and currency = 'PHP'
+						and status = 'Submitted'
+					)
+					or (
+						coalesce(transfer_type, '') = ''
+						and date(date_of_transfer) = %(report_date)s
+						and coalesce(currency, 'PHP') = 'PHP'
+						and (coalesce(vc_to_ps_cashier, 0) != 0 or coalesce(ps_cashier_to_vc, 0) != 0)
+					)
+				)
+		""",
+		{"branch": branch, "report_date": report_date},
+		as_dict=True,
+	)
+	row = rows[0] if rows else {}
+	return frappe._dict(
+		cash_from_vault=flt(row.get("cash_from_vault")),
+		cash_to_vault=flt(row.get("cash_to_vault")),
+	)
+
+
+@frappe.whitelist()
+def get_pawnshop_fund_transfer_totals(branch, report_date):
+	if not frappe.has_permission("Cash Position Report", "read") and not frappe.has_permission(
+		"Cash Position Report", "create"
+	):
+		frappe.throw(_("Not permitted to read Cash Position Report totals."), frappe.PermissionError)
+	return _get_pawnshop_fund_transfer_totals(branch, report_date)
+
 class CashPositionReport(Document):
+	def validate(self):
+		self.validate_pawnshop_fund_transfer_totals()
+
+	def validate_pawnshop_fund_transfer_totals(self):
+		totals = _get_pawnshop_fund_transfer_totals(self.branch, self.date)
+		if flt(self.cash_from_vault, 2) != flt(totals.cash_from_vault, 2) or flt(self.cash_to_vault, 2) != flt(
+			totals.cash_to_vault, 2
+		):
+			frappe.throw(
+				_(
+					"Fund Transfers changed after this Cash Position Report was calculated. "
+					"Refresh the report before saving. Expected Cash From Vault: {0}; Cash To Vault: {1}."
+				).format(
+					frappe.format_value(totals.cash_from_vault, {"fieldtype": "Currency", "options": "PHP"}),
+					frappe.format_value(totals.cash_to_vault, {"fieldtype": "Currency", "options": "PHP"}),
+				)
+			)
+
 	def on_submit(self):
 		self.validate_no_existing_inventory_count()
 		create_transaction_log_for_cash_position_report(self)

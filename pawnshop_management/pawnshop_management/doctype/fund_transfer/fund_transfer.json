@@ -1,16 +1,54 @@
 {
  "actions": [],
- "allow_rename": 1,
- "autoname": "field:fund_transfer_series",
+ "allow_rename": 0,
+ "autoname": "method",
  "creation": "2023-06-28 23:06:26.323626",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "transfer_details_section",
   "branch",
+  "business_date",
+  "column_break_details",
   "currency",
+  "transfer_type",
+  "amount",
   "date_of_transfer",
   "fund_transfer_series",
+  "status",
+  "custody_section",
+  "source",
+  "destination",
+  "column_break_custody",
+  "initiated_by",
+  "expected_authorizer",
+  "authorized_by",
+  "authorization_datetime",
+  "rover",
+  "rover_password",
+  "balance_section",
+  "opening_civ_balance",
+  "vault_balance_change",
+  "civ_balance",
+  "column_break_balance",
+  "purchased_usd",
+  "previously_transferred_usd",
+  "remaining_usd",
+  "external_section",
+  "source_system",
+  "legacy_transfer_id",
+  "external_party",
+  "comments",
+  "integration_section",
+  "accounting_status",
+  "journal_entry",
+  "google_sync_status",
+  "google_sync_datetime",
+  "google_sync_attempts",
+  "google_sync_error",
+  "cash_position",
+  "legacy_section",
   "vc_to_cm",
   "cm_to_vc",
   "vc_to_wu_cashier",
@@ -19,109 +57,371 @@
   "fx_cashier_to_vc",
   "vc_to_ps_cashier",
   "ps_cashier_to_vc",
-  "civ_balance",
   "given_by",
-  "received_by",
-  "comments"
+  "received_by"
  ],
  "fields": [
+  {
+   "fieldname": "transfer_details_section",
+   "fieldtype": "Section Break",
+   "label": "Transfer Details"
+  },
   {
    "fieldname": "branch",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Branch",
    "options": "Branch",
+   "read_only": 1,
    "reqd": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "business_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Business Date",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_details",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "currency",
    "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Currency",
-   "options": "PHP\nUSD"
+   "options": "\nPHP\nUSD",
+   "reqd": 1
+  },
+  {
+   "fieldname": "transfer_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Transfer Type",
+   "options": "Vault to Pawnshop (-NCB)\nPawnshop (-NCB) to Vault\nVault to Remittance\nRemittance to Vault\nVault to ForEx\nForEx to Vault\nArmored Van to Vault\nRover to Vault\nVault to Cash Manager\nCash Manager to Vault\nCash Position Adjustment",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount",
+   "non_negative": 1,
+   "reqd": 1
   },
   {
    "fieldname": "date_of_transfer",
-   "fieldtype": "Date",
-   "label": "Date of Transfer"
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Date and Time of Transfer",
+   "read_only": 1
   },
   {
    "fieldname": "fund_transfer_series",
    "fieldtype": "Data",
    "label": "Fund Transfer Series",
+   "read_only": 1,
    "unique": 1
+  },
+  {
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Draft\nPending Cashier Approval\nPending Rover Confirmation\nSubmitted\nRejected\nCancelled",
+   "read_only": 1
+  },
+  {
+   "fieldname": "custody_section",
+   "fieldtype": "Section Break",
+   "label": "Custody and Authorization"
+  },
+  {
+   "fieldname": "source",
+   "fieldtype": "Data",
+   "label": "Source",
+   "read_only": 1
+  },
+  {
+   "fieldname": "destination",
+   "fieldtype": "Data",
+   "label": "Destination",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_custody",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "initiated_by",
+   "fieldtype": "Link",
+   "label": "Initiated By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "expected_authorizer",
+   "fieldtype": "Link",
+   "label": "Expected Authorizer",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "authorized_by",
+   "fieldtype": "Link",
+   "label": "Authorized By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "authorization_datetime",
+   "fieldtype": "Datetime",
+   "label": "Authorization Date and Time",
+   "read_only": 1
+  },
+  {
+   "fieldname": "rover",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Rover",
+   "options": "User",
+   "read_only_depends_on": "eval:doc.status!='Draft' && doc.status!='Pending Rover Confirmation'"
+  },
+  {
+   "fieldname": "rover_password",
+   "fieldtype": "Password",
+   "hidden": 1,
+   "label": "Rover Password",
+   "no_copy": 1
+  },
+  {
+   "fieldname": "balance_section",
+   "fieldtype": "Section Break",
+   "label": "Cash In Vault Balance"
+  },
+  {
+   "depends_on": "eval:doc.docstatus==1",
+   "fieldname": "opening_civ_balance",
+   "fieldtype": "Currency",
+   "label": "Opening CIV Balance",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.docstatus==1",
+   "fieldname": "vault_balance_change",
+   "fieldtype": "Currency",
+   "label": "CIV Change",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.docstatus==1",
+   "fieldname": "civ_balance",
+   "fieldtype": "Currency",
+   "label": "Closing CIV Balance",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_balance",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.currency=='USD' && doc.transfer_type=='ForEx to Vault'",
+   "fieldname": "purchased_usd",
+   "fieldtype": "Currency",
+   "label": "USD Purchased Today",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.currency=='USD' && doc.transfer_type=='ForEx to Vault'",
+   "fieldname": "previously_transferred_usd",
+   "fieldtype": "Currency",
+   "label": "USD Previously Transferred",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.currency=='USD' && doc.transfer_type=='ForEx to Vault'",
+   "fieldname": "remaining_usd",
+   "fieldtype": "Currency",
+   "label": "USD Remaining After Transfer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "external_section",
+   "fieldtype": "Section Break",
+   "label": "Reference and Notes"
+  },
+  {
+   "default": "ERPNext",
+   "fieldname": "source_system",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Source System",
+   "options": "ERPNext\nAndroid\nMigration\nSystem Adjustment",
+   "read_only": 1
+  },
+  {
+   "fieldname": "legacy_transfer_id",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Legacy Transfer ID",
+   "unique": 1
+  },
+  {
+   "depends_on": "eval:doc.transfer_type=='Armored Van to Vault'",
+   "fieldname": "external_party",
+   "fieldtype": "Data",
+   "label": "External Party / Representative"
+  },
+  {
+   "fieldname": "comments",
+   "fieldtype": "Small Text",
+   "label": "Notes"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "integration_section",
+   "fieldtype": "Section Break",
+   "label": "Integration"
+  },
+  {
+   "default": "Not Configured",
+   "fieldname": "accounting_status",
+   "fieldtype": "Select",
+   "label": "Accounting Status",
+   "options": "Not Configured\nPending\nCreated\nFailed",
+   "read_only": 1
+  },
+  {
+   "fieldname": "journal_entry",
+   "fieldtype": "Link",
+   "label": "Journal Entry",
+   "options": "Journal Entry",
+   "read_only": 1
+  },
+  {
+   "default": "Not Queued",
+   "fieldname": "google_sync_status",
+   "fieldtype": "Select",
+   "label": "Google UAT Sync Status",
+   "options": "Not Queued\nPending\nSynced\nFailed\nDisabled",
+   "read_only": 1
+  },
+  {
+   "fieldname": "google_sync_datetime",
+   "fieldtype": "Datetime",
+   "label": "Google Sync Date and Time",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "google_sync_attempts",
+   "fieldtype": "Int",
+   "label": "Google Sync Attempts",
+   "read_only": 1
+  },
+  {
+   "fieldname": "google_sync_error",
+   "fieldtype": "Small Text",
+   "label": "Google Sync Error",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cash_position",
+   "fieldtype": "Link",
+   "label": "Vault Cash Position",
+   "options": "Vault Cash Position",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "legacy_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Legacy Compatibility"
   },
   {
    "fieldname": "vc_to_cm",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "VC to CM"
   },
   {
    "fieldname": "cm_to_vc",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "CM to VC"
   },
   {
    "fieldname": "vc_to_wu_cashier",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "VC to WU cashier"
   },
   {
    "fieldname": "wu_cashier_to_vc",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "WU cashier to VC"
   },
   {
    "fieldname": "vc_to_fx_cashier",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "VC to FX cashier"
   },
   {
    "fieldname": "fx_cashier_to_vc",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "FX cashier to VC"
   },
   {
    "fieldname": "vc_to_ps_cashier",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "VC to PS cashier"
   },
   {
    "fieldname": "ps_cashier_to_vc",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "PS cashier to VC"
-  },
-  {
-   "fieldname": "civ_balance",
-   "fieldtype": "Currency",
-   "label": "CIV Balance"
   },
   {
    "fieldname": "given_by",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Given By"
   },
   {
    "fieldname": "received_by",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Received By"
-  },
-  {
-   "fieldname": "comments",
-   "fieldtype": "Data",
-   "label": "Comments"
   }
  ],
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2023-06-29 14:20:25.532715",
+ "modified": "2026-07-30 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Fund Transfer",
+ "naming_rule": "By script",
  "owner": "Administrator",
  "permissions": [
   {
    "create": 1,
-   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
@@ -129,10 +429,36 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
+   "submit": 1,
    "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounting Analyst"
+  },
+  {
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Rover"
   }
  ],
- "sort_field": "modified",
+ "sort_field": "date_of_transfer",
  "sort_order": "DESC",
  "track_changes": 1
 }

@@ -61,6 +61,9 @@ frappe.ui.form.on('Cash Position Report', {
 			// 	frm.refresh_field('beginning_balance')
 			// })
 		}
+		if (frm.doc.docstatus === 0 && frm.doc.branch && frm.doc.date) {
+			get_ps_fund_transfers(frm, frm.doc.date);
+		}
 		// frm.set_value('date', frappe.datetime.now_date())
 		// frm.add_custom_button('Test', () => {
 		// 	get_provisional_receipts_of_the_day(frm, '2022-02-09');
@@ -465,22 +468,29 @@ function get_non_jewelry_of_the_day(frm, date_today=null) {
 }
 
 function get_ps_fund_transfers(frm, date_today=null) {
-	frappe.db.get_list('Fund Transfer', {
-		fields: ['ps_cashier_to_vc','vc_to_ps_cashier'],
-		filters: { date_of_transfer: date_today,branch: frm.doc.branch},
-		limit: 500
-	}).then(records => {
-		let psToVc = 0;
-		let vcToPs = 0;
-		for (let index = 0; index < records.length; index++) {
-			psToVc += records[index].ps_cashier_to_vc
-			vcToPs += records[index].vc_to_ps_cashier
+	const branch = frm.doc.branch;
+	const reportDate = date_today || frm.doc.date;
+	if (!branch || !reportDate) {
+		return Promise.all([
+			frm.set_value('cash_from_vault', 0),
+			frm.set_value('cash_to_vault', 0),
+		]);
+	}
+
+	return frappe.call({
+		method: 'pawnshop_management.pawnshop_management.doctype.cash_position_report.cash_position_report.get_pawnshop_fund_transfer_totals',
+		args: { branch, report_date: reportDate },
+	}).then(response => {
+		// Ignore a response for a branch/date that changed while the request was running.
+		if (frm.doc.branch !== branch || frm.doc.date !== reportDate) {
+			return;
 		}
-		frm.set_value('cash_to_vault', psToVc);
-		frm.set_value('cash_from_vault', vcToPs);
-		frm.refresh_field('cash_to_vault');
-		frm.refresh_field('cash_from_vault');
-	})
+		const totals = response.message || {};
+		return Promise.all([
+			frm.set_value('cash_from_vault', flt(totals.cash_from_vault)),
+			frm.set_value('cash_to_vault', flt(totals.cash_to_vault)),
+		]);
+	});
 }
 
 function get_subastado_sales(frm, date_today=null) {

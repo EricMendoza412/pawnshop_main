@@ -21,6 +21,48 @@ const SUBASTADO_FIELDS = [
 	'subastado_comment'
 ];
 
+const NJ_CATEGORY_OPTIONS = ['Maximum', 'Minimum', 'Defective'];
+const ESIM_APPRAISAL_GUIDE = '/assets/pawnshop_management/images/esim-only-iphone-appraisal-codigo.png';
+
+function is_esim_only_eligible(frm) {
+	return frm.doc.type === 'Cellphone' && frm.doc.brand === 'Apple';
+}
+
+function update_esim_only_controls(frm) {
+	const eligible = is_esim_only_eligible(frm);
+	frm.set_df_property('esim_only', 'hidden', eligible ? 0 : 1);
+
+	if (!eligible && frm.doc.esim_only) {
+		frm.set_value('esim_only', 0);
+	}
+
+	const category_options = frm.doc.esim_only
+		? NJ_CATEGORY_OPTIONS.filter(option => option !== 'Maximum')
+		: NJ_CATEGORY_OPTIONS;
+	frm.set_df_property('category', 'options', category_options.join('\n'));
+	frm.refresh_field('category');
+	frm.refresh_field('esim_only');
+}
+
+function show_esim_appraisal_guide() {
+	const dialog = new frappe.ui.Dialog({
+		title: __('eSIM-only iPhone – Appraisal Codigo'),
+		size: 'extra-large',
+		fields: [
+			{
+				fieldname: 'appraisal_guide',
+				fieldtype: 'HTML',
+				options: `<div style="text-align: center;">
+					<img src="${ESIM_APPRAISAL_GUIDE}"
+						alt="eSIM-only iPhone appraisal guide"
+						style="display: block; width: 100%; height: auto; margin: 0 auto;">
+				</div>`
+			}
+		]
+	});
+	dialog.show();
+}
+
 function toggle_subastado_fields(frm) {
 	const should_hide = ['Pawned', 'Collected'].includes(frm.doc.workflow_state);
 	SUBASTADO_FIELDS.forEach(fieldname => {
@@ -143,6 +185,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 	onload: function(frm) {
 		frm.message_shown = false; // Initialize message_shown
 		update_battery_health_fields(frm);
+		update_esim_only_controls(frm);
 		toggle_subastado_fields(frm);
 		if (frm.is_new()) {
 			//frm.set_value('main_appraiser', frappe.user_info().fullname);
@@ -171,6 +214,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 
 	refresh: function(frm){
 		update_battery_health_fields(frm);
+		update_esim_only_controls(frm);
 		toggle_subastado_fields(frm);
 		highlight_appraisal_value(frm);
 		let is_admin = frappe.user_roles.includes('Administrator');
@@ -244,6 +288,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 				frm.set_df_property('extra_battery', 'read_only', 1);
 				frm.set_df_property('extra_lens', 'read_only', 1);
 				frm.set_df_property('not_openline', 'read_only', 1);
+				frm.set_df_property('esim_only', 'read_only', 1);
 				frm.set_df_property('selling_price', 'read_only', 1);
 				frm.set_df_property('pt_principal', 'read_only', 1);
 				frm.set_df_property('w_audit_finding', 'read_only', 1);
@@ -505,6 +550,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 		}
 
 		update_battery_health_fields(frm);
+		update_esim_only_controls(frm);
 	},
 
 	brand: function(frm){
@@ -524,6 +570,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 		}
 
 		update_battery_health_fields(frm);
+		update_esim_only_controls(frm);
 	},
 
 	bh_tools: function(frm) {
@@ -548,6 +595,18 @@ frappe.ui.form.on('Non Jewelry Items', {
 
 	not_openline: function(frm){
 		compute_nj_av(frm)
+	},
+
+	esim_only: function(frm) {
+		if (frm.doc.esim_only && frm.doc.category === 'Maximum') {
+			frm.set_value('category', 'Minimum');
+		}
+		update_esim_only_controls(frm);
+		compute_nj_av(frm);
+
+		if (frm.doc.esim_only) {
+			show_esim_appraisal_guide();
+		}
 	}
 });
 

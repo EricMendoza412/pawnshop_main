@@ -34,6 +34,7 @@
 
 	let hasVaultCustodianAccess = true;
 	let matchesBranchFilterRoleProfile = false;
+	let fundTransferAccess = { has_any_access: true, fx_cashier: true, remittance_cashier: true };
 
 	function loadBranchRoles() {
 		if (!frappe.session || frappe.session.user === "Guest") return;
@@ -44,6 +45,13 @@
 				const roles = response.message || {};
 				hasVaultCustodianAccess = Boolean(roles[ROLE]);
 				matchesBranchFilterRoleProfile = Boolean(roles.matches_branch_filter_role_profile);
+				applyVisibility();
+			},
+		});
+		frappe.call({
+			method: "pawnshop_management.operations_access_control.access_control.get_fund_transfer_access",
+			callback(response) {
+				fundTransferAccess = response.message || {};
 				applyVisibility();
 			},
 		});
@@ -75,6 +83,7 @@
 				element.style.display = "";
 				delete element.dataset.branchRoleHidden;
 			});
+			applyFundTransferVisibility();
 			return;
 		}
 
@@ -89,6 +98,44 @@
 		if (routeMatches(route)) {
 			frappe.set_route("workspace", "Pawnshop Management");
 		}
+
+		applyFundTransferVisibility();
+	}
+
+	function setNavigationVisibility(labels, visible, marker) {
+		document.querySelectorAll("a, .widget, .shortcut-widget-box, .ce-block, .link-item, .desk-sidebar-item").forEach(element => {
+			if (!textMatches(element, labels)) return;
+			const container = element.closest(".ce-block, .shortcut-widget-box, .widget, .link-item, .desk-sidebar-item, a");
+			if (!container) return;
+			if (visible) {
+				if (container.dataset[marker] === "1") {
+					container.style.display = "";
+					delete container.dataset[marker];
+				}
+			} else {
+				container.dataset[marker] = "1";
+				container.style.display = "none";
+			}
+		});
+	}
+
+	function applyFundTransferVisibility() {
+		setNavigationVisibility(["Foreign Exchange"], Boolean(fundTransferAccess.fx_cashier), "fundTransferFxHidden");
+		setNavigationVisibility(["Remittance"], Boolean(fundTransferAccess.remittance_cashier), "fundTransferRemitHidden");
+		setNavigationVisibility(["Fund Transfer", "New Fund Transfer"], Boolean(fundTransferAccess.has_any_access), "fundTransferLinkHidden");
+
+		const route = frappe.get_route ? frappe.get_route().join("/") : "";
+		if (
+			(routeMatchesWorkspace(route, "Foreign Exchange") && !fundTransferAccess.fx_cashier)
+			|| (routeMatchesWorkspace(route, "Remittance") && !fundTransferAccess.remittance_cashier)
+		) {
+			frappe.set_route("workspace", "Pawnshop Management");
+		}
+	}
+
+	function routeMatchesWorkspace(route, workspace) {
+		const slug = workspace.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+		return route.includes(workspace) || route.toLowerCase().includes(slug);
 	}
 
 	if (frappe.ready) {

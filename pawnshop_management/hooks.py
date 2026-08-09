@@ -63,7 +63,7 @@ doctype_js = {
 
 # before_install = "pawnshop_management.install.before_install"
 # after_install = "pawnshop_management.install.after_install"
-after_migrate = "pawnshop_management.pawnshop_management.patches.v1_0.sync_branch_field_layout.execute"
+after_migrate = "pawnshop_management.pawnshop_management.after_migrate.execute"
 
 # Desk Notifications
 # ------------------
@@ -90,12 +90,16 @@ permission_query_conditions = {
 	"Branch Role Assignment": "pawnshop_management.operations_access_control.doctype.branch_role_assignment.branch_role_assignment.get_permission_query_conditions",
 	"VC Turnover Checklist": "pawnshop_management.pawnshop_management.doctype.vc_turnover_checklist.vc_turnover_checklist.get_permission_query_conditions",
 	"Transfer Tracker": "pawnshop_management.pawnshop_management.doctype.transfer_tracker.transfer_tracker.get_permission_query_conditions",
+	"Fund Transfer": "pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer.get_permission_query_conditions",
+	"Vault Cash Position": "pawnshop_management.pawnshop_management.doctype.vault_cash_position.vault_cash_position.get_permission_query_conditions",
 }
 #
 has_permission = {
 	"Branch Role Assignment": "pawnshop_management.operations_access_control.doctype.branch_role_assignment.branch_role_assignment.has_permission",
 	"VC Turnover Checklist": "pawnshop_management.pawnshop_management.doctype.vc_turnover_checklist.vc_turnover_checklist.has_permission",
 	"Transfer Tracker": "pawnshop_management.pawnshop_management.doctype.transfer_tracker.transfer_tracker.has_permission",
+	"Fund Transfer": "pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer.has_permission",
+	"Vault Cash Position": "pawnshop_management.pawnshop_management.doctype.vault_cash_position.vault_cash_position.has_permission",
 }
 
 # DocType Class
@@ -157,6 +161,9 @@ scheduler_events = {
 		],
 		"0 9 * * *":[
 			"pawnshop_management.pawnshop_management.smart_a2p.send_daily_pawn_ticket_sms_notifications"
+		],
+		"*/15 * * * *":[
+			"pawnshop_management.pawnshop_management.fund_transfer_google.retry_failed_google_uat_sync"
 		]
 	}	
 }

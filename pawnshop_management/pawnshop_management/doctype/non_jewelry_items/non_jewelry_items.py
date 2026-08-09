@@ -8,7 +8,18 @@ from frappe.utils import today
 
 class NonJewelryItems(Document):
 	def validate(self):
+		self.validate_esim_only()
 		self.validate_assistant_appraiser_edit()
+
+	def validate_esim_only(self):
+		if not self.esim_only:
+			return
+
+		if self.type != "Cellphone" or self.brand != "Apple":
+			frappe.throw("Esim only is allowed only for Apple cellphones.")
+
+		if self.category == "Maximum":
+			self.category = "Minimum"
 
 	def validate_assistant_appraiser_edit(self):
 		if self.is_new():

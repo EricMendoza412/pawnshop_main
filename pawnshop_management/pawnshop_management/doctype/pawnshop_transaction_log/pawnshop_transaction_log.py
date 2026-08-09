@@ -29,9 +29,10 @@ def get_branch_code(branch):
 	if branch_code:
 		return str(branch_code)
 
-	branch_code = frappe.db.get_value("Branch", branch, "branch_code")
-	if branch_code:
-		return str(branch_code)
+	if frappe.get_meta("Branch").has_field("branch_code"):
+		branch_code = frappe.db.get_value("Branch", branch, "branch_code")
+		if branch_code:
+			return str(branch_code)
 
 	return BRANCH_CODES.get(branch)
 

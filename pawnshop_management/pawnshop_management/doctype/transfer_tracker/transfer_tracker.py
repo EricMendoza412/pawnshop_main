@@ -16,6 +16,7 @@ SUBASTADO_TRANSFER_BRANCH_BY_ROLE = {
 	"Subastado member J": "Subastado J",
 	"Subastado member NJ": "Subastado NJ",
 }
+READ_ALL_ROLES = {"Auditor"}
 
 
 class TransferTracker(Document):
@@ -407,7 +408,7 @@ def get_sb_jewelry_pullout_items(origin, from_date, to_date):
 
 def get_permission_query_conditions(user=None):
 	user = user or frappe.session.user
-	if is_system_manager(user):
+	if is_system_manager(user) or has_read_all_role(user):
 		return None
 
 	escaped_user = frappe.db.escape(user)
@@ -437,10 +438,17 @@ def has_permission(doc, ptype=None, user=None):
 		return True
 
 	permission_type = ptype or "read"
+	if permission_type in {"read", "report", "print", "email", "export"} and has_read_all_role(user):
+		return True
+
 	if permission_type in {"read", "report", "print", "email", "export"} and is_subastado_transfer_tracker(doc, user):
 		return True
 
 	return is_transfer_tracker_branch_vault_custodian(doc, user)
+
+
+def has_read_all_role(user):
+	return bool(set(frappe.get_roles(user)).intersection(READ_ALL_ROLES))
 
 
 def get_subastado_transfer_branches(user):

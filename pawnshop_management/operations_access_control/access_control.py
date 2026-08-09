@@ -212,3 +212,35 @@ def get_active_branch_roles(branch=None):
 
 	active_roles["matches_branch_filter_role_profile"] = matches_branch_filter_role_profile
 	return active_roles
+
+
+@frappe.whitelist()
+def get_fund_transfer_access():
+	"""Return navigation capabilities. Server-side DocType permissions remain authoritative."""
+	user = frappe.session.user
+	if is_system_manager(user):
+		return {
+			"vault_custodian": True,
+			"pawnshop_cashier": True,
+			"fx_cashier": True,
+			"remittance_cashier": True,
+			"rover": True,
+			"accounting_analyst": True,
+			"has_any_access": True,
+		}
+
+	fields = {
+		"vault_custodian": "vault_custodian",
+		"pawnshop_cashier": "pawnshop_cashier",
+		"fx_cashier": "fx_cashier",
+		"remittance_cashier": "remittance_cashier",
+	}
+	access = {
+		key: bool(frappe.db.exists("Branch", {fieldname: user}))
+		for key, fieldname in fields.items()
+	}
+	roles = set(frappe.get_roles(user))
+	access["rover"] = "Rover" in roles
+	access["accounting_analyst"] = "Accounting Analyst" in roles
+	access["has_any_access"] = any(access.values())
+	return access

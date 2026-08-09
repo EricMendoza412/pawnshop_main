@@ -25,6 +25,7 @@
   "videocard",
   "category",
   "not_openline",
+  "esim_only",
   "accessories_section",
   "charger",
   "case",
@@ -312,6 +313,12 @@
    "fieldname": "not_openline",
    "fieldtype": "Check",
    "label": "Not Openline"
+  },
+  {
+   "default": "0",
+   "fieldname": "esim_only",
+   "fieldtype": "Check",
+   "label": "Esim only"
   },
   {
    "fetch_from": "main_appraiser.first_name",

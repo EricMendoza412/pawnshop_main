@@ -1,0 +1,110 @@
+{
+ "actions": [],
+ "creation": "2026-07-30 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "usd_validation_section",
+  "enable_usd_validation",
+  "fx_spreadsheet_id",
+  "fx_transaction_sheet",
+  "uat_section",
+  "enable_google_uat_sync",
+  "uat_spreadsheet_id",
+  "php_uat_sheet",
+  "usd_uat_sheet",
+  "credentials_section",
+  "google_service_account_json"
+ ],
+ "fields": [
+  {
+   "fieldname": "usd_validation_section",
+   "fieldtype": "Section Break",
+   "label": "Purchased USD Validation"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_usd_validation",
+   "fieldtype": "Check",
+   "label": "Enable Purchased USD Validation"
+  },
+  {
+   "default": "1Id-1_SYEb8ZY_-rYQqown_9msjKD15RUrCszbVJzjc8",
+   "fieldname": "fx_spreadsheet_id",
+   "fieldtype": "Data",
+   "label": "FX Spreadsheet ID"
+  },
+  {
+   "default": "Transaction Monitoring",
+   "fieldname": "fx_transaction_sheet",
+   "fieldtype": "Data",
+   "label": "FX Transaction Sheet"
+  },
+  {
+   "fieldname": "uat_section",
+   "fieldtype": "Section Break",
+   "label": "Google UAT Shadow Report"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_google_uat_sync",
+   "fieldtype": "Check",
+   "label": "Enable Google UAT Sync"
+  },
+  {
+   "default": "1yDrSllt_CC-W-xEn_2J6UM7NkTFYShNY6McdV7J2d6k",
+   "fieldname": "uat_spreadsheet_id",
+   "fieldtype": "Data",
+   "label": "UAT Spreadsheet ID"
+  },
+  {
+   "default": "PHP ERPNext UAT",
+   "fieldname": "php_uat_sheet",
+   "fieldtype": "Data",
+   "label": "PHP UAT Sheet"
+  },
+  {
+   "default": "USD ERPNext UAT",
+   "fieldname": "usd_uat_sheet",
+   "fieldtype": "Data",
+   "label": "USD UAT Sheet"
+  },
+  {
+   "fieldname": "credentials_section",
+   "fieldtype": "Section Break",
+   "label": "Google Credentials"
+  },
+  {
+   "fieldname": "google_service_account_json",
+   "fieldtype": "Password",
+   "label": "Google Service Account JSON",
+   "length": 5000
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-07-30 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Pawnshop Management",
+ "name": "Fund Transfer Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
