@@ -180,9 +180,18 @@ def has_permission(doc, ptype=None, user=None):
 		return bool(frappe.db.exists("Branch", {"vault_custodian": user}))
 	if permission_type in READ_PERMISSION_TYPES:
 		return is_custodian
-	if permission_type in {"write", "submit"}:
-		return is_custodian and doc.docstatus == 0
+	if permission_type == "write":
+		return is_custodian and (doc.docstatus == 0 or _is_draft_submission(doc))
+	if permission_type == "submit":
+		return is_custodian and (doc.docstatus == 0 or _is_draft_submission(doc))
 	return None
+
+
+def _is_draft_submission(doc):
+	"""Return whether the submitted in-memory document is still a draft in the database."""
+	if doc.docstatus != 1 or not getattr(doc, "name", None):
+		return False
+	return frappe.db.get_value("Vault Cash Position", doc.name, "docstatus") == 0
 
 
 def _ensure_table(doc, fieldname, denominations, currency):

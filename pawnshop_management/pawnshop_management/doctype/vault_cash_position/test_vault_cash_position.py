@@ -3,6 +3,8 @@
 
 import unittest
 
+from unittest.mock import patch
+
 import frappe
 
 from pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer import request_approval
@@ -10,6 +12,7 @@ from pawnshop_management.pawnshop_management.doctype.vault_cash_position.vault_c
 	PHP_DENOMINATIONS,
 	USD_DENOMINATIONS,
 	approve_reconciliation,
+	has_permission,
 )
 
 
@@ -42,6 +45,29 @@ class TestVaultCashPosition(unittest.TestCase):
 		self.assertEqual(doc.php_system_civ_balance, 2000)
 		self.assertEqual(doc.usd_system_civ_balance, 300)
 		self.assertEqual(doc.reconciliation_status, "Balanced")
+
+	@patch(
+		"pawnshop_management.pawnshop_management.doctype.vault_cash_position.vault_cash_position.is_system_manager",
+		return_value=False,
+	)
+	def test_registered_custodian_can_submit_draft(self, _is_system_manager):
+		custodian = "custodian@example.com"
+		doc = frappe._dict(doctype="Vault Cash Position", name="VCP-TEST", branch=TEST_BRANCH, docstatus=1)
+		stored_docstatus = {"value": 0}
+
+		def get_value(doctype, name, fieldname):
+			if doctype == "Branch":
+				return custodian
+			if doctype == "Vault Cash Position":
+				return stored_docstatus["value"]
+
+		with patch.object(frappe.db, "get_value", side_effect=get_value):
+			self.assertTrue(has_permission(doc, "write", custodian))
+			self.assertTrue(has_permission(doc, "submit", custodian))
+
+			stored_docstatus["value"] = 1
+			self.assertFalse(has_permission(doc, "write", custodian))
+			self.assertFalse(has_permission(doc, "submit", custodian))
 
 	def test_variance_does_not_block_transfer_and_reconciliation_adjusts_current_civ(self):
 		incoming = frappe.new_doc("Fund Transfer")
