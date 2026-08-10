@@ -112,7 +112,8 @@ class FundTransfer(Document):
 	def autoname(self):
 		branch_code = get_fund_transfer_branch_code(self.branch)
 		prefix = _safe_series_prefix(branch_code or self.branch or "FT")
-		self.name = make_autoname("{0}-.######".format(prefix))
+		self.naming_series = "{0}-.######".format(prefix)
+		self.name = make_autoname(self.naming_series)
 		self.fund_transfer_series = self.name
 
 	def before_insert(self):

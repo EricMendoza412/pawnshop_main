@@ -15,6 +15,7 @@
   "transfer_type",
   "amount",
   "date_of_transfer",
+  "naming_series",
   "fund_transfer_series",
   "status",
   "custody_section",
@@ -128,6 +129,13 @@
    "fieldtype": "Datetime",
    "in_list_view": 1,
    "label": "Date and Time of Transfer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Naming Series",
    "read_only": 1
   },
   {

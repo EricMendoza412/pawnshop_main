@@ -41,6 +41,10 @@ doctype_js = {
 	"Contact": "public/js/contact.js",
 }
 
+override_doctype_class = {
+	"Naming Series": "pawnshop_management.pawnshop_management.overrides.naming_series.PawnshopNamingSeries",
+}
+
 # Home Pages
 # ----------
 

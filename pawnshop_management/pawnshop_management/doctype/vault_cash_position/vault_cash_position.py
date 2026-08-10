@@ -25,7 +25,8 @@ READ_PERMISSION_TYPES = {"read", "report", "print", "email", "export"}
 class VaultCashPosition(Document):
 	def autoname(self):
 		branch_code = get_fund_transfer_branch_code(self.branch) or "VCP"
-		self.name = make_autoname("VCP{0}-.YYYY.-.#####".format(branch_code))
+		self.naming_series = "VCP{0}-.YYYY.-.#####".format(branch_code)
+		self.name = make_autoname(self.naming_series)
 
 	def before_insert(self):
 		self.business_date = today()

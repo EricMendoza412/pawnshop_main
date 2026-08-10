@@ -9,6 +9,7 @@
  "field_order": [
   "details_section",
   "branch",
+  "naming_series",
   "business_date",
   "count_datetime",
   "column_break_details",
@@ -53,6 +54,13 @@
    "options": "Branch",
    "reqd": 1,
    "set_only_once": 1
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Naming Series",
+   "read_only": 1
   },
   {
    "default": "Today",
