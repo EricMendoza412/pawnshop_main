@@ -9,6 +9,9 @@
   "enable_usd_validation",
   "fx_spreadsheet_id",
   "fx_transaction_sheet",
+  "fx_cpr_summary_sheet",
+  "fx_selling_spreadsheet_id",
+  "cash_manager_collection_sheet",
   "uat_section",
   "enable_google_uat_sync",
   "uat_spreadsheet_id",
@@ -40,6 +43,24 @@
    "fieldname": "fx_transaction_sheet",
    "fieldtype": "Data",
    "label": "FX Transaction Sheet"
+  },
+  {
+   "default": "FX CPR summary",
+   "fieldname": "fx_cpr_summary_sheet",
+   "fieldtype": "Data",
+   "label": "FX CPR Summary Sheet"
+  },
+  {
+   "default": "1m_DOQfy2UZqdplyCOK6sb5GCsqJpBxHcqIpvxSsBH54",
+   "fieldname": "fx_selling_spreadsheet_id",
+   "fieldtype": "Data",
+   "label": "FX Selling Spreadsheet ID"
+  },
+  {
+   "default": "Cash Manager Collection",
+   "fieldname": "cash_manager_collection_sheet",
+   "fieldtype": "Data",
+   "label": "Cash Manager Collection Sheet"
   },
   {
    "fieldname": "uat_section",

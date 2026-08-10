@@ -12,6 +12,88 @@ from googleapiclient.discovery import build
 GOOGLE_SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 
+@frappe.whitelist()
+def get_uncollected_fx_envelopes(branch):
+	from pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer import (
+		require_branch_vault_custodian,
+	)
+
+	require_branch_vault_custodian(branch)
+	settings = frappe.get_single("Fund Transfer Settings")
+	if not settings.enable_google_uat_sync:
+		frappe.throw(_("Google synchronization must be enabled before selecting an uncollected FX envelope."))
+	rows = _get_fx_cpr_rows(settings)
+	branch_code = _normalize_text(_branch_code(branch)).upper()
+	used_dates = set(
+		str(value)
+		for value in frappe.get_all(
+			"Fund Transfer",
+			filters={
+				"branch": branch,
+				"transfer_type": "Uncollected FX to Vault",
+				"docstatus": 1,
+			},
+			pluck="fx_cpr_date",
+			limit_page_length=0,
+		)
+	)
+	envelopes = []
+	for source_row, row in rows:
+		envelope = _parse_uncollected_fx_row(row, source_row)
+		if not envelope or envelope.branch.upper() != branch_code or str(envelope.cpr_date) in used_dates:
+			continue
+		envelopes.append(envelope)
+	return sorted(envelopes, key=lambda value: (value.cpr_date, value.source_row), reverse=True)
+
+
+def validate_uncollected_fx_envelope(branch, cpr_date):
+	settings = frappe.get_single("Fund Transfer Settings")
+	if not settings.enable_google_uat_sync:
+		frappe.throw(_("Google synchronization must be enabled before transferring an uncollected FX envelope."))
+	target_branch = _normalize_text(_branch_code(branch)).upper()
+	target_date = getdate(cpr_date)
+	for source_row, row in _get_fx_cpr_rows(settings):
+		envelope = _parse_uncollected_fx_row(row, source_row)
+		if envelope and envelope.branch.upper() == target_branch and envelope.cpr_date == target_date:
+			return envelope
+	frappe.throw(_("The selected FX envelope is no longer available. Reload and select another envelope."))
+
+
+def _get_fx_cpr_rows(settings):
+	service = _get_sheets_service(settings)
+	response = (
+		service.spreadsheets()
+		.values()
+		.get(
+			spreadsheetId=settings.fx_spreadsheet_id,
+			range="{0}!A3:CH".format(_quote_sheet(settings.fx_cpr_summary_sheet or "FX CPR summary")),
+			valueRenderOption="FORMATTED_VALUE",
+			dateTimeRenderOption="FORMATTED_STRING",
+		)
+		.execute()
+	)
+	return [(index + 3, row) for index, row in enumerate(response.get("values", []))]
+
+
+def _parse_uncollected_fx_row(row, source_row):
+	if len(row) <= 85 or _normalize_text(row[0]) or _normalize_text(row[2]):
+		return None
+	try:
+		cpr_date = getdate(get_datetime(row[3]))
+	except Exception:
+		return None
+	expected_amount = _parse_number(row[85])
+	if expected_amount <= 0 or expected_amount != int(expected_amount):
+		return None
+	return frappe._dict(
+		cpr_date=cpr_date,
+		branch=_normalize_text(row[4]),
+		expected_amount=int(expected_amount),
+		rate=_parse_number(row[26] if len(row) > 26 else 0),
+		source_row=source_row,
+	)
+
+
 def get_usd_availability(branch, business_date, exclude_transfer=None):
 	settings = frappe.get_single("Fund Transfer Settings")
 	if not settings.enable_usd_validation:
@@ -104,23 +186,22 @@ def sync_google_uat_row(fund_transfer):
 	try:
 		service = _get_sheets_service(settings)
 		sheet_name = settings.php_uat_sheet if doc.currency == "PHP" else settings.usd_uat_sheet
-		if _uat_row_exists(service, settings.uat_spreadsheet_id, sheet_name, doc.name):
-			_mark_synced(doc)
-			return
-
-		row = _build_uat_row(doc)
-		(
-			service.spreadsheets()
-			.values()
-			.append(
-				spreadsheetId=settings.uat_spreadsheet_id,
-				range="{0}!A:T".format(_quote_sheet(sheet_name)),
-				valueInputOption="USER_ENTERED",
-				insertDataOption="INSERT_ROWS",
-				body={"values": [row]},
+		if not _uat_row_exists(service, settings.uat_spreadsheet_id, sheet_name, doc.name):
+			row = _build_uat_row(doc)
+			(
+				service.spreadsheets()
+				.values()
+				.append(
+					spreadsheetId=settings.uat_spreadsheet_id,
+					range="{0}!A:T".format(_quote_sheet(sheet_name)),
+					valueInputOption="USER_ENTERED",
+					insertDataOption="INSERT_ROWS",
+					body={"values": [row]},
+				)
+				.execute()
 			)
-			.execute()
-		)
+		if doc.transfer_type == "Uncollected FX to Vault":
+			_sync_uncollected_fx_sources(service, settings, doc)
 		_mark_synced(doc)
 	except Exception:
 		message = frappe.get_traceback()
@@ -226,6 +307,7 @@ def _build_uat_row(doc):
 			"Remittance to Vault": 7,
 			"Vault to ForEx": 8,
 			"ForEx to Vault": 9,
+			"Uncollected FX to Vault": 4,
 		}
 		balance_column, given_column, received_column, comments_column, month_column = 10, 11, 12, 13, 14
 
@@ -256,6 +338,77 @@ def _build_uat_row(doc):
 	row[comments_column] = comments
 	row[month_column] = getdate(doc.business_date).strftime("%B %Y")
 	return row
+
+
+def _sync_uncollected_fx_sources(service, settings, doc):
+	envelope = _find_fx_cpr_envelope(service, settings, doc.branch, doc.fx_cpr_date, allow_collected=True)
+	expected_status = "USD-{0}".format(doc.received_by)
+	if flt(doc.fx_difference_amount):
+		expected_status = "{0}-{1}".format(expected_status, int(flt(doc.amount)))
+	current_status = _normalize_text(envelope.status)
+	if current_status and current_status != expected_status:
+		frappe.throw(_("The FX envelope was collected by another transaction."))
+
+	_cmc_append_if_missing(service, settings, doc, envelope.rate)
+	if current_status != expected_status:
+		service.spreadsheets().values().update(
+			spreadsheetId=settings.fx_spreadsheet_id,
+			range="{0}!C{1}".format(_quote_sheet(settings.fx_cpr_summary_sheet), envelope.source_row),
+			valueInputOption="USER_ENTERED",
+			body={"values": [[expected_status]]},
+		).execute()
+
+
+def _find_fx_cpr_envelope(service, settings, branch, cpr_date, allow_collected=False):
+	response = service.spreadsheets().values().get(
+		spreadsheetId=settings.fx_spreadsheet_id,
+		range="{0}!A3:CH".format(_quote_sheet(settings.fx_cpr_summary_sheet)),
+		valueRenderOption="FORMATTED_VALUE",
+		dateTimeRenderOption="FORMATTED_STRING",
+	).execute()
+	target_branch = _normalize_text(_branch_code(branch)).upper()
+	target_date = getdate(cpr_date)
+	for index, row in enumerate(response.get("values", []), start=3):
+		if len(row) <= 85 or _normalize_text(row[0]):
+			continue
+		try:
+			row_date = getdate(get_datetime(row[3]))
+		except Exception:
+			continue
+		if _normalize_text(row[4]).upper() == target_branch and row_date == target_date:
+			status = _normalize_text(row[2])
+			if status and not allow_collected:
+				continue
+			return frappe._dict(source_row=index, status=status, rate=_parse_number(row[26]))
+	frappe.throw(_("The FX CPR source row could not be found during Google synchronization."))
+
+
+def _cmc_append_if_missing(service, settings, doc, rate):
+	sheet = _quote_sheet(settings.cash_manager_collection_sheet)
+	response = service.spreadsheets().values().get(
+		spreadsheetId=settings.fx_selling_spreadsheet_id,
+		range="{0}!A2:G".format(sheet),
+		valueRenderOption="FORMATTED_VALUE",
+	).execute()
+	target_branch = _normalize_text(_branch_code(doc.branch)).upper()
+	target_date = str(getdate(doc.fx_cpr_date))
+	for row in response.get("values", []):
+		if len(row) > 6 and _normalize_text(row[1]).upper() == target_branch and _normalize_text(row[2]).upper() == "USD":
+			try:
+				row_cpr_date = str(getdate(get_datetime(row[6])))
+			except Exception:
+				continue
+			if row_cpr_date == target_date:
+				return
+	amount = int(flt(doc.amount))
+	row = [str(getdate(doc.business_date)), target_branch, "USD", amount, flt(rate), amount * flt(rate), target_date]
+	service.spreadsheets().values().append(
+		spreadsheetId=settings.fx_selling_spreadsheet_id,
+		range="{0}!A:G".format(sheet),
+		valueInputOption="USER_ENTERED",
+		insertDataOption="INSERT_ROWS",
+		body={"values": [row]},
+	).execute()
 
 
 def _mark_synced(doc):

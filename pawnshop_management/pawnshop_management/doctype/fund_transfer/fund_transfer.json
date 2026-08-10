@@ -35,6 +35,13 @@
   "purchased_usd",
   "previously_transferred_usd",
   "remaining_usd",
+  "uncollected_fx_section",
+  "fx_cpr_date",
+  "fx_expected_amount",
+  "column_break_uncollected_fx",
+  "fx_difference_amount",
+  "fx_source_row",
+  "fx_source_rate",
   "external_section",
   "source_system",
   "legacy_transfer_id",
@@ -105,7 +112,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Transfer Type",
-   "options": "Vault to Pawnshop (-NCB)\nPawnshop (-NCB) to Vault\nVault to Remittance\nRemittance to Vault\nVault to ForEx\nForEx to Vault\nArmored Van to Vault\nRover to Vault\nVault to Cash Manager\nCash Manager to Vault\nCash Position Adjustment",
+   "options": "Vault to Pawnshop (-NCB)\nPawnshop (-NCB) to Vault\nVault to Remittance\nRemittance to Vault\nVault to ForEx\nForEx to Vault\nUncollected FX to Vault\nArmored Van to Vault\nRover to Vault\nVault to Cash Manager\nCash Manager to Vault\nCash Position Adjustment",
    "reqd": 1
   },
   {
@@ -242,6 +249,53 @@
    "read_only": 1
   },
   {
+   "depends_on": "eval:doc.transfer_type=='Uncollected FX to Vault'",
+   "fieldname": "uncollected_fx_section",
+   "fieldtype": "Section Break",
+   "label": "Uncollected FX Envelope"
+  },
+  {
+   "depends_on": "eval:doc.transfer_type=='Uncollected FX to Vault'",
+   "fieldname": "fx_cpr_date",
+   "fieldtype": "Date",
+   "label": "FX CPR Date",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.transfer_type=='Uncollected FX to Vault'",
+   "fieldname": "fx_expected_amount",
+   "fieldtype": "Currency",
+   "label": "Expected USD",
+   "precision": "0",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_uncollected_fx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.transfer_type=='Uncollected FX to Vault'",
+   "fieldname": "fx_difference_amount",
+   "fieldtype": "Currency",
+   "label": "Difference / Shortage",
+   "precision": "0",
+   "read_only": 1
+  },
+  {
+   "fieldname": "fx_source_row",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "FX Source Row",
+   "read_only": 1
+  },
+  {
+   "fieldname": "fx_source_rate",
+   "fieldtype": "Float",
+   "hidden": 1,
+   "label": "FX Source Rate",
+   "read_only": 1
+  },
+  {
    "depends_on": "eval:doc.currency=='USD' && doc.transfer_type=='ForEx to Vault'",
    "fieldname": "previously_transferred_usd",
    "fieldtype": "Currency",
@@ -285,7 +339,8 @@
   {
    "fieldname": "comments",
    "fieldtype": "Small Text",
-   "label": "Notes"
+   "label": "Notes",
+   "read_only": 1
   },
   {
    "collapsible": 1,

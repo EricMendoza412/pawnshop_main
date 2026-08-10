@@ -20,6 +20,7 @@ CASHIER_TYPES = (
 	"ForEx to Vault",
 )
 ROVER_TYPES = ("Rover to Vault", "Vault to Cash Manager", "Cash Manager to Vault")
+DIRECT_TYPES = ("Armored Van to Vault", "Uncollected FX to Vault")
 
 
 def execute():
@@ -69,7 +70,7 @@ def ensure_workflow():
 		[
 			transition("Draft", "Submit", "Pending Cashier Approval", f"doc.transfer_type in {CASHIER_TYPES!r}"),
 			transition("Draft", "Submit", "Submitted", f"doc.transfer_type in {ROVER_TYPES!r}"),
-			transition("Draft", "Submit", "Submitted", "doc.transfer_type == 'Armored Van to Vault'"),
+			transition("Draft", "Submit", "Submitted", f"doc.transfer_type in {DIRECT_TYPES!r}"),
 			transition("Pending Cashier Approval", "Approve", "Submitted", "doc.expected_authorizer == frappe.session.user"),
 			transition("Pending Cashier Approval", "Reject", "Rejected", "doc.expected_authorizer == frappe.session.user"),
 			transition("Pending Cashier Approval", "Cancel Pending Transfer", "Cancelled", vault_custodian_condition()),

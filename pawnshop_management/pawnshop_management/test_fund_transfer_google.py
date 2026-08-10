@@ -7,6 +7,7 @@ from pawnshop_management.pawnshop_management.fund_transfer_google import (
 	_build_uat_row,
 	get_usd_availability,
 	_normalize_text,
+	_parse_uncollected_fx_row,
 	_parse_number,
 )
 
@@ -15,6 +16,38 @@ class TestFundTransferGoogle(unittest.TestCase):
 	def test_number_and_text_normalization(self):
 		self.assertEqual(_parse_number("1,250.50"), 1250.5)
 		self.assertEqual(_normalize_text(" USD   "), "USD")
+
+	def test_uncollected_fx_parser_uses_ch_and_requires_blank_a_and_c(self):
+		row = [""] * 86
+		row[3] = "8/7/2026 16:56:30"
+		row[4] = "GTC"
+		row[26] = "60.6893"
+		row[85] = "3,375"
+		envelope = _parse_uncollected_fx_row(row, 1443)
+		self.assertEqual(envelope.cpr_date.isoformat(), "2026-08-07")
+		self.assertEqual(envelope.expected_amount, 3375)
+		self.assertEqual(envelope.source_row, 1443)
+		row[2] = "USD-user@example.com"
+		self.assertIsNone(_parse_uncollected_fx_row(row, 1443))
+
+	def test_uncollected_fx_uses_usd_from_uncollected_column(self):
+		doc = frappe._dict(
+			currency="USD",
+			branch="TEST",
+			date_of_transfer="2026-08-07 10:06:49",
+			name="4.1-8368",
+			transfer_type="Uncollected FX to Vault",
+			amount=3375,
+			civ_balance=4081,
+			given_by="Uncollected FX",
+			received_by="user@example.com",
+			comments="user@example.com-Uncollected FX transfer",
+			business_date="2026-08-07",
+		)
+		row = _build_uat_row(doc)
+		self.assertEqual(row[4], 3375)
+		self.assertEqual(row[11], "Uncollected FX")
+		self.assertEqual(row[13], "user@example.com-Uncollected FX transfer")
 
 	def test_php_uat_row_uses_ncb_columns(self):
 		doc = frappe._dict(

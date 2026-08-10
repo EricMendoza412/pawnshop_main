@@ -2,6 +2,7 @@
 # See license.txt
 
 import unittest
+from unittest.mock import patch
 
 import frappe
 
@@ -102,6 +103,43 @@ class TestFundTransfer(unittest.TestCase):
 		doc.amount = 100
 		with self.assertRaises(frappe.ValidationError):
 			doc.insert()
+
+	def test_uncollected_fx_requires_whole_dollars_within_expected_amount(self):
+		for amount in (100.5, 101):
+			with self.subTest(amount=amount):
+				doc = frappe.new_doc("Fund Transfer")
+				doc.branch = TEST_BRANCH
+				doc.currency = "USD"
+				doc.transfer_type = "Uncollected FX to Vault"
+				doc.fx_cpr_date = "2026-08-07"
+				doc.fx_expected_amount = 100
+				doc.amount = amount
+				with self.assertRaises(frappe.ValidationError):
+					doc.insert()
+
+	@patch(
+		"pawnshop_management.pawnshop_management.fund_transfer_google.validate_uncollected_fx_envelope"
+	)
+	def test_uncollected_fx_submits_actual_amount_and_system_notes(self, validate_envelope):
+		from frappe.model.workflow import apply_workflow
+
+		validate_envelope.return_value = frappe._dict(source_row=1450, rate=60.7213, expected_amount=100)
+		doc = frappe.new_doc("Fund Transfer")
+		doc.branch = TEST_BRANCH
+		doc.currency = "USD"
+		doc.transfer_type = "Uncollected FX to Vault"
+		doc.fx_cpr_date = "2026-08-07"
+		doc.fx_expected_amount = 100
+		doc.amount = 75
+		doc.insert()
+		apply_workflow(doc, "Submit")
+		doc.reload()
+		self.assertEqual(doc.docstatus, 1)
+		self.assertEqual(doc.vault_balance_change, 75)
+		self.assertEqual(doc.fx_difference_amount, 25)
+		self.assertEqual(doc.given_by, "Uncollected FX")
+		self.assertEqual(doc.received_by, "Administrator")
+		self.assertEqual(doc.comments, "Administrator-Uncollected FX transfer")
 
 	def test_assigned_cashier_approves_from_own_session(self):
 		from frappe.model.workflow import apply_workflow

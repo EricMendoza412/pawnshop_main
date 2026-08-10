@@ -60,6 +60,13 @@ TRANSFER_RULES = {
 		"authorizer_field": "fx_cashier",
 		"legacy_field": "fx_cashier_to_vc",
 	},
+	"Uncollected FX to Vault": {
+		"currencies": {"USD"},
+		"source": "Uncollected FX",
+		"destination": "Vault",
+		"impact": 1,
+		"authorization": "none",
+	},
 	"Armored Van to Vault": {
 		"currencies": {"PHP", "USD"},
 		"source": "Armored Van",
@@ -126,6 +133,7 @@ class FundTransfer(Document):
 		self._validate_rule(rule)
 		self._set_derived_fields(rule)
 		self._validate_pending_authorizer(rule)
+		self._validate_uncollected_fx_fields()
 
 		if self.is_new() and self.transfer_type != "Cash Position Adjustment":
 			require_branch_vault_custodian(self.branch)
@@ -159,6 +167,8 @@ class FundTransfer(Document):
 
 		if self.currency == "USD" and self.transfer_type == "ForEx to Vault":
 			self._validate_usd_availability()
+		elif self.transfer_type == "Uncollected FX to Vault":
+			self._validate_uncollected_fx_source()
 
 		opening_balance = get_latest_civ_balance(self.branch, self.currency, lock=False)
 		change = self._get_balance_change()
@@ -313,6 +323,43 @@ class FundTransfer(Document):
 				)
 			)
 
+	def _validate_uncollected_fx_fields(self):
+		fields = (self.get("fx_cpr_date"), self.get("fx_expected_amount"))
+		if self.transfer_type != "Uncollected FX to Vault":
+			if any(fields):
+				frappe.throw(_("Uncollected FX envelope details are only valid for Uncollected FX to Vault."))
+			return
+		if not self.fx_cpr_date or flt(self.fx_expected_amount) <= 0:
+			frappe.throw(_("Select an uncollected FX envelope before saving."))
+		for label, value in ((_("Expected USD"), self.fx_expected_amount), (_("Actual USD"), self.amount)):
+			if flt(value) != int(flt(value)):
+				frappe.throw(_("{0} must be a whole-dollar amount.").format(label))
+		if flt(self.amount) > flt(self.fx_expected_amount):
+			frappe.throw(_("Actual USD cannot exceed the selected envelope's expected USD."))
+		self.fx_difference_amount = flt(self.fx_expected_amount) - flt(self.amount)
+
+	def _validate_uncollected_fx_source(self):
+		from pawnshop_management.pawnshop_management.fund_transfer_google import validate_uncollected_fx_envelope
+
+		duplicate = frappe.db.get_value(
+			"Fund Transfer",
+			{
+				"branch": self.branch,
+				"fx_cpr_date": self.fx_cpr_date,
+				"transfer_type": "Uncollected FX to Vault",
+				"docstatus": 1,
+				"name": ["!=", self.name],
+			},
+			"name",
+		)
+		if duplicate:
+			frappe.throw(_("This uncollected FX envelope was already transferred in {0}.").format(duplicate))
+		envelope = validate_uncollected_fx_envelope(self.branch, self.fx_cpr_date)
+		if flt(envelope.expected_amount) != flt(self.fx_expected_amount):
+			frappe.throw(_("The selected envelope amount changed. Reload and select it again."))
+		self.fx_source_row = envelope.source_row
+		self.fx_source_rate = envelope.rate
+
 	def _set_legacy_values(self):
 		for fieldname in (
 			"vc_to_cm",
@@ -331,6 +378,8 @@ class FundTransfer(Document):
 
 		self.given_by = _given_by(self)
 		self.received_by = _received_by(self)
+		if self.transfer_type == "Uncollected FX to Vault":
+			self.comments = "{0}-Uncollected FX transfer".format(self.received_by)
 
 	def _validate_immutable_submitted_document(self):
 		if self.is_new():
@@ -368,6 +417,11 @@ class FundTransfer(Document):
 			"source_system",
 			"legacy_transfer_id",
 			"external_party",
+			"fx_cpr_date",
+			"fx_expected_amount",
+			"fx_difference_amount",
+			"fx_source_row",
+			"fx_source_rate",
 		}
 		if any(not _same_protected_value(self, previous, fieldname) for fieldname in protected):
 			frappe.throw(_("Transfer details cannot be changed after authorization has been requested."))
@@ -718,6 +772,8 @@ def _given_by(doc):
 		return doc.initiated_by
 	if doc.source == "Armored Van":
 		return doc.external_party or "Armored Van"
+	if doc.source == "Uncollected FX":
+		return "Uncollected FX"
 	return doc.authorized_by or doc.source
 
 
