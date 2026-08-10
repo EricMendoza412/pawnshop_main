@@ -10,7 +10,7 @@ from frappe.model.naming import make_autoname
 from frappe.utils import flt, getdate, now_datetime, today
 from frappe.utils.password import check_password
 
-from pawnshop_management.operations_access_control.access_control import is_system_manager
+from pawnshop_management.operations_access_control.access_control import get_branch_from_request_ip, is_system_manager
 TRANSFER_RULES = {
 	"Vault to Pawnshop (-NCB)": {
 		"currencies": {"PHP"},
@@ -99,7 +99,6 @@ TRANSFER_RULES = {
 }
 
 READ_PERMISSION_TYPES = {"read", "report", "print", "email", "export"}
-BRANCH_PARTICIPANT_FIELDS = ("vault_custodian", "pawnshop_cashier", "fx_cashier", "remittance_cashier")
 
 
 class FundTransfer(Document):
@@ -120,6 +119,7 @@ class FundTransfer(Document):
 			self.source_system = "ERPNext"
 
 	def validate(self):
+		self._validate_imported_historical_document()
 		self._validate_immutable_submitted_document()
 		self._validate_pending_transfer_definition()
 		rule = get_transfer_rule(self.transfer_type)
@@ -239,8 +239,15 @@ class FundTransfer(Document):
 			frappe.throw(_("Submitted Fund Transfers cannot be cancelled or reversed."))
 
 	def on_trash(self):
+		if self.status == "Imported Historical":
+			frappe.throw(_("Imported Historical Fund Transfers cannot be deleted."))
 		if (self.docstatus == 1 or self.status == "Submitted") and not is_system_manager(frappe.session.user):
 			frappe.throw(_("Submitted Fund Transfers cannot be deleted."))
+
+	def _validate_imported_historical_document(self):
+		if self.status != "Imported Historical" or self.is_new() or self.flags.importing_historical:
+			return
+		frappe.throw(_("Imported Historical Fund Transfers are read-only."), frappe.PermissionError)
 
 	def _validate_rule(self, rule):
 		if self.currency not in rule["currencies"]:
@@ -613,20 +620,19 @@ def get_permission_query_conditions(user=None):
 	user = user or frappe.session.user
 	if is_system_manager(user) or "Accounting Analyst" in frappe.get_roles(user):
 		return None
-	escaped_user = frappe.db.escape(user)
-	return (
-		"("
-		"exists (select `tabBranch`.`name` from `tabBranch` "
-		"where `tabBranch`.`name`=`tabFund Transfer`.`branch` and ("
-		+ " or ".join(
-			"`tabBranch`.`{0}`={1}".format(fieldname, escaped_user) for fieldname in BRANCH_PARTICIPANT_FIELDS
-		)
-		+ ")) "
-		f"or `tabFund Transfer`.`authorized_by`={escaped_user} "
-		f"or `tabFund Transfer`.`expected_authorizer`={escaped_user} "
-		f"or `tabFund Transfer`.`initiated_by`={escaped_user}"
-		")"
-	)
+	branch = get_branch_from_request_ip()
+	if not branch:
+		return "1=0"
+	return "`tabFund Transfer`.`branch`={0}".format(frappe.db.escape(branch))
+
+
+@frappe.whitelist()
+def get_current_branch_context():
+	"""Return the request-IP branch so Desk can explain a fail-closed empty list."""
+	user = frappe.session.user
+	if is_system_manager(user) or "Accounting Analyst" in frappe.get_roles(user):
+		return {"unrestricted": True}
+	return {"branch": get_branch_from_request_ip()}
 
 
 def has_permission(doc, ptype=None, user=None):
@@ -639,7 +645,7 @@ def has_permission(doc, ptype=None, user=None):
 	if permission_type == "create":
 		return _user_is_any_vault_custodian(user)
 	if permission_type in READ_PERMISSION_TYPES:
-		return _can_read(doc, user)
+		return _can_read_from_current_branch(doc, user)
 	if permission_type == "submit":
 		if doc.docstatus == 1:
 			return _can_submit_workflow(doc, user)
@@ -651,17 +657,11 @@ def has_permission(doc, ptype=None, user=None):
 	return None
 
 
-def _can_read(doc, user):
+def _can_read_from_current_branch(doc, user):
 	if "Accounting Analyst" in frappe.get_roles(user):
 		return True
-	if user in {
-		getattr(doc, "initiated_by", None),
-		getattr(doc, "expected_authorizer", None),
-		getattr(doc, "authorized_by", None),
-	}:
-		return True
-	branch_values = frappe.db.get_value("Branch", doc.branch, BRANCH_PARTICIPANT_FIELDS, as_dict=True) or {}
-	return user in set(branch_values.values())
+	branch = get_branch_from_request_ip()
+	return bool(branch and branch == doc.branch)
 
 
 def _can_write_pending(doc, user):

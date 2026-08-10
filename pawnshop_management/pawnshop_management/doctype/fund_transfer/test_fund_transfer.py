@@ -19,6 +19,8 @@ TEST_BRANCH = "TEST"
 class TestFundTransfer(unittest.TestCase):
 	def setUp(self):
 		frappe.set_user("Administrator")
+		self.original_request_ip = getattr(frappe.local, "request_ip", None)
+		frappe.local.request_ip = frappe.db.get_value("Branch IP Addressing", TEST_BRANCH, "ip_address")
 		self.original_branch = frappe.db.get_value(
 			"Branch",
 			TEST_BRANCH,
@@ -45,6 +47,7 @@ class TestFundTransfer(unittest.TestCase):
 
 	def tearDown(self):
 		frappe.set_user("Administrator")
+		frappe.local.request_ip = self.original_request_ip
 		frappe.db.rollback()
 
 	def test_armored_van_then_vault_out_updates_running_civ(self):

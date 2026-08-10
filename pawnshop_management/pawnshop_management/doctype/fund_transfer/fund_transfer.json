@@ -138,7 +138,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Status",
-   "options": "Draft\nPending Cashier Approval\nPending Rover Confirmation\nSubmitted\nRejected\nCancelled",
+   "options": "Draft\nPending Cashier Approval\nPending Rover Confirmation\nSubmitted\nRejected\nCancelled\nImported Historical",
    "read_only": 1
   },
   {
@@ -460,7 +460,7 @@
    "role": "Rover"
   }
  ],
- "sort_field": "date_of_transfer",
+ "sort_field": "business_date",
  "sort_order": "DESC",
  "track_changes": 1
 }
