@@ -13,6 +13,7 @@ from pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer
 class PawnshopNamingSeries(NamingSeries):
 	"""Expose branch-specific cash-control counters in ERPNext Naming Series."""
 
+	@frappe.whitelist()
 	def get_options(self, arg=None):
 		doctype = arg or self.select_doc_for_series
 		if doctype in {"Fund Transfer", "Vault Cash Position"}:
