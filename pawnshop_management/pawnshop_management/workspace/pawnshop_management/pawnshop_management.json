@@ -72,15 +72,6 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Fund Transfer",
-   "link_to": "Fund Transfer",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
    "label": "Envelope Items",
    "link_to": "Models",
    "link_type": "DocType",
@@ -230,9 +221,27 @@
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Fund Transfer",
+   "link_to": "Fund Transfer",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Fund Transfer",
+   "link_to": "Fund Transfer",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2026-07-21 15:22:48.928357",
+ "modified": "2026-08-12 20:04:47.801495",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Pawnshop Management",

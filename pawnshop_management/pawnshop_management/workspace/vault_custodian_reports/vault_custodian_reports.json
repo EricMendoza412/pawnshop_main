@@ -36,15 +36,6 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Fund Transfer",
-   "link_to": "Fund Transfer",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
    "label": "Vault Cash Position",
    "link_to": "Vault Cash Position",
    "link_type": "DocType",
@@ -112,9 +103,27 @@
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Fund Transfer",
+   "link_to": "Fund Transfer",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Fund Transfer",
+   "link_to": "Fund Transfer",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2026-07-21 15:22:49.409284",
+ "modified": "2026-08-12 20:06:50.407473",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Vault Custodian Reports",
