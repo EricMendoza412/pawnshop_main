@@ -50,16 +50,24 @@ frappe.ui.form.on("FX Selling", {
 		frm.get_field("customer_id_html").$wrapper.html(`<img src="${url}" style="max-width:400px;height:auto">`);
 	},
 
-	currencies_add(frm) {
+});
+
+frappe.ui.form.on("FX Selling Currency", {
+	async currencies_add(frm, cdt, cdn) {
+		const row = locals[cdt][cdn];
+		if (frm._fx_rates_loaded && (!row.currency || row.currency === "USD")) {
+			if (!row.currency) {
+				await frappe.model.set_value(cdt, cdn, "currency", "USD");
+			}
+			await apply_usd_rate(frm, cdt, cdn);
+		}
 		calculate_total(frm);
 	},
 
 	currencies_remove(frm) {
 		calculate_total(frm);
 	},
-});
 
-frappe.ui.form.on("FX Selling Currency", {
 	async currency(frm, cdt, cdn) {
 		const row = locals[cdt][cdn];
 		if (!frm._fx_rates_loaded) {
@@ -68,16 +76,7 @@ frappe.ui.form.on("FX Selling Currency", {
 			return;
 		}
 		if (row.currency === "USD") {
-			const rate = (frm._fx_rates || {}).USD;
-			if (!rate) {
-				frappe.msgprint(__("No current USD rate is available."));
-				return;
-			}
-			await frappe.model.set_value(cdt, cdn, "base_rate", rate.base_rate);
-			await frappe.model.set_value(cdt, cdn, "selling_addition", rate.selling_addition);
-			await frappe.model.set_value(cdt, cdn, "selling_rate", rate.selling_rate);
-			await frappe.model.set_value(cdt, cdn, "rate_source_row", rate.source_row);
-			await clear_request(cdt, cdn);
+			await apply_usd_rate(frm, cdt, cdn);
 		} else {
 			await select_tracker_request(frm, cdt, cdn, row.currency);
 		}
@@ -88,6 +87,20 @@ frappe.ui.form.on("FX Selling Currency", {
 		calculate_row(frm, cdt, cdn);
 	},
 });
+
+async function apply_usd_rate(frm, cdt, cdn) {
+	const rate = (frm._fx_rates || {}).USD;
+	if (!rate) {
+		frappe.msgprint(__("No current USD rate is available."));
+		return false;
+	}
+	await frappe.model.set_value(cdt, cdn, "base_rate", rate.base_rate);
+	await frappe.model.set_value(cdt, cdn, "selling_addition", rate.selling_addition);
+	await frappe.model.set_value(cdt, cdn, "selling_rate", rate.selling_rate);
+	await frappe.model.set_value(cdt, cdn, "rate_source_row", rate.source_row);
+	await clear_request(cdt, cdn);
+	return true;
+}
 
 async function load_rates(frm) {
 	frm._fx_rates_loaded = false;

@@ -2,7 +2,7 @@
  "cards_label": "Foreign Exchange",
  "category": "Modules",
  "charts": [],
- "creation": "2026-07-30 00:00:00.000000",
+ "creation": "2026-07-30 00:00:00",
  "developer_mode_only": 0,
  "disable_user_customization": 1,
  "docstatus": 0,
@@ -10,6 +10,7 @@
  "extends_another_page": 0,
  "hide_custom": 0,
  "icon": "star",
+ "idx": 0,
  "is_default": 0,
  "is_standard": 1,
  "label": "Foreign Exchange",
@@ -17,19 +18,11 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "FX Selling",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "New FX Selling",
+   "label": "FX Documents",
    "link_to": "FX Selling",
    "link_type": "DocType",
    "onboard": 0,
-   "type": "Link"
+   "type": "Card Break"
   },
   {
    "hidden": 0,
@@ -43,14 +36,6 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Fund Transfers",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
    "label": "Fund Transfer",
    "link_to": "Fund Transfer",
    "link_type": "DocType",
@@ -58,13 +43,20 @@
    "type": "Link"
   }
  ],
- "modified": "2026-07-30 00:00:00.000000",
+ "modified": "2026-08-18 10:42:35.862916",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Foreign Exchange",
  "owner": "Administrator",
  "pin_to_bottom": 0,
  "pin_to_top": 0,
- "shortcuts": [],
+ "shortcuts": [
+  {
+   "doc_view": "New",
+   "label": "New FX Selling",
+   "link_to": "FX Selling",
+   "type": "DocType"
+  }
+ ],
  "shortcuts_label": "Shortcuts"
 }
