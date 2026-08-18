@@ -10,6 +10,7 @@
   "branch",
   "business_date",
   "posting_datetime",
+  "naming_series",
   "column_break_details",
   "seller",
   "status",
@@ -62,6 +63,13 @@
    "fieldname": "posting_datetime",
    "fieldtype": "Datetime",
    "label": "Transaction Date and Time",
+   "read_only": 1
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Naming Series",
    "read_only": 1
   },
   {

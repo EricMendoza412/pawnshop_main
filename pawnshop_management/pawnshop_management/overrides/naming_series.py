@@ -16,7 +16,7 @@ class PawnshopNamingSeries(NamingSeries):
 	@frappe.whitelist()
 	def get_options(self, arg=None):
 		doctype = arg or self.select_doc_for_series
-		if doctype in {"Fund Transfer", "Vault Cash Position"}:
+		if doctype in {"Fund Transfer", "FX Selling", "Vault Cash Position"}:
 			return "\n".join(_get_branch_series(doctype))
 		return super().get_options(arg)
 
@@ -29,6 +29,8 @@ def _get_branch_series(doctype):
 			continue
 		if doctype == "Fund Transfer":
 			series.add("{0}-.######".format(_safe_series_prefix(branch_code)))
+		elif doctype == "FX Selling":
+			series.add("FXS-{0}-.YYYY.-.#####".format(_safe_series_prefix(branch_code)))
 		else:
 			series.add("VCP{0}-.YYYY.-.#####".format(branch_code))
 	return sorted(series)

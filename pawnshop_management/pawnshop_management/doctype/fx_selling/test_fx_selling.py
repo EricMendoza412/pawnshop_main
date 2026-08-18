@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 import frappe
 
 from pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling import (
+	FXSelling,
 	_latest_rates,
 	_round_up_rate,
 	cancel_linked_transaction,
@@ -12,6 +13,7 @@ from pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling impor
 	refresh_and_validate_rates,
 	sync_google_rows,
 )
+from pawnshop_management.pawnshop_management.overrides.naming_series import _get_branch_series
 
 
 class TestFXSelling(unittest.TestCase):
@@ -44,6 +46,30 @@ class TestFXSelling(unittest.TestCase):
 		frappe.set_user("Guest")
 		with self.assertRaises(frappe.PermissionError):
 			cancel_linked_transaction("FX Selling", "FXS-TEST-2026-00001")
+
+	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.make_autoname")
+	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.get_fund_transfer_branch_code")
+	def test_autoname_records_branch_specific_naming_series(self, get_branch_code, make_autoname):
+		get_branch_code.return_value = "Test Branch"
+		make_autoname.return_value = "FXS-TEST-BRANCH-2026-00001"
+		doc = FXSelling({"doctype": "FX Selling", "branch": "TEST"})
+
+		doc.autoname()
+
+		self.assertEqual(doc.naming_series, "FXS-TEST-BRANCH-.YYYY.-.#####")
+		make_autoname.assert_called_once_with(doc.naming_series)
+		self.assertEqual(doc.name, "FXS-TEST-BRANCH-2026-00001")
+
+	@patch("pawnshop_management.pawnshop_management.overrides.naming_series.get_fund_transfer_branch_code")
+	@patch("pawnshop_management.pawnshop_management.overrides.naming_series.frappe.get_all")
+	def test_naming_series_exposes_one_sanitized_option_per_branch(self, get_all, get_branch_code):
+		get_all.return_value = ["Branch One", "Branch Two", "Duplicate Branch"]
+		get_branch_code.side_effect = ["ONE", "Branch Two", "ONE"]
+
+		self.assertEqual(
+			_get_branch_series("FX Selling"),
+			["FXS-BRANCH-TWO-.YYYY.-.#####", "FXS-ONE-.YYYY.-.#####"],
+		)
 
 	def test_android_rate_rounding_parity(self):
 		self.assertEqual(_round_up_rate(61.12 + 0.70, 2), 61.82)
@@ -146,6 +172,7 @@ class TestFXSelling(unittest.TestCase):
 		doc.append("currencies", {"currency": "USD", "amount": 100})
 		doc.insert()
 		self.assertRegex(doc.name, r"^FXS-TEST-\d{4}-\d{5}$")
+		self.assertEqual(doc.naming_series, "FXS-TEST-.YYYY.-.#####")
 		self.assertEqual(doc.customer_name, frappe.db.get_value("Customer", customer[0], "customer_name"))
 		self.assertEqual(doc.currencies[0].base_rate, 61.12)
 		self.assertEqual(doc.currencies[0].selling_rate, 61.82)

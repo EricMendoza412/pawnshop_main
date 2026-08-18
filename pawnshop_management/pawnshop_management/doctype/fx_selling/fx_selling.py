@@ -15,6 +15,7 @@ from pawnshop_management.operations_access_control.access_control import (
 	is_system_manager,
 )
 from pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer import (
+	_safe_series_prefix,
 	get_fund_transfer_branch_code,
 )
 
@@ -38,8 +39,9 @@ class FXSelling(Document):
 		self.branch = self.branch or get_branch_from_request_ip()
 		if not self.branch:
 			frappe.throw(_("Branch is required before naming FX Selling."))
-		code = get_fund_transfer_branch_code(self.branch) or "FXS"
-		self.name = make_autoname("FXS-{0}-.YYYY.-.#####".format(code))
+		code = _safe_series_prefix(get_fund_transfer_branch_code(self.branch) or "FXS")
+		self.naming_series = "FXS-{0}-.YYYY.-.#####".format(code)
+		self.name = make_autoname(self.naming_series)
 
 	def before_insert(self):
 		self.branch = self.branch or get_branch_from_request_ip()
