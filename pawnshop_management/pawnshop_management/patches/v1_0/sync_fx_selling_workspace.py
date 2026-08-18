@@ -10,11 +10,12 @@ def execute():
 	workspace.module = "Pawnshop Management"
 	workspace.category = "Modules"
 	workspace.set("links", [
-		{"type": "Card Break", "label": "FX Selling", "link_type": "DocType"},
-		{"type": "Link", "label": "New FX Selling", "link_to": "FX Selling", "link_type": "DocType"},
+		{"type": "Card Break", "label": "FX Documents", "link_to": "FX Selling", "link_type": "DocType"},
 		{"type": "Link", "label": "FX Selling Transactions", "link_to": "FX Selling", "link_type": "DocType"},
-		{"type": "Card Break", "label": "Fund Transfers", "link_type": "DocType"},
 		{"type": "Link", "label": "Fund Transfer", "link_to": "Fund Transfer", "link_type": "DocType"},
+	])
+	workspace.set("shortcuts", [
+		{"type": "DocType", "label": "New FX Selling", "link_to": "FX Selling", "doc_view": "New"},
 	])
 	workspace.save(ignore_permissions=True)
 	frappe.clear_cache()
