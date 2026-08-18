@@ -78,11 +78,20 @@ class FXSelling(Document):
 			raise
 
 	def before_cancel(self):
-		# Administrator may need to cancel this record together with its generated Fund Transfer.
-		if not is_system_manager(frappe.session.user):
+		if frappe.session.user != "Administrator":
 			frappe.throw(_("Submitted FX Selling documents cannot be cancelled. Use an audited reversal process."))
+		if self.fund_transfer and not self.flags.coordinated_fx_lifecycle:
+			frappe.throw(
+				_("Use Cancel Linked Transaction to cancel this FX Selling document and its Fund Transfer together.")
+			)
 
 	def on_trash(self):
+		if frappe.session.user != "Administrator":
+			frappe.throw(_("Only Administrator can delete FX Selling documents."), frappe.PermissionError)
+		if self.fund_transfer and not self.flags.coordinated_fx_lifecycle:
+			frappe.throw(
+				_("Use Delete Linked Transaction to delete this FX Selling document and its Fund Transfer together.")
+			)
 		if self.docstatus == 1:
 			frappe.throw(_("Submitted FX Selling documents cannot be deleted."))
 
@@ -248,6 +257,90 @@ def get_fx_selling_context():
 	return {"branch": get_branch_from_request_ip(), "seller": frappe.session.user}
 
 
+@frappe.whitelist()
+def cancel_linked_transaction(reference_doctype, reference_name):
+	_require_administrator_lifecycle_access()
+	fx_selling, fund_transfer = _get_linked_transaction_documents(reference_doctype, reference_name)
+	_savepoint = "cancel_fx_selling_transaction"
+	frappe.db.savepoint(_savepoint)
+	try:
+		_cancel_if_submitted(fx_selling)
+		_cancel_if_submitted(fund_transfer)
+	except Exception:
+		frappe.db.rollback(save_point=_savepoint)
+		raise
+	return _linked_transaction_result(fx_selling, fund_transfer)
+
+
+@frappe.whitelist()
+def delete_linked_transaction(reference_doctype, reference_name):
+	_require_administrator_lifecycle_access()
+	fx_selling, fund_transfer = _get_linked_transaction_documents(reference_doctype, reference_name)
+	_savepoint = "delete_fx_selling_transaction"
+	frappe.db.savepoint(_savepoint)
+	try:
+		_cancel_if_submitted(fx_selling)
+		_cancel_if_submitted(fund_transfer)
+		# FX Selling owns the only database Link, so remove it before its Fund Transfer.
+		_delete_if_present(fx_selling)
+		_delete_if_present(fund_transfer)
+	except Exception:
+		frappe.db.rollback(save_point=_savepoint)
+		raise
+	return {"deleted": True}
+
+
+def _require_administrator_lifecycle_access():
+	if frappe.session.user != "Administrator":
+		frappe.throw(_("Only Administrator can cancel or delete linked FX transactions."), frappe.PermissionError)
+
+
+def _get_linked_transaction_documents(reference_doctype, reference_name):
+	if reference_doctype not in {"FX Selling", "Fund Transfer"}:
+		frappe.throw(_("Invalid linked transaction type."))
+	if not frappe.db.exists(reference_doctype, reference_name):
+		frappe.throw(_("{0} {1} does not exist.").format(reference_doctype, reference_name))
+
+	fx_selling = None
+	fund_transfer = None
+	if reference_doctype == "FX Selling":
+		fx_selling = frappe.get_doc("FX Selling", reference_name)
+		if fx_selling.fund_transfer and frappe.db.exists("Fund Transfer", fx_selling.fund_transfer):
+			fund_transfer = frappe.get_doc("Fund Transfer", fx_selling.fund_transfer)
+	else:
+		fund_transfer = frappe.get_doc("Fund Transfer", reference_name)
+		fx_selling_name = frappe.db.get_value("FX Selling", {"fund_transfer": reference_name}, "name")
+		if fx_selling_name:
+			fx_selling = frappe.get_doc("FX Selling", fx_selling_name)
+
+	return fx_selling, fund_transfer
+
+
+def _cancel_if_submitted(doc):
+	if not doc or doc.docstatus != 1:
+		return
+	doc.flags.coordinated_fx_lifecycle = True
+	doc.cancel()
+
+
+def _delete_if_present(doc):
+	if not doc or not frappe.db.exists(doc.doctype, doc.name):
+		return
+	frappe.delete_doc(
+		doc.doctype,
+		doc.name,
+		flags={"coordinated_fx_lifecycle": True},
+	)
+
+
+def _linked_transaction_result(fx_selling, fund_transfer):
+	return {
+		"fx_selling": fx_selling.name if fx_selling else None,
+		"fund_transfer": fund_transfer.name if fund_transfer else None,
+		"cancelled": True,
+	}
+
+
 def refresh_and_validate_rates(doc):
 	settings = frappe.get_single("FX Selling Settings")
 	rates = _latest_rates(settings) if any(row.currency == "USD" for row in doc.currencies) else {}
@@ -406,10 +499,10 @@ def get_permission_query_conditions(user=None):
 
 def has_permission(doc, ptype=None, user=None):
 	user = user or frappe.session.user
+	if ptype in {"cancel", "delete"}:
+		return user == "Administrator"
 	if is_system_manager(user):
 		return True
-	if ptype in {"cancel", "delete"}:
-		return False
 	if ptype in {"read", "report", "print", "email", "export"} and "Accounting Analyst" in frappe.get_roles(user):
 		return True
 	branch = get_branch_from_request_ip()

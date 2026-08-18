@@ -28,6 +28,7 @@ frappe.ui.form.on("Fund Transfer", {
 	refresh(frm) {
 		set_transfer_definition_read_only(frm);
 		set_transfer_type_options(frm);
+		configure_linked_fx_lifecycle_actions(frm);
 		if (frm.is_new()) {
 			frm.set_value("business_date", frappe.datetime.get_today());
 			set_branch_from_request_ip(frm);
@@ -75,6 +76,50 @@ frappe.ui.form.on("Fund Transfer", {
 		}
 	},
 });
+
+function configure_linked_fx_lifecycle_actions(frm) {
+	if (frappe.session.user !== "Administrator" || !frm.doc.fx_selling || frm.is_new()) return;
+
+	if (frm.doc.docstatus === 1) {
+		frm.page.set_secondary_action(__("Cancel Linked Transaction"), () => {
+			cancel_linked_fx_transaction(frm);
+		});
+	} else if (frm.doc.docstatus === 2) {
+		frm.add_custom_button(__("Delete Linked Transaction"), () => {
+			delete_linked_fx_transaction(frm);
+		});
+	}
+}
+
+function cancel_linked_fx_transaction(frm) {
+	frappe.confirm(
+		__("Cancel this Fund Transfer and its linked FX Selling document?"),
+		() => frappe.call({
+			method: "pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.cancel_linked_transaction",
+			args: { reference_doctype: frm.doctype, reference_name: frm.doc.name },
+			freeze: true,
+			freeze_message: __("Cancelling linked transaction..."),
+			callback(response) {
+				if (!response.exc) frm.reload_doc();
+			},
+		})
+	);
+}
+
+function delete_linked_fx_transaction(frm) {
+	frappe.confirm(
+		__("Permanently delete this Fund Transfer and its linked FX Selling document?"),
+		() => frappe.call({
+			method: "pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.delete_linked_transaction",
+			args: { reference_doctype: frm.doctype, reference_name: frm.doc.name },
+			freeze: true,
+			freeze_message: __("Deleting linked transaction..."),
+			callback(response) {
+				if (!response.exc) frappe.set_route("List", frm.doctype);
+			},
+		})
+	);
+}
 
 function set_transfer_type_options(frm) {
 	const php = [

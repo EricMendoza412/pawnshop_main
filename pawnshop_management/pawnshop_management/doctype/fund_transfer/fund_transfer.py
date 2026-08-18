@@ -246,14 +246,22 @@ class FundTransfer(Document):
 		queue_google_uat_sync(self.name)
 
 	def before_cancel(self):
-		if not is_system_manager(frappe.session.user):
+		if frappe.session.user != "Administrator":
 			frappe.throw(_("Submitted Fund Transfers cannot be cancelled or reversed."))
+		if self.fx_selling and not self.flags.coordinated_fx_lifecycle:
+			frappe.throw(
+				_("Use Cancel Linked Transaction to cancel this Fund Transfer and its FX Selling document together.")
+			)
 
 	def on_trash(self):
 		if self.status == "Imported Historical":
 			frappe.throw(_("Imported Historical Fund Transfers cannot be deleted."))
-		if (self.docstatus == 1 or self.status == "Submitted") and not is_system_manager(frappe.session.user):
+		if (self.docstatus == 1 or self.status == "Submitted") and frappe.session.user != "Administrator":
 			frappe.throw(_("Submitted Fund Transfers cannot be deleted."))
+		if self.fx_selling and not self.flags.coordinated_fx_lifecycle:
+			frappe.throw(
+				_("Use Delete Linked Transaction to delete this Fund Transfer and its FX Selling document together.")
+			)
 
 	def _validate_imported_historical_document(self):
 		if self.status != "Imported Historical" or self.is_new() or self.flags.importing_historical:
@@ -709,10 +717,10 @@ def get_current_branch_context():
 def has_permission(doc, ptype=None, user=None):
 	user = user or frappe.session.user
 	permission_type = ptype or "read"
+	if permission_type in {"cancel", "delete"}:
+		return user == "Administrator"
 	if is_system_manager(user):
 		return True
-	if permission_type in {"cancel", "delete"}:
-		return False
 	if permission_type == "create":
 		return _user_is_any_vault_custodian(user)
 	if permission_type in READ_PERMISSION_TYPES:

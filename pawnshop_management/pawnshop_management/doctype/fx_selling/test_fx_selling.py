@@ -6,6 +6,8 @@ import frappe
 from pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling import (
 	_latest_rates,
 	_round_up_rate,
+	cancel_linked_transaction,
+	delete_linked_transaction,
 	get_available_tracker_requests,
 	refresh_and_validate_rates,
 	sync_google_rows,
@@ -26,6 +28,22 @@ class TestFXSelling(unittest.TestCase):
 		frappe.set_user("Guest")
 		with self.assertRaises(frappe.ValidationError):
 			doc.before_cancel()
+
+	def test_linked_document_requires_coordinated_cancellation(self):
+		doc = frappe.new_doc("FX Selling")
+		doc.fund_transfer = "TEST-000001"
+
+		frappe.set_user("Administrator")
+		with self.assertRaisesRegex(frappe.ValidationError, "Cancel Linked Transaction"):
+			doc.before_cancel()
+
+		doc.flags.coordinated_fx_lifecycle = True
+		doc.before_cancel()
+
+	def test_linked_lifecycle_service_is_administrator_only(self):
+		frappe.set_user("Guest")
+		with self.assertRaises(frappe.PermissionError):
+			cancel_linked_transaction("FX Selling", "FXS-TEST-2026-00001")
 
 	def test_android_rate_rounding_parity(self):
 		self.assertEqual(_round_up_rate(61.12 + 0.70, 2), 61.82)
@@ -175,9 +193,20 @@ class TestFXSelling(unittest.TestCase):
 		transfer = frappe.get_doc("Fund Transfer", doc.fund_transfer)
 		self.assertEqual(doc.status, "Completed")
 		self.assertEqual(transfer.docstatus, 1)
+		self.assertEqual(frappe.get_meta("Fund Transfer").get_field("fx_selling").fieldtype, "Data")
 		self.assertEqual(transfer.fx_selling, doc.name)
 		self.assertEqual(transfer.vault_balance_change, -200)
 		self.assertEqual(transfer.civ_balance, 800)
 		self.assertEqual(transfer.given_by, "Administrator")
 		self.assertEqual(transfer.received_by, doc.customer_name)
 		self.assertEqual(transfer.comments, "FOREX SELLING")
+
+		cancel_linked_transaction("Fund Transfer", transfer.name)
+		doc.reload()
+		transfer.reload()
+		self.assertEqual(doc.docstatus, 2)
+		self.assertEqual(transfer.docstatus, 2)
+
+		delete_linked_transaction("FX Selling", doc.name)
+		self.assertFalse(frappe.db.exists("FX Selling", doc.name))
+		self.assertFalse(frappe.db.exists("Fund Transfer", transfer.name))

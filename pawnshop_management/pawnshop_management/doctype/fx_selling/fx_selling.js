@@ -29,6 +29,7 @@ frappe.ui.form.on("FX Selling", {
 		const is_system_manager = frappe.user_roles.includes("System Manager") || frappe.session.user === "Administrator";
 		frm.set_df_property("branch", "read_only", !is_system_manager);
 		frm.set_df_property("customer", "read_only", !frm.is_new());
+		configure_fx_selling_lifecycle_actions(frm);
 		set_currency_table_locked(
 			frm,
 			frm.doc.docstatus === 1 || !frm._fx_rates_loaded || !frm._fx_availability_loaded
@@ -53,6 +54,50 @@ frappe.ui.form.on("FX Selling", {
 	},
 
 });
+
+function configure_fx_selling_lifecycle_actions(frm) {
+	if (frappe.session.user !== "Administrator" || !frm.doc.fund_transfer || frm.is_new()) return;
+
+	if (frm.doc.docstatus === 1) {
+		frm.page.set_secondary_action(__("Cancel Linked Transaction"), () => {
+			cancel_fx_selling_transaction(frm);
+		});
+	} else if (frm.doc.docstatus === 2) {
+		frm.add_custom_button(__("Delete Linked Transaction"), () => {
+			delete_fx_selling_transaction(frm);
+		});
+	}
+}
+
+function cancel_fx_selling_transaction(frm) {
+	frappe.confirm(
+		__("Cancel this FX Selling document and its linked Fund Transfer?"),
+		() => frappe.call({
+			method: "pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.cancel_linked_transaction",
+			args: { reference_doctype: frm.doctype, reference_name: frm.doc.name },
+			freeze: true,
+			freeze_message: __("Cancelling linked transaction..."),
+			callback(response) {
+				if (!response.exc) frm.reload_doc();
+			},
+		})
+	);
+}
+
+function delete_fx_selling_transaction(frm) {
+	frappe.confirm(
+		__("Permanently delete this FX Selling document and its linked Fund Transfer?"),
+		() => frappe.call({
+			method: "pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.delete_linked_transaction",
+			args: { reference_doctype: frm.doctype, reference_name: frm.doc.name },
+			freeze: true,
+			freeze_message: __("Deleting linked transaction..."),
+			callback(response) {
+				if (!response.exc) frappe.set_route("List", frm.doctype);
+			},
+		})
+	);
+}
 
 frappe.ui.form.on("FX Selling Currency", {
 	async currencies_add(frm, cdt, cdn) {
