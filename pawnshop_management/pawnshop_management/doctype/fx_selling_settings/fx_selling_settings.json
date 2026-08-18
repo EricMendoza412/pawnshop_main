@@ -1,0 +1,33 @@
+{
+ "actions": [],
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "integration_section", "enabled", "enable_google_writes", "column_break_integration",
+  "rates_spreadsheet_id", "rates_sheet", "source_spreadsheet_id", "write_spreadsheet_id",
+  "sheet_section", "transaction_sheet", "transfer_tracker_sheet", "google_service_account_json"
+ ],
+ "fields": [
+  {"fieldname":"integration_section","fieldtype":"Section Break","label":"FX Selling Integration"},
+  {"default":"0","fieldname":"enabled","fieldtype":"Check","label":"Enable FX Selling"},
+  {"default":"0","description":"Keep disabled until UAT copies have been verified.","fieldname":"enable_google_writes","fieldtype":"Check","label":"Enable Google Writes"},
+  {"fieldname":"column_break_integration","fieldtype":"Column Break"},
+  {"default":"10IoVKDC6nQxKXo89SXlB-blpQnFSGezDlc6kc1S6ILY","fieldname":"rates_spreadsheet_id","fieldtype":"Data","label":"Rates Spreadsheet ID"},
+  {"default":"All Rates","fieldname":"rates_sheet","fieldtype":"Data","label":"Rates Sheet"},
+  {"default":"1m_DOQfy2UZqdplyCOK6sb5GCsqJpBxHcqIpvxSsBH54","description":"Production source used for rate-independent Transfer Tracker lookups.","fieldname":"source_spreadsheet_id","fieldtype":"Data","label":"Source Spreadsheet ID"},
+  {"description":"Use a UAT copy first. Set to the source spreadsheet only at production cutover.","fieldname":"write_spreadsheet_id","fieldtype":"Data","label":"Write Spreadsheet ID"},
+  {"fieldname":"sheet_section","fieldtype":"Section Break","label":"Sheets and Credentials"},
+  {"default":"Transaction Monitoring","fieldname":"transaction_sheet","fieldtype":"Data","label":"Transaction Monitoring Sheet"},
+  {"default":"Transfer Tracker","fieldname":"transfer_tracker_sheet","fieldtype":"Data","label":"Transfer Tracker Sheet"},
+  {"description":"If blank, Fund Transfer Settings credentials are used.","fieldname":"google_service_account_json","fieldtype":"Password","label":"Google Service Account JSON","length":5000}
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "module": "Pawnshop Management",
+ "name": "FX Selling Settings",
+ "permissions": [{"create":1,"delete":1,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"System Manager","share":1,"write":1}],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

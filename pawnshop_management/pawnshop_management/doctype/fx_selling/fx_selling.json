@@ -1,0 +1,255 @@
+{
+ "actions": [],
+ "autoname": "method",
+ "creation": "2026-08-18 00:16:37.077532",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "details_section",
+  "branch",
+  "business_date",
+  "posting_datetime",
+  "column_break_details",
+  "seller",
+  "status",
+  "customer_section",
+  "customer",
+  "customer_name",
+  "customer_birthday",
+  "column_break_customer",
+  "customer_contact",
+  "customer_id_html",
+  "customer_id_picture",
+  "currencies_section",
+  "currencies",
+  "total_peso_amount",
+  "compliance_section",
+  "source_of_funds",
+  "purpose",
+  "integration_section",
+  "fund_transfer",
+  "google_sync_status",
+  "google_sync_error",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "label": "FX Selling Details"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Branch",
+   "options": "Branch",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "business_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Business Date",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "posting_datetime",
+   "fieldtype": "Datetime",
+   "label": "Transaction Date and Time",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_details",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "seller",
+   "fieldtype": "Link",
+   "label": "FX Cashier",
+   "options": "User",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Draft\nProcessing\nCompleted\nIntegration Failed",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "customer_section",
+   "fieldtype": "Section Break",
+   "label": "Customer"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Search Customer by name or tracker",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "customer.customer_name",
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "Customer Name",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_customer",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "customer.customer_primary_contact",
+   "fieldname": "customer_contact",
+   "fieldtype": "Link",
+   "label": "Customer Contact",
+   "options": "Contact",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "customer_contact.date_of_birth",
+   "fieldname": "customer_birthday",
+   "fieldtype": "Date",
+   "label": "Customer Birthday",
+   "read_only": 1
+  },
+  {
+   "fieldname": "customer_id_picture",
+   "fieldtype": "Select",
+   "label": "Customer ID",
+   "reqd": 1
+  },
+  {
+   "fieldname": "customer_id_html",
+   "fieldtype": "HTML",
+   "label": "Customer ID Picture"
+  },
+  {
+   "fieldname": "compliance_section",
+   "fieldtype": "Section Break",
+   "label": "Compliance"
+  },
+  {
+   "depends_on": "eval:doc.total_peso_amount>=100000",
+   "fieldname": "source_of_funds",
+   "fieldtype": "Select",
+   "label": "Source of Funds",
+   "mandatory_depends_on": "eval:doc.total_peso_amount>=100000",
+   "options": "\nRemittance from family\nSavings\nPension\nBusiness Income",
+   "read_only_depends_on": "eval:doc.total_peso_amount<100000"
+  },
+  {
+   "depends_on": "eval:doc.total_peso_amount>=100000",
+   "fieldname": "purpose",
+   "fieldtype": "Select",
+   "label": "Purpose",
+   "mandatory_depends_on": "eval:doc.total_peso_amount>=100000",
+   "options": "\nAllowance\nFamily Expenses\nCommercial Transaction\nBusiness",
+   "read_only_depends_on": "eval:doc.total_peso_amount<100000"
+  },
+  {
+   "fieldname": "total_peso_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total Peso In",
+   "read_only": 1
+  },
+  {
+   "fieldname": "currencies_section",
+   "fieldtype": "Section Break",
+   "label": "Currencies Sold"
+  },
+  {
+   "fieldname": "currencies",
+   "fieldtype": "Table",
+   "label": "Currencies",
+   "options": "FX Selling Currency",
+   "reqd": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "integration_section",
+   "fieldtype": "Section Break",
+   "label": "Integration"
+  },
+  {
+   "fieldname": "fund_transfer",
+   "fieldtype": "Link",
+   "label": "USD Fund Transfer",
+   "options": "Fund Transfer",
+   "read_only": 1
+  },
+  {
+   "default": "Not Queued",
+   "fieldname": "google_sync_status",
+   "fieldtype": "Select",
+   "label": "Google Sync Status",
+   "options": "Not Queued\nPending\nSynced\nFailed\nDisabled",
+   "read_only": 1
+  },
+  {
+   "fieldname": "google_sync_error",
+   "fieldtype": "Small Text",
+   "label": "Google Sync Error",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "FX Selling",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-08-18 07:30:41.813788",
+ "modified_by": "Administrator",
+ "module": "Pawnshop Management",
+ "name": "FX Selling",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

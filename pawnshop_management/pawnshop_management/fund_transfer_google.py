@@ -323,8 +323,10 @@ def _build_uat_row(doc):
 	row[balance_column] = flt(doc.civ_balance)
 	row[given_column] = doc.given_by or ""
 	row[received_column] = doc.received_by or ""
-	comments = doc.comments or ""
-	if doc.transfer_type in {
+	comments = "FOREX SELLING" if doc.fx_selling else (doc.comments or "")
+	if doc.fx_selling:
+		transfer_note = None
+	elif doc.transfer_type in {
 		"Vault to Cash Manager",
 		"Cash Manager to Vault",
 	}:

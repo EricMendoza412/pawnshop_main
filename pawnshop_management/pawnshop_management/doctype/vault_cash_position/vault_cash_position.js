@@ -34,9 +34,10 @@ frappe.ui.form.on("Vault Cash Position", {
 });
 
 frappe.ui.form.on("Vault Cash Denomination", {
-	quantity(frm, cdt, cdn) {
+	amount(frm, cdt, cdn) {
 		const row = locals[cdt][cdn];
-		frappe.model.set_value(cdt, cdn, "amount", flt(row.denomination) * cint(row.quantity));
+		const quantity = flt(row.denomination) ? flt(row.amount) / flt(row.denomination) : 0;
+		frappe.model.set_value(cdt, cdn, "quantity", quantity);
 		recalculate_parent(frm);
 	},
 });
@@ -53,15 +54,15 @@ function seed_rows(frm, fieldname, denominations, currency) {
 		const previous = existing.get(denomination);
 		row.currency = currency;
 		row.denomination = denomination;
-		row.quantity = cint(previous && previous.quantity);
-		row.amount = denomination * row.quantity;
+		row.amount = flt(previous && previous.amount);
+		row.quantity = row.amount / denomination;
 	});
 	frm.refresh_field(fieldname);
 }
 
 function recalculate_parent(frm) {
 	const total = (fieldname) =>
-		(frm.doc[fieldname] || []).reduce((sum, row) => sum + flt(row.denomination) * cint(row.quantity), 0);
+		(frm.doc[fieldname] || []).reduce((sum, row) => sum + flt(row.amount), 0);
 	frm.set_value("php_actual_cash", total("php_denominations"));
 	frm.set_value("usd_actual_cash", total("usd_denominations"));
 }

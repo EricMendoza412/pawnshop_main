@@ -206,14 +206,14 @@ def _ensure_table(doc, fieldname, denominations, currency):
 	doc.set(fieldname, [])
 	for denomination in denominations:
 		row = existing.get(flt(denomination))
-		quantity = flt(row.quantity) if row else 0
+		amount = flt(row.amount) if row else 0
 		doc.append(
 			fieldname,
 			{
 				"currency": currency,
 				"denomination": denomination,
-				"quantity": quantity,
-				"amount": flt(denomination) * quantity,
+				"quantity": amount / flt(denomination),
+				"amount": amount,
 			},
 		)
 
@@ -221,10 +221,19 @@ def _ensure_table(doc, fieldname, denominations, currency):
 def _calculate_table(rows):
 	total = 0
 	for row in rows:
-		if flt(row.quantity) < 0:
-			frappe.throw(_("Denomination quantities cannot be negative."))
-		row.amount = flt(row.denomination) * flt(row.quantity)
-		total += row.amount
+		amount = flt(row.amount)
+		denomination = flt(row.denomination)
+		if amount < 0:
+			frappe.throw(_("Denomination amounts cannot be negative."))
+		quantity = amount / denomination
+		if abs(quantity - round(quantity)) > 0.000001:
+			frappe.throw(
+				_("Amount {0} must be a whole-number multiple of denomination {1}.").format(
+					frappe.bold(row.amount), frappe.bold(row.denomination)
+				)
+			)
+		row.quantity = round(quantity)
+		total += amount
 	return total
 
 
@@ -247,7 +256,11 @@ def _latest_transfer_snapshot(branch, currency):
 		(branch, currency),
 		as_dict=True,
 	)
-	return (result[0].name, flt(result[0].civ_balance)) if result else (None, 0)
+	if result:
+		return result[0].name, flt(result[0].civ_balance)
+	# A currency may not have a Fund Transfer after its cutover opening position.
+	# Use the same opening-position fallback as Fund Transfer's canonical CIV lookup.
+	return None, get_latest_civ_balance(branch, currency, lock=False)
 
 
 def _is_accounting_analyst(user):

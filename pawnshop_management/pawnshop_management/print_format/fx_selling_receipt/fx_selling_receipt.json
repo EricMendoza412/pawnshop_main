@@ -1,0 +1,20 @@
+{
+ "absolute_value": 0,
+ "align_labels_right": 0,
+ "custom_format": 1,
+ "default_print_language": "en",
+ "disabled": 0,
+ "doc_type": "FX Selling",
+ "docstatus": 0,
+ "doctype": "Print Format",
+ "font": "Default",
+ "html": "<div style=\"font-family:Arial,sans-serif;font-size:11px\"><h2 style=\"text-align:center;margin-bottom:4px\">GARCIA'S PAWNSHOP</h2><h3 style=\"text-align:center;margin-top:0\">FX SELLING RECEIPT</h3><table style=\"width:100%;margin-bottom:12px\"><tr><td><b>Receipt:</b> {{ doc.name }}</td><td style=\"text-align:right\"><b>Date:</b> {{ frappe.format(doc.posting_datetime or doc.creation, {'fieldtype':'Datetime'}) }}</td></tr><tr><td><b>Branch:</b> {{ doc.branch }}</td><td style=\"text-align:right\"><b>FX Cashier:</b> {{ doc.seller }}</td></tr><tr><td><b>Customer:</b> {{ doc.customer_name }}</td><td style=\"text-align:right\"><b>Tracker:</b> {{ doc.customer_tracking_no }}</td></tr></table><table style=\"width:100%;border-collapse:collapse\"><thead><tr><th style=\"border:1px solid #333;padding:5px\">Currency</th><th style=\"border:1px solid #333;padding:5px;text-align:right\">Amount Out</th><th style=\"border:1px solid #333;padding:5px;text-align:right\">Selling Rate</th><th style=\"border:1px solid #333;padding:5px;text-align:right\">Total Peso In</th></tr></thead><tbody>{% for row in doc.currencies %}<tr><td style=\"border:1px solid #333;padding:5px\">{{ row.currency }}</td><td style=\"border:1px solid #333;padding:5px;text-align:right\">{{ frappe.format(row.amount, {'fieldtype':'Float'}) }}</td><td style=\"border:1px solid #333;padding:5px;text-align:right\">{{ row.selling_rate }}</td><td style=\"border:1px solid #333;padding:5px;text-align:right\">{{ frappe.format(row.peso_amount, {'fieldtype':'Currency'}) }}</td></tr>{% endfor %}</tbody><tfoot><tr><td colspan=\"3\" style=\"border:1px solid #333;padding:5px;text-align:right\"><b>Total</b></td><td style=\"border:1px solid #333;padding:5px;text-align:right\"><b>{{ frappe.format(doc.total_peso_amount, {'fieldtype':'Currency'}) }}</b></td></tr></tfoot></table>{% if doc.source_of_funds or doc.purpose %}<p><b>Source of Funds:</b> {{ doc.source_of_funds or '' }}<br><b>Purpose:</b> {{ doc.purpose or '' }}</p>{% endif %}<p style=\"margin-top:36px\"><b>Received from customer:</b> ____________________</p></div>",
+ "idx": 0,
+ "line_breaks": 0,
+ "module": "Pawnshop Management",
+ "name": "FX Selling Receipt",
+ "print_format_type": "Jinja",
+ "raw_printing": 0,
+ "show_section_headings": 0,
+ "standard": "Yes"
+}

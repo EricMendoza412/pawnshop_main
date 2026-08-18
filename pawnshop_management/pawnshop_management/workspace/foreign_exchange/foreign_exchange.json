@@ -17,6 +17,32 @@
   {
    "hidden": 0,
    "is_query_report": 0,
+   "label": "FX Selling",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "New FX Selling",
+   "link_to": "FX Selling",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "FX Selling Transactions",
+   "link_to": "FX Selling",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
    "label": "Fund Transfers",
    "link_type": "DocType",
    "onboard": 0,

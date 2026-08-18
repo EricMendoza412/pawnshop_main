@@ -85,11 +85,11 @@ class TestVaultCashPosition(unittest.TestCase):
 		position = self._new_position(php_counts={1000: 1, 100: -0}, usd_counts={})
 		# Declare a PHP 100 shortage while preserving a complete denomination table.
 		for row in position.php_denominations:
-			row.quantity = 0
+			row.amount = 0
 			if row.denomination == 500:
-				row.quantity = 1
+				row.amount = 500
 			if row.denomination == 200:
-				row.quantity = 2
+				row.amount = 400
 		position.save()
 		position.submit()
 		position.reload()
@@ -128,12 +128,12 @@ class TestVaultCashPosition(unittest.TestCase):
 		for denomination in PHP_DENOMINATIONS:
 			doc.append(
 				"php_denominations",
-				{"denomination": denomination, "quantity": php_counts.get(denomination, 0)},
+				{"denomination": denomination, "amount": denomination * php_counts.get(denomination, 0)},
 			)
 		for denomination in USD_DENOMINATIONS:
 			doc.append(
 				"usd_denominations",
-				{"denomination": denomination, "quantity": usd_counts.get(denomination, 0)},
+				{"denomination": denomination, "amount": denomination * usd_counts.get(denomination, 0)},
 			)
 		doc.insert()
 		return doc

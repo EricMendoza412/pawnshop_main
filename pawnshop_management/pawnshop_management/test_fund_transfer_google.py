@@ -139,6 +139,27 @@ class TestFundTransferGoogle(unittest.TestCase):
 
 		self.assertEqual(row[13], "Existing comment\nBy vc@example.com-Rover transfer")
 
+	def test_fx_selling_comment_does_not_include_rover_note(self):
+		doc = frappe._dict(
+			currency="USD",
+			branch="TEST",
+			date_of_transfer="2026-08-17 23:59:21",
+			name="POB-000023",
+			transfer_type="Vault to Cash Manager",
+			amount=400,
+			civ_balance=8300,
+			given_by="Administrator",
+			received_by="TEST CUSTOMER",
+			initiated_by="Administrator",
+			comments="FOREX SELLING - FXS-POB-2026-00002",
+			fx_selling="FXS-POB-2026-00002",
+			business_date="2026-08-17",
+		)
+
+		row = _build_uat_row(doc)
+
+		self.assertEqual(row[13], "FOREX SELLING")
+
 	@patch("pawnshop_management.pawnshop_management.fund_transfer_google.frappe.get_all")
 	@patch("pawnshop_management.pawnshop_management.fund_transfer_google._get_sheets_service")
 	@patch("pawnshop_management.pawnshop_management.fund_transfer_google.frappe.get_single")

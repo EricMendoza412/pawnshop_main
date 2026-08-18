@@ -47,6 +47,8 @@
   "source_system",
   "legacy_transfer_id",
   "external_party",
+  "customer_name",
+  "fx_selling",
   "comments",
   "integration_section",
   "accounting_status",
@@ -343,6 +345,21 @@
    "fieldname": "external_party",
    "fieldtype": "Data",
    "label": "External Party / Representative"
+  },
+  {
+   "depends_on": "eval:doc.fx_selling",
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "Customer Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "fx_selling",
+   "fieldtype": "Link",
+   "label": "FX Selling",
+   "options": "FX Selling",
+   "read_only": 1,
+   "unique": 1
   },
   {
    "fieldname": "comments",

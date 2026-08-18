@@ -289,6 +289,9 @@ class FundTransfer(Document):
 			self.external_party = "Armored Van"
 
 	def _validate_authorization(self):
+		if self.flags.fx_selling_submission:
+			self._validate_fx_selling_submission()
+			return
 		rule = get_transfer_rule(self.transfer_type)
 		authorization = rule.get("authorization", "cashier")
 		if authorization == "cashier":
@@ -303,6 +306,17 @@ class FundTransfer(Document):
 		elif authorization == "system":
 			if not self.flags.system_adjustment:
 				frappe.throw(_("Invalid system adjustment authorization."), frappe.PermissionError)
+
+	def _validate_fx_selling_submission(self):
+		if self.currency != "USD" or self.transfer_type != "Vault to Cash Manager" or not self.fx_selling:
+			frappe.throw(_("Invalid FX Selling Fund Transfer."), frappe.PermissionError)
+		if not self.customer_name:
+			frappe.throw(_("Customer Name is required for an FX Selling Fund Transfer."))
+		if not frappe.db.exists("FX Selling", self.fx_selling):
+			frappe.throw(_("The linked FX Selling document does not exist."))
+		vault_custodian = frappe.db.get_value("Branch", self.branch, "vault_custodian")
+		if not vault_custodian or self.initiated_by != vault_custodian:
+			frappe.throw(_("The branch's assigned Vault Custodian must be Given By."), frappe.PermissionError)
 
 	def _get_balance_change(self):
 		if self.transfer_type == "Cash Position Adjustment":
@@ -418,6 +432,8 @@ class FundTransfer(Document):
 			"source_system",
 			"legacy_transfer_id",
 			"external_party",
+			"customer_name",
+			"fx_selling",
 			"fx_cpr_date",
 			"fx_expected_amount",
 			"fx_difference_amount",
@@ -779,6 +795,8 @@ def _given_by(doc):
 
 
 def _received_by(doc):
+	if doc.fx_selling and doc.customer_name:
+		return doc.customer_name
 	if doc.destination == "Vault":
 		return doc.initiated_by
 	return doc.authorized_by or doc.destination

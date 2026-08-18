@@ -1,0 +1,23 @@
+{
+ "actions": [],
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "istable": 1,
+ "field_order": ["currency","amount","base_rate","selling_addition","selling_rate","peso_amount","request_no","request_source_row","request_available_amount","remaining_amount","rate_source_row"],
+ "fields": [
+  {"fieldname":"currency","fieldtype":"Select","in_list_view":1,"label":"Currency","options":"USD\nYEN\nEUR\nSR\nSR <= 20\nSR = 1\nPDS\nSGD\nUAE\nAUD\nCAD\nHKD\nWON\nNT\nQR\nYUAN\nBR\nMYR\nSF\nTHAI BAHT\nIDR\nNZD","reqd":1},
+  {"fieldname":"amount","fieldtype":"Float","in_list_view":1,"label":"Amount Out","non_negative":1,"reqd":1},
+  {"fieldname":"base_rate","fieldtype":"Float","hidden":1,"label":"Base Rate","read_only":1},
+  {"fieldname":"selling_addition","fieldtype":"Float","label":"Selling Addition","read_only":1},
+  {"fieldname":"selling_rate","fieldtype":"Float","in_list_view":1,"label":"Selling Rate","read_only":1},
+  {"fieldname":"peso_amount","fieldtype":"Currency","in_list_view":1,"label":"Total Peso In","read_only":1},
+  {"depends_on":"eval:doc.currency!='USD'","fieldname":"request_no","fieldtype":"Data","label":"FX Request No","read_only":1},
+  {"fieldname":"request_source_row","fieldtype":"Int","hidden":1,"label":"Request Google Row","read_only":1},
+  {"fieldname":"request_available_amount","fieldtype":"Float","label":"Request Available Amount","read_only":1},
+  {"fieldname":"remaining_amount","fieldtype":"Float","label":"Amount For Return","read_only":1},
+  {"fieldname":"rate_source_row","fieldtype":"Int","hidden":1,"label":"Rate Google Row","read_only":1}
+ ],
+ "module":"Pawnshop Management",
+ "name":"FX Selling Currency"
+}

@@ -95,6 +95,7 @@ permission_query_conditions = {
 	"VC Turnover Checklist": "pawnshop_management.pawnshop_management.doctype.vc_turnover_checklist.vc_turnover_checklist.get_permission_query_conditions",
 	"Transfer Tracker": "pawnshop_management.pawnshop_management.doctype.transfer_tracker.transfer_tracker.get_permission_query_conditions",
 	"Fund Transfer": "pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer.get_permission_query_conditions",
+	"FX Selling": "pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.get_permission_query_conditions",
 	"Vault Cash Position": "pawnshop_management.pawnshop_management.doctype.vault_cash_position.vault_cash_position.get_permission_query_conditions",
 }
 #
@@ -103,6 +104,7 @@ has_permission = {
 	"VC Turnover Checklist": "pawnshop_management.pawnshop_management.doctype.vc_turnover_checklist.vc_turnover_checklist.has_permission",
 	"Transfer Tracker": "pawnshop_management.pawnshop_management.doctype.transfer_tracker.transfer_tracker.has_permission",
 	"Fund Transfer": "pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer.has_permission",
+	"FX Selling": "pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.has_permission",
 	"Vault Cash Position": "pawnshop_management.pawnshop_management.doctype.vault_cash_position.vault_cash_position.has_permission",
 }
 
