@@ -73,7 +73,7 @@ class TestFundTransfer(unittest.TestCase):
 		self.assertEqual(outgoing.civ_balance, 750)
 		self.assertEqual(outgoing.vc_to_ps_cashier, 250)
 
-	def test_pending_transfer_can_be_cancelled_but_submitted_cannot(self):
+	def test_pending_transfer_and_submitted_transfer_can_be_cancelled_by_administrator(self):
 		pending = self._new_transfer("Vault to Pawnshop (-NCB)", 25)
 		request_approval(pending.name)
 		cancel_pending_transfer(pending.name)
@@ -84,8 +84,8 @@ class TestFundTransfer(unittest.TestCase):
 		submitted = self._new_transfer("Armored Van to Vault", 50)
 		request_approval(submitted.name)
 		submitted.reload()
-		with self.assertRaises(frappe.ValidationError):
-			submitted.cancel()
+		submitted.cancel()
+		self.assertEqual(submitted.docstatus, 2)
 
 	def test_pending_transfer_definition_is_immutable(self):
 		doc = self._new_transfer("Vault to Pawnshop (-NCB)", 100)

@@ -17,6 +17,16 @@ class TestFXSelling(unittest.TestCase):
 		frappe.set_user("Administrator")
 		frappe.db.rollback()
 
+	def test_only_privileged_users_can_pass_cancellation_guard(self):
+		doc = frappe.new_doc("FX Selling")
+
+		frappe.set_user("Administrator")
+		doc.before_cancel()
+
+		frappe.set_user("Guest")
+		with self.assertRaises(frappe.ValidationError):
+			doc.before_cancel()
+
 	def test_android_rate_rounding_parity(self):
 		self.assertEqual(_round_up_rate(61.12 + 0.70, 2), 61.82)
 		self.assertEqual(_round_up_rate(0.378 + 0.01, 5), 0.388)

@@ -16,9 +16,11 @@ frappe.ui.form.on("FX Selling", {
 			}
 		}
 		frm._fx_initializing = false;
-		const rates_loaded = await load_rates(frm);
-		if (rates_loaded) {
-			await load_available_currencies(frm);
+		if (frm.doc.docstatus === 0) {
+			const rates_loaded = await load_rates(frm);
+			if (rates_loaded) {
+				await load_available_currencies(frm);
+			}
 		}
 		if (frm.doc.customer) load_customer_ids(frm);
 	},

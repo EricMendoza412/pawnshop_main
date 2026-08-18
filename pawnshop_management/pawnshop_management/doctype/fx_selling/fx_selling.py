@@ -78,7 +78,9 @@ class FXSelling(Document):
 			raise
 
 	def before_cancel(self):
-		frappe.throw(_("Submitted FX Selling documents cannot be cancelled. Use an audited reversal process."))
+		# Administrator may need to cancel this record together with its generated Fund Transfer.
+		if not is_system_manager(frappe.session.user):
+			frappe.throw(_("Submitted FX Selling documents cannot be cancelled. Use an audited reversal process."))
 
 	def on_trash(self):
 		if self.docstatus == 1:

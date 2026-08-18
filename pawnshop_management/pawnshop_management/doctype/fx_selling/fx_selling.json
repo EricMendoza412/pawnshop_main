@@ -218,6 +218,7 @@
   }
  ],
  "index_web_pages_for_search": 1,
+ "default_print_format": "FX Selling Application",
  "is_submittable": 1,
  "links": [],
  "modified": "2026-08-18 07:30:41.813788",
@@ -228,6 +229,7 @@
  "permissions": [
   {
    "create": 1,
+   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
