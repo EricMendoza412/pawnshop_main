@@ -137,7 +137,10 @@ class FundTransfer(Document):
 		self._validate_uncollected_fx_fields()
 
 		if self.is_new() and self.transfer_type != "Cash Position Adjustment":
-			require_branch_vault_custodian(self.branch)
+			if self.flags.fx_selling_submission:
+				self._validate_fx_selling_submission()
+			else:
+				require_branch_vault_custodian(self.branch)
 
 		if self.transfer_type == "Cash Position Adjustment" and not self.flags.system_adjustment:
 			frappe.throw(_("Cash Position Adjustments can only be created by the reconciliation process."))
@@ -322,6 +325,21 @@ class FundTransfer(Document):
 			frappe.throw(_("Customer Name is required for an FX Selling Fund Transfer."))
 		if not frappe.db.exists("FX Selling", self.fx_selling):
 			frappe.throw(_("The linked FX Selling document does not exist."))
+
+		fx_selling = frappe.get_doc("FX Selling", self.fx_selling)
+		if fx_selling.docstatus != 1:
+			frappe.throw(_("The linked FX Selling document must be submitted."), frappe.PermissionError)
+		if self.branch != fx_selling.branch:
+			frappe.throw(_("The Fund Transfer branch must match the linked FX Selling branch."), frappe.PermissionError)
+		if self.customer_name != fx_selling.customer_name:
+			frappe.throw(_("The Fund Transfer customer must match the linked FX Selling customer."), frappe.PermissionError)
+
+		usd_amount = sum(flt(row.amount) for row in fx_selling.currencies if row.currency == "USD")
+		if not usd_amount or flt(self.amount) != usd_amount:
+			frappe.throw(_("The Fund Transfer amount must match the linked FX Selling USD amount."), frappe.PermissionError)
+		if not self.authorized_by or self.authorized_by != fx_selling.seller or self.authorized_by != frappe.session.user:
+			frappe.throw(_("The submitting FX Cashier must authorize the linked Fund Transfer."), frappe.PermissionError)
+
 		vault_custodian = frappe.db.get_value("Branch", self.branch, "vault_custodian")
 		if not vault_custodian or self.initiated_by != vault_custodian:
 			frappe.throw(_("The branch's assigned Vault Custodian must be Given By."), frappe.PermissionError)

@@ -210,6 +210,11 @@ class TestFXSelling(unittest.TestCase):
 
 		frappe.set_user("Administrator")
 		frappe.db.set_value("Branch", "TEST", "vault_custodian", "Administrator", update_modified=False)
+		cashier = frappe.new_doc("User")
+		cashier.email = "fx.selling.cashier@example.com"
+		cashier.first_name = "FX Selling Cashier"
+		cashier.send_welcome_email = 0
+		cashier.insert(ignore_permissions=True)
 		frappe.db.set_value(
 			"FX Selling Settings", "FX Selling Settings",
 			{"enabled": 1, "enable_google_writes": 1, "write_spreadsheet_id": "uat"}, update_modified=False,
@@ -230,13 +235,24 @@ class TestFXSelling(unittest.TestCase):
 		latest_rates.return_value = {
 			"USD": {"base_rate": 61.12, "selling_addition": 0.70, "selling_rate": 61.82, "source_row": 573}
 		}
-		doc = frappe.new_doc("FX Selling")
-		doc.branch = "TEST"
-		doc.customer = customer[0]
-		doc.customer_id_picture = "test-id"
-		doc.append("currencies", {"currency": "USD", "amount": 200, "base_rate": 61.12, "selling_addition": 0.70, "selling_rate": 61.82, "peso_amount": 12364})
-		doc.insert()
-		doc.submit()
+		frappe.set_user(cashier.name)
+		with patch(
+			"pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.get_branch_from_request_ip",
+			return_value="TEST",
+		), patch(
+			"pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.has_active_branch_role",
+			return_value=True,
+		), patch(
+			"pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer.get_branch_from_request_ip",
+			return_value="TEST",
+		):
+			doc = frappe.new_doc("FX Selling")
+			doc.branch = "TEST"
+			doc.customer = customer[0]
+			doc.customer_id_picture = "test-id"
+			doc.append("currencies", {"currency": "USD", "amount": 200, "base_rate": 61.12, "selling_addition": 0.70, "selling_rate": 61.82, "peso_amount": 12364})
+			doc.insert()
+			doc.submit()
 		doc.reload()
 		transfer = frappe.get_doc("Fund Transfer", doc.fund_transfer)
 		self.assertEqual(doc.status, "Completed")
@@ -246,9 +262,11 @@ class TestFXSelling(unittest.TestCase):
 		self.assertEqual(transfer.vault_balance_change, -200)
 		self.assertEqual(transfer.civ_balance, 800)
 		self.assertEqual(transfer.given_by, "Administrator")
+		self.assertEqual(transfer.authorized_by, cashier.name)
 		self.assertEqual(transfer.received_by, doc.customer_name)
 		self.assertEqual(transfer.comments, "FOREX SELLING")
 
+		frappe.set_user("Administrator")
 		cancel_linked_transaction("Fund Transfer", transfer.name)
 		doc.reload()
 		transfer.reload()
