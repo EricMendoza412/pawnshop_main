@@ -10,6 +10,7 @@ from pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling impor
 	cancel_linked_transaction,
 	delete_linked_transaction,
 	get_available_tracker_requests,
+	has_permission,
 	refresh_and_validate_rates,
 	sync_google_rows,
 )
@@ -46,6 +47,26 @@ class TestFXSelling(unittest.TestCase):
 		frappe.set_user("Guest")
 		with self.assertRaises(frappe.PermissionError):
 			cancel_linked_transaction("FX Selling", "FXS-TEST-2026-00001")
+
+	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.has_active_branch_role")
+	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.get_branch_from_request_ip")
+	def test_cashier_can_pass_permissions_during_draft_submission(self, get_branch, has_active_role):
+		get_branch.return_value = "TEST"
+		has_active_role.return_value = True
+		doc = FXSelling({
+			"doctype": "FX Selling",
+			"name": "FXS-TEST-2026-00001",
+			"branch": "TEST",
+			"docstatus": 1,
+		})
+
+		with patch.object(frappe.db, "get_value", return_value=0):
+			self.assertTrue(has_permission(doc, "write", "cashier@example.com"))
+			self.assertTrue(has_permission(doc, "submit", "cashier@example.com"))
+
+		with patch.object(frappe.db, "get_value", return_value=1):
+			self.assertFalse(has_permission(doc, "write", "cashier@example.com"))
+			self.assertFalse(has_permission(doc, "submit", "cashier@example.com"))
 
 	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.make_autoname")
 	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.get_fund_transfer_branch_code")

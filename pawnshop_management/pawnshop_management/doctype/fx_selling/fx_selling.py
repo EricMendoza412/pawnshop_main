@@ -501,15 +501,29 @@ def get_permission_query_conditions(user=None):
 
 def has_permission(doc, ptype=None, user=None):
 	user = user or frappe.session.user
-	if ptype in {"cancel", "delete"}:
+	permission_type = ptype or "read"
+	if permission_type in {"cancel", "delete"}:
 		return user == "Administrator"
 	if is_system_manager(user):
 		return True
-	if ptype in {"read", "report", "print", "email", "export"} and "Accounting Analyst" in frappe.get_roles(user):
+	if permission_type in {"read", "report", "print", "email", "export"} and "Accounting Analyst" in frappe.get_roles(user):
 		return True
 	branch = get_branch_from_request_ip()
 	if not branch or doc.branch != branch:
 		return False
-	if ptype in {"read", "report", "print", "email", "export"}:
+	if permission_type in {"read", "report", "print", "email", "export"}:
 		return has_active_branch_role(user, branch, FX_ROLE)
-	return has_active_branch_role(user, branch, FX_ROLE) and doc.docstatus == 0
+	if permission_type == "create":
+		return has_active_branch_role(user, branch, FX_ROLE) and doc.docstatus == 0
+	if permission_type in {"write", "submit"}:
+		return has_active_branch_role(user, branch, FX_ROLE) and (
+			doc.docstatus == 0 or _is_draft_submission(doc)
+		)
+	return None
+
+
+def _is_draft_submission(doc):
+	"""Return whether the submitted in-memory document is still a draft in the database."""
+	if doc.docstatus != 1 or not getattr(doc, "name", None):
+		return False
+	return frappe.db.get_value("FX Selling", doc.name, "docstatus") == 0
