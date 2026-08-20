@@ -10,6 +10,7 @@ from pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling impor
 	cancel_linked_transaction,
 	delete_linked_transaction,
 	get_available_tracker_requests,
+	get_permission_query_conditions,
 	has_permission,
 	refresh_and_validate_rates,
 	sync_google_rows,
@@ -18,6 +19,20 @@ from pawnshop_management.pawnshop_management.overrides.naming_series import _get
 
 
 class TestFXSelling(unittest.TestCase):
+	@patch(
+		"pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.frappe.get_roles",
+		return_value=["Auditor"],
+	)
+	@patch(
+		"pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.is_system_manager",
+		return_value=False,
+	)
+	def test_auditor_can_read_all_branches_without_list_filter(self, _is_system_manager, _get_roles):
+		doc = FXSelling({"doctype": "FX Selling", "branch": "OTHER BRANCH", "docstatus": 1})
+		self.assertIsNone(get_permission_query_conditions("auditor@example.com"))
+		self.assertTrue(has_permission(doc, "read", "auditor@example.com"))
+		self.assertTrue(has_permission(doc, "report", "auditor@example.com"))
+
 	def tearDown(self):
 		frappe.set_user("Administrator")
 		frappe.db.rollback()

@@ -11,6 +11,8 @@ from frappe.utils import flt, getdate, now_datetime, today
 from frappe.utils.password import check_password
 
 from pawnshop_management.operations_access_control.access_control import get_branch_from_request_ip, is_system_manager
+
+READ_ALL_ROLES = {"Accounting Analyst", "Auditor"}
 TRANSFER_RULES = {
 	"Vault to Pawnshop (-NCB)": {
 		"currencies": {"PHP"},
@@ -715,7 +717,7 @@ def create_cash_position_adjustment(cash_position, currency, variance):
 
 def get_permission_query_conditions(user=None):
 	user = user or frappe.session.user
-	if is_system_manager(user) or "Accounting Analyst" in frappe.get_roles(user):
+	if is_system_manager(user) or _has_read_all_role(user):
 		return None
 	branch = get_branch_from_request_ip()
 	if not branch:
@@ -727,7 +729,7 @@ def get_permission_query_conditions(user=None):
 def get_current_branch_context():
 	"""Return the request-IP branch so Desk can explain a fail-closed empty list."""
 	user = frappe.session.user
-	if is_system_manager(user) or "Accounting Analyst" in frappe.get_roles(user):
+	if is_system_manager(user) or _has_read_all_role(user):
 		return {"unrestricted": True}
 	return {"branch": get_branch_from_request_ip()}
 
@@ -755,10 +757,14 @@ def has_permission(doc, ptype=None, user=None):
 
 
 def _can_read_from_current_branch(doc, user):
-	if "Accounting Analyst" in frappe.get_roles(user):
+	if _has_read_all_role(user):
 		return True
 	branch = get_branch_from_request_ip()
 	return bool(branch and branch == doc.branch)
+
+
+def _has_read_all_role(user):
+	return bool(set(frappe.get_roles(user)).intersection(READ_ALL_ROLES))
 
 
 def _can_write_pending(doc, user):

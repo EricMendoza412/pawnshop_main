@@ -21,6 +21,7 @@ from pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer
 
 
 FX_ROLE = "Foreign Exchange Cashier"
+READ_ALL_ROLES = {"Accounting Analyst", "Auditor"}
 RATE_CONFIG = {
 	"USD": (1, 0.70, 2), "YEN": (2, 0.01, 5), "EUR": (3, 1.00, 2),
 	"SR": (4, 1.00, 2), "SR <= 20": (5, 1.00, 2), "SR = 1": (6, 1.00, 2),
@@ -493,7 +494,7 @@ def _normalize_currency(currency):
 
 def get_permission_query_conditions(user=None):
 	user = user or frappe.session.user
-	if is_system_manager(user) or "Accounting Analyst" in frappe.get_roles(user):
+	if is_system_manager(user) or _has_read_all_role(user):
 		return None
 	branch = get_branch_from_request_ip()
 	return "`tabFX Selling`.`branch`={0}".format(frappe.db.escape(branch)) if branch else "1=0"
@@ -506,7 +507,7 @@ def has_permission(doc, ptype=None, user=None):
 		return user == "Administrator"
 	if is_system_manager(user):
 		return True
-	if permission_type in {"read", "report", "print", "email", "export"} and "Accounting Analyst" in frappe.get_roles(user):
+	if permission_type in {"read", "report", "print", "email", "export"} and _has_read_all_role(user):
 		return True
 	branch = get_branch_from_request_ip()
 	if not branch or doc.branch != branch:
@@ -520,6 +521,10 @@ def has_permission(doc, ptype=None, user=None):
 			doc.docstatus == 0 or _is_draft_submission(doc)
 		)
 	return None
+
+
+def _has_read_all_role(user):
+	return bool(set(frappe.get_roles(user)).intersection(READ_ALL_ROLES))
 
 
 def _is_draft_submission(doc):
