@@ -19,6 +19,7 @@ from pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer
 
 PHP_DENOMINATIONS = (1000, 500, 200, 100, 50, 20, 10, 5, 1, 0.25)
 USD_DENOMINATIONS = (100, 50, 20, 10, 5, 2, 1)
+READ_ALL_ROLES = {"Accounting Analyst", "Auditor", "Operations Manager"}
 READ_PERMISSION_TYPES = {"read", "report", "print", "email", "export"}
 
 
@@ -158,7 +159,7 @@ def get_action_context(name):
 
 def get_permission_query_conditions(user=None):
 	user = user or frappe.session.user
-	if is_system_manager(user) or _is_accounting_analyst(user):
+	if is_system_manager(user) or _has_read_all_role(user):
 		return None
 	escaped_user = frappe.db.escape(user)
 	return (
@@ -175,7 +176,7 @@ def has_permission(doc, ptype=None, user=None):
 		return True
 	if permission_type in {"cancel", "delete"}:
 		return False
-	if _is_accounting_analyst(user):
+	if _has_read_all_role(user):
 		return permission_type in READ_PERMISSION_TYPES
 	is_custodian = frappe.db.get_value("Branch", doc.branch, "vault_custodian") == user
 	if permission_type == "create":
@@ -265,3 +266,7 @@ def _latest_transfer_snapshot(branch, currency):
 
 def _is_accounting_analyst(user):
 	return user == "Administrator" or "Accounting Analyst" in frappe.get_roles(user)
+
+
+def _has_read_all_role(user):
+	return bool(set(frappe.get_roles(user)).intersection(READ_ALL_ROLES))

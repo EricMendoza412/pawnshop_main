@@ -34,6 +34,20 @@ class TestFundTransfer(unittest.TestCase):
 		self.assertTrue(has_permission(doc, "read", "auditor@example.com"))
 		self.assertTrue(has_permission(doc, "report", "auditor@example.com"))
 
+	@patch(
+		"pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer.frappe.get_roles",
+		return_value=["Operations Manager"],
+	)
+	@patch(
+		"pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer.is_system_manager",
+		return_value=False,
+	)
+	def test_operations_manager_can_read_all_branches_without_list_filter(self, _is_system_manager, _get_roles):
+		doc = frappe._dict(branch="OTHER BRANCH")
+		self.assertIsNone(get_permission_query_conditions("operations.manager@example.com"))
+		self.assertTrue(has_permission(doc, "read", "operations.manager@example.com"))
+		self.assertTrue(has_permission(doc, "report", "operations.manager@example.com"))
+
 	def setUp(self):
 		frappe.set_user("Administrator")
 		self.original_request_ip = getattr(frappe.local, "request_ip", None)

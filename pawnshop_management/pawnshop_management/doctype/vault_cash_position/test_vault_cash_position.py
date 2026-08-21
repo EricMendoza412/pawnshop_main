@@ -12,6 +12,7 @@ from pawnshop_management.pawnshop_management.doctype.vault_cash_position.vault_c
 	PHP_DENOMINATIONS,
 	USD_DENOMINATIONS,
 	approve_reconciliation,
+	get_permission_query_conditions,
 	has_permission,
 )
 
@@ -20,6 +21,23 @@ TEST_BRANCH = "TEST"
 
 
 class TestVaultCashPosition(unittest.TestCase):
+	@patch(
+		"pawnshop_management.pawnshop_management.doctype.vault_cash_position.vault_cash_position.is_system_manager",
+		return_value=False,
+	)
+	def test_read_all_roles_can_read_all_branches_without_list_filter(self, _is_system_manager):
+		doc = frappe._dict(branch="OTHER BRANCH")
+		for role in ("Accounting Analyst", "Auditor", "Operations Manager"):
+			user = "{0}@example.com".format(role.lower().replace(" ", "."))
+			with self.subTest(role=role), patch(
+				"pawnshop_management.pawnshop_management.doctype.vault_cash_position.vault_cash_position.frappe.get_roles",
+				return_value=[role],
+			):
+				self.assertIsNone(get_permission_query_conditions(user))
+				self.assertTrue(has_permission(doc, "read", user))
+				self.assertTrue(has_permission(doc, "report", user))
+				self.assertFalse(has_permission(doc, "write", user))
+
 	def setUp(self):
 		frappe.set_user("Administrator")
 		frappe.db.set_value("Branch", TEST_BRANCH, "vault_custodian", "Administrator", update_modified=False)
