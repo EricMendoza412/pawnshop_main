@@ -12,7 +12,7 @@ from frappe.utils.password import check_password
 
 from pawnshop_management.operations_access_control.access_control import get_branch_from_request_ip, is_system_manager
 
-READ_ALL_ROLES = {"Accounting Analyst", "Auditor", "Operations Manager"}
+READ_ALL_ROLES = {"Accounting Analyst", "Auditor", "Operations Manager", "Settlement Member"}
 TRANSFER_RULES = {
 	"Vault to Pawnshop (-NCB)": {
 		"currencies": {"PHP"},

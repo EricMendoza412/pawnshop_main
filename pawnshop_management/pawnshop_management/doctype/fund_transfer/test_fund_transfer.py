@@ -35,18 +35,20 @@ class TestFundTransfer(unittest.TestCase):
 		self.assertTrue(has_permission(doc, "report", "auditor@example.com"))
 
 	@patch(
-		"pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer.frappe.get_roles",
-		return_value=["Operations Manager"],
-	)
-	@patch(
 		"pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer.is_system_manager",
 		return_value=False,
 	)
-	def test_operations_manager_can_read_all_branches_without_list_filter(self, _is_system_manager, _get_roles):
+	def test_additional_read_all_roles_can_read_all_branches_without_list_filter(self, _is_system_manager):
 		doc = frappe._dict(branch="OTHER BRANCH")
-		self.assertIsNone(get_permission_query_conditions("operations.manager@example.com"))
-		self.assertTrue(has_permission(doc, "read", "operations.manager@example.com"))
-		self.assertTrue(has_permission(doc, "report", "operations.manager@example.com"))
+		for role in ("Operations Manager", "Settlement Member"):
+			user = "{0}@example.com".format(role.lower().replace(" ", "."))
+			with self.subTest(role=role), patch(
+				"pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer.frappe.get_roles",
+				return_value=[role],
+			):
+				self.assertIsNone(get_permission_query_conditions(user))
+				self.assertTrue(has_permission(doc, "read", user))
+				self.assertTrue(has_permission(doc, "report", user))
 
 	def setUp(self):
 		frappe.set_user("Administrator")

@@ -19,7 +19,7 @@ from pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer
 
 PHP_DENOMINATIONS = (1000, 500, 200, 100, 50, 20, 10, 5, 1, 0.25)
 USD_DENOMINATIONS = (100, 50, 20, 10, 5, 2, 1)
-READ_ALL_ROLES = {"Accounting Analyst", "Auditor", "Operations Manager"}
+READ_ALL_ROLES = {"Accounting Analyst", "Auditor", "Operations Manager", "Settlement Member"}
 READ_PERMISSION_TYPES = {"read", "report", "print", "email", "export"}
 
 

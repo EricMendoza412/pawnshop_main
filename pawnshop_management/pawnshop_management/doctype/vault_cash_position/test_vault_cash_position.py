@@ -27,7 +27,7 @@ class TestVaultCashPosition(unittest.TestCase):
 	)
 	def test_read_all_roles_can_read_all_branches_without_list_filter(self, _is_system_manager):
 		doc = frappe._dict(branch="OTHER BRANCH")
-		for role in ("Accounting Analyst", "Auditor", "Operations Manager"):
+		for role in ("Accounting Analyst", "Auditor", "Operations Manager", "Settlement Member"):
 			user = "{0}@example.com".format(role.lower().replace(" ", "."))
 			with self.subTest(role=role), patch(
 				"pawnshop_management.pawnshop_management.doctype.vault_cash_position.vault_cash_position.frappe.get_roles",
