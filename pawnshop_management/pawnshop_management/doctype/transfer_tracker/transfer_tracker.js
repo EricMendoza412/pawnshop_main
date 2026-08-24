@@ -75,6 +75,26 @@ const syncTransferTypeOptions = frm => {
 
 const isPulloutTransferType = transferType => transferType === PULLOUT_TRANSFER_TYPE;
 
+const setNonJewelryPulloutItemQuery = frm => {
+	frm.set_query('item_no', 'nj_items', () => {
+		if (frm.doc.origin === 'Subastado NJ') {
+			return {
+				filters: {
+					workflow_state: 'Unprocessed',
+					current_location: frm.doc.origin
+				}
+			};
+		}
+
+		return {
+			filters: {
+				workflow_state: 'Collected',
+				branch: frm.doc.origin
+			}
+		};
+	});
+};
+
 const addDraftPrintButton = frm => {
 	if (!frm || frm.is_new() || frm.doc.docstatus !== 0) return;
 
@@ -459,6 +479,9 @@ frappe.ui.form.on('Transfer Tracker', {
 
 		//if transfer type is Pull out of Expired Sangla, hide selling_price column in nj_items table
 		if (frm.doc.transfer_type == "Pull out of Expired Sangla") {
+			if (frm.doc.item_type === 'Non Jewelry Items') {
+				setNonJewelryPulloutItemQuery(frm);
+			}
 			frm.get_field('nj_items').grid.set_column_disp('selling_price', false);
 			frm.get_field('j_items').grid.set_column_disp('selling_price', false);
 			frm.refresh_field('nj_items');
@@ -751,15 +774,9 @@ frappe.ui.form.on('Transfer Tracker', {
 							}else {
 							frm.set_value('destination', 'Subastado NJ');
 							}
-						//Set filter for NJ items table based on the origin except if user is a Subastado member
-						frm.set_query('item_no', 'nj_items', function(){
-							return {
-								filters: {
-									workflow_State: 'Collected',
-									branch: frm.doc.origin
-								}
-							}
-						})
+							// Subastado NJ pulls unprocessed items from their current location.
+							// Other origins keep the existing collected-item branch filter.
+							setNonJewelryPulloutItemQuery(frm);
 					}else if(frm.doc.item_type == "Jewelry Items"){
 						frm.set_value('destination', 'Subastado J');
 						//Set filter for J items table based on the origin except if user is a Subastado member
