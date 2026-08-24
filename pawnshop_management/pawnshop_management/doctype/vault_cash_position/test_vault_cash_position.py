@@ -11,6 +11,7 @@ from pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer
 from pawnshop_management.pawnshop_management.doctype.vault_cash_position.vault_cash_position import (
 	PHP_DENOMINATIONS,
 	USD_DENOMINATIONS,
+	_print_signature_line,
 	approve_reconciliation,
 	get_permission_query_conditions,
 	has_permission,
@@ -86,6 +87,25 @@ class TestVaultCashPosition(unittest.TestCase):
 			stored_docstatus["value"] = 1
 			self.assertFalse(has_permission(doc, "write", custodian))
 			self.assertFalse(has_permission(doc, "submit", custodian))
+
+	def test_before_print_adds_underlined_custodian_and_blank_manager_lines(self):
+		doc = frappe.new_doc("Vault Cash Position")
+		doc.vault_custodian = "custodian@example.com"
+
+		with patch.object(frappe.db, "get_value", return_value="Juan Dela Cruz"):
+			doc.before_print()
+
+		self.assertIn("Juan Dela Cruz", doc.signature_over_printed_name)
+		self.assertIn("border-bottom:1px solid #000", doc.signature_over_printed_name)
+		self.assertIn("padding:0 28px", doc.signature_over_printed_name)
+		self.assertNotIn("Juan Dela Cruz", doc.managers_spot_check)
+		self.assertIn("&nbsp;", doc.managers_spot_check)
+
+	def test_signature_line_escapes_the_printed_name(self):
+		line = _print_signature_line("Custodian <One>")
+
+		self.assertIn("Custodian &lt;One&gt;", line)
+		self.assertNotIn("Custodian <One>", line)
 
 	def test_variance_does_not_block_transfer_and_reconciliation_adjusts_current_civ(self):
 		incoming = frappe.new_doc("Fund Transfer")

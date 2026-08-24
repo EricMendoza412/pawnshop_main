@@ -5,7 +5,7 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.model.naming import make_autoname
-from frappe.utils import flt, getdate, now_datetime, today
+from frappe.utils import escape_html, flt, getdate, now_datetime, today
 
 from pawnshop_management.operations_access_control.access_control import is_system_manager
 from pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer import (
@@ -24,6 +24,13 @@ READ_PERMISSION_TYPES = {"read", "report", "print", "email", "export"}
 
 
 class VaultCashPosition(Document):
+	def before_print(self, settings=None):
+		vault_custodian_name = (
+			frappe.db.get_value("User", self.vault_custodian, "full_name") or self.vault_custodian or ""
+		)
+		self.signature_over_printed_name = _print_signature_line(vault_custodian_name)
+		self.managers_spot_check = _print_signature_line()
+
 	def autoname(self):
 		branch_code = get_fund_transfer_branch_code(self.branch) or "VCP"
 		self.naming_series = "VCP{0}-.YYYY.-.#####".format(branch_code)
@@ -112,6 +119,15 @@ class VaultCashPosition(Document):
 		)
 		if existing:
 			frappe.throw(_("Vault Cash Position {0} already exists for this branch and date.").format(existing))
+
+
+def _print_signature_line(printed_name=""):
+	content = escape_html(printed_name) if printed_name else "&nbsp;"
+	return (
+		'<span style="display:inline-block;min-width:280px;padding:0 28px;'
+		'border-bottom:1px solid #000;text-align:center;box-sizing:border-box;">'
+		f"{content}</span>"
+	)
 
 
 @frappe.whitelist()
