@@ -10,8 +10,13 @@ from frappe import _ # _ for to set the string into literal string
 from pawnshop_management.pawnshop_management.custom_codes.get_ip import get_ip_from_settings
 from pawnshop_management.operations_access_control.vault_custodian import require_vault_custodian_access
 
+
+OPERATIONS_MANAGER_ROLE = "Operations Manager"
+
+
 def execute(filters=None):
-	require_vault_custodian_access(filters)
+	if OPERATIONS_MANAGER_ROLE not in frappe.get_roles(frappe.session.user):
+		require_vault_custodian_access(filters)
 	columns, data = [], []
 	status_value = getattr(filters, 'branch')
 	series = getattr(filters, 'series')
