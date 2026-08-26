@@ -10,6 +10,7 @@ from pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling impor
 	cancel_linked_transaction,
 	delete_linked_transaction,
 	get_available_tracker_requests,
+	get_branch_fx_on_hand,
 	get_permission_query_conditions,
 	has_permission,
 	refresh_and_validate_rates,
@@ -165,6 +166,83 @@ class TestFXSelling(unittest.TestCase):
 		self.assertEqual(result[0]["request_no"], "20-1")
 		self.assertEqual(result[0]["source_row"], 2)
 		self.assertEqual(result[0]["available_amount"], 10000)
+
+	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling._tracker_rows")
+	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.frappe.get_single")
+	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.get_fund_transfer_branch_code")
+	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.frappe.db.exists")
+	def test_branch_fx_on_hand_applies_tracker_inventory_rules(
+		self, exists, get_branch_code, get_single, tracker_rows
+	):
+		exists.return_value = True
+		get_branch_code.return_value = "POB"
+		get_single.return_value = frappe._dict()
+
+		def tracker_row(
+			currency, transferred, sold="", for_returns="", closed="", rover="",
+			received="Kim\n2026-08-20", branch="POB",
+		):
+			row = [""] * 34
+			row[2], row[10], row[14], row[15] = currency, transferred, branch, received
+			row[16], row[25], row[26], row[30] = sold, for_returns, closed, rover
+			return row
+
+		tracker_rows.return_value = [
+			tracker_row("YEN", 1000),                                      # Entire amount on-hand.
+			tracker_row("EUR", 500, for_returns=500),                      # Entire amount for return.
+			tracker_row("EUR", 1000, sold="2026-08-21", for_returns=300), # Partial remainder on-hand.
+			tracker_row("YEN", 800, sold="2026-08-21", for_returns=200, rover="Rover"),
+			tracker_row("CAD", 400, sold="2026-08-21", for_returns=100, closed="2026-08-22"),
+			tracker_row("USD", 600),
+			tracker_row("NZD", 700, received="Cancelled"),
+			tracker_row("SR<=20", 50),
+			tracker_row("SR = 1", 25),
+			tracker_row("THAI BAHT", 90),
+			tracker_row("YEN", 999, branch="OTHER"),
+		]
+
+		result = get_branch_fx_on_hand("Garcia's Pawnshop - POB")
+
+		self.assertEqual(result["branch_code"], "POB")
+		self.assertEqual(result["warnings"], [])
+		self.assertEqual(
+			{row["currency"]: row["on_hand_amount"] for row in result["currencies"]},
+			{"EUR": 300.0, "SR": 75.0, "THAI B": 90.0, "YEN": 1000.0},
+		)
+		tracker_rows.assert_called_once_with(get_single.return_value, end_column="AH")
+
+	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling._tracker_rows")
+	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.frappe.get_single")
+	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.get_fund_transfer_branch_code", return_value="POB")
+	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.frappe.db.exists", return_value=True)
+	def test_branch_fx_on_hand_excludes_invalid_amounts(
+		self, _exists, _get_branch_code, get_single, tracker_rows
+	):
+		get_single.return_value = frappe._dict()
+		row = [""] * 34
+		row[2], row[10], row[14], row[15] = "EUR", "invalid", "POB", "Received\n2026-08-20"
+		overstated_return = [""] * 34
+		overstated_return[2], overstated_return[10], overstated_return[14], overstated_return[15] = (
+			"YEN", 100, "POB", "Received\n2026-08-20"
+		)
+		overstated_return[16], overstated_return[25] = "2026-08-21", 150
+		tracker_rows.return_value = [row, overstated_return]
+
+		result = get_branch_fx_on_hand("Garcia's Pawnshop - POB")
+
+		self.assertEqual(result["currencies"], [])
+		self.assertEqual(len(result["warnings"]), 2)
+
+	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.has_active_branch_role", return_value=False)
+	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling._has_read_all_role", return_value=False)
+	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.is_system_manager", return_value=False)
+	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.frappe.db.exists", return_value=True)
+	def test_branch_fx_on_hand_requires_authorized_user(
+		self, _exists, _is_system_manager, _has_read_all_role, _has_active_role
+	):
+		frappe.set_user("ordinary.user@example.com")
+		with self.assertRaises(frappe.PermissionError):
+			get_branch_fx_on_hand("Garcia's Pawnshop - POB")
 
 	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling._sheet_service")
 	@patch("pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.frappe.get_single")

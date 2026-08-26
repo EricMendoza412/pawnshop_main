@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 
 import json
 import math
+import re
+from decimal import Decimal, InvalidOperation
 
 import frappe
 from frappe import _
@@ -22,6 +24,7 @@ from pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer
 
 FX_ROLE = "Foreign Exchange Cashier"
 READ_ALL_ROLES = {"Accounting Analyst", "Auditor"}
+TRACKER_RECEIVED_DATE_PATTERN = re.compile(r"(?<!\d)(\d{4}-\d{2}-\d{2})(?!\d)")
 RATE_CONFIG = {
 	"USD": (1, 0.70, 2), "YEN": (2, 0.01, 5), "EUR": (3, 1.00, 2),
 	"SR": (4, 1.00, 2), "SR <= 20": (5, 1.00, 2), "SR = 1": (6, 1.00, 2),
@@ -382,7 +385,9 @@ def _tracker_request_row(rows, item):
 	return row
 
 
-def _tracker_rows(settings, spreadsheet_id=None):
+def _tracker_rows(settings, spreadsheet_id=None, end_column="AA"):
+	if end_column not in {"AA", "AH"}:
+		raise ValueError("Unsupported Transfer Tracker end column")
 	service = _sheet_service(settings)
 	sheet = _quote_sheet(settings.transfer_tracker_sheet)
 	spreadsheet_id = spreadsheet_id or settings.source_spreadsheet_id
@@ -396,7 +401,7 @@ def _tracker_rows(settings, spreadsheet_id=None):
 	last_row = len(request_numbers) + 1
 	return service.spreadsheets().values().get(
 		spreadsheetId=spreadsheet_id or settings.source_spreadsheet_id,
-		range="{0}!A2:AA{1}".format(sheet, last_row),
+		range="{0}!A2:{1}{2}".format(sheet, end_column, last_row),
 		valueRenderOption="UNFORMATTED_VALUE",
 	).execute().get("values", [])
 
@@ -416,6 +421,120 @@ def get_available_tracker_requests(branch=None):
 		if row[8] not in (None, "") and row[15] not in (None, "") and row[16] in (None, "") and row[26] in (None, "") and str(row[14]).strip().upper() == str(code).upper():
 			result.append({"request_no": row[0], "currency": row[2], "available_amount": flt(row[10]), "request_rate": flt(row[4]), "source_row": index, "branch": row[14]})
 	return result
+
+
+@frappe.whitelist()
+def get_branch_fx_on_hand(branch=None):
+	"""Return physical non-USD FX held by the cashier at a branch."""
+	branch = str(branch or "").strip()
+	if not branch or not frappe.db.exists("Branch", branch):
+		frappe.throw(_("Select a valid Branch."))
+
+	user = frappe.session.user
+	if user == "Guest":
+		frappe.throw(_("Authentication is required."), frappe.PermissionError)
+	if not (
+		is_system_manager(user)
+		or _has_read_all_role(user)
+		or has_active_branch_role(user, branch, FX_ROLE)
+	):
+		frappe.throw(_("Not permitted."), frappe.PermissionError)
+
+	branch_code = get_fund_transfer_branch_code(branch)
+	if not branch_code:
+		frappe.throw(_("Branch {0} has no branch code.").format(branch))
+
+	settings = frappe.get_single("FX Selling Settings")
+	totals = {}
+	warnings = []
+	for row_number, source_row in enumerate(
+		_tracker_rows(settings, end_column="AH"), start=2
+	):
+		row = list(source_row) + [""] * (34 - len(source_row))
+		if str(row[14]).strip().upper() != str(branch_code).strip().upper():
+			continue
+
+		currency = _on_hand_currency(row[2])
+		if not currency or currency == "USD" or not _contains_received_date(row[15]):
+			continue
+		# A populated AA means the remainder is closed or already in the return flow.
+		if not _is_blank_tracker_cell(row[26]):
+			continue
+
+		transferred = _tracker_amount(row[10])
+		for_returns = _tracker_amount(row[25])
+		if transferred is None:
+			warnings.append(_("Transfer Tracker row {0} has an invalid Amount Transferred.").format(row_number))
+		if for_returns is None:
+			warnings.append(_("Transfer Tracker row {0} has an invalid For Returns amount.").format(row_number))
+		if transferred is None or for_returns is None:
+			continue
+		if for_returns > transferred:
+			warnings.append(
+				_("Transfer Tracker row {0} has a For Returns amount greater than Amount Transferred.").format(
+					row_number
+				)
+			)
+			continue
+
+		on_hand = Decimal("0")
+		if _is_blank_tracker_cell(row[16]):
+			# Once an entirely unsold transfer is designated for return, it is no
+			# longer counted as cashier on-hand even while its Rover cell is blank.
+			if for_returns <= 0 and transferred > 0:
+				on_hand = transferred
+		elif (
+			for_returns > 0
+			and _is_blank_tracker_cell(row[30])
+		):
+			on_hand = for_returns
+
+		if on_hand > 0:
+			totals[currency] = totals.get(currency, Decimal("0")) + on_hand
+
+	return {
+		"branch": branch,
+		"branch_code": str(branch_code).strip().upper(),
+		"as_of": str(now_datetime()),
+		"currencies": [
+			{"currency": currency, "on_hand_amount": float(amount)}
+			for currency, amount in sorted(totals.items())
+		],
+		"warnings": warnings,
+	}
+
+
+def _is_blank_tracker_cell(value):
+	return value is None or (isinstance(value, str) and not value.strip())
+
+
+def _contains_received_date(value):
+	for match in TRACKER_RECEIVED_DATE_PATTERN.finditer(str(value or "")):
+		try:
+			if str(getdate(match.group(1))) == match.group(1):
+				return True
+		except (TypeError, ValueError):
+			continue
+	return False
+
+
+def _tracker_amount(value):
+	if value is None or (isinstance(value, str) and value.strip() in {"", "-"}):
+		return Decimal("0")
+	try:
+		amount = Decimal(str(value).replace(",", "").strip())
+	except (InvalidOperation, ValueError):
+		return None
+	return amount if amount.is_finite() and amount >= 0 else None
+
+
+def _on_hand_currency(currency):
+	value = _normalize_currency(currency)
+	if value in {"SR", "SR<=20", "SR=1"}:
+		return "SR"
+	if value == "THAIB":
+		return "THAI B"
+	return value
 
 
 def validate_tracker_requests(doc, settings):
