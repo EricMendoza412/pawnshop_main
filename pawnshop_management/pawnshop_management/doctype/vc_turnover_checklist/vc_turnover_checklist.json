@@ -24,6 +24,10 @@
   "cash_inside_safe_column",
   "forex_reserved_php",
   "forex_reserved_usd",
+  "php_cash_source_type",
+  "php_cash_source_document",
+  "usd_cash_source_type",
+  "usd_cash_source_document",
   "petty_cash_fund_php",
   "display_section",
   "necklace_count",
@@ -58,6 +62,7 @@
   "php_10",
   "php_5",
   "php_1",
+  "php_025",
   "php_total",
   "usd_column",
   "usd_100",
@@ -204,13 +209,47 @@
    "default": "0",
    "fieldname": "forex_reserved_php",
    "fieldtype": "Currency",
-   "label": "Forex Reserved (PHP)"
+   "label": "PHP In Vault",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "forex_reserved_usd",
    "fieldtype": "Currency",
-   "label": "Forex Reserved (USD)"
+   "label": "USD In Vault",
+   "read_only": 1
+  },
+  {
+   "fieldname": "php_cash_source_type",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "PHP Cash Source Type",
+   "options": "\nVault Cash Position\nFund Transfer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "php_cash_source_document",
+   "fieldtype": "Dynamic Link",
+   "hidden": 1,
+   "label": "PHP Cash Source Document",
+   "options": "php_cash_source_type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "usd_cash_source_type",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "USD Cash Source Type",
+   "options": "\nVault Cash Position\nFund Transfer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "usd_cash_source_document",
+   "fieldtype": "Dynamic Link",
+   "hidden": 1,
+   "label": "USD Cash Source Document",
+   "options": "usd_cash_source_type",
+   "read_only": 1
   },
   {
    "default": "0",
@@ -367,61 +406,77 @@
   {
    "fieldname": "denomination_section",
    "fieldtype": "Section Break",
-   "label": "FX Reserved Cash Breakdown"
+   "label": "Reserved Cash Breakdown"
   },
   {
    "default": "0",
    "fieldname": "php_1000",
    "fieldtype": "Currency",
-   "label": "PHP 1000"
+   "label": "PHP 1000",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "php_500",
    "fieldtype": "Currency",
-   "label": "PHP 500"
+   "label": "PHP 500",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "php_200",
    "fieldtype": "Currency",
-   "label": "PHP 200"
+   "label": "PHP 200",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "php_100",
    "fieldtype": "Currency",
-   "label": "PHP 100"
+   "label": "PHP 100",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "php_50",
    "fieldtype": "Currency",
-   "label": "PHP 50"
+   "label": "PHP 50",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "php_20",
    "fieldtype": "Currency",
-   "label": "PHP 20"
+   "label": "PHP 20",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "php_10",
    "fieldtype": "Currency",
-   "label": "PHP 10"
+   "label": "PHP 10",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "php_5",
    "fieldtype": "Currency",
-   "label": "PHP 5"
+   "label": "PHP 5",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "php_1",
    "fieldtype": "Currency",
-   "label": "PHP 1"
+   "label": "PHP 1",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "php_025",
+   "fieldtype": "Currency",
+   "label": "PHP 0.25",
+   "read_only": 1
   },
   {
    "default": "0",
@@ -439,43 +494,50 @@
    "default": "0",
    "fieldname": "usd_100",
    "fieldtype": "Currency",
-   "label": "USD 100"
+   "label": "USD 100",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "usd_50",
    "fieldtype": "Currency",
-   "label": "USD 50"
+   "label": "USD 50",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "usd_20",
    "fieldtype": "Currency",
-   "label": "USD 20"
+   "label": "USD 20",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "usd_10",
    "fieldtype": "Currency",
-   "label": "USD 10"
+   "label": "USD 10",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "usd_5",
    "fieldtype": "Currency",
-   "label": "USD 5"
+   "label": "USD 5",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "usd_2",
    "fieldtype": "Currency",
-   "label": "USD 2"
+   "label": "USD 2",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "usd_1",
    "fieldtype": "Currency",
-   "label": "USD 1"
+   "label": "USD 1",
+   "read_only": 1
   },
   {
    "default": "0",

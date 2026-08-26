@@ -21,6 +21,7 @@ const TOTAL_FIELD_GROUPS = {
 		"php_10",
 		"php_5",
 		"php_1",
+		"php_025",
 	],
 	usd_total: ["usd_100", "usd_50", "usd_20", "usd_10", "usd_5", "usd_2", "usd_1"],
 	petty_cash_total: [
@@ -48,6 +49,49 @@ const calculateTotals = frm => {
 	});
 };
 
+const CASH_BREAKDOWN_FIELDS = {
+	php: TOTAL_FIELD_GROUPS.php_total,
+	usd: TOTAL_FIELD_GROUPS.usd_total,
+};
+
+const setCashBreakdownReadOnly = frm => {
+	Object.entries(CASH_BREAKDOWN_FIELDS).forEach(([currency, fields]) => {
+		const isManualFundTransferBreakdown =
+			frm.doc.docstatus === 0 && frm.doc[`${currency}_cash_source_type`] === "Fund Transfer";
+		fields.forEach(fieldname => {
+			frm.set_df_property(fieldname, "read_only", isManualFundTransferBreakdown ? 0 : 1);
+		});
+	});
+};
+
+const applyVaultCashValues = (frm, values) => {
+	if (!values) return;
+
+	["php", "usd"].forEach(currency => {
+		const totalField = currency === "php" ? "forex_reserved_php" : "forex_reserved_usd";
+		const sourceTypeField = `${currency}_cash_source_type`;
+		const sourceDocumentField = `${currency}_cash_source_document`;
+		const previousSourceType = frm.doc[sourceTypeField];
+		const sourceType = values[sourceTypeField] || "";
+		const breakdown = values[`${currency}_breakdown`];
+
+		frm.set_value(totalField, values[totalField] || 0);
+		if (sourceType === "Vault Cash Position" || !sourceType) {
+			CASH_BREAKDOWN_FIELDS[currency].forEach(fieldname => {
+				frm.set_value(fieldname, (breakdown && breakdown[fieldname]) || 0);
+			});
+		} else if (previousSourceType === "Vault Cash Position") {
+			CASH_BREAKDOWN_FIELDS[currency].forEach(fieldname => frm.set_value(fieldname, 0));
+		}
+
+		frm.set_value(sourceTypeField, sourceType);
+		frm.set_value(sourceDocumentField, values[sourceDocumentField] || "");
+	});
+
+	setCashBreakdownReadOnly(frm);
+	calculateTotals(frm);
+};
+
 const applyAutofillValues = (frm, values) => {
 	if (!values) return;
 
@@ -70,7 +114,22 @@ const applyAutofillValues = (frm, values) => {
 		}
 	});
 
-	calculateTotals(frm);
+	applyVaultCashValues(frm, values);
+};
+
+const refreshVaultCashFields = frm => {
+	if (!frm.doc.branch || frm.doc.docstatus !== 0) return;
+
+	frappe.call({
+		method: "pawnshop_management.pawnshop_management.doctype.vc_turnover_checklist.vc_turnover_checklist.get_vault_cash_autofill_values",
+		args: {
+			branch: frm.doc.branch,
+			business_date: frm.doc.date,
+		},
+		callback(response) {
+			applyVaultCashValues(frm, response.message);
+		},
+	});
 };
 
 const refreshSystemFields = frm => {
@@ -120,8 +179,10 @@ frappe.ui.form.on("VC Turnover Checklist", {
 
 		if (frm.doc.docstatus === 0) {
 			frm.add_custom_button(__("Refresh System Counts"), () => refreshSystemFields(frm));
+			refreshVaultCashFields(frm);
 		}
 
+		setCashBreakdownReadOnly(frm);
 		calculateTotals(frm);
 	},
 

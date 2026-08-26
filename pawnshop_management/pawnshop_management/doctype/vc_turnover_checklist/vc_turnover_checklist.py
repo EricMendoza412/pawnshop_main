@@ -5,7 +5,7 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.model.naming import make_autoname
-from frappe.utils import cint, flt, now_datetime, today
+from frappe.utils import cint, flt, getdate, now_datetime, today
 
 from pawnshop_management.pawnshop_management.doctype.pawnshop_transaction_log.pawnshop_transaction_log import (
 	get_branch_code,
@@ -23,6 +23,27 @@ from pawnshop_management.operations_access_control.access_control import (
 TURNOVER_LIST_TYPES = ("A-Jewelry", "B-Jewelry", "B-Non Jewelry", "Agreement to Sell")
 GADGET_WORKFLOW_STATES = ("For Sale", "Reserved")
 MANAGER_ROLES = {"Operations Manager", "Supervisor"}
+PHP_BREAKDOWN_FIELDS = {
+	1000.0: "php_1000",
+	500.0: "php_500",
+	200.0: "php_200",
+	100.0: "php_100",
+	50.0: "php_50",
+	20.0: "php_20",
+	10.0: "php_10",
+	5.0: "php_5",
+	1.0: "php_1",
+	0.25: "php_025",
+}
+USD_BREAKDOWN_FIELDS = {
+	100.0: "usd_100",
+	50.0: "usd_50",
+	20.0: "usd_20",
+	10.0: "usd_10",
+	5.0: "usd_5",
+	2.0: "usd_2",
+	1.0: "usd_1",
+}
 
 
 class VCTurnoverChecklist(Document):
@@ -49,6 +70,8 @@ class VCTurnoverChecklist(Document):
 			self.date = today()
 
 		self.populate_system_fields()
+		if self.docstatus == 0:
+			self.populate_vault_cash_fields()
 		self.calculate_totals()
 
 	def validate(self):
@@ -59,6 +82,7 @@ class VCTurnoverChecklist(Document):
 			frappe.throw(_("Received By is required before submitting VC Turnover Checklist."))
 
 		self.validate_acceptance()
+		self.validate_manual_cash_breakdowns()
 
 	def before_submit(self):
 		self.populate_system_fields()
@@ -154,6 +178,49 @@ class VCTurnoverChecklist(Document):
 		self.sangla_non_jewelry = sum(1 for row in rows if row.get("list_type") == "B-Non Jewelry")
 		self.sanglang_benta = sum(1 for row in rows if row.get("list_type") == "Agreement to Sell")
 
+	def populate_vault_cash_fields(self):
+		if not self.branch:
+			return
+
+		previous = _get_stored_cash_sources(self)
+		values = get_vault_cash_autofill(self.branch, self.date)
+
+		for currency, total_field, breakdown_fields in (
+			("php", "forex_reserved_php", PHP_BREAKDOWN_FIELDS.values()),
+			("usd", "forex_reserved_usd", USD_BREAKDOWN_FIELDS.values()),
+		):
+			source_type = values.get(f"{currency}_cash_source_type") or ""
+			source_document = values.get(f"{currency}_cash_source_document") or ""
+			self.set(total_field, values.get(total_field) or 0)
+
+			breakdown = values.get(f"{currency}_breakdown")
+			if source_type == "Vault Cash Position" or not source_type:
+				for fieldname in breakdown_fields:
+					self.set(fieldname, (breakdown or {}).get(fieldname, 0))
+			elif _should_clear_transfer_breakdown(previous, currency, self.branch):
+				for fieldname in breakdown_fields:
+					self.set(fieldname, 0)
+
+			self.set(f"{currency}_cash_source_type", source_type)
+			self.set(f"{currency}_cash_source_document", source_document)
+
+	def validate_manual_cash_breakdowns(self):
+		for currency, source_field, total_field, breakdown_total_field in (
+			("PHP", "php_cash_source_type", "forex_reserved_php", "php_total"),
+			("USD", "usd_cash_source_type", "forex_reserved_usd", "usd_total"),
+		):
+			if self.get(source_field) != "Fund Transfer":
+				continue
+
+			in_vault = flt(self.get(total_field), 2)
+			breakdown_total = flt(self.get(breakdown_total_field), 2)
+			if abs(in_vault - breakdown_total) > 0.005:
+				frappe.throw(
+					_("{0} Reserved Cash Breakdown total must equal {0} In Vault ({1}).").format(
+						currency, frappe.format_value(in_vault, {"fieldtype": "Currency"})
+					)
+				)
+
 	def calculate_totals(self):
 		self.jewelry_display_total = sum(
 			cint(self.get(fieldname) or 0)
@@ -183,6 +250,7 @@ class VCTurnoverChecklist(Document):
 				"php_10",
 				"php_5",
 				"php_1",
+				"php_025",
 			)
 		)
 		self.usd_total = sum(
@@ -310,6 +378,109 @@ def get_default_branch():
 	return get_branch_from_request_ip()
 
 
+def get_vault_cash_autofill(branch, business_date=None):
+	business_date = getdate(business_date or today())
+	values = {}
+	vault_cash_position = frappe.db.get_value(
+		"Vault Cash Position",
+		{
+			"branch": branch,
+			"business_date": ["<=", business_date],
+			"docstatus": 1,
+		},
+		"name",
+		order_by="business_date desc, count_datetime desc, creation desc",
+	)
+	vault_doc = frappe.get_doc("Vault Cash Position", vault_cash_position) if vault_cash_position else None
+
+	for currency, total_field, actual_cash_field, table_field, breakdown_fields in (
+		("php", "forex_reserved_php", "php_actual_cash", "php_denominations", PHP_BREAKDOWN_FIELDS),
+		("usd", "forex_reserved_usd", "usd_actual_cash", "usd_denominations", USD_BREAKDOWN_FIELDS),
+	):
+		fund_transfer = frappe.db.get_value(
+			"Fund Transfer",
+			{
+				"branch": branch,
+				"business_date": business_date,
+				"currency": currency.upper(),
+				"docstatus": 1,
+				"status": "Submitted",
+			},
+			["name", "civ_balance"],
+			as_dict=True,
+			order_by="date_of_transfer desc, creation desc",
+		)
+
+		if fund_transfer:
+			values.update(
+				{
+					total_field: flt(fund_transfer.civ_balance),
+					f"{currency}_cash_source_type": "Fund Transfer",
+					f"{currency}_cash_source_document": fund_transfer.name,
+					f"{currency}_breakdown": None,
+				}
+			)
+			continue
+
+		if vault_doc:
+			breakdown = {fieldname: 0 for fieldname in breakdown_fields.values()}
+			for row in vault_doc.get(table_field):
+				fieldname = breakdown_fields.get(flt(row.denomination))
+				if fieldname:
+					breakdown[fieldname] = flt(row.amount)
+			values.update(
+				{
+					total_field: flt(vault_doc.get(actual_cash_field)),
+					f"{currency}_cash_source_type": "Vault Cash Position",
+					f"{currency}_cash_source_document": vault_doc.name,
+					f"{currency}_breakdown": breakdown,
+				}
+			)
+			continue
+
+		values.update(
+			{
+				total_field: 0,
+				f"{currency}_cash_source_type": "",
+				f"{currency}_cash_source_document": "",
+				f"{currency}_breakdown": {fieldname: 0 for fieldname in breakdown_fields.values()},
+			}
+		)
+
+	return values
+
+
+@frappe.whitelist()
+def get_vault_cash_autofill_values(branch, business_date=None):
+	if not branch:
+		branch = get_branch_from_request_ip()
+	if not branch:
+		return {}
+	require_active_branch_role(frappe.session.user, branch, "Vault Custodian")
+	return get_vault_cash_autofill(branch, business_date)
+
+
+def _get_stored_cash_sources(doc):
+	if doc.is_new() or not doc.name:
+		return frappe._dict()
+	return frappe.db.get_value(
+		"VC Turnover Checklist",
+		doc.name,
+		[
+			"branch",
+			"php_cash_source_type",
+			"php_cash_source_document",
+			"usd_cash_source_type",
+			"usd_cash_source_document",
+		],
+		as_dict=True,
+	) or frappe._dict()
+
+
+def _should_clear_transfer_breakdown(previous, currency, branch):
+	return previous.get("branch") != branch or previous.get(f"{currency}_cash_source_type") == "Vault Cash Position"
+
+
 @frappe.whitelist()
 def get_autofill_values(branch):
 	if not branch:
@@ -322,8 +493,9 @@ def get_autofill_values(branch):
 
 	rows = get_turnover_rows(branch)
 	gadget_counts = get_gadget_counts(branch)
+	cash_values = get_vault_cash_autofill(branch, today())
 
-	return {
+	values = {
 		"branch": branch,
 		"endorsed_by": get_active_branch_role_user(branch, "Vault Custodian"),
 		"sangla_envelopes_cb": sum(1 for row in rows if row.get("list_type") == "A-Jewelry"),
@@ -337,6 +509,8 @@ def get_autofill_values(branch):
 		"gadget_under_installment": get_non_jewelry_item_count(branch, "Under Installment"),
 		"branch_mobile_phones": get_non_jewelry_item_count(branch, "Company Used"),
 	}
+	values.update(cash_values)
+	return values
 
 
 def get_permission_query_conditions(user=None):
