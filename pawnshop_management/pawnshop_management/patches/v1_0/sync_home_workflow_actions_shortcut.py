@@ -1,7 +1,7 @@
 import frappe
 
 
-SHORTCUT_LABEL = "My Workflow Actions"
+SHORTCUT_LABEL = "VC Turnovers for Acceptance"
 SHORTCUT_LINK = "Workflow Action"
 
 
@@ -20,7 +20,8 @@ def sync_home_workflow_actions_shortcut():
 		(
 			row
 			for row in workspace.shortcuts
-			if row.link_to == SHORTCUT_LINK or row.label == SHORTCUT_LABEL
+			if row.link_to == SHORTCUT_LINK
+			or row.label in {"My Workflow Actions", SHORTCUT_LABEL}
 		),
 		None,
 	)
@@ -35,8 +36,12 @@ def sync_home_workflow_actions_shortcut():
 			"link_to": SHORTCUT_LINK,
 			"doc_view": "List",
 			"color": "Orange",
-			"format": "{} Open",
-			"stats_filter": '{"status":"Open"}',
+			"format": "{} Pending",
+			"stats_filter": (
+				'{"status":"Open","user":frappe.session.user,'
+				'"reference_doctype":"VC Turnover Checklist",'
+				'"workflow_state":"For Acceptance"}'
+			),
 		}
 	)
 	workspace.save(ignore_permissions=True)
