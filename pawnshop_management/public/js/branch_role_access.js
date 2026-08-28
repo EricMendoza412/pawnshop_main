@@ -28,7 +28,6 @@
 		"Renewed PT today (J)",
 		"Redeemed PT today (J)",
 		"Daily New J-Sangla",
-		"VC Turnover Checklist",
 		"Transfer Tracker",
 	];
 
