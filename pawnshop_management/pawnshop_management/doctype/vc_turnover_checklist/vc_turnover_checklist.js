@@ -34,6 +34,7 @@ const TOTAL_FIELD_GROUPS = {
 		"petty_php_10",
 		"petty_php_5",
 		"petty_php_1",
+		"petty_php_025",
 	],
 };
 

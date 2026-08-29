@@ -25,6 +25,9 @@ READ_PERMISSION_TYPES = {"read", "report", "print", "email", "export"}
 
 class VaultCashPosition(Document):
 	def before_print(self, settings=None):
+		# Existing records may predate the hidden currency field. Set it in memory so
+		# standard print formatting always renders the USD summary with a dollar sign.
+		self.usd_currency = "USD"
 		vault_custodian_name = (
 			frappe.db.get_value("User", self.vault_custodian, "full_name") or self.vault_custodian or ""
 		)
@@ -43,6 +46,7 @@ class VaultCashPosition(Document):
 		self._ensure_denomination_rows()
 
 	def validate(self):
+		self.usd_currency = "USD"
 		if not self.flags.ignore_vault_custodian_check:
 			require_branch_vault_custodian(self.branch)
 		if self.business_date and getdate(self.business_date) != getdate(today()) and not is_system_manager(

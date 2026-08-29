@@ -98,7 +98,7 @@ class VCTurnoverChecklist(Document):
 			frappe.throw(_("Submit the VC Turnover Checklist through the workflow action."))
 
 	def on_submit(self):
-		pass
+		sync_acceptance_workflow_action(self)
 
 	def before_cancel(self):
 		if self.workflow_state not in {"For Acceptance", "Rejected"}:
@@ -106,8 +106,10 @@ class VCTurnoverChecklist(Document):
 
 	def on_cancel(self):
 		self.db_set("workflow_state", "Rejected", update_modified=False)
+		sync_acceptance_workflow_action(self)
 
 	def on_update_after_submit(self):
+		sync_acceptance_workflow_action(self)
 		if self.workflow_state == "Accepted":
 			self.update_branch_vault_custodian()
 
@@ -269,6 +271,7 @@ class VCTurnoverChecklist(Document):
 				"petty_php_10",
 				"petty_php_5",
 				"petty_php_1",
+				"petty_php_025",
 			)
 		)
 
@@ -529,6 +532,32 @@ def get_permission_query_conditions(user=None):
 		f"or `tabVC Turnover Checklist`.`endorsed_by` = {escaped_user} "
 		f"or `tabVC Turnover Checklist`.`owner` = {escaped_user})"
 	)
+
+
+def sync_acceptance_workflow_action(doc):
+	"""Keep the pending workflow action assigned only to the named receiver."""
+	if not doc.name:
+		return
+
+	filters = {
+		"reference_doctype": "VC Turnover Checklist",
+		"reference_name": doc.name,
+	}
+	frappe.db.delete("Workflow Action", filters)
+
+	if cint(doc.docstatus) != 1 or doc.workflow_state != "For Acceptance" or not doc.received_by:
+		return
+
+	frappe.get_doc(
+		{
+			"doctype": "Workflow Action",
+			"reference_doctype": "VC Turnover Checklist",
+			"reference_name": doc.name,
+			"workflow_state": doc.workflow_state,
+			"status": "Open",
+			"user": doc.received_by,
+		}
+	).insert(ignore_permissions=True)
 
 
 def has_permission(doc, ptype=None, user=None):

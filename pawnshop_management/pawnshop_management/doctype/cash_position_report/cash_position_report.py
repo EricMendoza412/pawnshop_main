@@ -7,6 +7,18 @@ from frappe.utils import flt
 from frappe.model.document import Document
 from frappe.utils import today
 from pawnshop_management.pawnshop_management.report.vc_report.vc_report import get_vc_report_data
+from pawnshop_management.operations_access_control.access_control import get_branch_from_request_ip
+
+
+CPR_CREATE_RESTRICTED_MESSAGE = _(
+	"Only the Pawnshop Cashier currently assigned to this branch can create a Cash Position Report."
+)
+CPR_BRANCH_NOT_FOUND_MESSAGE = _(
+	"Unable to determine the branch for this workstation. Please contact IT."
+)
+CPR_CASHIER_NOT_ASSIGNED_MESSAGE = _(
+	"No Pawnshop Cashier is assigned to branch {0}."
+)
 
 
 def _report_rows(report_date, branch):
@@ -348,7 +360,43 @@ def get_pawnshop_fund_transfer_totals(branch, report_date):
 		frappe.throw(_("Not permitted to read Cash Position Report totals."), frappe.PermissionError)
 	return _get_pawnshop_fund_transfer_totals(branch, report_date)
 
+
+def _get_cash_position_report_create_access(branch=None, user=None):
+	user = user or frappe.session.user
+	branch = branch or get_branch_from_request_ip()
+
+	if user == "Administrator":
+		return {"allowed": True, "branch": branch, "message": None}
+
+	if not branch:
+		return {"allowed": False, "branch": None, "message": CPR_BRANCH_NOT_FOUND_MESSAGE}
+
+	pawnshop_cashier = frappe.db.get_value("Branch", branch, "pawnshop_cashier")
+	if not pawnshop_cashier:
+		return {
+			"allowed": False,
+			"branch": branch,
+			"message": CPR_CASHIER_NOT_ASSIGNED_MESSAGE.format(branch),
+		}
+
+	return {
+		"allowed": pawnshop_cashier == user,
+		"branch": branch,
+		"message": None if pawnshop_cashier == user else CPR_CREATE_RESTRICTED_MESSAGE,
+	}
+
+
+@frappe.whitelist()
+def get_cash_position_report_create_access(branch=None):
+	return _get_cash_position_report_create_access(branch=branch)
+
+
 class CashPositionReport(Document):
+	def before_insert(self):
+		access = _get_cash_position_report_create_access(branch=self.branch)
+		if not access["allowed"]:
+			frappe.throw(access["message"], frappe.PermissionError)
+
 	def validate(self):
 		self.validate_pawnshop_fund_transfer_totals()
 

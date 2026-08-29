@@ -91,6 +91,7 @@ class TestVaultCashPosition(unittest.TestCase):
 	def test_before_print_adds_underlined_custodian_and_blank_manager_lines(self):
 		doc = frappe.new_doc("Vault Cash Position")
 		doc.vault_custodian = "custodian@example.com"
+		doc.usd_currency = None
 
 		with patch.object(frappe.db, "get_value", return_value="Juan Dela Cruz"):
 			doc.before_print()
@@ -100,6 +101,22 @@ class TestVaultCashPosition(unittest.TestCase):
 		self.assertIn("padding:0 28px", doc.signature_over_printed_name)
 		self.assertNotIn("Juan Dela Cruz", doc.managers_spot_check)
 		self.assertIn("&nbsp;", doc.managers_spot_check)
+		self.assertEqual(doc.usd_currency, "USD")
+
+	def test_before_print_formats_usd_summary_with_dollar_sign(self):
+		doc = frappe.new_doc("Vault Cash Position")
+		doc.usd_currency = None
+		doc.usd_system_civ_balance = 1050
+		doc.usd_actual_cash = 1050
+		doc.usd_variance = 0
+
+		with patch.object(frappe.db, "get_value", return_value=""):
+			doc.before_print()
+
+		for fieldname in ("usd_system_civ_balance", "usd_actual_cash", "usd_variance"):
+			formatted_value = doc.get_formatted(fieldname)
+			self.assertIn("$", formatted_value)
+			self.assertNotIn("₱", formatted_value)
 
 	def test_signature_line_escapes_the_printed_name(self):
 		line = _print_signature_line("Custodian <One>")

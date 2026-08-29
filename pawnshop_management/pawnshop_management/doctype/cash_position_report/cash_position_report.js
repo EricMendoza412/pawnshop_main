@@ -7,6 +7,10 @@ frappe.ui.form.on('Cash Position Report', {
 		frm._loaded_at = frappe.datetime.now_datetime(); // "YYYY-MM-DD HH:mm:ss"
 		// Optional: show user when the check will anchor from
 		frappe.show_alert({message: `Loaded at: ${frm._loaded_at}`, indicator: 'blue'});
+
+		if (frm.is_new()) {
+			check_cash_position_report_create_access(frm);
+		}
   	},
 
 	refresh: function(frm) {
@@ -25,42 +29,6 @@ frappe.ui.form.on('Cash Position Report', {
 				'bank_transfer'
 			],
 			 is_allowed);
-		if (frm.is_new()) {
-			frappe.call({
-				method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip',
-				callback: function(data){
-					let current_ip = data.message
-
-					frappe.db.get_list('Branch IP Addressing', {
-						fields: ['name'],
-						filters: {
-							ip_address: current_ip
-						}
-					}).then(records => {
-
-						console.log (records[0].name);
-						frm.set_value('branch', records[0].name);
-						frm.refresh_field('branch');
-					})
-				}
-			})
-			// frappe.db.get_list('Cash Position Report', {
-			// 	fields: ['ending_balance', 'date', 'creation'],
-			// 	filters: {
-			// 		date: frappe.datetime.add_days(frm.doc.date, -1)
-			// 	}
-			// }).then(records => {
-			// 	let latest_record = records[0]
-			// 	for (let index = 0; index < records.length; index++) {
-			// 		if (latest_record.creation < records[index].creation) {
-			// 			latest_record = records[index]
-			// 		}
-			// 	}
-			// 	frm.set_value('beginning_balance', 0.00)
-			// 	frm.set_value('beginning_balance', latest_record.ending_balance)
-			// 	frm.refresh_field('beginning_balance')
-			// })
-		}
 		if (frm.doc.docstatus === 0 && frm.doc.branch && frm.doc.date) {
 			get_ps_fund_transfers(frm, frm.doc.date);
 		}
@@ -310,6 +278,70 @@ frappe.ui.form.on('Cash Position Report', {
 		//total_cash_breakdown(frm);
 	}
 });
+
+function check_cash_position_report_create_access(frm) {
+	if (!frm.is_new() || frm.__cpr_create_access_checking || frm.__cpr_create_access_checked) {
+		return;
+	}
+
+	frm.__cpr_create_access_checking = true;
+	frm.disable_save();
+
+	frappe.call({
+		method: 'pawnshop_management.pawnshop_management.doctype.cash_position_report.cash_position_report.get_cash_position_report_create_access',
+		args: {
+			branch: frm.doc.branch
+		},
+		callback: function(response) {
+			frm.__cpr_create_access_checking = false;
+			const access = response.message || {};
+
+			if (!access.allowed) {
+				block_cash_position_report_creation(frm, access.message);
+				return;
+			}
+
+			frm.__cpr_create_access_checked = true;
+			if (access.branch && access.branch !== frm.doc.branch) {
+				frm.set_value('branch', access.branch).then(() => frm.enable_save());
+				return;
+			}
+
+			frm.enable_save();
+		},
+		error: function() {
+			frm.__cpr_create_access_checking = false;
+			frm.disable_save();
+		}
+	});
+}
+
+function block_cash_position_report_creation(frm, message) {
+	if (frm.__cpr_create_access_blocked) {
+		return;
+	}
+
+	frm.__cpr_create_access_blocked = true;
+	frm.disable_save();
+	frm.doc.__unsaved = 0;
+
+	const dialog = frappe.msgprint({
+		title: __('CPR creation restricted'),
+		message: __(message || 'Only the assigned Pawnshop Cashier can create a Cash Position Report.'),
+		indicator: 'red'
+	});
+
+	dialog.onhide = function() {
+		frm.doc.__unsaved = 0;
+		const previous_route = frappe.get_prev_route();
+		if (previous_route && previous_route.length) {
+			frappe.set_route(previous_route);
+			return;
+		}
+
+		frappe.set_route('List', 'Cash Position Report');
+	};
+}
 
 
 function get_beginning_balance(frm) {

@@ -9,6 +9,7 @@ import frappe
 from pawnshop_management.pawnshop_management.doctype.vc_turnover_checklist.vc_turnover_checklist import (
 	VCTurnoverChecklist,
 	get_vault_cash_autofill,
+	sync_acceptance_workflow_action,
 )
 
 
@@ -33,6 +34,53 @@ class _ChecklistStub:
 
 
 class TestVCTurnoverChecklistCashAutofill(unittest.TestCase):
+	@patch(f"{MODULE}.frappe.get_doc")
+	@patch(f"{MODULE}.frappe.db.delete")
+	def test_pending_acceptance_action_is_routed_only_to_receiver(self, delete_actions, get_doc):
+		action = get_doc.return_value
+		doc = frappe._dict(
+			name="VCT-0001",
+			docstatus=1,
+			workflow_state="For Acceptance",
+			received_by="receiver@example.com",
+		)
+
+		sync_acceptance_workflow_action(doc)
+
+		delete_actions.assert_called_once_with(
+			"Workflow Action",
+			{
+				"reference_doctype": "VC Turnover Checklist",
+				"reference_name": "VCT-0001",
+			},
+		)
+		get_doc.assert_called_once_with(
+			{
+				"doctype": "Workflow Action",
+				"reference_doctype": "VC Turnover Checklist",
+				"reference_name": "VCT-0001",
+				"workflow_state": "For Acceptance",
+				"status": "Open",
+				"user": "receiver@example.com",
+			}
+		)
+		action.insert.assert_called_once_with(ignore_permissions=True)
+
+	@patch(f"{MODULE}.frappe.get_doc")
+	@patch(f"{MODULE}.frappe.db.delete")
+	def test_non_pending_document_has_no_open_acceptance_action(self, delete_actions, get_doc):
+		doc = frappe._dict(
+			name="VCT-0001",
+			docstatus=1,
+			workflow_state="Accepted",
+			received_by="receiver@example.com",
+		)
+
+		sync_acceptance_workflow_action(doc)
+
+		delete_actions.assert_called_once()
+		get_doc.assert_not_called()
+
 	def test_same_day_transfer_overrides_only_its_currency(self):
 		position = frappe._dict(
 			name="VCP-0001",
@@ -145,6 +193,13 @@ class TestVCTurnoverChecklistCashAutofill(unittest.TestCase):
 		VCTurnoverChecklist.calculate_totals(doc)
 
 		self.assertEqual(doc.php_total, 1.25)
+
+	def test_petty_cash_quarter_is_included_in_total(self):
+		doc = _ChecklistStub(petty_php_1=1, petty_php_025=0.25)
+
+		VCTurnoverChecklist.calculate_totals(doc)
+
+		self.assertEqual(doc.petty_cash_total, 1.25)
 
 	def test_manual_transfer_breakdown_must_equal_in_vault_total(self):
 		doc = _ChecklistStub(

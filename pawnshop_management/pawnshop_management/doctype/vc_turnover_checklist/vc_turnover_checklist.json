@@ -83,6 +83,7 @@
   "petty_php_10",
   "petty_php_5",
   "petty_php_1",
+  "petty_php_025",
   "petty_cash_total",
   "others_inside_vault_or_safe",
   "turnover_lists_section",
@@ -604,6 +605,12 @@
    "fieldname": "petty_php_1",
    "fieldtype": "Currency",
    "label": "Petty PHP 1"
+  },
+  {
+   "default": "0",
+   "fieldname": "petty_php_025",
+   "fieldtype": "Currency",
+   "label": "Petty PHP 0.25"
   },
   {
    "default": "0",

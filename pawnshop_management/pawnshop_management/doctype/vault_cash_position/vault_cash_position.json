@@ -28,6 +28,7 @@
   "usd_section",
   "usd_denominations",
   "usd_summary_section",
+  "usd_currency",
   "usd_latest_fund_transfer",
   "usd_system_civ_balance",
   "usd_actual_cash",
@@ -195,6 +196,16 @@
    "label": "USD Summary"
   },
   {
+   "default": "USD",
+   "fieldname": "usd_currency",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "USD Currency",
+   "options": "Currency",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
    "fieldname": "usd_latest_fund_transfer",
    "fieldtype": "Link",
    "label": "Latest USD Fund Transfer",
@@ -205,24 +216,28 @@
    "fieldname": "usd_system_civ_balance",
    "fieldtype": "Currency",
    "label": "USD System CIV",
+   "options": "usd_currency",
    "read_only": 1
   },
   {
    "fieldname": "usd_actual_cash",
    "fieldtype": "Currency",
    "label": "USD Actual Cash",
+   "options": "usd_currency",
    "read_only": 1
   },
   {
    "fieldname": "usd_variance",
    "fieldtype": "Currency",
    "label": "USD Shortage / Overage",
+   "options": "usd_currency",
    "read_only": 1
   },
   {
    "fieldname": "usd_reconciled_ending_balance",
    "fieldtype": "Currency",
    "label": "USD Reconciled Ending CIV",
+   "options": "usd_currency",
    "print_hide": 1,
    "read_only": 1,
    "allow_on_submit": 1
