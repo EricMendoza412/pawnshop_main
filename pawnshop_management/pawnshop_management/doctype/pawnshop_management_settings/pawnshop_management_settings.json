@@ -9,6 +9,7 @@
   "gadget_interest_rate",
   "column_break_2",
   "jewelry_interest_rate",
+  "jewelry_a_series_limit",
   "gp_app_version"
  ],
  "fields": [
@@ -26,6 +27,14 @@
    "fieldname": "jewelry_interest_rate",
    "fieldtype": "Percent",
    "label": "Jewelry Interest Rate"
+  },
+  {
+   "default": "40000",
+   "fieldname": "jewelry_a_series_limit",
+   "fieldtype": "Currency",
+   "label": "Jewelry A Series Maximum Principal",
+   "reqd": 1,
+   "description": "Jewelry principal at or below this amount uses Series A; above this amount uses Series B."
   },
   {
    "fieldname": "gp_app_version",

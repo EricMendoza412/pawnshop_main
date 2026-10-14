@@ -165,7 +165,7 @@ def get_non_jewelry_pullout_items(origin, from_date, to_date):
 		filters={
 			"branch": origin,
 			"date_loan_granted": ["between", [from_date, to_date]],
-			"workflow_state": ["in", ["Active", "Expired"]],
+			"workflow_state": ["in", ["Active", "Expired", "Returned"]],
 			"docstatus": 1,
 		},
 		order_by="date_loan_granted asc, name asc",
@@ -243,7 +243,7 @@ def get_jewelry_pullout_items(origin, from_date, to_date):
 		filters={
 			"branch": origin,
 			"date_loan_granted": ["between", [from_date, to_date]],
-			"workflow_state": ["in", ["Active", "Expired"]],
+			"workflow_state": ["in", ["Active", "Expired", "Returned"]],
 			"docstatus": 1,
 		},
 		order_by="item_series asc, date_loan_granted asc, name asc",

@@ -2,7 +2,7 @@
 # See license.txt
 
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import frappe
 
@@ -12,11 +12,83 @@ from pawnshop_management.pawnshop_management.doctype.cash_position_report.cash_p
 	CPR_CASHIER_NOT_ASSIGNED_MESSAGE,
 	CPR_CREATE_RESTRICTED_MESSAGE,
 	_get_cash_position_report_create_access,
+	_get_inventory_totals,
 	_get_pawnshop_fund_transfer_totals,
 )
 
 
 class TestCashPositionReport(unittest.TestCase):
+	@patch("frappe.new_doc")
+	@patch("frappe.local.db", new_callable=Mock, create=True)
+	def test_inventory_count_and_principal_include_returned_with_matching_scope(self, db, new_doc):
+		tickets = []
+		for doctype, series, multiplier in (
+			("Pawn Ticket Jewelry", "A", 1),
+			("Pawn Ticket Jewelry", "B", 10),
+			("Pawn Ticket Non Jewelry", "B", 100),
+		):
+			for status, date, branch, principal in (
+				("Active", "2026-08-05", "TEST", 100),
+				("Expired", "2026-07-01", "TEST", 200),
+				("Returned", "2026-07-01", "TEST", 300),
+				("Returned", "2026-08-05", "TEST", 400),
+				("Returned", "2026-08-06", "TEST", 500),
+				("Active", "2026-08-06", "TEST", 600),
+				("Expired", "2026-08-06", "TEST", 700),
+				("Returned", "2026-07-01", "OTHER", 800),
+				("Redeemed", "2026-07-01", "TEST", 900),
+				("Renewed", "2026-07-01", "TEST", 1000),
+				("Pulled Out", "2026-07-01", "TEST", 1100),
+				("Rejected", "2026-07-01", "TEST", 1200),
+			):
+				tickets.append({
+					"doctype": doctype, "item_series": series, "branch": branch,
+					"workflow_state": status, "date_loan_granted": date,
+					"change_status_date": date, "desired_principal": principal * multiplier,
+				})
+
+		def matches(ticket, filters):
+			for field, condition in filters.items():
+				value = ticket.get(field)
+				if isinstance(condition, list):
+					operator, expected = condition
+					if operator == "in":
+						if value not in expected:
+							return False
+					elif operator == "<=":
+						if value > expected:
+							return False
+					else:
+						self.fail("Unexpected filter operator: " + operator)
+				elif value != condition:
+					return False
+			return True
+
+		def selected(doctype, filters):
+			return [row for row in tickets if row["doctype"] == doctype and matches(row, filters)]
+
+		db.count.side_effect = lambda doctype, filters: len(selected(doctype, filters))
+		db.get_all.side_effect = lambda doctype, filters, fields, pluck: [
+			row[pluck] for row in selected(doctype, filters)
+		]
+		inventory = Mock()
+		new_doc.return_value = inventory
+		report = frappe._dict(branch="TEST", date="2026-08-05")
+
+		CashPositionReport.create_inventory_count_document(report)
+
+		for suffix, multiplier in (("a", 1), ("b", 10), ("nj", 100)):
+			with self.subTest(category=suffix):
+				self.assertEqual(getattr(inventory, "total_" + suffix), 4)
+				self.assertEqual(getattr(inventory, "principal_total" + suffix), 1000 * multiplier)
+		new_doc.assert_called_once_with("Inventory Count")
+		inventory.save.assert_called_once_with(ignore_permissions=True)
+
+	@patch("frappe.local.db", new_callable=Mock, create=True)
+	def test_empty_inventory_totals_are_zero(self, db):
+		db.get_all.return_value = []
+		self.assertEqual(_get_inventory_totals("Pawn Ticket Non Jewelry", "TEST", "2026-08-05"), (0, 0))
+
 	@patch("frappe.db.get_value", return_value="cashier@example.com")
 	def test_assigned_pawnshop_cashier_can_create_report(self, get_value):
 		access = _get_cash_position_report_create_access(branch="TEST", user="cashier@example.com")

@@ -340,7 +340,7 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 		frm.set_value('expiry_date', defaul_expiry_date);
 	},
 
-	desired_principal: function(frm, cdt, cdn) {
+	desired_principal: async function(frm, cdt, cdn) {
 		//check if desired principal is greater than the total suggested_appraisal_value of jewelry items
 		let total_appraised_amount = get_total_appraised_amount(frm, cdt, cdn);
 		if (parseFloat(frm.doc.desired_principal) > parseFloat(total_appraised_amount)) {
@@ -353,7 +353,7 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 			frm.refresh_field('desired_principal');
 		}
 
-		set_series(frm);
+		await set_series(frm);
 		frm.refresh_fields('pawn_ticket');
 		set_item_interest(frm)
 		frm.set_value('original_principal', frm.doc.desired_principal);
@@ -428,7 +428,7 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 
 	item_series: function(frm){
 		if (frm.is_new()){
-			show_tracking_no(frm);
+			return show_tracking_no(frm);
 		}		
 	},
 
@@ -507,18 +507,24 @@ frappe.ui.form.on('Jewelry List', {
 });
 
 
-function set_series(frm) { //Set the pawn ticket series
-	if (frm.is_new()){
+async function set_series(frm) {
+	if (!frm.is_new() || frm.doc.amended_from) return;
 
-		// if(parseInt(frm.doc.desired_principal) > 8000 || parseInt(frm.doc.desired_principal) < 1500){
-		if(parseInt(frm.doc.desired_principal) > 15000){
-			frm.set_value('item_series', "B")
-		}else{
-			frm.set_value('item_series', "A")
-		}
-		frm.refresh_field('item_series');
-	}	
+	const configured_limit = await frappe.db.get_single_value(
+		'Pawnshop Management Settings', 'jewelry_a_series_limit'
+	);
+	// Existing sites may not have a saved value until the migration runs.
+	const limit = configured_limit == null || configured_limit === ''
+		? 40000 : Number(configured_limit);
+	if (!Number.isFinite(limit) || limit <= 0) {
+		frappe.throw(__('Jewelry A Series Maximum Principal must be greater than zero.'));
+	}
+	if (!frm.is_new() || frm.doc.amended_from) return;
+
+	await frm.set_value('item_series', Number(frm.doc.desired_principal) > limit ? 'B' : 'A');
+	frm.refresh_field('item_series');
 }
+
 
 function set_appraiser_queries(frm) {
 	const appraiser_roles = [
@@ -697,7 +703,7 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 		return;
 	}
 
-	frappe.db.get_list('Branch IP Addressing', {
+	return frappe.db.get_list('Branch IP Addressing', {
 		fields: ['branch_code'],
 		filters: {
 			name: frm.doc.branch
@@ -708,7 +714,7 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 		if (frm.doc.amended_from == null) {
 			let jewelry_inv_count;
 			if (frm.doc.item_series == "A") {
-				frappe.db.get_value('Pawnshop Naming Series', frm.doc.branch,['a_series', 'jewelry_inventory_count'])
+				return frappe.db.get_value('Pawnshop Naming Series', frm.doc.branch,['a_series', 'jewelry_inventory_count'])
 				.then(value => {
 					let tracking_no = value.message;
 					jewelry_inv_count = parseInt(tracking_no.jewelry_inventory_count);
@@ -718,7 +724,7 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 					frm.refresh_field('pawn_ticket');
 				})
 			} else if (frm.doc.item_series == "B") {
-				frappe.db.get_value('Pawnshop Naming Series', frm.doc.branch,['b_series', 'jewelry_inventory_count'])
+				return frappe.db.get_value('Pawnshop Naming Series', frm.doc.branch,['b_series', 'jewelry_inventory_count'])
 				.then(value => {
 					let tracking_no = value.message;
 					jewelry_inv_count = parseInt(tracking_no.jewelry_inventory_count);
@@ -728,7 +734,7 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 					frm.refresh_field('pawn_ticket');
 				})
 			} else if (frm.doc.item_series == "Automatic") {
-				frappe.db.get_value('Pawnshop Naming Series', frm.doc.branch,['b_series', 'jewelry_inventory_count'])
+				return frappe.db.get_value('Pawnshop Naming Series', frm.doc.branch,['b_series', 'jewelry_inventory_count'])
 				.then(value => {
 					let tracking_no = value.message;
 					jewelry_inv_count = parseInt(tracking_no.jewelry_inventory_count);

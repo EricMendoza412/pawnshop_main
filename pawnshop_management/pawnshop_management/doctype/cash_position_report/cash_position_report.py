@@ -30,6 +30,22 @@ def _report_rows(report_date, branch):
 	return data
 
 
+def _get_inventory_totals(doctype, branch, report_date, item_series=None):
+	filters = {
+		"branch": branch,
+		"date_loan_granted": ["<=", report_date],
+		"workflow_state": ["in", ["Active", "Expired", "Returned"]],
+	}
+	if item_series is not None:
+		filters["item_series"] = item_series
+
+	# Derive count and principal from the same tickets so their scope stays aligned.
+	principals = frappe.db.get_all(
+		doctype, filters=filters, fields=["desired_principal"], pluck="desired_principal"
+	)
+	return len(principals), sum(flt(principal) for principal in principals)
+
+
 def _same_date(first, second):
 	return str(first or "")[:10] == str(second or "")[:10]
 
@@ -473,16 +489,10 @@ class CashPositionReport(Document):
 		a_ret_principal = 0
 		for record in a_principal_returned:
 			a_ret_principal += record
-#A Total
-		a_total_active = frappe.db.count('Pawn Ticket Jewelry', {'date_loan_granted': ['<=', self.date], 'item_series': 'A', 'workflow_state': ['in', ['Active', 'Expired', 'Returned']], 'branch': self.branch})
-#A Total principal
-		a_principal_total_act = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', 'workflow_state': 'Active'}, fields=['desired_principal'], pluck='desired_principal')
-		a_principal_total_exp = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'A', 'workflow_state': 'Expired'}, fields=['desired_principal'], pluck='desired_principal')
-		a_principal_total = 0
-		for record in a_principal_total_act:
-			a_principal_total += record
-		for record2 in a_principal_total_exp:
-			a_principal_total += record2
+#A Total count and principal
+		a_total_active, a_principal_total = _get_inventory_totals(
+			"Pawn Ticket Jewelry", self.branch, self.date, item_series="A"
+		)
 #B IN count
 		b_in_count_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'date_loan_granted': self.date ,'item_series': 'B', 'branch': self.branch, 'workflow_state': 'Active'})
 		b_renewed_count_of_the_day = frappe.db.count('Pawn Ticket Jewelry', {'change_status_date': self.date, 'workflow_state': 'Renewed', 'item_series': 'B', 'branch': self.branch})
@@ -528,16 +538,10 @@ class CashPositionReport(Document):
 		b_ret_principal = 0
 		for record in b_principal_returned:
 			b_ret_principal += record
-#B Total
-		b_total_active = frappe.db.count('Pawn Ticket Jewelry', {'date_loan_granted': ['<=', self.date], 'item_series': 'B', 'workflow_state': ['in', ['Active', 'Expired', 'Returned']], 'branch': self.branch})
-#B Total principal
-		b_principal_total_act = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'B', 'workflow_state': 'Active'}, fields=['desired_principal'], pluck='desired_principal')
-		b_principal_total_exp = frappe.db.get_all('Pawn Ticket Jewelry', filters={"branch": self.branch, "item_series": 'B', 'workflow_state': 'Expired'}, fields=['desired_principal'], pluck='desired_principal')
-		b_principal_total = 0
-		for record in b_principal_total_act:
-			b_principal_total += record
-		for record2 in b_principal_total_exp:
-			b_principal_total += record2
+#B Total count and principal
+		b_total_active, b_principal_total = _get_inventory_totals(
+			"Pawn Ticket Jewelry", self.branch, self.date, item_series="B"
+		)
 #BNJ IN count
 		nj_in_count_of_the_day = frappe.db.count('Pawn Ticket Non Jewelry', {'date_loan_granted': self.date , 'workflow_state': 'Active', 'branch': self.branch})
 		nj_renewed_count_of_the_day = frappe.db.count('Pawn Ticket Non Jewelry', {'change_status_date': self.date, 'workflow_state': 'Renewed', 'branch': self.branch})
@@ -588,17 +592,10 @@ class CashPositionReport(Document):
 		bnj_ret_principal = 0
 		for record in bnj_principal_returned:
 			bnj_ret_principal += record
-#BNJ Total
-		nj_total_active = frappe.db.count('Pawn Ticket Non Jewelry', {'date_loan_granted': ['<=', self.date], 'workflow_state': ['in', ['Active', 'Expired', 'Returned']], 'branch': self.branch})
-#BNJ Total principal
-		bnj_principal_total_act = frappe.db.get_all('Pawn Ticket Non Jewelry', filters={"branch": self.branch, 'workflow_state': 'Active'}, fields=['desired_principal'], pluck='desired_principal')
-		bnj_principal_total_exp = frappe.db.get_all('Pawn Ticket Non Jewelry', filters={"branch": self.branch, 'workflow_state': 'Expired'}, fields=['desired_principal'], pluck='desired_principal')
-		bnj_principal_total = 0
-		for record in bnj_principal_total_act:
-			bnj_principal_total += record
-		for record2 in bnj_principal_total_exp:
-			bnj_principal_total += record2
-
+#BNJ Total count and principal
+		nj_total_active, bnj_principal_total = _get_inventory_totals(
+			"Pawn Ticket Non Jewelry", self.branch, self.date
+		)
 #SB IN count
 		sb_in_count = frappe.db.count('Agreement to Sell', {'date_of_sale': self.date, 'branch': self.branch, 'workflow_state': 'Active'})
 		sb_in_principal = frappe.db.get_all('Agreement to Sell', filters={'date_of_sale': self.date, 'branch': self.branch, 'workflow_state': 'Active'}, fields=['total_value'], pluck='total_value')
