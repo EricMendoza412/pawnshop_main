@@ -186,3 +186,60 @@ class TestFundTransferGoogle(unittest.TestCase):
 		self.assertEqual(result.purchased_usd, 1000)
 		self.assertEqual(result.transferred_usd, 250)
 		self.assertEqual(result.available_usd, 750)
+
+
+class TestReconciliationGoogleExport(unittest.TestCase):
+	def adjustment(self, variance=89, currency="PHP"):
+		return frappe._dict(
+			name="TEST-ADJUSTMENT", branch="TEST", currency=currency,
+			transfer_type="Cash Position Adjustment", amount=abs(variance),
+			vault_balance_change=variance, civ_balance=3552300 + variance,
+			date_of_transfer="2026-10-24 10:00:00", business_date="2026-10-24",
+			given_by="analyst@example.com", received_by="analyst@example.com",
+			cash_position="VCP-TEST", comments="Original adjustment comment", docstatus=1,
+		)
+
+	@patch("pawnshop_management.pawnshop_management.fund_transfer_google._branch_code", return_value="TEST")
+	def test_php_variance_columns_and_audit_fields(self, branch_code):
+		for variance, shortage, overage in ((89, "", 89), (-89, 89, ""), (-0.25, 0.25, ""), (0, "", "")):
+			with self.subTest(variance=variance):
+				doc = self.adjustment(variance)
+				row = _build_uat_row(doc)
+				self.assertEqual(row[13:16], [shortage, overage, doc.civ_balance])
+				self.assertEqual(row[3:13], [""] * 10)
+				self.assertEqual(row[2], doc.name)
+				self.assertEqual(row[16:18], [doc.given_by, doc.received_by])
+				self.assertIn("VCP VCP-TEST", row[18])
+				self.assertEqual(row[19], "October 2026")
+				self.assertEqual(doc.comments, "Original adjustment comment")
+
+	@patch("pawnshop_management.pawnshop_management.fund_transfer_google._branch_code", return_value="TEST")
+	def test_usd_layout_is_preserved(self, branch_code):
+		row = _build_uat_row(self.adjustment(-89, "USD"))
+		self.assertEqual(len(row), 15)
+		self.assertEqual(row[3:10], [""] * 7)
+		self.assertEqual(row[10], 3552211)
+		self.assertIn("USD CIV adjustment -89", row[13])
+		self.assertEqual(row[14], "October 2026")
+
+	def test_retry_keeps_existing_sheet_row_and_manual_values(self):
+		from pawnshop_management.pawnshop_management import fund_transfer_google as google
+		doc = self.adjustment()
+		service = MagicMock()
+		values = service.spreadsheets.return_value.values.return_value
+		# First export is absent; retry finds its existing transfer ID in column C.
+		values.get.return_value.execute.side_effect = [{"values": []}, {"values": [[doc.name]]}]
+		settings = frappe._dict(enable_google_uat_sync=1, php_uat_sheet="PHP", uat_spreadsheet_id="test")
+		with patch.object(google.frappe, "get_doc", return_value=doc), \
+			patch.object(google.frappe, "get_single", return_value=settings), \
+			patch.object(google, "_get_sheets_service", return_value=service), \
+			patch.object(google, "_branch_code", return_value="TEST"), \
+			patch.object(google, "_mark_synced") as mark_synced:
+			doc.db_set = MagicMock()
+			google.sync_google_uat_row(doc.name)
+			google.sync_google_uat_row(doc.name)
+		values.append.assert_called_once()
+		row = values.append.call_args.kwargs["body"]["values"][0]
+		self.assertEqual(row[13:16], ["", 89, 3552389])
+		values.update.assert_not_called()
+		self.assertEqual(mark_synced.call_count, 2)

@@ -111,6 +111,7 @@
   {
    "fieldname": "inventory_tracking_no",
    "fieldtype": "Data",
+   "in_standard_filter": 1,
    "label": "Inventory Tracking No",
    "read_only": 1,
    "reqd": 1

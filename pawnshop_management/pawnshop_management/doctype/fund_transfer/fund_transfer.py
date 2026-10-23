@@ -121,7 +121,7 @@ class FundTransfer(Document):
 	def before_insert(self):
 		if not self.business_date:
 			self.business_date = today()
-		if not self.initiated_by:
+		if not (self.flags.fx_selling_submission or self.flags.system_adjustment):
 			self.initiated_by = frappe.session.user
 		if not self.status:
 			self.status = "Draft"
@@ -135,41 +135,71 @@ class FundTransfer(Document):
 		rule = get_transfer_rule(self.transfer_type)
 		self._validate_rule(rule)
 		self._set_derived_fields(rule)
-		self._validate_pending_authorizer(rule)
 		self._validate_uncollected_fx_fields()
 
-		if self.is_new() and self.transfer_type != "Cash Position Adjustment":
-			if self.flags.fx_selling_submission:
-				self._validate_fx_selling_submission()
-			else:
-				require_branch_vault_custodian(self.branch)
+		if self.flags.fx_selling_submission:
+			self._validate_fx_selling_submission()
+		elif self.transfer_type == "Cash Position Adjustment":
+			if not self.flags.system_adjustment:
+				frappe.throw(_("Cash Position Adjustments can only be created by the reconciliation process."))
+		else:
+			self._validate_manual_transfer()
 
-		if self.transfer_type == "Cash Position Adjustment" and not self.flags.system_adjustment:
-			frappe.throw(_("Cash Position Adjustments can only be created by the reconciliation process."))
+		if self.is_new():
+			self._validate_day_open()
 
-	def _validate_pending_authorizer(self, rule):
-		if self.status != "Pending Cashier Approval":
+		# Credentials are used only by this submission, never by an ordinary save.
+		if self._action != "submit":
+			self.confirmation_password = None
+			self.rover_password = None
+			if self.docstatus == 0 and not (self.flags.fx_selling_submission or self.flags.system_adjustment):
+				self.authorized_by = None
+				self.authorization_datetime = None
+
+	def _validate_manual_transfer(self):
+		if self.docstatus == 2:
 			return
-		if self.expected_authorizer:
-			return
+		if self.transfer_type == "Cash Manager to Vault":
+			frappe.throw(_("Cash Manager to Vault is retired. Use Rover to Vault for new deliveries."))
+		if self.status not in {"Draft", "Submitted", "Cancelled"}:
+			frappe.throw(_("Pending approvals are retired. Create a new Fund Transfer."))
+		previous = self.get_doc_before_save()
+		if previous and self.initiated_by != previous.initiated_by:
+			frappe.throw(_("The Fund Transfer initiator cannot be changed."), frappe.PermissionError)
+		require_transfer_initiator(self)
+		if self._action == "submit" and self.initiated_by != frappe.session.user:
+			frappe.throw(_("Only the original initiator can submit this Fund Transfer. Recreate it if assignments changed."), frappe.PermissionError)
 
-		role_label = {
-			"pawnshop_cashier": _("Pawnshop Cashier"),
-			"fx_cashier": _("Foreign Exchange Cashier"),
-			"remittance_cashier": _("Remittance Cashier"),
-		}.get(rule.get("authorizer_field"), _("cashier"))
-		frappe.throw(
-			_("No {0} is assigned to branch {1}. Assign one before submitting this Fund Transfer.").format(
-				role_label, frappe.bold(self.branch)
-			)
-		)
+	def _validate_day_open(self, posting_date=None):
+		_lock_branch(self.branch)
+		# Only the internal reconciliation path may post after closing. Do not trust
+		# a transfer type or client-provided document fields as an exemption.
+		if self.flags.system_adjustment and self.transfer_type == "Cash Position Adjustment":
+			self._validate_reconciliation_adjustment()
+			return
+		validate_fund_transfer_day_open(self.branch, posting_date)
+
+	def _validate_reconciliation_adjustment(self):
+		from pawnshop_management.pawnshop_management.doctype.vault_cash_position.vault_cash_position import _is_accounting_analyst
+
+		if not self.cash_position or not _is_accounting_analyst(frappe.session.user):
+			frappe.throw(_("Invalid reconciliation adjustment."), frappe.PermissionError)
+		position = frappe.get_doc("Vault Cash Position", self.cash_position, for_update=True)
+		variance = position.get(self.currency.lower() + "_variance") if position else None
+		if (not position or position.branch != self.branch or position.docstatus != 1
+			or position.reconciliation_status != "Pending Accounting Review"
+			or not flt(variance) or flt(self.vault_balance_change) != flt(variance)
+			or flt(self.amount) != abs(flt(variance))):
+			frappe.throw(_("The adjustment must match a submitted Vault Cash Position awaiting reconciliation."), frappe.PermissionError)
 
 	def before_submit(self):
-		self._authorize_workflow_submission()
-		self._validate_authorization()
+		# Serialize with VCP submission/cancellation before checking today's close.
+		_lock_branch(self.branch)
 		self.date_of_transfer = now_datetime()
 		self.business_date = getdate(self.date_of_transfer)
-		_lock_branch(self.branch)
+		self._validate_day_open(self.business_date)
+		self._authorize_workflow_submission()
+		self._validate_authorization()
 
 		if self.currency == "USD" and self.transfer_type == "ForEx to Vault":
 			self._validate_usd_availability()
@@ -193,57 +223,38 @@ class FundTransfer(Document):
 		self._set_legacy_values()
 
 	def _authorize_workflow_submission(self):
-		# Legacy service methods still perform their own participant/password checks
-		# before setting this flag. Native workflow submissions are authorized below.
-		if self.flags.system_adjustment or (self.flags.authorized_submission and self.authorized_by):
+		if self.flags.system_adjustment or self.flags.fx_selling_submission:
 			return
-
 		previous_status = frappe.db.get_value("Fund Transfer", self.name, "status") or "Draft"
+		if previous_status != "Draft":
+			frappe.throw(_("Only a Draft Fund Transfer can be submitted."))
+		require_transfer_initiator(self)
+		if self.initiated_by != frappe.session.user:
+			frappe.throw(_("Only the original initiator can submit this Fund Transfer."), frappe.PermissionError)
 		rule = get_transfer_rule(self.transfer_type)
 		authorization = rule.get("authorization", "cashier")
-
-		if previous_status == "Draft" and authorization == "none":
-			require_branch_vault_custodian(self.branch)
-			self.authorized_by = frappe.session.user
-		elif previous_status == "Pending Cashier Approval" and authorization == "cashier":
-			expected = get_expected_authorizer(self.branch, rule)
-			if frappe.session.user != expected:
-				frappe.throw(_("Only the currently assigned cashier can approve this transfer."), frappe.PermissionError)
-			self.expected_authorizer = expected
-			self.authorized_by = frappe.session.user
-		elif previous_status in {"Draft", "Pending Rover Confirmation"} and authorization == "rover":
-			require_branch_vault_custodian(self.branch)
-			self._verify_rover_password()
-		else:
-			frappe.throw(_("Use the available workflow action to submit this Fund Transfer."))
-
-		self.authorization_datetime = now_datetime()
-
-	def _verify_rover_password(self):
-		rover = self.rover
-		password = self.rover_password
-		if not rover or not frappe.db.get_value("User", rover, "enabled") or "Rover" not in frappe.get_roles(rover):
-			frappe.throw(_("Select an enabled User with the Rover role."), frappe.PermissionError)
-		if rover == self.initiated_by:
-			frappe.throw(_("The initiating Vault Custodian cannot authorize as Rover."), frappe.PermissionError)
-		if not password:
-			frappe.throw(_("The Rover password is required."), frappe.AuthenticationError)
-
-		rate_limit_key = _rover_rate_limit_key(rover)
-		if int(frappe.cache().get_value(rate_limit_key) or 0) >= 5:
-			frappe.throw(
-				_("Rover authorization is temporarily locked after repeated failed attempts. Try again in five minutes."),
-				frappe.AuthenticationError,
-			)
 		try:
-			check_password(rover, password)
-		except frappe.AuthenticationError:
-			attempts = int(frappe.cache().get_value(rate_limit_key) or 0) + 1
-			frappe.cache().set_value(rate_limit_key, attempts, expires_in_sec=300)
-			raise
-		frappe.cache().delete_value(rate_limit_key)
-		self.authorized_by = rover
-		self.rover_password = None
+			if authorization == "none":
+				self.authorized_by = frappe.session.user
+			elif authorization == "cashier":
+				confirmer = get_expected_authorizer(self.branch, rule)
+				if not confirmer:
+					frappe.throw(_("No {0} is assigned to branch {1}.").format(
+						PARTICIPANT_LABELS[get_confirmer_field(rule)], self.branch))
+				_verify_confirmation_password(confirmer, self.confirmation_password, self.initiated_by)
+				self.expected_authorizer = confirmer
+				self.authorized_by = confirmer
+			elif authorization == "rover":
+				if not self.rover or "Rover" not in frappe.get_roles(self.rover):
+					frappe.throw(_("Select an enabled User with the Rover role."), frappe.PermissionError)
+				_verify_confirmation_password(self.rover, self.rover_password, self.initiated_by)
+				self.authorized_by = self.rover
+			else:
+				frappe.throw(_("This transfer type cannot be submitted manually."))
+		finally:
+			self.confirmation_password = None
+			self.rover_password = None
+		self.authorization_datetime = now_datetime()
 
 	def on_submit(self):
 		from pawnshop_management.pawnshop_management.fund_transfer_google import queue_google_uat_sync
@@ -310,7 +321,7 @@ class FundTransfer(Document):
 		if authorization == "cashier":
 			expected = get_expected_authorizer(self.branch, rule)
 			if not expected or self.authorized_by != expected:
-				frappe.throw(_("The currently assigned cashier must authorize this transfer."), frappe.PermissionError)
+				frappe.throw(_("The currently assigned receiving person must confirm this transfer."), frappe.PermissionError)
 		elif authorization == "rover":
 			if not self.rover or self.authorized_by != self.rover or "Rover" not in frappe.get_roles(self.rover):
 				frappe.throw(_("A valid Rover confirmation is required."), frappe.PermissionError)
@@ -491,9 +502,90 @@ def get_fund_transfer_branch_code(branch):
 	return str(branch).strip().upper()
 
 
+PARTICIPANT_LABELS = {
+	"vault_custodian": _("Vault Custodian"),
+	"pawnshop_cashier": _("Pawnshop Cashier"),
+	"remittance_cashier": _("Remittance Cashier"),
+	"fx_cashier": _("Foreign Exchange Cashier"),
+}
+
+
+def get_initiator_field(rule):
+	if rule.get("authorizer_field") and rule["destination"] == "Vault":
+		return rule["authorizer_field"]
+	return "vault_custodian"
+
+
+def get_confirmer_field(rule):
+	if not rule.get("authorizer_field"):
+		return None
+	return rule["authorizer_field"] if rule["source"] == "Vault" else "vault_custodian"
+
+
 def get_expected_authorizer(branch, rule):
-	fieldname = rule.get("authorizer_field")
+	fieldname = get_confirmer_field(rule)
 	return frappe.db.get_value("Branch", branch, fieldname) if fieldname else None
+
+
+def _is_assigned_initiator(branch, transfer_type, user):
+	if transfer_type not in TRANSFER_RULES or transfer_type in {"Cash Manager to Vault", "Cash Position Adjustment"}:
+		return False
+	return bool(branch and frappe.db.get_value("Branch", branch, get_initiator_field(TRANSFER_RULES[transfer_type])) == user)
+
+
+def require_transfer_initiator(doc):
+	user = frappe.session.user
+	if is_system_manager(user):
+		return
+	if not _is_assigned_initiator(doc.branch, doc.transfer_type, user):
+		frappe.throw(_("Only the branch's assigned source cashier or Vault Custodian can initiate this transfer type."), frappe.PermissionError)
+	if doc.initiated_by != user:
+		frappe.throw(_("Only the original initiator can edit this Fund Transfer."), frappe.PermissionError)
+
+
+def _verify_confirmation_password(user, password, initiator):
+	if not frappe.db.get_value("User", user, "enabled"):
+		frappe.throw(_("The confirming user must be enabled."), frappe.PermissionError)
+	if user == initiator or user == frappe.session.user:
+		frappe.throw(_("The initiator cannot confirm their own transfer."), frappe.PermissionError)
+	if not password:
+		frappe.throw(_("The confirming person's password is required."), frappe.AuthenticationError)
+	key = _confirmation_rate_limit_key(user)
+	if int(frappe.cache().get_value(key, expires=True) or 0) >= 5:
+		frappe.throw(_("Confirmation is locked after repeated failed attempts. Try again in five minutes."), frappe.AuthenticationError)
+	try:
+		check_password(user, password)
+	except frappe.AuthenticationError:
+		attempts = int(frappe.cache().get_value(key, expires=True) or 0) + 1
+		frappe.cache().set_value(key, attempts, expires_in_sec=300)
+		raise
+	frappe.cache().delete_value(key)
+
+
+@frappe.whitelist()
+def get_entry_context(branch=None, currency=None):
+	"""Return only the current user's permitted branches/types and assigned confirmers."""
+	user = frappe.session.user
+	admin = is_system_manager(user)
+	branches = frappe.get_all("Branch", fields=["name"] + list(PARTICIPANT_LABELS))
+	permitted = [b for b in branches if admin or user in [b.get(f) for f in PARTICIPANT_LABELS]]
+	selected = next((b for b in permitted if b.name == branch), None)
+	transfers = []
+	if selected:
+		for name, rule in TRANSFER_RULES.items():
+			if name in {"Cash Manager to Vault", "Cash Position Adjustment"}:
+				continue
+			if currency not in rule["currencies"]:
+				continue
+			if not admin and selected.get(get_initiator_field(rule)) != user:
+				continue
+			field = get_confirmer_field(rule)
+			transfers.append({"transfer_type": name, "confirmer": selected.get(field) if field else None,
+				"confirmer_label": PARTICIPANT_LABELS.get(field), "authorization": rule.get("authorization", "cashier")})
+	closed_position = get_closed_vault_position(branch) if selected else None
+	return {"branches": [b.name for b in permitted], "transfers": transfers,
+		"closed_position": closed_position,
+		"closure_message": fund_transfer_closure_message(branch, today(), closed_position) if closed_position else None}
 
 
 @frappe.whitelist()
@@ -530,6 +622,33 @@ def require_branch_vault_custodian(branch, user=None):
 		frappe.throw(_("Only the branch's current Vault Custodian can perform this action."), frappe.PermissionError)
 
 
+def get_closed_vault_position(branch, posting_date=None, for_update=False):
+	if not branch:
+		return None
+	# FOR UPDATE is a current read in MariaDB, even if this transaction already
+	# established an older repeatable-read snapshot before waiting for the branch.
+	rows = frappe.db.sql("""
+		select name from `tabVault Cash Position`
+		where branch=%s and business_date=%s and docstatus=1
+		order by name limit 1
+		""" + (" for update" if for_update else ""), (branch, posting_date or today()))
+	return rows[0][0] if rows else None
+
+
+def fund_transfer_closure_message(branch, posting_date, position):
+	return _("Fund transfers are closed for {0} on {1} because Vault Cash Position {2} has already been submitted.").format(
+		frappe.utils.escape_html(branch), frappe.utils.formatdate(posting_date),
+		frappe.utils.get_link_to_form("Vault Cash Position", position))
+
+
+def validate_fund_transfer_day_open(branch, posting_date=None):
+	_lock_branch(branch)
+	posting_date = posting_date or today()
+	position = get_closed_vault_position(branch, posting_date, for_update=True)
+	if position:
+		frappe.throw(fund_transfer_closure_message(branch, posting_date, position))
+
+
 def get_latest_civ_balance(branch, currency, lock=True):
 	if lock:
 		_lock_branch(branch)
@@ -539,7 +658,7 @@ def get_latest_civ_balance(branch, currency, lock=True):
 		from `tabFund Transfer`
 		where branch=%s and currency=%s and docstatus=1 and status='Submitted'
 		order by date_of_transfer desc, creation desc
-		limit 1
+		limit 1 for update
 		""",
 		(branch, currency),
 		as_dict=True,
@@ -568,110 +687,39 @@ def _lock_branch(branch):
 
 @frappe.whitelist()
 def request_approval(name):
+	"""Compatibility for transfers that never required a second person's password."""
 	doc = frappe.get_doc("Fund Transfer", name)
 	doc.check_permission("write")
-	require_branch_vault_custodian(doc.branch)
-	if doc.docstatus != 0 or doc.status != "Draft":
-		frappe.throw(_("Only a Draft Fund Transfer can be requested."))
-
-	rule = get_transfer_rule(doc.transfer_type)
-	authorization = rule.get("authorization", "cashier")
-	if authorization == "cashier":
-		doc.expected_authorizer = get_expected_authorizer(doc.branch, rule)
-		if not doc.expected_authorizer:
-			frappe.throw(_("No cashier is currently assigned to this branch for the selected transfer type."))
-		doc.status = "Pending Cashier Approval"
-		doc.save()
-	elif authorization == "rover":
-		doc.status = "Pending Rover Confirmation"
-		doc.save()
-	elif authorization == "none":
-		doc.authorized_by = frappe.session.user
-		doc.authorization_datetime = now_datetime()
-		_submit_authorized(doc)
-	else:
-		frappe.throw(_("This transfer type cannot be requested manually."))
+	if get_transfer_rule(doc.transfer_type).get("authorization") != "none":
+		frappe.throw(_("Use Submit and confirm with the receiving person's password. Pending approvals are retired."))
+	doc.submit()
 	return doc.as_dict()
 
 
 @frappe.whitelist()
 def approve_cashier_transfer(name):
-	doc = frappe.get_doc("Fund Transfer", name)
-	if doc.docstatus != 0 or doc.status != "Pending Cashier Approval":
-		frappe.throw(_("This Fund Transfer is not awaiting cashier approval."))
-	rule = get_transfer_rule(doc.transfer_type)
-	expected = get_expected_authorizer(doc.branch, rule)
-	if frappe.session.user != expected:
-		frappe.throw(_("Only the currently assigned cashier can approve this transfer."), frappe.PermissionError)
-	doc.expected_authorizer = expected
-	doc.authorized_by = frappe.session.user
-	doc.authorization_datetime = now_datetime()
-	_submit_authorized(doc)
-	return doc.as_dict()
+	frappe.throw(_("Pending approvals are retired. Use Submit with password confirmation."))
 
 
 @frappe.whitelist()
 def reject_cashier_transfer(name, reason=None):
-	doc = frappe.get_doc("Fund Transfer", name)
-	if doc.docstatus != 0 or doc.status != "Pending Cashier Approval":
-		frappe.throw(_("This Fund Transfer is not awaiting cashier approval."))
-	rule = get_transfer_rule(doc.transfer_type)
-	if frappe.session.user != get_expected_authorizer(doc.branch, rule):
-		frappe.throw(_("Only the currently assigned cashier can reject this transfer."), frappe.PermissionError)
-	doc.status = "Rejected"
-	doc.authorized_by = frappe.session.user
-	doc.authorization_datetime = now_datetime()
-	if reason:
-		doc.comments = _append_comment(doc.comments, _("Rejected: {0}").format(reason))
-	doc.save(ignore_permissions=True)
-	return doc.as_dict()
+	frappe.throw(_("Pending approvals are retired."))
 
 
 @frappe.whitelist()
 def confirm_rover_transfer(name, rover, password):
-	doc = frappe.get_doc("Fund Transfer", name)
-	require_branch_vault_custodian(doc.branch)
-	if doc.docstatus != 0 or doc.status != "Pending Rover Confirmation":
-		frappe.throw(_("This Fund Transfer is not awaiting Rover confirmation."))
-	if not rover or not frappe.db.get_value("User", rover, "enabled") or "Rover" not in frappe.get_roles(rover):
-		frappe.throw(_("Select an enabled User with the Rover role."), frappe.PermissionError)
-	if rover == doc.initiated_by:
-		frappe.throw(_("The initiating Vault Custodian cannot authorize as Rover."), frappe.PermissionError)
-
-	rate_limit_key = _rover_rate_limit_key(rover)
-	if int(frappe.cache().get_value(rate_limit_key) or 0) >= 5:
-		frappe.throw(
-			_("Rover authorization is temporarily locked after repeated failed attempts. Try again in five minutes."),
-			frappe.AuthenticationError,
-		)
-	try:
-		check_password(rover, password)
-	except frappe.AuthenticationError:
-		attempts = int(frappe.cache().get_value(rate_limit_key) or 0) + 1
-		frappe.cache().set_value(rate_limit_key, attempts, expires_in_sec=300)
-		frappe.logger("fund_transfer").warning(
-			"Failed Rover authorization: transfer=%s rover=%s ip=%s",
-			doc.name,
-			rover,
-			getattr(frappe.local, "request_ip", None),
-		)
-		raise
-	frappe.cache().delete_value(rate_limit_key)
-	doc.rover = rover
-	doc.authorized_by = rover
-	doc.authorization_datetime = now_datetime()
-	_submit_authorized(doc)
-	return doc.as_dict()
+	frappe.throw(_("Use Submit with Rover password confirmation. Pending approvals are retired."))
 
 
 @frappe.whitelist()
 def cancel_pending_transfer(name):
 	doc = frappe.get_doc("Fund Transfer", name)
-	require_branch_vault_custodian(doc.branch)
-	if doc.docstatus != 0 or doc.status not in {"Draft", "Pending Cashier Approval", "Pending Rover Confirmation"}:
-		frappe.throw(_("Only a Draft or pending Fund Transfer can be cancelled."))
+	doc.check_permission("write")
+	require_transfer_initiator(doc)
+	if doc.docstatus != 0 or doc.status != "Draft":
+		frappe.throw(_("Only a Draft Fund Transfer can be cancelled."))
 	doc.status = "Cancelled"
-	doc.save(ignore_permissions=True)
+	doc.save()
 	return doc.as_dict()
 
 
@@ -742,17 +790,13 @@ def has_permission(doc, ptype=None, user=None):
 	if is_system_manager(user):
 		return True
 	if permission_type == "create":
-		return _user_is_any_vault_custodian(user)
+		if doc and doc.get("branch") and doc.get("transfer_type"):
+			return _is_assigned_initiator(doc.branch, doc.transfer_type, user)
+		return any(frappe.db.exists("Branch", {field: user}) for field in PARTICIPANT_LABELS)
 	if permission_type in READ_PERMISSION_TYPES:
 		return _can_read_from_current_branch(doc, user)
-	if permission_type == "submit":
-		if doc.docstatus == 1:
-			return _can_submit_workflow(doc, user)
-		return _can_write_pending(doc, user)
-	if permission_type == "write":
-		if doc.docstatus == 1:
-			return _can_submit_workflow(doc, user)
-		return _can_write_pending(doc, user)
+	if permission_type in {"submit", "write"}:
+		return _can_write_draft(doc, user)
 	return None
 
 
@@ -767,46 +811,14 @@ def _has_read_all_role(user):
 	return bool(set(frappe.get_roles(user)).intersection(READ_ALL_ROLES))
 
 
-def _can_write_pending(doc, user):
-	status = doc.status
-	if doc.docstatus == 0 and status == "Submitted" and getattr(doc, "name", None):
-		status = frappe.db.get_value("Fund Transfer", doc.name, "status") or status
-	if (
-		frappe.db.get_value("Branch", doc.branch, "vault_custodian") == user
-		and status in {"Draft", "Pending Cashier Approval", "Pending Rover Confirmation"}
-	):
-		return True
-	if status == "Pending Cashier Approval":
-		return user == get_expected_authorizer(doc.branch, get_transfer_rule(doc.transfer_type))
-	return False
-
-
-def _can_submit_workflow(doc, user):
-	"""Authorize only a draft-to-submitted transition that is currently in progress."""
-	stored = frappe.db.get_value("Fund Transfer", doc.name, ["docstatus", "status"], as_dict=True)
-	if not stored or stored.docstatus != 0:
+def _can_write_draft(doc, user):
+	if not doc.get("name"):
 		return False
-
-	if stored.status == "Pending Cashier Approval":
-		return user == doc.expected_authorizer
-	if stored.status == "Pending Rover Confirmation":
-		return frappe.db.get_value("Branch", doc.branch, "vault_custodian") == user
-	if stored.status == "Draft" and get_transfer_rule(doc.transfer_type).get("authorization") in {"none", "rover"}:
-		return frappe.db.get_value("Branch", doc.branch, "vault_custodian") == user
-	return False
-
-
-def _user_is_any_vault_custodian(user):
-	return bool(frappe.db.exists("Branch", {"vault_custodian": user}))
-
-
-def _submit_authorized(doc):
-	doc.flags.authorized_submission = True
-	# Each public action performs its exact participant check before reaching this
-	# point. Dynamic Branch assignments cannot be represented by static DocPerm
-	# roles, so submission intentionally bypasses only the static role gate.
-	doc.flags.ignore_permissions = True
-	doc.submit()
+	stored = frappe.db.get_value("Fund Transfer", doc.name, ["docstatus", "status", "initiated_by", "branch", "transfer_type"], as_dict=True)
+	return bool(stored and stored.docstatus == 0 and stored.status == "Draft"
+		and stored.initiated_by == user and doc.initiated_by == user
+		and _is_assigned_initiator(stored.branch, stored.transfer_type, user)
+		and _is_assigned_initiator(doc.branch, doc.transfer_type, user))
 
 
 def _safe_series_prefix(value):
@@ -817,6 +829,8 @@ def _safe_series_prefix(value):
 
 
 def _given_by(doc):
+	if get_transfer_rule(doc.transfer_type).get("authorizer_field"):
+		return doc.initiated_by
 	if doc.source == "Vault":
 		return doc.initiated_by
 	if doc.source == "Armored Van":
@@ -827,6 +841,8 @@ def _given_by(doc):
 
 
 def _received_by(doc):
+	if get_transfer_rule(doc.transfer_type).get("authorizer_field"):
+		return doc.authorized_by
 	if doc.fx_selling and doc.customer_name:
 		return doc.customer_name
 	if doc.destination == "Vault":
@@ -850,6 +866,6 @@ def _same_protected_value(doc, previous, fieldname):
 	return str(current_value or "").strip() == str(previous_value or "").strip()
 
 
-def _rover_rate_limit_key(rover):
+def _confirmation_rate_limit_key(user):
 	request_ip = getattr(frappe.local, "request_ip", None) or "unknown"
-	return "fund-transfer-rover-auth:{0}:{1}".format(rover, request_ip)
+	return "fund-transfer-confirmation:{0}:{1}".format(user, request_ip)

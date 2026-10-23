@@ -19,6 +19,7 @@ from pawnshop_management.operations_access_control.access_control import (
 from pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer import (
 	_safe_series_prefix,
 	get_fund_transfer_branch_code,
+	validate_fund_transfer_day_open,
 )
 
 
@@ -63,6 +64,8 @@ class FXSelling(Document):
 
 	def before_submit(self):
 		self._validate_actor()
+		if any(row.currency == "USD" for row in self.currencies):
+			validate_fund_transfer_day_open(self.branch)
 		settings = frappe.get_single("FX Selling Settings")
 		if not settings.enable_google_writes or not settings.write_spreadsheet_id:
 			frappe.throw(_("Google writes must be enabled with a UAT write spreadsheet before submitting FX Selling."))

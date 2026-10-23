@@ -28,6 +28,7 @@
   "authorization_datetime",
   "rover",
   "rover_password",
+  "confirmation_password",
   "balance_section",
   "opening_civ_balance",
   "vault_balance_change",
@@ -219,6 +220,13 @@
    "fieldtype": "Password",
    "hidden": 1,
    "label": "Rover Password",
+   "no_copy": 1
+  },
+  {
+   "fieldname": "confirmation_password",
+   "fieldtype": "Password",
+   "hidden": 1,
+   "label": "Confirmation Password",
    "no_copy": 1
   },
   {

@@ -4,13 +4,11 @@ import frappe
 WORKFLOW_NAME = "Fund Transfer Workflow"
 WORKFLOW_STATES = {
 	"Draft": "Inverse",
-	"Pending Cashier Approval": "Warning",
-	"Pending Rover Confirmation": "Warning",
 	"Submitted": "Success",
 	"Rejected": "Danger",
 	"Cancelled": "Danger",
 }
-WORKFLOW_ACTIONS = ("Submit", "Approve", "Reject", "Confirm with Rover Password", "Cancel Pending Transfer")
+WORKFLOW_ACTIONS = ("Submit", "Cancel Pending Transfer")
 CASHIER_TYPES = (
 	"Vault to Pawnshop (-NCB)",
 	"Pawnshop (-NCB) to Vault",
@@ -19,7 +17,7 @@ CASHIER_TYPES = (
 	"Vault to ForEx",
 	"ForEx to Vault",
 )
-ROVER_TYPES = ("Rover to Vault", "Vault to Cash Manager", "Cash Manager to Vault")
+ROVER_TYPES = ("Rover to Vault", "Vault to Cash Manager")
 DIRECT_TYPES = ("Armored Van to Vault", "Uncollected FX to Vault")
 
 
@@ -58,8 +56,6 @@ def ensure_workflow():
 		"states",
 		[
 			{"state": "Draft", "doc_status": "0", "allow_edit": "All"},
-			{"state": "Pending Cashier Approval", "doc_status": "0", "allow_edit": "All"},
-			{"state": "Pending Rover Confirmation", "doc_status": "0", "allow_edit": "All"},
 			{"state": "Submitted", "doc_status": "1", "allow_edit": "System Manager"},
 			{"state": "Rejected", "doc_status": "0", "allow_edit": "System Manager"},
 			{"state": "Cancelled", "doc_status": "0", "allow_edit": "System Manager"},
@@ -68,14 +64,11 @@ def ensure_workflow():
 	workflow.set(
 		"transitions",
 		[
-			transition("Draft", "Submit", "Pending Cashier Approval", f"doc.transfer_type in {CASHIER_TYPES!r}"),
+			transition("Draft", "Submit", "Submitted", f"doc.transfer_type in {CASHIER_TYPES!r}"),
 			transition("Draft", "Submit", "Submitted", f"doc.transfer_type in {ROVER_TYPES!r}"),
 			transition("Draft", "Submit", "Submitted", f"doc.transfer_type in {DIRECT_TYPES!r}"),
-			transition("Pending Cashier Approval", "Approve", "Submitted", "doc.expected_authorizer == frappe.session.user"),
-			transition("Pending Cashier Approval", "Reject", "Rejected", "doc.expected_authorizer == frappe.session.user"),
-			transition("Pending Cashier Approval", "Cancel Pending Transfer", "Cancelled", vault_custodian_condition()),
-			transition("Pending Rover Confirmation", "Confirm with Rover Password", "Submitted", vault_custodian_condition()),
-			transition("Pending Rover Confirmation", "Cancel Pending Transfer", "Cancelled", vault_custodian_condition()),
+			transition("Draft", "Submit", "Submitted", "doc.transfer_type == 'Cash Position Adjustment'"),
+			transition("Draft", "Cancel Pending Transfer", "Cancelled", "doc.initiated_by == frappe.session.user"),
 		],
 	)
 	workflow.save(ignore_permissions=True)
@@ -83,6 +76,8 @@ def ensure_workflow():
 
 
 def transition(state, action, next_state, condition):
+	if state == "Draft" and action == "Submit":
+		condition = "({0}) and (doc.initiated_by == frappe.session.user or (doc.fx_selling and doc.authorized_by == frappe.session.user))".format(condition)
 	return {
 		"state": state,
 		"action": action,
@@ -91,7 +86,3 @@ def transition(state, action, next_state, condition):
 		"allow_self_approval": 1,
 		"condition": condition,
 	}
-
-
-def vault_custodian_condition():
-	return "frappe.db.get_value('Branch', doc.branch, 'vault_custodian') == frappe.session.user"

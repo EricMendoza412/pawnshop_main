@@ -302,7 +302,8 @@ class TestFXSelling(unittest.TestCase):
 		from pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer import request_approval
 
 		frappe.set_user("Administrator")
-		frappe.db.set_value("Branch", "TEST", "vault_custodian", "Administrator", update_modified=False)
+		frappe.get_doc({"doctype": "Branch", "branch": "FX-CUTOFF-TEST"}).insert(ignore_permissions=True)
+		frappe.db.set_value("Branch", "FX-CUTOFF-TEST", "vault_custodian", "Administrator", update_modified=False)
 		cashier = frappe.new_doc("User")
 		cashier.email = "fx.selling.cashier@example.com"
 		cashier.first_name = "FX Selling Cashier"
@@ -316,7 +317,7 @@ class TestFXSelling(unittest.TestCase):
 			"Fund Transfer Settings", "Fund Transfer Settings", "enable_google_uat_sync", 0, update_modified=False
 		)
 		incoming = frappe.new_doc("Fund Transfer")
-		incoming.branch = "TEST"
+		incoming.branch = "FX-CUTOFF-TEST"
 		incoming.currency = "USD"
 		incoming.transfer_type = "Armored Van to Vault"
 		incoming.amount = 1000
@@ -331,20 +332,32 @@ class TestFXSelling(unittest.TestCase):
 		frappe.set_user(cashier.name)
 		with patch(
 			"pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.get_branch_from_request_ip",
-			return_value="TEST",
+			return_value="FX-CUTOFF-TEST",
 		), patch(
 			"pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling.has_active_branch_role",
 			return_value=True,
 		), patch(
 			"pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer.get_branch_from_request_ip",
-			return_value="TEST",
+			return_value="FX-CUTOFF-TEST",
 		):
 			doc = frappe.new_doc("FX Selling")
-			doc.branch = "TEST"
+			doc.branch = "FX-CUTOFF-TEST"
 			doc.customer = customer[0]
 			doc.customer_id_picture = "test-id"
 			doc.append("currencies", {"currency": "USD", "amount": 200, "base_rate": 61.12, "selling_addition": 0.70, "selling_rate": 61.82, "peso_amount": 12364})
 			doc.insert()
+			# A submitted VCP must stop the sale before either the linked transfer
+			# or the external Google write occurs.
+			closed = frappe.get_doc({"doctype": "Vault Cash Position", "name": "FX-CUTOFF-TEST",
+				"branch": "FX-CUTOFF-TEST", "business_date": frappe.utils.today(), "docstatus": 1})
+			closed.db_insert()
+			with self.assertRaisesRegex(frappe.ValidationError, "Fund transfers are closed"):
+				doc.submit()
+			doc.reload()
+			self.assertEqual(doc.docstatus, 0)
+			self.assertFalse(doc.fund_transfer)
+			sync_google.assert_not_called()
+			frappe.db.sql("delete from `tabVault Cash Position` where name=%s", closed.name)
 			doc.submit()
 		doc.reload()
 		transfer = frappe.get_doc("Fund Transfer", doc.fund_transfer)

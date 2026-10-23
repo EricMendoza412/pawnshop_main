@@ -18,7 +18,7 @@ from pawnshop_management.pawnshop_management.doctype.vault_cash_position.vault_c
 )
 
 
-TEST_BRANCH = "TEST"
+TEST_BRANCH = "VCP-CUTOFF-TEST"
 
 
 class TestVaultCashPosition(unittest.TestCase):
@@ -41,6 +41,7 @@ class TestVaultCashPosition(unittest.TestCase):
 
 	def setUp(self):
 		frappe.set_user("Administrator")
+		frappe.get_doc({"doctype": "Branch", "branch": TEST_BRANCH}).insert(ignore_permissions=True)
 		frappe.db.set_value("Branch", TEST_BRANCH, "vault_custodian", "Administrator", update_modified=False)
 		frappe.db.set_value(
 			"Fund Transfer Settings",
@@ -124,7 +125,7 @@ class TestVaultCashPosition(unittest.TestCase):
 		self.assertIn("Custodian &lt;One&gt;", line)
 		self.assertNotIn("Custodian <One>", line)
 
-	def test_variance_does_not_block_transfer_and_reconciliation_adjusts_current_civ(self):
+	def test_submitted_position_blocks_transfers_but_allows_reconciliation(self):
 		incoming = frappe.new_doc("Fund Transfer")
 		incoming.update(
 			{
@@ -153,7 +154,7 @@ class TestVaultCashPosition(unittest.TestCase):
 		self.assertEqual(position.php_variance, -100)
 		self.assertEqual(position.reconciliation_status, "Pending Accounting Review")
 
-		# A real transfer can continue before Accounting approval.
+		# Even while Accounting review is pending, the branch is closed.
 		second = frappe.new_doc("Fund Transfer")
 		second.update(
 			{
@@ -163,10 +164,8 @@ class TestVaultCashPosition(unittest.TestCase):
 				"amount": 200,
 			}
 		)
-		second.insert()
-		request_approval(second.name)
-		second.reload()
-		self.assertEqual(second.civ_balance, 1200)
+		with self.assertRaisesRegex(frappe.ValidationError, "Fund transfers are closed"):
+			second.insert()
 
 		approve_reconciliation(position.name, "Approved test shortage")
 		position.reload()
@@ -174,8 +173,8 @@ class TestVaultCashPosition(unittest.TestCase):
 		self.assertTrue(position.php_adjustment_fund_transfer)
 		adjustment = frappe.get_doc("Fund Transfer", position.php_adjustment_fund_transfer)
 		self.assertEqual(adjustment.vault_balance_change, -100)
-		self.assertEqual(adjustment.opening_civ_balance, 1200)
-		self.assertEqual(adjustment.civ_balance, 1100)
+		self.assertEqual(adjustment.opening_civ_balance, 1000)
+		self.assertEqual(adjustment.civ_balance, 900)
 
 	def _new_position(self, php_counts, usd_counts):
 		doc = frappe.new_doc("Vault Cash Position")

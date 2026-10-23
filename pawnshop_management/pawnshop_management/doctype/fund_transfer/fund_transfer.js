@@ -9,17 +9,19 @@ const TRANSFER_DEFINITION_FIELDS = [
 	"legacy_transfer_id",
 	"external_party",
 ];
-const ROVER_TRANSFER_TYPES = ["Rover to Vault", "Vault to Cash Manager", "Cash Manager to Vault"];
+const ROVER_TRANSFER_TYPES = ["Rover to Vault", "Vault to Cash Manager"];
 const UNCOLLECTED_FX_TYPE = "Uncollected FX to Vault";
 
 frappe.ui.form.on("Fund Transfer", {
 	setup(frm) {
-		frm.set_query("branch", () => {
-			if (frappe.session.user === "Administrator") {
-				return {};
+		$(document).off("ajaxComplete.fund_transfer_confirmation").on("ajaxComplete.fund_transfer_confirmation", (_event, _xhr, settings) => {
+			if ((settings.url || "").includes("frappe.model.workflow.apply_workflow") ||
+				String(settings.data || "").includes("frappe.model.workflow.apply_workflow")) {
+				frm.doc.confirmation_password = null;
+				frm.doc.rover_password = null;
 			}
-			return { filters: { vault_custodian: frappe.session.user } };
 		});
+		frm.set_query("branch", () => ({ filters: { name: ["in", frm.__entry_branches || []] } }));
 		frm.set_query("rover", () => ({
 			query: "pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer.rover_user_query",
 		}));
@@ -39,19 +41,36 @@ frappe.ui.form.on("Fund Transfer", {
 	},
 
 	async before_workflow_action(frm) {
+		let context;
+		if (frm.selected_workflow_action === "Submit") {
+			context = await load_entry_context(frm);
+			show_day_closure(frm, context);
+			if (context.closed_position) frappe.throw(context.closure_message);
+		}
 		if (
 			frm.selected_workflow_action === "Submit" &&
 			ROVER_TRANSFER_TYPES.includes(frm.doc.transfer_type)
 		) {
 			const values = await prompt_for_rover_confirmation(frm);
-			await frm.set_value("rover", values.rover);
-			await frm.set_value("rover_password", values.password);
+			frm.doc.rover = values.rover;
+			// Transient values: do not mark the saved draft dirty or save credentials.
+			frm.doc.rover_password = values.password;
 		}
 
-		if (frm.selected_workflow_action === "Reject") {
-			const values = await prompt_for_rejection();
-			await frm.set_value("comments", append_comment(frm.doc.comments, `Rejected: ${values.reason}`));
+		if (frm.selected_workflow_action === "Submit" && !ROVER_TRANSFER_TYPES.includes(frm.doc.transfer_type)) {
+			const entry = context.transfers.find((item) => item.transfer_type === frm.doc.transfer_type);
+			if (!entry) frappe.throw(__("You cannot initiate this transfer type for this branch."));
+			if (entry.authorization === "cashier") {
+				if (!entry.confirmer) frappe.throw(__("No {0} is assigned to this branch.", [entry.confirmer_label]));
+				const values = await prompt_for_confirmation(frm, entry);
+				frm.doc.confirmation_password = values.password;
+			}
 		}
+	},
+
+	after_workflow_action(frm) {
+		frm.doc.confirmation_password = null;
+		frm.doc.rover_password = null;
 	},
 
 	currency(frm) {
@@ -71,6 +90,7 @@ frappe.ui.form.on("Fund Transfer", {
 	},
 
 	branch(frm) {
+		set_transfer_type_options(frm);
 		if (frm.doc.transfer_type === UNCOLLECTED_FX_TYPE && !frm.doc.fx_cpr_date) {
 			select_uncollected_fx_envelope(frm);
 		}
@@ -121,34 +141,40 @@ function delete_linked_fx_transaction(frm) {
 	);
 }
 
-function set_transfer_type_options(frm) {
-	const php = [
-		"Vault to Pawnshop (-NCB)",
-		"Pawnshop (-NCB) to Vault",
-		"Vault to Remittance",
-		"Remittance to Vault",
-		"Vault to ForEx",
-		"ForEx to Vault",
-		"Armored Van to Vault",
-		"Rover to Vault",
-		"Vault to Cash Manager",
-		"Cash Manager to Vault",
-	];
-	const usd = [
-		"Vault to Remittance",
-		"Remittance to Vault",
-		"ForEx to Vault",
-		UNCOLLECTED_FX_TYPE,
-		"Armored Van to Vault",
-		"Rover to Vault",
-		"Vault to Cash Manager",
-		"Cash Manager to Vault",
-	];
-	const options = frm.doc.currency === "USD" ? usd : frm.doc.currency === "PHP" ? php : [];
-	frm.toggle_display("transfer_type", Boolean(frm.doc.currency));
+async function load_entry_context(frm) {
+	const response = await frappe.call({
+		method: "pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer.get_entry_context",
+		args: { branch: frm.doc.branch, currency: frm.doc.currency },
+	});
+	return response.message;
+}
+
+async function set_transfer_type_options(frm) {
+	// Historical documents must retain their original type and displayed options.
+	if (!frm.is_new() && frm.doc.status !== "Draft") return;
+	const branch = frm.doc.branch;
+	const currency = frm.doc.currency;
+	const context = await load_entry_context(frm);
+	if (branch !== frm.doc.branch || currency !== frm.doc.currency) return;
+	show_day_closure(frm, context);
+	frm.__entry_branches = context.branches;
+	const options = context.transfers.map((entry) => entry.transfer_type);
+	frm.toggle_display("transfer_type", Boolean(currency));
 	frm.set_df_property("transfer_type", "options", options.join("\n"));
 	if (frm.doc.transfer_type && !options.includes(frm.doc.transfer_type)) {
 		frm.set_value("transfer_type", null);
+	}
+}
+
+function show_day_closure(frm, context) {
+	if (context.closed_position) {
+		frm.__day_closed = true;
+		frm.disable_save();
+		frm.dashboard.set_headline_alert(context.closure_message);
+	} else if (frm.__day_closed) {
+		frm.__day_closed = false;
+		frm.enable_save();
+		frm.dashboard.clear_headline();
 	}
 }
 
@@ -288,46 +314,50 @@ function set_branch_from_request_ip(frm) {
 	});
 }
 
-function prompt_for_rejection() {
-	return new Promise((resolve) => {
-		frappe.prompt(
-			[{ fieldname: "reason", fieldtype: "Small Text", label: __("Reason"), reqd: 1 }],
-			resolve,
-			__("Reject Fund Transfer"),
-			__("Continue")
-		);
-	});
+function prompt_for_confirmation(frm, entry) {
+	return confirmation_dialog(frm, [
+		{ fieldname: "confirmer", fieldtype: "Data", label: __(entry.confirmer_label), default: entry.confirmer, read_only: 1 },
+	]);
 }
 
 function prompt_for_rover_confirmation(frm) {
-	return new Promise((resolve) => {
+	return confirmation_dialog(frm, [
+		{ fieldname: "rover", fieldtype: "Link", options: "User", label: __("Rover"), reqd: 1,
+			get_query: () => ({ query: "pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer.rover_user_query" }) },
+	]);
+}
+
+function confirmation_dialog(frm, participant_fields) {
+	// A failed request must not leave a reusable password on the browser document.
+	frm.doc.confirmation_password = null;
+	frm.doc.rover_password = null;
+	return new Promise((resolve, reject) => {
+		let accepted = false;
 		const dialog = new frappe.ui.Dialog({
-			title: __("Rover Confirmation"),
+			title: __("Confirm Fund Transfer"),
 			fields: [
-				{
-					fieldname: "confirmation",
-					fieldtype: "HTML",
-					options: __(
-						"<p>Confirm <b>{0} {1}</b> for <b>{2}</b>. The Rover password authorizes this exact transfer.</p>",
-						[frm.doc.currency, format_currency(frm.doc.amount, frm.doc.currency), frm.doc.transfer_type]
-					),
-				},
-				{ fieldname: "rover", fieldtype: "Link", options: "User", label: __("Rover"), reqd: 1 },
-				{ fieldname: "password", fieldtype: "Password", label: __("Password"), reqd: 1 },
+				{ fieldname: "branch", fieldtype: "Data", label: __("Branch"), default: frm.doc.branch, read_only: 1 },
+				{ fieldname: "transfer_type", fieldtype: "Data", label: __("Transfer Type"), default: frm.doc.transfer_type, read_only: 1 },
+				{ fieldname: "currency", fieldtype: "Data", label: __("Currency"), default: frm.doc.currency, read_only: 1 },
+				{ fieldname: "amount", fieldtype: "Currency", label: __("Amount"), default: frm.doc.amount, read_only: 1, options: "currency" },
+				...participant_fields,
+				{ fieldname: "password", fieldtype: "Password", label: __("Confirming Person's Password"), reqd: 1 },
 			],
-			primary_action_label: __("Continue"),
+			primary_action_label: __("Confirm and Submit"),
 			primary_action(values) {
+				accepted = true;
+				dialog.set_value("password", "");
 				dialog.hide();
 				resolve(values);
 			},
+			onhide() {
+				if (!accepted) {
+					frappe.dom.unfreeze();
+					reject(new Error(__("Transfer confirmation cancelled.")));
+				}
+			},
 		});
-		dialog.fields_dict.rover.get_query = () => ({
-			query: "pawnshop_management.pawnshop_management.doctype.fund_transfer.fund_transfer.rover_user_query",
-		});
+		frappe.dom.unfreeze();
 		dialog.show();
 	});
-}
-
-function append_comment(current, addition) {
-	return current ? `${current}\n${addition}` : addition;
 }

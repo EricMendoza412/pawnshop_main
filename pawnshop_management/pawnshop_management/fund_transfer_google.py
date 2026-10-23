@@ -315,15 +315,20 @@ def _build_uat_row(doc):
 	row[1] = str(doc.date_of_transfer)
 	row[2] = doc.name
 	direction_column = direction_columns.get(doc.transfer_type)
+	comments = "FOREX SELLING" if doc.fx_selling else (doc.comments or "")
 	if direction_column is not None:
 		row[direction_column] = flt(doc.amount)
 	elif doc.transfer_type == "Cash Position Adjustment":
-		# The shadow report has no adjustment column; preserve the balance and explain the adjustment.
-		doc.comments = "{0} CIV adjustment {1}".format(doc.currency, doc.vault_balance_change)
+		variance = flt(doc.vault_balance_change)
+		if doc.currency == "PHP" and variance:
+			# PHP N = shortage, O = overage; both report positive amounts.
+			row[13 if variance < 0 else 14] = abs(variance)
+		comments = "{0} CIV adjustment {1}".format(doc.currency, doc.vault_balance_change)
+		if doc.cash_position:
+			comments += " - VCP {0}".format(doc.cash_position)
 	row[balance_column] = flt(doc.civ_balance)
 	row[given_column] = doc.given_by or ""
 	row[received_column] = doc.received_by or ""
-	comments = "FOREX SELLING" if doc.fx_selling else (doc.comments or "")
 	if doc.fx_selling:
 		transfer_note = None
 	elif doc.transfer_type in {

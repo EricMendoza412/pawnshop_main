@@ -58,9 +58,9 @@ class VaultCashPosition(Document):
 
 	def before_submit(self):
 		require_branch_vault_custodian(self.branch)
-		self._validate_unique_daily_position()
 		self._validate_complete_tables()
 		_lock_branch(self.branch)
+		self._validate_unique_daily_position()
 		self.count_datetime = now_datetime()
 		self.vault_custodian = frappe.session.user
 
@@ -96,6 +96,7 @@ class VaultCashPosition(Document):
 			self.db_set("reconciliation_status", "Pending Accounting Review", update_modified=False)
 
 	def before_cancel(self):
+		_lock_branch(self.branch)
 		if not is_system_manager(frappe.session.user):
 			frappe.throw(_("Submitted Vault Cash Positions cannot be cancelled."))
 
@@ -112,17 +113,14 @@ class VaultCashPosition(Document):
 		_validate_table(self.usd_denominations, USD_DENOMINATIONS, "USD")
 
 	def _validate_unique_daily_position(self):
-		existing = frappe.db.exists(
-			"Vault Cash Position",
-			{
-				"branch": self.branch,
-				"business_date": self.business_date,
-				"docstatus": ["!=", 2],
-				"name": ["!=", self.name],
-			},
-		)
+		existing = frappe.db.sql("""
+			select name from `tabVault Cash Position`
+			where branch=%s and business_date=%s and docstatus != 2 and name != %s
+			limit 1 for update
+			""", (self.branch, self.business_date, self.name))
 		if existing:
-			frappe.throw(_("Vault Cash Position {0} already exists for this branch and date.").format(existing))
+			frappe.throw(_("Vault Cash Position {0} already exists for this branch and date.").format(existing[0][0]))
+
 
 
 def _print_signature_line(printed_name=""):
@@ -144,6 +142,11 @@ def approve_reconciliation(name, comments=None):
 		frappe.throw(_("This Vault Cash Position is not pending Accounting review."))
 
 	_lock_branch(doc.branch)
+	# Reload the locked position: another reviewer may have reconciled it while
+	# this request waited for the branch lock.
+	doc = frappe.get_doc("Vault Cash Position", name, for_update=True)
+	if doc.docstatus != 1 or doc.reconciliation_status != "Pending Accounting Review":
+		frappe.throw(_("This Vault Cash Position is not pending Accounting review."))
 	php_adjustment = create_cash_position_adjustment(doc, "PHP", doc.php_variance)
 	usd_adjustment = create_cash_position_adjustment(doc, "USD", doc.usd_variance)
 	php_balance = get_latest_civ_balance(doc.branch, "PHP", lock=False)
@@ -272,7 +275,7 @@ def _latest_transfer_snapshot(branch, currency):
 		from `tabFund Transfer`
 		where branch=%s and currency=%s and docstatus=1 and status='Submitted'
 		order by date_of_transfer desc, creation desc
-		limit 1
+		limit 1 for update
 		""",
 		(branch, currency),
 		as_dict=True,
