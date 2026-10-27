@@ -5,6 +5,7 @@ import unittest
 from unittest.mock import patch
 
 import frappe
+from pawnshop_management.pawnshop_management.doctype.vault_cash_position.vault_cash_position import get_balance_preview
 from frappe.model.workflow import apply_workflow
 from frappe.utils import today
 from frappe.utils.password import update_password
@@ -285,6 +286,7 @@ class TestFundTransfer(unittest.TestCase):
 		frappe.set_user("Administrator")
 		# Use an actual linked document so link validation is exercised.
 		position = frappe.get_doc({"doctype": "Vault Cash Position", "branch": TEST_BRANCH})
+		position._vault_balance_snapshot = get_balance_preview(position.branch)["token"]
 		position.insert(ignore_permissions=True)
 		for row in position.php_denominations:
 			row.amount = 900 if row.denomination == 100 else 0
@@ -332,6 +334,7 @@ class TestFundTransfer(unittest.TestCase):
 	def _close_vault(self, amount=0):
 		frappe.set_user(self.vc)
 		position = frappe.get_doc({"doctype": "Vault Cash Position", "branch": TEST_BRANCH})
+		position._vault_balance_snapshot = get_balance_preview(position.branch)["token"]
 		position.insert()
 		for row in position.php_denominations:
 			row.amount = amount if row.denomination == 100 else 0
@@ -402,6 +405,7 @@ class TestFundTransfer(unittest.TestCase):
 
 	def test_draft_vcp_does_not_close_day(self):
 		position = frappe.get_doc({"doctype": "Vault Cash Position", "branch": TEST_BRANCH})
+		position._vault_balance_snapshot = get_balance_preview(position.branch)["token"]
 		position.insert()
 		self._fund_vault()
 		self.assertIsNone(get_entry_context(TEST_BRANCH, "PHP")["closed_position"])

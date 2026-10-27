@@ -673,6 +673,7 @@ def get_latest_civ_balance(branch, currency, lock=True):
 			{"branch": branch, "docstatus": 1, "is_opening_position": 1},
 			fieldname,
 			order_by="business_date desc, creation desc",
+			for_update=True,
 		)
 		if opening is not None:
 			return flt(opening)
