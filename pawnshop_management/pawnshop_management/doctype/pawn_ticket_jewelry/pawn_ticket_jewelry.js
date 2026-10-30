@@ -332,12 +332,21 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 		}
 	},
 
-	date_loan_granted: function(frm){
-		let default_maturity_date = frappe.datetime.add_days(frm.doc.date_loan_granted, 30);
-		frm.set_value('maturity_date', default_maturity_date);
-
-		let defaul_expiry_date = frappe.datetime.add_days(frm.doc.date_loan_granted, 120);
-		frm.set_value('expiry_date', defaul_expiry_date);
+	date_loan_granted: async function(frm) {
+		const loan_date = frm.doc.date_loan_granted;
+		const request_id = (frm._loan_dates_request_id || 0) + 1;
+		frm._loan_dates_request_id = request_id;
+		if (!loan_date) {
+			await frm.set_value({maturity_date: null, expiry_date: null});
+			return;
+		}
+		const response = await frappe.call({
+			method: 'pawnshop_management.pawnshop_management.loan_dates.calculate_pawn_ticket_dates',
+			args: {pawn_ticket_type: frm.doctype, date_loan_granted: loan_date}
+		});
+		if (frm._loan_dates_request_id === request_id && frm.doc.date_loan_granted === loan_date) {
+			await frm.set_value(response.message);
+		}
 	},
 
 	desired_principal: async function(frm, cdt, cdn) {

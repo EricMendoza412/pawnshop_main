@@ -80,6 +80,7 @@ def transfer_to_next_pt_j(pawn_ticket, nxt_pt):
     # transfer paper jammed PT details to the next PT
 	previous_pawn_ticket = frappe.get_doc("Pawn Ticket Jewelry", pawn_ticket)
 	new_pawn_ticket = frappe.new_doc("Pawn Ticket Jewelry")
+	new_pawn_ticket.flags.preserve_loan_dates = True
 	new_pawn_ticket.branch = previous_pawn_ticket.branch
 	new_pawn_ticket.item_series = previous_pawn_ticket.item_series
 	#Must fetch next available pawn ticket in the same series
@@ -139,6 +140,7 @@ def transfer_to_next_pt_nj(pawn_ticket, nxt_pt):
     # transfer paper jammed PT details to the next PT
 	previous_pawn_ticket = frappe.get_doc("Pawn Ticket Non Jewelry", pawn_ticket)
 	new_pawn_ticket = frappe.new_doc("Pawn Ticket Non Jewelry")
+	new_pawn_ticket.flags.preserve_loan_dates = True
 	new_pawn_ticket.branch = previous_pawn_ticket.branch
 	new_pawn_ticket.item_series = previous_pawn_ticket.item_series
 	# Must fetch next available pawn ticket in the same series

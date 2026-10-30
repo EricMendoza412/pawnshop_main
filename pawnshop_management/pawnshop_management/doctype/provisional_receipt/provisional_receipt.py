@@ -6,6 +6,7 @@ from pydoc import Doc, doc
 from frappe.utils import add_to_date, today, cstr
 import frappe
 from frappe.model.document import Document
+from pawnshop_management.pawnshop_management.loan_dates import set_pawn_ticket_dates
 from frappe.utils import flt
 from pawnshop_management.pawnshop_management.utils import validate_unique_pawn_ticket_name
 
@@ -270,7 +271,7 @@ class ProvisionalReceipt(Document):
 				new_pawn_ticket.pawn_ticket = self.new_pawn_ticket_no
 				new_pawn_ticket.date_loan_granted = self.date_issued
 				new_pawn_ticket.old_pawn_ticket = self.pawn_ticket_no
-				new_pawn_ticket.maturity_date = add_to_date(self.date_issued, days=30)
+				set_pawn_ticket_dates(new_pawn_ticket)
 				new_pawn_ticket.customers_tracking_no = previous_pawn_ticket.customers_tracking_no
 				new_pawn_ticket.customers_full_name = previous_pawn_ticket.customers_full_name
 				new_pawn_ticket.inventory_tracking_no = previous_pawn_ticket.inventory_tracking_no
@@ -279,7 +280,6 @@ class ProvisionalReceipt(Document):
 				if self.pawn_ticket_type == "Pawn Ticket Non Jewelry":
 					new_pawn_ticket.interest_rate = previous_pawn_ticket.interest_rate
 					previous_items = previous_pawn_ticket.non_jewelry_items
-					new_pawn_ticket.expiry_date = add_to_date(self.date_issued, days=30)
 					for i in range(len(previous_items)):
 						new_pawn_ticket.append("non_jewelry_items", {
 							"item_no": previous_items[i].item_no,
@@ -291,7 +291,6 @@ class ProvisionalReceipt(Document):
 						})
 				elif self.pawn_ticket_type == "Pawn Ticket Jewelry":
 					previous_items = previous_pawn_ticket.jewelry_items
-					new_pawn_ticket.expiry_date = add_to_date(self.date_issued, days=120)
 					new_pawn_ticket.main_appraiser_acct = previous_pawn_ticket.main_appraiser_acct
 					new_pawn_ticket.main_appraiser = previous_pawn_ticket.main_appraiser
 					new_pawn_ticket.assistant_appraiser_acct = previous_pawn_ticket.assistant_appraiser_acct

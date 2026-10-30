@@ -3,6 +3,7 @@
 
 import unittest
 from types import SimpleNamespace
+from pawnshop_management.pawnshop_management.loan_dates import LOAN_PERIOD_DEFAULTS
 from unittest.mock import patch
 
 from pawnshop_management.pawnshop_management.doctype.pawnshop_management_settings import (
@@ -15,7 +16,7 @@ class TestPawnshopManagementSettings(unittest.TestCase):
     def test_positive_jewelry_limit(self):
         for value in (40000, 50000, 40000.01):
             settings.PawnshopManagementSettings.validate(
-                SimpleNamespace(jewelry_a_series_limit=value)
+                SimpleNamespace(jewelry_a_series_limit=value, **LOAN_PERIOD_DEFAULTS)
             )
 
     def test_invalid_jewelry_limit(self):
@@ -24,7 +25,7 @@ class TestPawnshopManagementSettings(unittest.TestCase):
                 frappe.throw.side_effect = ValueError
                 with self.assertRaises(ValueError):
                     settings.PawnshopManagementSettings.validate(
-                        SimpleNamespace(jewelry_a_series_limit=value)
+                        SimpleNamespace(jewelry_a_series_limit=value, **LOAN_PERIOD_DEFAULTS)
                     )
 
     def test_migration_only_initializes_missing_limit(self):

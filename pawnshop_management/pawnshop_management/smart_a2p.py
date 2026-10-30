@@ -296,7 +296,7 @@ def send_administrator_test_sms(reference_doctype=None, reference_name=None):
 
 	destination = TEST_DESTINATION
 	text = TEST_MESSAGE
-	if reference_doctype == "Pawn Ticket Jewelry" and reference_name:
+	if reference_doctype in PAWN_TICKET_DOCTYPES and reference_name:
 		_validate_pawn_ticket_sms_workflow_state(reference_doctype, reference_name)
 		destination, text = _get_pawn_ticket_customer_sms_details(reference_doctype, reference_name, "Maturity")
 
@@ -306,7 +306,7 @@ def send_administrator_test_sms(reference_doctype=None, reference_name=None):
 		reference_name=reference_name,
 		destination=destination,
 		text=text,
-		sms_purpose="Maturity" if reference_doctype == "Pawn Ticket Jewelry" else None,
+		sms_purpose="Maturity" if reference_doctype in PAWN_TICKET_DOCTYPES else None,
 	)
 
 
@@ -500,20 +500,20 @@ def send_daily_pawn_ticket_sms_notifications():
 
 	frappe.set_user("Administrator")
 	try:
-		for pawn_ticket in _get_pawn_tickets_for_daily_sms(
-			"Pawn Ticket Jewelry",
-			"maturity_date",
-			"texted_upon_maturity",
-		):
-			if _send_daily_pawn_ticket_sms(
-				send_administrator_test_sms,
-				"Pawn Ticket Jewelry",
-				pawn_ticket.name,
-				summary,
-				"Maturity",
+		for doctype in PAWN_TICKET_DOCTYPES:
+			for pawn_ticket in _get_pawn_tickets_for_daily_sms(
+				doctype,
+				"maturity_date",
+				"texted_upon_maturity",
 			):
-				summary["maturity_sent"] += 1
-
+				if _send_daily_pawn_ticket_sms(
+					send_administrator_test_sms,
+					doctype,
+					pawn_ticket.name,
+					summary,
+					"Maturity",
+				):
+					summary["maturity_sent"] += 1
 		for doctype in PAWN_TICKET_DOCTYPES:
 			for pawn_ticket in _get_pawn_tickets_for_daily_sms(
 				doctype,

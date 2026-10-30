@@ -10,7 +10,12 @@
   "column_break_2",
   "jewelry_interest_rate",
   "jewelry_a_series_limit",
-  "gp_app_version"
+  "gp_app_version",
+  "loan_periods_section",
+  "jewelry_maturity_days",
+  "jewelry_expiry_days",
+  "non_jewelry_maturity_days",
+  "non_jewelry_expiry_days"
  ],
  "fields": [
   {
@@ -40,6 +45,43 @@
    "fieldname": "gp_app_version",
    "fieldtype": "Data",
    "label": "GP app version"
+  },
+  {
+   "fieldname": "loan_periods_section",
+   "fieldtype": "Section Break",
+   "label": "Loan Periods"
+  },
+  {
+   "fieldname": "jewelry_maturity_days",
+   "fieldtype": "Int",
+   "label": "Jewelry Maturity Period (Days)",
+   "default": "30",
+   "reqd": 1,
+   "description": "Calendar days from Date Loan Granted. Applies to new and renewed loans."
+  },
+  {
+   "fieldname": "jewelry_expiry_days",
+   "fieldtype": "Int",
+   "label": "Jewelry Expiry Period (Days)",
+   "default": "120",
+   "reqd": 1,
+   "description": "Calendar days from Date Loan Granted. Applies to new and renewed loans."
+  },
+  {
+   "fieldname": "non_jewelry_maturity_days",
+   "fieldtype": "Int",
+   "label": "Non Jewelry Maturity Period (Days)",
+   "default": "30",
+   "reqd": 1,
+   "description": "Calendar days from Date Loan Granted. Applies to new and renewed loans."
+  },
+  {
+   "fieldname": "non_jewelry_expiry_days",
+   "fieldtype": "Int",
+   "label": "Non Jewelry Expiry Period (Days)",
+   "default": "30",
+   "reqd": 1,
+   "description": "Calendar days from Date Loan Granted. Applies to new and renewed loans."
   }
  ],
  "index_web_pages_for_search": 1,

@@ -59,3 +59,47 @@ class TestDailyPawnTicketSMSQuery(unittest.TestCase):
 			set(filters["workflow_state"][1]),
 			smart_a2p.PAWN_TICKET_SMS_WORKFLOW_STATES,
 		)
+
+
+class TestNonJewelryMaturitySMS(unittest.TestCase):
+	def test_maturity_sender_uses_customer_and_maturity_purpose(self):
+		for doctype in smart_a2p.PAWN_TICKET_DOCTYPES:
+			with self.subTest(doctype=doctype), \
+				patch.object(smart_a2p, 'require_vault_custodian_access') as access, \
+				patch.object(smart_a2p, 'get_reference_branch', return_value='TEST BRANCH'), \
+				patch.object(smart_a2p, '_validate_pawn_ticket_sms_workflow_state') as validate, \
+				patch.object(smart_a2p, '_get_pawn_ticket_customer_sms_details', return_value=('TEST PHONE', 'MATURITY MESSAGE')) as details, \
+				patch.object(smart_a2p, '_send_administrator_test_sms') as send:
+				smart_a2p.send_administrator_test_sms(doctype, 'TEST PT')
+				access.assert_called_once_with(branch='TEST BRANCH')
+				validate.assert_called_once_with(doctype, 'TEST PT')
+				details.assert_called_once_with(doctype, 'TEST PT', 'Maturity')
+				self.assertEqual(send.call_args.kwargs['sms_purpose'], 'Maturity')
+				self.assertEqual(send.call_args.kwargs['destination'], 'TEST PHONE')
+				self.assertEqual(send.call_args.kwargs['text'], 'MATURITY MESSAGE')
+
+	def test_daily_job_processes_both_dates_for_both_types(self):
+		from types import SimpleNamespace
+		with patch.object(smart_a2p.frappe, 'session', SimpleNamespace(user='TEST USER')), \
+			patch.object(smart_a2p.frappe, 'set_user') as set_user, \
+			patch.object(smart_a2p, '_get_pawn_tickets_for_daily_sms', return_value=[SimpleNamespace(name='TEST PT')]) as query, \
+			patch.object(smart_a2p, '_send_daily_pawn_ticket_sms', return_value=True) as send, \
+			patch.object(smart_a2p, '_send_daily_text_blast_status_sms', return_value=True):
+			result = smart_a2p.send_daily_pawn_ticket_sms_notifications()
+			self.assertEqual(result['maturity_sent'], 2)
+			self.assertEqual(result['expiry_sent'], 2)
+			self.assertEqual(send.call_count, 4)
+			for doctype in smart_a2p.PAWN_TICKET_DOCTYPES:
+				query.assert_any_call(doctype, 'maturity_date', 'texted_upon_maturity')
+				query.assert_any_call(doctype, 'expiry_date', 'texted_upon_expiry')
+			set_user.assert_called_with('TEST USER')
+
+	def test_delivered_maturity_does_not_mark_expiry(self):
+		from unittest.mock import Mock
+		from frappe import _dict
+		for purpose, field in [('Maturity', 'texted_upon_maturity'), ('Expiry', 'texted_upon_expiry')]:
+			with self.subTest(purpose=purpose), patch.object(smart_a2p.frappe, 'db', Mock()) as db:
+				db.exists.return_value = True
+				log = _dict(reference_doctype='Pawn Ticket Non Jewelry', reference_name='TEST PT', sms_purpose=purpose)
+				smart_a2p._mark_pawn_ticket_texted_if_delivered(log)
+				db.set_value.assert_called_once_with('Pawn Ticket Non Jewelry', 'TEST PT', field, 1, update_modified=False)

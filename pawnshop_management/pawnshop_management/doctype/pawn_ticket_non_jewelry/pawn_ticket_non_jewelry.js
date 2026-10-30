@@ -72,14 +72,10 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 			return days_from_today >= 0 && days_from_today <= 5;
 		};
 
-		const add_expiry_sms_button = function() {
-			if (!can_send_smart_sms || !is_today_or_within_previous_5_days(frm.doc.expiry_date) || frm.doc.texted_upon_expiry) {
-				return;
-			}
-
-			frm.add_custom_button(__('Expiry Date SMS'), function() {
+		const add_smart_sms_button = function(label, method) {
+			frm.add_custom_button(__(label), function() {
 				frappe.call({
-					method: 'pawnshop_management.pawnshop_management.smart_a2p.send_expiry_date_sms',
+					method: method,
 					args: {
 						reference_doctype: frm.doc.doctype,
 						reference_name: frm.doc.name
@@ -99,15 +95,32 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 			});
 		};
 
+		const add_smart_sms_buttons = function() {
+			if (can_send_smart_sms && is_today_or_within_previous_5_days(frm.doc.maturity_date) && !frm.doc.texted_upon_maturity) {
+				add_smart_sms_button(
+					'Maturity Date SMS',
+					'pawnshop_management.pawnshop_management.smart_a2p.send_administrator_test_sms'
+				);
+			}
+
+			if (can_send_smart_sms && is_today_or_within_previous_5_days(frm.doc.expiry_date) && !frm.doc.texted_upon_expiry) {
+				add_smart_sms_button(
+					'Expiry Date SMS',
+					'pawnshop_management.pawnshop_management.smart_a2p.send_expiry_date_sms'
+				);
+			}
+		};
+
+
 		if (is_administrator) {
-			add_expiry_sms_button();
+			add_smart_sms_buttons();
 		} else if (frm.doc.branch) {
 			frappe.call({
 				method: "pawnshop_management.operations_access_control.access_control.get_active_branch_roles",
 				args: { branch: frm.doc.branch },
 				callback(response) {
 					if ((response.message || {})["Vault Custodian"]) {
-						add_expiry_sms_button();
+						add_smart_sms_buttons();
 					}
 				},
 			});
@@ -331,12 +344,21 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 		}
 	},
 
-	date_loan_granted: function(frm){
-		let default_maturity_date = frappe.datetime.add_days(frm.doc.date_loan_granted, 30);
-		frm.set_value('maturity_date', default_maturity_date);
-
-		let defaul_expiry_date = frappe.datetime.add_days(frm.doc.date_loan_granted, 30);
-		frm.set_value('expiry_date', defaul_expiry_date);
+	date_loan_granted: async function(frm) {
+		const loan_date = frm.doc.date_loan_granted;
+		const request_id = (frm._loan_dates_request_id || 0) + 1;
+		frm._loan_dates_request_id = request_id;
+		if (!loan_date) {
+			await frm.set_value({maturity_date: null, expiry_date: null});
+			return;
+		}
+		const response = await frappe.call({
+			method: 'pawnshop_management.pawnshop_management.loan_dates.calculate_pawn_ticket_dates',
+			args: {pawn_ticket_type: frm.doctype, date_loan_granted: loan_date}
+		});
+		if (frm._loan_dates_request_id === request_id && frm.doc.date_loan_granted === loan_date) {
+			await frm.set_value(response.message);
+		}
 	},
 
 	desired_principal: function(frm, cdt, cdn) {
