@@ -428,6 +428,7 @@ frappe.ui.form.on('Non Jewelry Items', {
 							"Junior Appraiser",
 							"Operations Supervisor",
 							"Appraiser/Cashier",
+							"Cashier",
 							"Vault Custodian",
 							"Operations Manager",
 							"Area Manager"
