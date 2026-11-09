@@ -473,6 +473,14 @@ frappe.ui.form.on('Transfer Tracker', {
 		syncTransferTypeOptions(frm);
 		syncPulloutDateFieldState(frm);
 		addDraftPrintButton(frm);
+		frm.set_df_property('origin', 'read_only', 1);
+		if (frm.doc.item_type === 'Non Jewelry Items' && isDisplayTransferType(frm.doc.transfer_type)) {
+			frm.set_query('item_no', 'nj_items', () => ({ filters: {
+				workflow_state: ['in', ['For Sale', 'Reserved']],
+				current_location: frm.doc.origin
+			} }));
+		}
+
 
 		updateJewelryCounts(frm);
 		updatePawnTicketEnvelopeCounts(frm);
@@ -504,44 +512,31 @@ frappe.ui.form.on('Transfer Tracker', {
 		syncTransferTypeOptions(frm);
 		syncPulloutDateFieldState(frm);
 
-		if (frappe.session.user == "Administrator"){
-			frm.set_df_property('origin', 'read_only', 0);
-			frm.refresh_field('origin');
-		}
+		frm.set_df_property('origin', 'read_only', 1);
 		// set value of date_of_transfer to current date
 		//check if form is new
 		if (frm.is_new()) {
 		frm.set_value('date_of_transfer', frappe.datetime.nowdate());
 		frm.set_df_property('transfer_type', 'read_only', 1);
 
+		frm.disable_save();
 		frappe.call({
-				method: 'pawnshop_management.pawnshop_management.custom_codes.get_ip.get_ip',
-				callback: function(data){
-					let current_ip = data.message
-
-					frappe.db.get_list('Branch IP Addressing', {
-						fields: ['name'],
-						filters: {
-							ip_address: current_ip
-						}
-					}).then(records => {
-
-						//if user is a Subastado member and not Administrator, set origin to Subastado NJ
-						if (frappe.user.has_role("Subastado member NJ") && frappe.session.user != "Administrator") {	
-							frm.set_value('origin', 'Subastado NJ');
-						}else if (frappe.user.has_role("Subastado member J") && frappe.session.user != "Administrator"){
-							frm.set_value('origin', 'Subastado J');
-						}else if (frappe.user.has_role("Chief Executive Officer") && frappe.session.user != "Administrator"){
-							frm.set_value('origin', 'Garcia\'s Pawnshop - Head Office');
-						}else {
-							frm.set_value('origin', records[0].name);
-						}
-						
-						frm.refresh_field('origin');
-
-					})
-				}
-			})
+			method: 'pawnshop_management.pawnshop_management.doctype.transfer_tracker.transfer_tracker.get_transfer_defaults'
+		}).then(async ({ message }) => {
+			await frm.set_value(message);
+			if (['Bulk NJ', 'Subastado NJ'].includes(message.origin)) {
+				await frm.set_value('item_type', 'Non Jewelry Items');
+			} else if (message.origin === 'Subastado J') {
+				await frm.set_value('item_type', 'Jewelry Items');
+			}
+			if (message.origin === 'Bulk NJ') {
+				await frm.set_value('transfer_type', 'Transfer of Display Items');
+			}
+			frm.enable_save();
+		}).catch(() => {
+			frm.disable_save();
+			frm.set_intro(__('Transfer stopped. Correct the Vault Custodian assignment or branch numbering settings, then reload.'), 'red');
+		});
 
 		// // If user has role Subastado member, Transfer Type should be Transfer of Display Items and should be read only
 		// if ((frappe.user.has_role("Subastado member J") || frappe.user.has_role("Subastado member NJ")) && frappe.session.user != "Administrator") {
@@ -627,29 +622,6 @@ frappe.ui.form.on('Transfer Tracker', {
 
 
 
-	},
-
-	origin: function(frm) {
-
-		frappe.db.get_value("Pawnshop Naming Series", frm.doc.origin, "nj_transfer_form")
-		.then(r => {
-			let current_form = r.message.nj_transfer_form;
-			frappe.db.get_value("Branch IP Addressing", frm.doc.origin, "branch_code")
-				.then(r => {
-					let branchCode = r.message.branch_code;
-					if (frappe.user.has_role("Subastado member NJ") && frappe.session.user != "Administrator") {
-						current_form = "SCG-"+ current_form	
-						frm.set_value('item_type', 'Non Jewelry Items');
-					}else if (frappe.user.has_role("Subastado member J") && frappe.session.user != "Administrator"){
-						current_form = "SCJ-"+ current_form
-						frm.set_value('item_type', 'Jewelry Items');
-					}else {
-						current_form = branchCode + "-"+ current_form	
-					}
-						frm.set_value('transfer_no', current_form );
-						frm.refresh_field('transfer_no');
-				})
-		})
 	},
 
 	witnessed_by: function(frm){
@@ -804,7 +776,7 @@ frappe.ui.form.on('Transfer Tracker', {
 						frm.set_query('item_no', 'nj_items', function(){
 							return {
 								filters: {
-									workflow_State: ['in', ['For Sale', 'Reserved']],
+									workflow_state: ['in', ['For Sale', 'Reserved']],
 									current_location: frm.doc.origin
 								}
 							}

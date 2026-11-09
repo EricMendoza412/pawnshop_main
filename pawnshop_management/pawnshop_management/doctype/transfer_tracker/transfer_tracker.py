@@ -19,14 +19,61 @@ SUBASTADO_TRANSFER_BRANCH_BY_ROLE = {
 READ_ALL_ROLES = {"Auditor"}
 
 
+@frappe.whitelist()
+def get_transfer_origin():
+	branches = frappe.get_all("Branch", filters={"vault_custodian": frappe.session.user},
+		fields=["name"], order_by="name", limit_page_length=0)
+	if not branches:
+		frappe.throw("You are not registered as Vault Custodian of any branch. Transfer stopped.")
+	if len(branches) != 1:
+		frappe.throw("You are registered as Vault Custodian of multiple branches: {0}. Correct the assignments before continuing.".format(
+			", ".join(branch.name for branch in branches)))
+	return branches[0].name
+
+
+def get_transfer_number(origin):
+	prefix = {"Subastado NJ": "SCG", "Subastado J": "SCJ"}.get(origin)
+	if not prefix:
+		prefix = frappe.db.get_value("Branch IP Addressing", origin, "branch_code")
+	counter = frappe.db.get_value("Pawnshop Naming Series", origin, "nj_transfer_form")
+	if not prefix or counter is None:
+		frappe.throw("Configure Branch IP Addressing branch code and Pawnshop Naming Series for {0}.".format(origin))
+	return "{0}-{1}".format(prefix, counter)
+
+
+@frappe.whitelist()
+def get_transfer_defaults():
+	origin = get_transfer_origin()
+	return {"origin": origin, "transfer_no": get_transfer_number(origin)}
+
+
 class TransferTracker(Document):
 	def validate(self):
-		if not is_system_manager(frappe.session.user):
-			require_vault_custodian_access(branch=self.origin)
+		self.validate_origin_and_items()
+
+	def validate_origin_and_items(self):
+		if self.origin != get_transfer_origin():
+			frappe.throw("Origin must match your registered Vault Custodian branch.")
+		if not self.is_new():
+			previous_origin = frappe.db.get_value("Transfer Tracker", self.name, "origin")
+			if previous_origin and previous_origin != self.origin:
+				frappe.throw("Origin cannot be changed on an existing transfer.")
+		if self.origin == "Bulk NJ" and (
+			self.item_type != "Non Jewelry Items" or self.transfer_type != "Transfer of Display Items"
+		):
+			frappe.throw("Bulk NJ can only transfer Non Jewelry display items.")
+		if self.item_type == "Non Jewelry Items" and self.transfer_type == "Transfer of Display Items":
+			for row in self.nj_items:
+				item = frappe.db.get_value("Non Jewelry Items", row.item_no,
+					["current_location", "workflow_state"], as_dict=True)
+				if not item or item.current_location != self.origin or item.workflow_state not in ("For Sale", "Reserved"):
+					frappe.throw("Item {0} must be For Sale or Reserved and currently located at {1}.".format(row.item_no, self.origin))
+
+	def before_update_after_submit(self):
+		get_transfer_origin()
 
 	def before_submit(self):
-		if not is_system_manager(frappe.session.user):
-			require_vault_custodian_access(branch=self.origin)
+		self.validate_origin_and_items()
 
 		if not self.witnessed_by or not self.rover:
 			frappe.throw("Witnessed By and Rover are required before submitting Transfer Tracker.")
@@ -43,6 +90,7 @@ class TransferTracker(Document):
 		if frappe.db.exists('Transfer Tracker', self.name) == None:
 			if self.amended_from == None:
 				settings = frappe.get_doc('Pawnshop Naming Series', self.origin)
+				self.transfer_no = get_transfer_number(self.origin)
 				settings.nj_transfer_form += 1
 				settings.save(ignore_permissions=True)
 
