@@ -520,9 +520,10 @@ frappe.ui.form.on('Transfer Tracker', {
 		frm.set_df_property('transfer_type', 'read_only', 1);
 
 		frm.disable_save();
-		frappe.call({
+		// Older Frappe returns a jQuery Deferred without Promise.catch().
+		Promise.resolve(frappe.call({
 			method: 'pawnshop_management.pawnshop_management.doctype.transfer_tracker.transfer_tracker.get_transfer_defaults'
-		}).then(async ({ message }) => {
+		})).then(async ({ message }) => {
 			await frm.set_value(message);
 			if (['Bulk NJ', 'Subastado NJ'].includes(message.origin)) {
 				await frm.set_value('item_type', 'Non Jewelry Items');
