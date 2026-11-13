@@ -33,3 +33,4 @@ pawnshop_management.pawnshop_management.patches.v1_0.set_loan_periods
 pawnshop_management.pawnshop_management.patches.v1_0.remove_nj_interest_expiry_label
 
 pawnshop_management.pawnshop_management.patches.v1_0.configure_bulk_nj_transfer_numbering
+pawnshop_management.pawnshop_management.patches.v1_0.enable_models_price_approval

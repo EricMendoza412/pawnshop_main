@@ -117,7 +117,7 @@ function set_appraiser_queries(frm) {
 	frm.set_query('assistant_appraiser_acct', function() {
 		return {
 			"filters": {
-				"role_profile_name": ["in", appraiser_roles]
+				"role_profile_name": ["in", appraiser_roles.concat(["Cashier"])]
 			}
 		};
 	});

@@ -613,8 +613,16 @@ frappe.ui.form.on('Non Jewelry Items', {
 
 
 function compute_nj_av(frm) {
-	frappe.db.get_value('Models', frm.doc.model, ['defective', 'minimum', 'maximum', 'no_charger_less']).then(function(r){
+	if (!frm.doc.model) return;
+	const requested_model = frm.doc.model;
+	frappe.db.get_value('Models', frm.doc.model, ['defective', 'minimum', 'maximum', 'no_charger_less', 'has_approved_pricing']).then(function(r){
+		if (frm.doc.model !== requested_model) return;
 		let price_suggestion = r.message;
+		if (!price_suggestion || !price_suggestion.has_approved_pricing) {
+			frm.set_value('appraisal_value', 0);
+			frappe.msgprint(__('This model has no approved initial pricing. Have its price proposal approved before appraisal.'));
+			return;
+		}
 		var initial_price;
 		if (frm.doc.category == "Maximum") {
 			initial_price = parseFloat(price_suggestion.maximum);

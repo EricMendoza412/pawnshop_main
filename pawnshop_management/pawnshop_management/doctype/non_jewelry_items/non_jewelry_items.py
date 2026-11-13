@@ -8,8 +8,17 @@ from frappe.utils import today
 
 class NonJewelryItems(Document):
 	def validate(self):
+		self.validate_approved_model_pricing()
 		self.validate_esim_only()
 		self.validate_assistant_appraiser_edit()
+
+	def validate_approved_model_pricing(self):
+		old = self.get_doc_before_save()
+		pricing_fields = ('model', 'category', 'charger', 'not_openline', 'esim_only', 'appraisal_value')
+		if old and not any(self.get(f) != old.get(f) for f in pricing_fields):
+			return
+		if self.model and not frappe.db.get_value('Models', self.model, 'has_approved_pricing'):
+			frappe.throw('This model has no approved initial pricing. Have its price proposal approved before appraisal.')
 
 	def validate_esim_only(self):
 		if not self.esim_only:

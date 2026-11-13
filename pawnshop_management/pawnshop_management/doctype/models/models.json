@@ -26,7 +26,20 @@
   "column_break_fzp4h",
   "model_series",
   "year_released",
-  "last_srp_update"
+  "last_srp_update",
+  "price_proposal_section",
+  "has_approved_pricing",
+  "pending_price_change_approval",
+  "new_max_sell_price",
+  "new_max_av_percent",
+  "new_maximum",
+  "new_minimum",
+  "new_defective",
+  "maximum_difference",
+  "proposed_by",
+  "proposed_on",
+  "approved_by",
+  "approved_on"
  ],
  "fields": [
   {
@@ -57,21 +70,24 @@
    "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "Defective",
-   "read_only": 1
+   "read_only": 1,
+   "no_copy": 1
   },
   {
    "fieldname": "minimum",
    "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "Minimum",
-   "read_only": 1
+   "read_only": 1,
+   "no_copy": 1
   },
   {
    "fieldname": "maximum",
    "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "Maximum",
-   "read_only": 1
+   "read_only": 1,
+   "no_copy": 1
   },
   {
    "fieldname": "preview",
@@ -115,12 +131,16 @@
   {
    "fieldname": "max_av_percent",
    "fieldtype": "Percent",
-   "label": "Max AV (SRP%)"
+   "label": "Max AV (SRP%)",
+   "read_only": 1,
+   "no_copy": 1
   },
   {
    "fieldname": "max_sell_price",
    "fieldtype": "Currency",
-   "label": "Max Selling price"
+   "label": "Max Selling price",
+   "read_only": 1,
+   "no_copy": 1
   },
   {
    "fieldname": "model_series",
@@ -146,7 +166,103 @@
    "fieldname": "last_srp_update",
    "fieldtype": "Date",
    "label": "Last selling price update",
-   "read_only": 1
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "price_proposal_section",
+   "fieldtype": "Section Break",
+   "label": "Price Proposal and Approval"
+  },
+  {
+   "fieldname": "has_approved_pricing",
+   "label": "Has Approved Pricing",
+   "fieldtype": "Check",
+   "read_only": 1,
+   "no_copy": 1,
+   "hidden": 1,
+   "default": "0"
+  },
+  {
+   "fieldname": "pending_price_change_approval",
+   "label": "Pending price change approval",
+   "fieldtype": "Check",
+   "read_only": 1,
+   "no_copy": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "new_max_sell_price",
+   "label": "New Max Selling Price",
+   "fieldtype": "Currency",
+   "read_only": 0,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "new_max_av_percent",
+   "label": "New Max AV (SRP%)",
+   "fieldtype": "Percent",
+   "read_only": 0,
+   "no_copy": 1,
+   "default": "80"
+  },
+  {
+   "fieldname": "new_maximum",
+   "label": "New Maximum",
+   "fieldtype": "Currency",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "new_minimum",
+   "label": "New Minimum",
+   "fieldtype": "Currency",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "new_defective",
+   "label": "New Defective",
+   "fieldtype": "Currency",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "maximum_difference",
+   "label": "Maximum Difference",
+   "fieldtype": "Currency",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "proposed_by",
+   "label": "Proposed By",
+   "fieldtype": "Link",
+   "read_only": 1,
+   "no_copy": 1,
+   "options": "User"
+  },
+  {
+   "fieldname": "proposed_on",
+   "label": "Proposed On",
+   "fieldtype": "Datetime",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "approved_by",
+   "label": "Approved By",
+   "fieldtype": "Link",
+   "read_only": 1,
+   "no_copy": 1,
+   "options": "User"
+  },
+  {
+   "fieldname": "approved_on",
+   "label": "Approved On",
+   "fieldtype": "Datetime",
+   "read_only": 1,
+   "no_copy": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -168,6 +284,13 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
+  },
+  {
+   "role": "Subastado member NJ",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "report": 1
   }
  ],
  "sort_field": "modified",
