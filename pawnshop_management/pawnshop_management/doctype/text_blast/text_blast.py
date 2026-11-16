@@ -3,7 +3,8 @@ import re
 
 import frappe
 from frappe.model.document import Document
-from frappe.utils import now_datetime
+from frappe.utils import now_datetime, getdate
+from .selection import FILTER_TYPES, sms_metrics, registration_matches, fx_buying_trackers
 
 from pawnshop_management.pawnshop_management.doctype.smart_sms_log.smart_sms_log import get_branch_code
 from pawnshop_management.pawnshop_management.smart_a2p import (
@@ -42,11 +43,14 @@ class TextBlast(Document):
 			)
 
 	def _set_message_length(self):
-		self.message_length = _get_message_length_display(self.message)
+		self.message_length = _get_message_length_display(self.message, len(self.recipient_list or []))
 
 	def _validate_recipient_source(self):
 		if self.recipient_options and not frappe.db.exists("Branch", self.recipient_options):
 			frappe.throw("Recipient Options must be an existing Branch.")
+
+		if any(self.get(field) for field in ("recipient_filter", "from_date", "to_date")):
+			_validate_selection(self.recipient_options, self.recipient_filter, self.from_date, self.to_date)
 
 	def _validate_recipients(self):
 		if not self.recipient_list:
@@ -92,7 +96,7 @@ class TextBlast(Document):
 
 		old_recipients = [(row.contact_name, row.mobile_number) for row in previous.recipient_list]
 		new_recipients = [(row.contact_name, row.mobile_number) for row in self.recipient_list]
-		if previous.message != self.message or previous.recipient_options != self.recipient_options or old_recipients != new_recipients:
+		if previous.message != self.message or previous.recipient_options != self.recipient_options or old_recipients != new_recipients or any(previous.get(field) != self.get(field) for field in ("recipient_filter", "from_date", "to_date")):
 			frappe.throw("Message and recipients cannot be changed after submission for approval.")
 
 
@@ -116,10 +120,10 @@ def is_authorized_text_blast_approver(user):
 	)
 
 
-def _get_message_length_display(message):
-	characters = len(message or "")
-	segments = max(1, int(math.ceil(characters / 160.0)))
-	return "Characters: {0} / {1}\nSMS Segments: {2}".format(characters, segments * 160, segments)
+def _get_message_length_display(message, recipient_count=0):
+	metrics = sms_metrics(message)
+	return "Encoding: {encoding} | Character count: {units}\n{segments} (SMS Segments) x {recipients} (Recipients) = {total} (Estimated total SMS Segments)".format(
+		**metrics, recipients=recipient_count, total=metrics["segments"] * recipient_count)
 
 
 @frappe.whitelist()
@@ -128,7 +132,9 @@ def get_recipient_options():
 
 
 @frappe.whitelist()
-def get_branch_recipients(branch):
+def get_branch_recipients(branch, recipient_filter=None, from_date=None, to_date=None):
+	frappe.has_permission("Text Blast", "create", throw=True)
+	start, end = _validate_selection(branch, recipient_filter, from_date, to_date)
 	if not frappe.db.exists("Branch", branch):
 		frappe.throw("Branch {0} was not found.".format(branch))
 
@@ -145,6 +151,11 @@ def get_branch_recipients(branch):
 		],
 	)
 	customers = [customer for customer in customers if tracker_pattern.search(customer.name or "")]
+	if recipient_filter == "Registered date range":
+		customers = [c for c in customers if registration_matches(c.name, start, end)]
+	else:
+		matching = _transaction_customers(recipient_filter, start, end)
+		customers = [c for c in customers if c.name in matching]
 	if not customers:
 		return []
 
@@ -171,12 +182,69 @@ def get_branch_recipients(branch):
 	seen_mobiles = set()
 	for customer in customers:
 		contact = customer.customer_primary_contact or linked_contacts.get(customer.name)
-		mobile = contacts.get(contact)
+		mobile = str(contacts.get(contact) or "").strip()
 		if not mobile or mobile in seen_mobiles:
 			continue
 		seen_mobiles.add(mobile)
 		recipients.append({"contact_name": contact, "mobile_number": mobile})
 	return recipients
+
+
+def _validate_selection(branch, recipient_filter, from_date, to_date):
+	if not branch or recipient_filter not in FILTER_TYPES or not from_date or not to_date:
+		frappe.throw("Select a Branch, recipient filter, From Date and To Date before loading customers.")
+	start, end = getdate(from_date), getdate(to_date)
+	if start > end:
+		frappe.throw("From Date must be on or before To Date.")
+	return start, end
+
+
+def _transaction_customers(recipient_filter, start, end):
+	if recipient_filter == "FX buying date range":
+		return _fx_buying_customers(start, end)
+	sources = {
+		"Subastado sales date range": [("Subastado Sales Commissions", "customer_tracker", "date_bought_or_returned", {})],
+		"Agreement to sell date range": [("Agreement to Sell", "customer_tracker", "date_of_sale", {"workflow_state": ["in", ["Active", "Pulled Out"]]})],
+		"Pawn ticket date range": [(doctype, "customers_tracking_no", "date_loan_granted", {"workflow_state": ["not in", ["Rejected", "Draft"]]}) for doctype in ("Pawn Ticket Jewelry", "Pawn Ticket Non Jewelry")],
+		"FX selling date range": [("FX Selling", "customer", "business_date", {"docstatus": 1})],
+	}
+	customers = set()
+	for doctype, customer_field, date_field, filters in sources[recipient_filter]:
+		filters[date_field] = ["between", [start, end]]
+		customers.update(frappe.get_all(doctype, filters=filters, pluck=customer_field))
+	return customers
+
+
+def _fx_buying_customers(start, end):
+	from pawnshop_management.pawnshop_management.doctype.fx_selling.fx_selling import _sheet_service, _quote_sheet
+
+	spreadsheet_id = "1Id-1_SYEb8ZY_-rYQqown_9msjKD15RUrCszbVJzjc8"
+	try:
+		service = _sheet_service(frappe.get_single("FX Selling Settings"))
+		sheets = service.spreadsheets()
+		metadata = sheets.get(spreadsheetId=spreadsheet_id, fields="sheets.properties").execute()
+		tabs = [s["properties"] for s in metadata.get("sheets", [])
+			if re.fullmatch(r"Transaction Monitoring(?: \d{4}(?: \([12]/2\))?)?", s["properties"]["title"])]
+		if not tabs:
+			raise ValueError("No Transaction Monitoring tabs found")
+		customers = set()
+		for tab in tabs:
+			year = re.search(r"\b(\d{4})\b", tab["title"])
+			if year and not start.year <= int(year.group(1)) <= end.year:
+				continue
+			quoted = _quote_sheet(tab["title"])
+			header = sheets.values().get(spreadsheetId=spreadsheet_id, range=quoted + "!A1:N1").execute().get("values", [[]])[0]
+			if len(header) < 14 or "date" not in header[1].lower() or "customer" not in header[3].lower() or "void" not in header[13].lower():
+				raise ValueError("Unexpected Transaction Monitoring columns")
+			for first in range(2, tab["gridProperties"]["rowCount"] + 1, 2000):
+				last = min(first + 1999, tab["gridProperties"]["rowCount"])
+				rows = sheets.values().get(spreadsheetId=spreadsheet_id,
+					range="{0}!A{1}:N{2}".format(quoted, first, last), valueRenderOption="UNFORMATTED_VALUE").execute().get("values", [])
+				customers.update(fx_buying_trackers(rows, start, end))
+		return customers
+	except Exception:
+		frappe.log_error(frappe.get_traceback(), "Text Blast FX Buying Read Failed")
+		frappe.throw("Unable to read FX Buying transactions. Check spreadsheet access and column layout, then retry. No recipients have been loaded.")
 
 
 @frappe.whitelist()
