@@ -79,6 +79,40 @@ class TestTextBlast(unittest.TestCase):
 			with self.assertRaises(ValueError):
 				module.TextBlast._prevent_approved_content_changes(doc)
 
+
+	def test_approval_accepts_database_dates_and_browser_date_strings(self):
+		previous = module.frappe._dict(workflow_state="For Approval", message="Hello", recipient_options="Branch",
+			recipient_filter="Registered date range", from_date=date(2026, 1, 1),
+			to_date=date(2026, 12, 31), recipient_list=[])
+		doc = SimpleNamespace(**dict(previous))
+		doc.workflow_state = "Sent"
+		doc.from_date, doc.to_date = "2026-01-01", "2026-12-31"
+		doc.get = lambda field: getattr(doc, field, None)
+		doc.get_doc_before_save = lambda: previous
+		with patch.object(module.frappe, "throw", side_effect=ValueError):
+			module.TextBlast._prevent_approved_content_changes(doc)
+			# Representation normalization must not permit actual content changes.
+			for field, value in (("from_date", "2026-01-02"), ("to_date", "2026-12-30"),
+				("message", "Changed"), ("recipient_options", "Other Branch"),
+				("recipient_filter", "FX buying date range"),
+				("recipient_list", [module.frappe._dict(contact_name="Other", mobile_number="09123456789")])):
+				with self.subTest(field=field):
+					original = getattr(doc, field)
+					setattr(doc, field, value)
+					with self.assertRaises(ValueError):
+						module.TextBlast._prevent_approved_content_changes(doc)
+					setattr(doc, field, original)
+
+	def test_approval_accepts_empty_optional_filters(self):
+		previous = module.frappe._dict(workflow_state="For Approval", message="Hello", recipient_options=None,
+			recipient_filter=None, from_date=None, to_date=None, recipient_list=[])
+		doc = SimpleNamespace(**dict(previous))
+		doc.recipient_options = doc.recipient_filter = doc.from_date = doc.to_date = ""
+		doc.get = lambda field: getattr(doc, field, None)
+		doc.get_doc_before_save = lambda: previous
+		with patch.object(module.frappe, "throw", side_effect=ValueError):
+			module.TextBlast._prevent_approved_content_changes(doc)
+
 	def test_branch_customers_intersect_transactions_and_deduplicate(self):
 		customers = [module.frappe._dict(name="1.1-1-01012026", customer_primary_contact="C1"),
 			module.frappe._dict(name="1.1-2-01012026", customer_primary_contact="C2"),

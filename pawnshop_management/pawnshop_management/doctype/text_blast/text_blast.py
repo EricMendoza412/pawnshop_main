@@ -96,7 +96,17 @@ class TextBlast(Document):
 
 		old_recipients = [(row.contact_name, row.mobile_number) for row in previous.recipient_list]
 		new_recipients = [(row.contact_name, row.mobile_number) for row in self.recipient_list]
-		if previous.message != self.message or previous.recipient_options != self.recipient_options or old_recipients != new_recipients or any(previous.get(field) != self.get(field) for field in ("recipient_filter", "from_date", "to_date")):
+		# Database Date values are date objects; workflow requests carry ISO strings.
+		# Compare calendar dates, and treat empty optional fields consistently.
+		filters_changed = any(
+			(previous.get(field) or "") != (self.get(field) or "")
+			for field in ("recipient_options", "recipient_filter")
+		) or any(
+			(getdate(previous.get(field)) if previous.get(field) else None)
+			!= (getdate(self.get(field)) if self.get(field) else None)
+			for field in ("from_date", "to_date")
+		)
+		if previous.message != self.message or old_recipients != new_recipients or filters_changed:
 			frappe.throw("Message and recipients cannot be changed after submission for approval.")
 
 
