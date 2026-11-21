@@ -1,3 +1,4 @@
+from pawnshop_management.pawnshop_management.jewelry_interest import resolve_rate
 # Copyright (c) 2021, Rabie Moses Santillan and contributors
 # For license information, please see license.txt
 
@@ -43,6 +44,7 @@ class JewelryItems(Document):
 			)
 
 			if previous_workflow_state in ("Active", "Expired"):
+				resolve_rate(parent_doc, persist=True)
 				frappe.db.set_value('Pawn Ticket Jewelry', parent_pt_name, 'workflow_state', 'Rejected')
 				frappe.db.set_value('Pawn Ticket Jewelry', parent_pt_name, 'change_status_date', today())
 				frappe.db.set_value('Pawn Ticket Jewelry', parent_pt_name, 'docstatus', 2)
@@ -112,7 +114,7 @@ class JewelryItems(Document):
 					total_principal = previous_pawn_ticket.desired_principal
 
 				new_pawn_ticket.desired_principal = total_principal
-				interest_rate = previous_pawn_ticket.interest / previous_pawn_ticket.desired_principal
+				interest_rate = resolve_rate(previous_pawn_ticket) / 100
 				new_interest = (total_principal * interest_rate)
 				new_pawn_ticket.interest = new_interest
 				new_pawn_ticket.net_proceeds = total_principal - new_interest

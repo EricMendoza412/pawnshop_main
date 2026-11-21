@@ -4,6 +4,7 @@
 from pydoc import doc
 import frappe
 from frappe.model.document import Document
+from pawnshop_management.pawnshop_management.jewelry_interest import apply_ticket_rate
 from pawnshop_management.pawnshop_management.loan_dates import set_pawn_ticket_dates
 from frappe.utils import flt
 from pawnshop_management.pawnshop_management.utils import (
@@ -38,7 +39,11 @@ class PawnTicketJewelry(Document):
 	def before_insert(self):
 		self.set_amended_pawn_ticket()
 
+	def before_update_after_submit(self):
+		apply_ticket_rate(self)
+
 	def before_validate(self):
+		apply_ticket_rate(self)
 		set_pawn_ticket_dates(self)
 		self.set_amended_pawn_ticket()
 

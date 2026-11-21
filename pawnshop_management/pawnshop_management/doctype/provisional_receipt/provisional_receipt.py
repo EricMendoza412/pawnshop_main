@@ -6,8 +6,9 @@ from pydoc import Doc, doc
 from frappe.utils import add_to_date, today, cstr
 import frappe
 from frappe.model.document import Document
+from pawnshop_management.pawnshop_management.jewelry_interest import prepare_receipt, resolve_rate
 from pawnshop_management.pawnshop_management.loan_dates import set_pawn_ticket_dates
-from frappe.utils import flt
+from frappe.utils import flt, cint
 from pawnshop_management.pawnshop_management.utils import validate_unique_pawn_ticket_name
 
 
@@ -16,6 +17,13 @@ VAULT_CUSTODIAN_REDEMPTION_MESSAGE = "The Vault Custodian is not allowed to tran
 
 @frappe.whitelist()
 def calculate_interest(date_issued, date_loan_granted, maturity_date, expiry_date, interest, pawn_ticket_no, pawn_ticket_type,branch):
+	promo_loan = False
+	if pawn_ticket_type == "Pawn Ticket Jewelry":
+		ticket = frappe.get_doc(pawn_ticket_type, pawn_ticket_no)
+		ticket.check_permission("read")
+		resolve_rate(ticket)
+		interest = ticket.interest
+		promo_loan = bool(cint(ticket.get("use_promo_interest_rate")))
 	# e-mail: Regarding Accrued interest computation
 	# e-mail: Short-term loan computation
 
@@ -110,7 +118,8 @@ def calculate_interest(date_issued, date_loan_granted, maturity_date, expiry_dat
 			"age": age,
 			"withSunday": withSunday,
 			"tawad_days": tawad_days,
-			"st_rate": short_term_rate,
+			"st_rate": 0 if promo_loan else short_term_rate,
+			"promo_loan": promo_loan,
 			"holiday_ctr": holiday_ctr
 			}
 
@@ -181,7 +190,7 @@ def calculate_interest(date_issued, date_loan_granted, maturity_date, expiry_dat
 		months_accrued -= 1
 	
 	months_accrued = months_accrued
-	value = months_accrued * int(interest)
+	value = months_accrued * (flt(interest) if pawn_ticket_type == "Pawn Ticket Jewelry" else int(interest))
 
 	return {
         "value": value,
@@ -189,7 +198,8 @@ def calculate_interest(date_issued, date_loan_granted, maturity_date, expiry_dat
 		"age": age,
 		"withSunday": withSunday,
 		"tawad_days": tawad_days,
-		"st_rate": short_term_rate,
+		"st_rate": 0 if promo_loan else short_term_rate,
+		"promo_loan": promo_loan,
 		"holiday_ctr": holiday_ctr
     }
 
@@ -218,6 +228,9 @@ class ProvisionalReceipt(Document):
 			validate_unique_pawn_ticket_name(self.new_pawn_ticket_no)
 
 		
+
+	def before_submit(self):
+		prepare_receipt(self)
 
 	def on_submit(self):
 
@@ -266,6 +279,8 @@ class ProvisionalReceipt(Document):
 			try:
 				previous_pawn_ticket = frappe.get_doc(self.pawn_ticket_type, self.pawn_ticket_no)
 				new_pawn_ticket = frappe.new_doc(self.pawn_ticket_type)
+				if self.pawn_ticket_type == "Pawn Ticket Jewelry":
+					new_pawn_ticket.flags.interest_source_ticket = previous_pawn_ticket.name
 				new_pawn_ticket.branch = self.branch
 				new_pawn_ticket.item_series = previous_pawn_ticket.item_series
 				new_pawn_ticket.pawn_ticket = self.new_pawn_ticket_no
@@ -345,7 +360,6 @@ class ProvisionalReceipt(Document):
 				)
 
 		elif self.transaction_type == "Amortization" and not self.amended_from:
-			interest_rate = frappe.get_doc('Pawnshop Management Settings')
 			if self.pawn_ticket_type == "Pawn Ticket Non Jewelry":
 				used_int_rate = frappe.db.get_value(self.pawn_ticket_type, self.pawn_ticket_no, "interest_rate")
 				desired_principal = self.principal_amount - self.additional_amortization
@@ -363,7 +377,7 @@ class ProvisionalReceipt(Document):
 
 			elif self.pawn_ticket_type == "Pawn Ticket Jewelry":
 				desired_principal = self.principal_amount - self.additional_amortization
-				interest = desired_principal * (interest_rate.jewelry_interest_rate/100)
+				interest = flt(desired_principal * resolve_rate(frappe.get_doc(self.pawn_ticket_type, self.pawn_ticket_no), persist=True) / 100, 2)
 				net_proceeds = desired_principal - interest
 				frappe.db.set_value(self.pawn_ticket_type, self.pawn_ticket_no, {
 					'desired_principal': desired_principal,

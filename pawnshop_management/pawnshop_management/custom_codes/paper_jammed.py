@@ -1,5 +1,6 @@
 import frappe
 from frappe.utils import today
+from pawnshop_management.pawnshop_management.jewelry_interest import resolve_rate
 # from flask import jsonify
 
 RENEWAL_TRANSACTION_TYPES = ("Renewal", "Renewal w/ Amortization")
@@ -69,6 +70,7 @@ def update_connected_provisional_receipt(previous_pawn_ticket, pawn_ticket_type,
 
 @frappe.whitelist()
 def transfer_to_next_pt_j(pawn_ticket, nxt_pt):
+	resolve_rate(frappe.get_doc("Pawn Ticket Jewelry", pawn_ticket), persist=True)
 	
     # cancel paper jammed pawn ticket
 	frappe.db.set_value('Pawn Ticket Jewelry', pawn_ticket, 'workflow_state', 'Rejected')
@@ -80,6 +82,7 @@ def transfer_to_next_pt_j(pawn_ticket, nxt_pt):
     # transfer paper jammed PT details to the next PT
 	previous_pawn_ticket = frappe.get_doc("Pawn Ticket Jewelry", pawn_ticket)
 	new_pawn_ticket = frappe.new_doc("Pawn Ticket Jewelry")
+	new_pawn_ticket.flags.interest_source_ticket = previous_pawn_ticket.name
 	new_pawn_ticket.flags.preserve_loan_dates = True
 	new_pawn_ticket.branch = previous_pawn_ticket.branch
 	new_pawn_ticket.item_series = previous_pawn_ticket.item_series

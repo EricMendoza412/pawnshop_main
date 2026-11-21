@@ -775,17 +775,63 @@ function get_total_appraised_amount(frm, cdt, cdn) { // Calculate Principal Amou
 }
 
 function set_item_interest(frm) {
-	var principal = parseFloat(frm.doc.desired_principal);
-	var interest = 0.00;
-	var net_proceeds = 0.00;
-
-	frappe.db.get_single_value('Pawnshop Management Settings', 'jewelry_interest_rate').then(value => {
-		interest = (parseFloat(value)/100) * (parseFloat(principal));
-		frm.set_value('interest', interest);
-		net_proceeds = principal - interest;
-		frm.set_value('net_proceeds', net_proceeds)
-	});
+	return update_jewelry_interest(frm, true);
 }
+
+async function update_jewelry_interest(frm, recalculate = false) {
+	const request = (frm._interest_request || 0) + 1;
+	frm._interest_request = request;
+	const inherited = Boolean(frm.doc.amended_from || frm.doc.created_by_pr);
+	const finalized = frm.doc.docstatus !== 0;
+	const admin_amend = !finalized && frm.doc.amended_from && frappe.session.user === 'Administrator';
+	frm.set_df_property('interest_rate', 'read_only', admin_amend ? 0 : 1);
+	frm.set_df_property('use_promo_interest_rate', 'read_only', finalized || inherited ? 1 : 0);
+	const response = await frappe.call({
+		method: 'pawnshop_management.pawnshop_management.jewelry_interest.get_interest_context',
+		args: {
+			branch: frm.doc.branch, loan_date: frm.doc.date_loan_granted,
+			ticket: frm.is_new() ? null : frm.doc.name,
+			source: frm.is_new() ? (frm.doc.amended_from || frm.doc.old_pawn_ticket) : null
+		}
+	});
+	if (request !== frm._interest_request) return;
+	const context = response.message;
+	if ((finalized || inherited) && context.rate == null) {
+		frm.set_intro(__('Historical interest rate could not be established. Administrator must confirm Interest rate used through amendment before financial processing.'), 'orange');
+	}
+	frm.toggle_display('use_promo_interest_rate', Boolean(frm.doc.use_promo_interest_rate || context.promo || (!inherited && !finalized && context.eligible)));
+	if (finalized) return;
+	let rate;
+	if (inherited) {
+		rate = admin_amend && frm.doc.interest_rate > 0 ? frm.doc.interest_rate : context.rate;
+		await frm.set_value('use_promo_interest_rate', context.promo || 0);
+	} else {
+		if (!context.eligible && frm.doc.use_promo_interest_rate) {
+			await frm.set_value('use_promo_interest_rate', 0);
+		}
+		rate = frm.doc.use_promo_interest_rate ? context.promo_rate : context.regular_rate;
+	}
+	if (rate > 0) {
+		await frm.set_value('interest_rate', rate);
+		if (recalculate) {
+			const interest = flt(flt(frm.doc.desired_principal) * rate / 100, precision('interest', frm.doc));
+			await frm.set_value({interest, net_proceeds: flt(frm.doc.desired_principal) - interest});
+		}
+	}
+}
+
+frappe.ui.form.on('Pawn Ticket Jewelry', {
+	refresh(frm) { update_jewelry_interest(frm); },
+	branch(frm) { update_jewelry_interest(frm, true); },
+	date_loan_granted(frm) { update_jewelry_interest(frm, true); },
+	use_promo_interest_rate(frm) { update_jewelry_interest(frm, true); },
+	interest_rate(frm) {
+		if (frm.doc.docstatus === 0 && frm.doc.amended_from && frappe.session.user === 'Administrator') {
+			const interest = flt(flt(frm.doc.desired_principal) * flt(frm.doc.interest_rate) / 100, precision('interest', frm.doc));
+			frm.set_value({interest, net_proceeds: flt(frm.doc.desired_principal) - interest});
+		}
+	}
+});
 
 function null_checker(number) {
 	if (number == null) {

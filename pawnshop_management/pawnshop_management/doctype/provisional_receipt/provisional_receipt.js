@@ -427,6 +427,14 @@ frappe.ui.form.on('Provisional Receipt', {
 	},
 
 	other_discount_st: function(frm){
+		if (frm._promo_loan) {
+			frm.set_df_property('other_discount_st', 'hidden', 1);
+			frm.set_df_property('discount', 'hidden', 1);
+			frm.set_value('other_discount_st', 'None');
+			frm.set_value('discount', 0);
+			calculate_total_amount(frm);
+			return;
+		}
 		console.log(og_total_no_discount);
 		let discount_amount;
 		if(frm.doc.other_discount_st == "3%"){
@@ -797,6 +805,7 @@ function show_payment_fields(frm) {
 }
 
 function calculate_interest(frm) {
+	const interest_ticket = frm.doc.pawn_ticket_no;
 
 	// For future overhauled interest calculation
 	
@@ -813,6 +822,8 @@ function calculate_interest(frm) {
 		},
 		callback: function(response) {
 			if (response.message) {
+				if (frm.doc.pawn_ticket_no !== interest_ticket) return;
+				frm._promo_loan = Boolean(response.message.promo_loan);
 				// Assuming 'data_field' is a Data field in your Doctype
 				frm.set_value('interest_payment', response.message.value);
 				let Sunday = 0, Senior = 0;
@@ -856,6 +867,12 @@ function calculate_interest(frm) {
 				}else{
 					frm.set_value('other_discount_st','None');
 				}
+				if (frm._promo_loan) {
+					frm.set_value('discount', 0);
+					frm.set_df_property('other_discount_st', 'hidden', 1);
+					frm.set_df_property('discount', 'hidden', 1);
+					calculate_total_amount(frm);
+				}
 			}
 		}
 	});
@@ -890,6 +907,10 @@ function calculate_total_amount(frm){
 			if(frappe.user_roles.includes('Administrator')){
 				frm.set_df_property('other_discount_st', 'hidden', 0);
 			}
+		}
+		if (frm._promo_loan) {
+			frm.set_df_property('other_discount_st', 'hidden', 1);
+			frm.set_df_property('discount', 'hidden', 1);
 		}
 	} else if (frm.doc.transaction_type == "Renewal w/ Amortization") {
 		if (frm.doc.additional_amortization == 0) {
@@ -1462,8 +1483,12 @@ function calculate_new_interest(frm) {
 		// })
 
 	} else {
-		frappe.db.get_single_value('Pawnshop Management Settings', 'jewelry_interest_rate')
-		.then(rate => {
+		frappe.call({
+			method: 'pawnshop_management.pawnshop_management.jewelry_interest.get_ticket_rate',
+			args: {ticket: frm.doc.pawn_ticket_no}
+		})
+		.then(response => {
+			const rate = response.message;
 			let new_interest = (parseFloat(frm.doc.principal_amount) - parseFloat(frm.doc.additional_amortization)) * (rate/100);
 			frm.set_value('advance_interest', new_interest);
 			frm.refresh_field('advance_interest');

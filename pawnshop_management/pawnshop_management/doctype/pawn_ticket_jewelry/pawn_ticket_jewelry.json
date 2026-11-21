@@ -35,6 +35,8 @@
   "net_proceeds",
   "column_break_yrmww",
   "original_principal",
+  "interest_rate",
+  "use_promo_interest_rate",
   "section_break_ziypr",
   "last_j_sangla_date_in_branch",
   "last_nj_sangla_date_in_branch",
@@ -315,6 +317,22 @@
    "fieldtype": "Data",
    "label": "Assistant Appraiser Name",
    "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "interest_rate",
+   "fieldtype": "Percent",
+   "label": "Interest rate used",
+   "no_copy": 1,
+   "precision": "6",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "use_promo_interest_rate",
+   "fieldtype": "Check",
+   "label": "Use Promo interest rate",
+   "no_copy": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -325,7 +343,7 @@
    "link_fieldname": "inventory_tracking_no"
   }
  ],
- "modified": "2026-07-05 17:59:40.938384",
+ "modified": "2026-11-21 17:12:36.864088",
  "modified_by": "Administrator",
  "module": "Pawnshop Management",
  "name": "Pawn Ticket Jewelry",
