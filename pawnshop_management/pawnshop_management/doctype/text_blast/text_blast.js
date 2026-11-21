@@ -1,15 +1,4 @@
 frappe.ui.form.on('Text Blast', {
-	setup(frm) {
-		frappe.call({
-			method: 'pawnshop_management.pawnshop_management.doctype.text_blast.text_blast.get_recipient_options',
-			callback(r) {
-				const options = [''].concat(r.message || []).join('\n');
-				frm.set_df_property('recipient_options', 'options', options);
-				frm.refresh_field('recipient_options');
-			}
-		});
-	},
-
 	onload(frm) {
 		const rows = frm.doc.recipient_list || [];
 		// Frappe inserts a placeholder for required tables on new documents.
@@ -20,6 +9,7 @@ frappe.ui.form.on('Text Blast', {
 	},
 
 	refresh(frm) {
+		load_branch_options(frm);
 		update_message_length(frm);
 		// Frappe's change event fires on blur; input gives immediate encoding feedback.
 		if (frm.fields_dict.message.$input) {
@@ -112,12 +102,65 @@ frappe.ui.form.on('Recipient List', {
 	recipient_list_remove(frm) { update_message_length(frm); }
 });
 
+// The form is reused across documents, but field metadata is document-specific.
+// Cache the response on the form and reapply it to the active document on refresh.
+function load_branch_options(frm) {
+	const instructions = __('Choose a branch, filter and dates, then preview matching recipients. Manual selection is also available.');
+	const retry_label = __('Retry Loading Branches');
+	const show_status = message => {
+		frm.set_df_property('recipient_options', 'description', message ? `${message} ${instructions}` : instructions);
+	};
+	const apply_options = () => {
+		const selected = frm.doc.recipient_options;
+		const branches = frm.text_blast_branch_options.slice();
+		// Preserve saved selections even if a branch no longer appears in the response.
+		if (selected && !branches.includes(selected)) branches.push(selected);
+		frm.text_blast_applying_branch_options = true;
+		try {
+			frm.set_df_property('recipient_options', 'options', [''].concat(branches).join('\n'));
+			frm.refresh_field('recipient_options');
+		} finally {
+			frm.text_blast_applying_branch_options = false;
+		}
+		show_status('');
+		frm.remove_custom_button(retry_label);
+	};
+	if (frm.text_blast_branch_options) {
+		apply_options();
+		return;
+	}
+	show_status(__('Loading branches...'));
+	if (frm.text_blast_branches_loading) return;
+	frm.text_blast_branches_loading = true;
+	frm.remove_custom_button(retry_label);
+	const failed = () => {
+		frm.text_blast_branches_loading = false;
+		show_status(__('Unable to load branches. Use Retry Loading Branches to try again.'));
+		frm.add_custom_button(retry_label, () => load_branch_options(frm));
+	};
+	frappe.call({
+		method: 'pawnshop_management.pawnshop_management.doctype.text_blast.text_blast.get_recipient_options',
+		callback(r) {
+			if (r.exc || !Array.isArray(r.message) || !r.message.length ||
+				r.message.some(branch => typeof branch !== 'string' || !branch.trim())) {
+				failed();
+				return;
+			}
+			frm.text_blast_branches_loading = false;
+			frm.text_blast_branch_options = [...new Set(r.message)];
+			apply_options();
+		},
+		error: failed
+	});
+}
+
 function selection_args(frm) {
 	return {branch: frm.doc.recipient_options, recipient_filter: frm.doc.recipient_filter,
 		from_date: frm.doc.from_date, to_date: frm.doc.to_date};
 }
 
 function selection_changed(frm) {
+	if (frm.text_blast_applying_branch_options) return;
 	if (frm.doc.workflow_state !== 'Draft') return;
 	// A list loaded for previous criteria must not silently survive a criteria change.
 	frm.clear_table('recipient_list');
