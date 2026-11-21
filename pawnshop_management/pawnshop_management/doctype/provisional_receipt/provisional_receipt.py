@@ -279,8 +279,7 @@ class ProvisionalReceipt(Document):
 			try:
 				previous_pawn_ticket = frappe.get_doc(self.pawn_ticket_type, self.pawn_ticket_no)
 				new_pawn_ticket = frappe.new_doc(self.pawn_ticket_type)
-				if self.pawn_ticket_type == "Pawn Ticket Jewelry":
-					new_pawn_ticket.flags.interest_source_ticket = previous_pawn_ticket.name
+				new_pawn_ticket.flags.interest_source_ticket = previous_pawn_ticket.name
 				new_pawn_ticket.branch = self.branch
 				new_pawn_ticket.item_series = previous_pawn_ticket.item_series
 				new_pawn_ticket.pawn_ticket = self.new_pawn_ticket_no

@@ -99,6 +99,12 @@ def apply_ticket_rate(doc):
             rate = settings.jewelry_interest_rate
     if not valid_rate(rate):
         frappe.throw("Interest rate used must be greater than zero and at most 100%.")
+    try:
+        principal = float(doc.desired_principal)
+    except (TypeError, ValueError):
+        principal = float('nan')
+    if not math.isfinite(principal) or principal <= 0:
+        frappe.throw("Desired Principal must be a positive number.")
     doc.interest_rate = float(rate)
     doc.interest = flt(flt(doc.desired_principal) * doc.interest_rate / 100, doc.precision("interest"))
     doc.net_proceeds = flt(flt(doc.desired_principal) - doc.interest, doc.precision("net_proceeds"))

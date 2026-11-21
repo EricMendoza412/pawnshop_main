@@ -1,3 +1,4 @@
+from pawnshop_management.pawnshop_management.non_jewelry_interest import historical_rate
 # Copyright (c) 2021, Rabie Moses Santillan and contributors
 # For license information, please see license.txt
 
@@ -84,6 +85,7 @@ class NonJewelryItems(Document):
 		if previous_workflow_state not in ("Active", "Expired"):
 			return
 
+		historical_rate(frappe.get_doc('Pawn Ticket Non Jewelry', parent_pt_name))
 		frappe.db.set_value('Pawn Ticket Non Jewelry', parent_pt_name, 'workflow_state', 'Rejected')
 		frappe.db.set_value('Pawn Ticket Non Jewelry', parent_pt_name, 'change_status_date', today())
 		frappe.db.set_value('Pawn Ticket Non Jewelry', parent_pt_name, 'docstatus', 2)

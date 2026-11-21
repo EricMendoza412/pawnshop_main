@@ -362,9 +362,9 @@ frappe.ui.form.on('Pawn Ticket Jewelry', {
 			frm.refresh_field('desired_principal');
 		}
 
+		await set_item_interest(frm);
 		await set_series(frm);
 		frm.refresh_fields('pawn_ticket');
-		set_item_interest(frm)
 		frm.set_value('original_principal', frm.doc.desired_principal);
 	},
 
@@ -759,17 +759,24 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 function set_total_appraised_amount(frm, cdt, cdn) { // Calculate Principal Amount
 	let temp_principal = 0.00;
 	$.each(frm.doc.jewelry_items, function(index, item){
-		temp_principal += parseFloat(item.suggested_appraisal_value);
+		const appraisal = Number(item.suggested_appraisal_value || 0);
+		if (!Number.isFinite(appraisal) || appraisal < 0) {
+			frappe.throw(__('Item appraisal values must be valid non-negative numbers.'));
+		}
+		temp_principal += appraisal;
 	});
 	frm.set_value('desired_principal', temp_principal)
-	set_item_interest(frm)
 	return temp_principal
 }
 
 function get_total_appraised_amount(frm, cdt, cdn) { // Calculate Principal Amount
 	let temp_principal = 0.00;
 	$.each(frm.doc.jewelry_items, function(index, item){
-		temp_principal += parseFloat(item.suggested_appraisal_value);
+		const appraisal = Number(item.suggested_appraisal_value || 0);
+		if (!Number.isFinite(appraisal) || appraisal < 0) {
+			frappe.throw(__('Item appraisal values must be valid non-negative numbers.'));
+		}
+		temp_principal += appraisal;
 	});
 	return temp_principal
 }
@@ -778,7 +785,13 @@ function set_item_interest(frm) {
 	return update_jewelry_interest(frm, true);
 }
 
-async function update_jewelry_interest(frm, recalculate = false) {
+function update_jewelry_interest(frm, recalculate = false) {
+	const pending = calculate_jewelry_interest(frm, recalculate);
+	frm._interest_pending = pending;
+	return pending;
+}
+
+async function calculate_jewelry_interest(frm, recalculate = false) {
 	const request = (frm._interest_request || 0) + 1;
 	frm._interest_request = request;
 	const inherited = Boolean(frm.doc.amended_from || frm.doc.created_by_pr);
@@ -786,14 +799,20 @@ async function update_jewelry_interest(frm, recalculate = false) {
 	const admin_amend = !finalized && frm.doc.amended_from && frappe.session.user === 'Administrator';
 	frm.set_df_property('interest_rate', 'read_only', admin_amend ? 0 : 1);
 	frm.set_df_property('use_promo_interest_rate', 'read_only', finalized || inherited ? 1 : 0);
-	const response = await frappe.call({
-		method: 'pawnshop_management.pawnshop_management.jewelry_interest.get_interest_context',
-		args: {
-			branch: frm.doc.branch, loan_date: frm.doc.date_loan_granted,
-			ticket: frm.is_new() ? null : frm.doc.name,
-			source: frm.is_new() ? (frm.doc.amended_from || frm.doc.old_pawn_ticket) : null
-		}
-	});
+	let response;
+	try {
+		response = await frappe.call({
+			method: 'pawnshop_management.pawnshop_management.jewelry_interest.get_interest_context',
+			args: {
+				branch: frm.doc.branch, loan_date: frm.doc.date_loan_granted,
+				ticket: frm.is_new() ? null : frm.doc.name,
+				source: frm.is_new() ? (frm.doc.amended_from || frm.doc.old_pawn_ticket) : null
+			}
+		});
+	} catch (error) {
+		if (request !== frm._interest_request) return;
+		frappe.throw(__('Interest could not be calculated. Check the connection and rate, then save again.'));
+	}
 	if (request !== frm._interest_request) return;
 	const context = response.message;
 	if ((finalized || inherited) && context.rate == null) {
@@ -802,33 +821,49 @@ async function update_jewelry_interest(frm, recalculate = false) {
 	frm.toggle_display('use_promo_interest_rate', Boolean(frm.doc.use_promo_interest_rate || context.promo || (!inherited && !finalized && context.eligible)));
 	if (finalized) return;
 	let rate;
+	let promo = frm.doc.use_promo_interest_rate;
 	if (inherited) {
 		rate = admin_amend && frm.doc.interest_rate > 0 ? frm.doc.interest_rate : context.rate;
-		await frm.set_value('use_promo_interest_rate', context.promo || 0);
+		promo = context.promo || 0;
 	} else {
-		if (!context.eligible && frm.doc.use_promo_interest_rate) {
-			await frm.set_value('use_promo_interest_rate', 0);
-		}
-		rate = frm.doc.use_promo_interest_rate ? context.promo_rate : context.regular_rate;
+		if (!context.eligible) promo = 0;
+		rate = promo ? context.promo_rate : context.regular_rate;
 	}
-	if (rate > 0) {
-		await frm.set_value('interest_rate', rate);
-		if (recalculate) {
-			const interest = flt(flt(frm.doc.desired_principal) * rate / 100, precision('interest', frm.doc));
-			await frm.set_value({interest, net_proceeds: flt(frm.doc.desired_principal) - interest});
-		}
+	rate = Number(rate);
+	const principal = Number(frm.doc.desired_principal);
+	if (!Number.isFinite(rate) || rate <= 0 || rate > 100 || !Number.isFinite(principal) || principal <= 0) {
+		if (!recalculate) return; // Empty new forms may be refreshed before principal entry.
+		frappe.throw(__('Enter a positive Desired Principal and resolve the interest rate before saving.'));
+	}
+	const interest = flt(principal * rate / 100, precision('interest', frm.doc));
+	// A refresh must also finish the latest calculation; it must never cancel it.
+	frm._applying_interest = true;
+	try {
+		await frm.set_value({interest_rate: rate, use_promo_interest_rate: promo, interest,
+			net_proceeds: flt(principal - interest, precision('net_proceeds', frm.doc))});
+	} finally {
+		frm._applying_interest = false;
 	}
 }
 
 frappe.ui.form.on('Pawn Ticket Jewelry', {
-	refresh(frm) { update_jewelry_interest(frm); },
-	branch(frm) { update_jewelry_interest(frm, true); },
-	date_loan_granted(frm) { update_jewelry_interest(frm, true); },
-	use_promo_interest_rate(frm) { update_jewelry_interest(frm, true); },
+	refresh(frm) { return update_jewelry_interest(frm); },
+	async validate(frm) {
+		update_jewelry_interest(frm, true);
+		let pending;
+		do {
+			pending = frm._interest_pending;
+			await pending;
+		} while (pending !== frm._interest_pending);
+	},
+	branch(frm) { return update_jewelry_interest(frm); },
+	date_loan_granted(frm) { return update_jewelry_interest(frm); },
+	use_promo_interest_rate(frm) {
+		if (!frm._applying_interest) return update_jewelry_interest(frm, true);
+	},
 	interest_rate(frm) {
-		if (frm.doc.docstatus === 0 && frm.doc.amended_from && frappe.session.user === 'Administrator') {
-			const interest = flt(flt(frm.doc.desired_principal) * flt(frm.doc.interest_rate) / 100, precision('interest', frm.doc));
-			frm.set_value({interest, net_proceeds: flt(frm.doc.desired_principal) - interest});
+		if (!frm._applying_interest && frm.doc.docstatus === 0 && frm.doc.amended_from && frappe.session.user === 'Administrator') {
+			return update_jewelry_interest(frm, true);
 		}
 	}
 });

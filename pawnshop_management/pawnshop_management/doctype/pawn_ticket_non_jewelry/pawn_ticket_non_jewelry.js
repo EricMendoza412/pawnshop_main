@@ -24,7 +24,11 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 		const run_validation = () => {
 			var temp_principal = 0.0;
 			$.each(frm.doc.non_jewelry_items, function(index, item){
-				temp_principal += parseFloat(item.suggested_appraisal_value);
+				const appraisal = Number(item.suggested_appraisal_value || 0);
+		if (!Number.isFinite(appraisal) || appraisal < 0) {
+			frappe.throw(__('Item appraisal values must be valid non-negative numbers.'));
+		}
+		temp_principal += appraisal;
 			});
 
 			if (frm.doc.desired_principal > temp_principal) {
@@ -366,8 +370,8 @@ frappe.ui.form.on('Pawn Ticket Non Jewelry', {
 			show_tracking_no(frm);
 		}	
 		frm.refresh_fields('pawn_ticket');
-		set_item_interest(frm)
 		frm.set_value('original_principal', frm.doc.desired_principal);
+		return set_item_interest(frm);
 	},
 
 	inventory_tracking_no: function(frm, cdt, cdn){
@@ -669,25 +673,59 @@ function show_tracking_no(frm){ //Sets inventory tracking number
 function set_total_appraised_amount(frm, cdt, cdn) { 			// Calculate Principal Amount
 	let temp_principal = 0.00;
 	$.each(frm.doc.non_jewelry_items, function(index, item){
-		temp_principal += parseFloat(item.suggested_appraisal_value);
+		const appraisal = Number(item.suggested_appraisal_value || 0);
+		if (!Number.isFinite(appraisal) || appraisal < 0) {
+			frappe.throw(__('Item appraisal values must be valid non-negative numbers.'));
+		}
+		temp_principal += appraisal;
 	});
 	frm.set_value('desired_principal', temp_principal);
-	set_item_interest(frm)
 	return temp_principal
 }
 
 function set_item_interest(frm) {
-	var principal = parseFloat(frm.doc.desired_principal);
-	var interest = 0.00;
-	var net_proceeds = 0.00;
-	frappe.db.get_single_value('Pawnshop Management Settings', 'gadget_interest_rate').then(value => {
-		interest = parseFloat(value)/100 * principal;
-		frm.set_value('interest', interest);
-		net_proceeds = principal - interest;
-		frm.set_value('net_proceeds', net_proceeds);
-		frm.set_value('interest_rate',value);
-	});
+	const pending = calculate_non_jewelry_interest(frm);
+	frm._interest_pending = pending;
+	return pending;
 }
+
+async function calculate_non_jewelry_interest(frm) {
+	if (frm.doc.docstatus !== 0) return;
+	const request = frm._interest_request = (frm._interest_request || 0) + 1;
+	let response;
+	try {
+		response = await frappe.call({
+			method: 'pawnshop_management.pawnshop_management.non_jewelry_interest.get_interest_rate',
+			args: {
+				ticket: frm.is_new() ? null : frm.doc.name,
+				source: frm.is_new() ? (frm.doc.amended_from || frm.doc.old_pawn_ticket) : null
+			}
+		});
+	} catch (error) {
+		if (request !== frm._interest_request) return;
+		frappe.throw(__('Interest could not be calculated. Check the connection and rate, then save again.'));
+	}
+	if (request !== frm._interest_request) return;
+	const rate = Number(response.message);
+	const principal = Number(frm.doc.desired_principal);
+	if (!Number.isFinite(rate) || rate <= 0 || rate > 100 || !Number.isFinite(principal) || principal <= 0) {
+		frappe.throw(__('Enter a positive Desired Principal and a valid interest rate before saving.'));
+	}
+	const interest = flt(principal * rate / 100, precision('interest', frm.doc));
+	return frm.set_value({interest_rate: rate, interest,
+		net_proceeds: flt(principal - interest, precision('net_proceeds', frm.doc))});
+}
+
+frappe.ui.form.on('Pawn Ticket Non Jewelry', {
+	async validate(frm) {
+		set_item_interest(frm);
+		let pending;
+		do {
+			pending = frm._interest_pending;
+			await pending;
+		} while (pending !== frm._interest_pending);
+	}
+});
 
 function load_customer_id_pictures(frm) {
 	if (!frm.doc.customers_tracking_no) {
